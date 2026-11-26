@@ -16,7 +16,7 @@ my $nport = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 plan skip_all => "ClickHouse native not reachable"
     unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nport, Timeout => 2);
 
-plan tests => 95;
+plan tests => 96;
 
 # Run EV::run with a bail-out timer so a missed EV::break can't hang
 # the test. Cheaper than spelling it out in every block.
@@ -870,17 +870,16 @@ SKIP: {
 # the closure frees -> $ch DESTROY -> Safefree(self); pipeline_advance
 # must not then touch freed self. Reaching the assertion = no crash.
 {
-    my $survived = 0;
+    my ($survived, $fired) = (0, 0);
     {
         my $ch;
         $ch = EV::ClickHouse->new(
             host => $host, port => $nport, protocol => 'native',
             on_connect => sub {
                 $ch->query("select 1", sub { });
-                # on_drain closure captures $ch; once we undef our own
-                # copy below, the CV is the sole owner of the object.
-                $ch->drain(sub { my $r = $ch->server_revision; EV::break });
-                undef $ch;   # drop our ref — only the drain CV holds it now
+                my $own = $ch;
+                $ch->drain(sub { $fired = defined $own->server_revision; EV::break });
+                undef $ch;
             },
             on_error => sub { },
         );
@@ -888,6 +887,7 @@ SKIP: {
     my $bail = EV::timer(5, 0, sub { EV::break });
     EV::run; undef $bail;
     $survived = 1;
+    ok $fired, 'drain fired with the object alive in its closure';
     ok $survived, 'drain CV holding last $ch ref does not crash pipeline_advance';
 }
 

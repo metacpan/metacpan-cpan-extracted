@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::DistFiles 0.008;
+package Dist::Conformance::Check::DistFiles 0.011;
 
 # ABSTRACT: A distribution has the files that its build needs
 
@@ -22,13 +22,11 @@ sub config_schema ($class) {
     };
 }
 
-
 sub check ( $self, $snapshot ) {
     my $marker = $self->config->{marker};
     return ( $self->config->{absent}, "no $marker" ) if !$snapshot->contains($marker);
     return $self->SUPER::check($snapshot);
 }
-
 
 sub update ( $self, $update ) {
     return if !$update->snapshot->contains( $self->config->{marker} );
@@ -47,7 +45,7 @@ Dist::Conformance::Check::DistFiles - A distribution has the files that its buil
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -59,14 +57,6 @@ L<Dist::Conformance::Check::ToolConfiguration>.
 
 A flavor for a repository that is never a distribution can remove this check
 with C<DistFiles: ~>.
-
-=head1 METHODS
-
-=head2 check
-
-=head2 update
-
-Does nothing without the marker.
 
 =head1 IN A FLAVOR
 

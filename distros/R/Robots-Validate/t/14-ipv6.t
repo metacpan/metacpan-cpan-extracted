@@ -1,5 +1,5 @@
 #!perl
-use Test2::V0;
+use Test2::V0 -no_srand;
 use Net::DNS::Resolver::Mock;
 use Net::IP qw( ip_expand_address );
 use Robots::Validate;

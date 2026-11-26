@@ -23,7 +23,7 @@ use Data::URIID::Result;
 use Data::URIID::Colour;
 use Data::URIID::Request;
 
-our $VERSION = v0.26;
+our $VERSION = v0.27;
 
 use parent 'Data::URIID::Base';
 
@@ -60,6 +60,7 @@ my $config_wikidata = {
         P10689 => 'osm-way',
         P10787 => 'factgrid-identifier',
         P11693 => 'osm-node',
+        P12596 => 'md-tag-identifier',
         (map {$_ => 'musicbrainz-identifier'} @musicbrainz_wikidata_relations),
     },
     endpoint => {
@@ -205,6 +206,12 @@ my %attrmap_open_graph = (
     title       => 'displayname',
     description => 'description',
     image       => 'thumbnail',
+);
+
+my %idmap_md = (
+    gnd         => 'gnd-identifier',
+    iconclass   => 'iconclass-identifier',
+    wikidata    => 'wikidata-identifier',
 );
 
 my %own_metadata = (
@@ -627,6 +634,10 @@ sub _own_well_known {
                     },
                 }} (
                 {uuid => '878aac4c-581b-4257-998c-19a9c4003d22', name => 'colour'},
+                {uuid => 'f92f5ec5-86d7-4278-b57d-9e4a27a0b160', name => 'taglist'},
+                {uuid => '5401e4cd-3be1-45d8-9a62-eb610bffd299', name => 'e621-post'},
+                {uuid => 'd7cfaa77-cb85-4eb1-8ec7-bb3f5b483d11', name => 'pool'},
+                {uuid => '68aa9198-110c-43bb-a8cc-e0a533e2341e', name => 'spacetime-subject'},
             ),
         },
     );
@@ -831,10 +842,10 @@ sub register_service {
     my ($pkg, @args) = @_;
     my ($name, $id) = Data::URIID->_register_service(@args);
 
-    $own_metadata{services}{$name} //= {};
+    $own_metadata{service}{$name} //= {};
 
     if (defined(my $displayname = $id->displayname(default => undef, no_defaults => 1))) {
-        $own_metadata{services}{$name}{displayname} = {'*' => $displayname};
+        $own_metadata{service}{$name}{displayname} = {'*' => $displayname};
     }
 }
 
@@ -870,6 +881,7 @@ sub _extra_lookup_services {
         'danbooru2chanjp'       => ['danbooru2chanjp-post-identifier'],
         'denkxweb-hessen'       => ['denkxweb-hessen-identifier'],
         'ibbco'                 => ['ibbco-identifier'],
+        'term-md'               => ['md-tag-identifier'],
     }
 }
 
@@ -1206,6 +1218,7 @@ sub _online_lookup__wikibase__stage_1 {
         @keys = keys %{$attr{displayname}};
         if (scalar(@keys) == 1) {
             $attr{displayname}{'*'} = $attr{displayname}{$keys[0]};
+            $attr{natural_language} //= [[Data::Identifier::Generate->language($keys[0])]];
         }
     }
     $attr{description} = {map {$_ => $data->{descriptions}{$_}{value}} keys %{$data->{descriptions}}};
@@ -1485,6 +1498,30 @@ sub _online_lookup__iconclass {
     return \%res;
 }
 
+sub _online_lookup__term_md {
+    my ($self, $result, %opts) = @_;
+    my $id = $result->id('md-tag-identifier');
+    my $json = $self->_get_json($result->url(service => 'term-md', action => 'metadata'), local_override => ['%s.json', $id]) // return undef;
+    my %ids;
+    my %displayname;
+    my %description;
+    my %attr = (displayname => \%displayname, description => \%description);
+    my %res = (id => \%ids, attributes => \%attr);
+
+    foreach my $lang (keys %{$json->{langs}//{}}) {
+        my $ent = $json->{langs}{$lang};
+        $displayname{$lang} = $ent->{name} if defined($ent->{name}) && length($ent->{name});
+        $description{$lang} = $ent->{note} if defined($ent->{note}) && length($ent->{note});
+    }
+
+    foreach my $ref (@{$json->{references}//[]}) {
+        my $type = $idmap_md{$ref->{source}} // next;
+        $ids{$type} = $ref->{source_id} // next;
+    }
+
+    return \%res;
+}
+
 sub _online_lookup__e621 {
     my ($self, $result, %opts) = @_;
     my $json = $self->_get_json($result->url(service => 'e621', action => 'metadata')) // return undef;
@@ -1674,7 +1711,7 @@ sub _online_lookup__ibbco {
 sub displayname {
     my ($self, %opts) = @_;
     my $name = $self->name;
-    if (defined($own_metadata{services}{$name}) && defined(my $displayname = $own_metadata{services}{$name}{displayname}{'*'})) {
+    if (defined($own_metadata{service}{$name}) && defined(my $displayname = $own_metadata{service}{$name}{displayname}{'*'})) {
         return $displayname;
     }
     return $name;
@@ -1694,7 +1731,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.26
+version v0.27
 
 =head1 SYNOPSIS
 

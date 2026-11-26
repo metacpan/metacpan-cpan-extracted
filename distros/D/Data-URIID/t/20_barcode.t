@@ -5,7 +5,7 @@ use warnings;
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
     
-use Test::More;
+use Test::More tests => 8;
 
 use_ok('Data::URIID::Barcode');
 
@@ -23,7 +23,5 @@ my $barcode = Data::URIID::Barcode->new(type => Data::URIID::Barcode->TYPE_QRCOD
 isa_ok($barcode, 'Data::URIID::Barcode');
 is($barcode->type, Data::URIID::Barcode->TYPE_QRCODE);
 is($barcode->type_info->{type}, Data::URIID::Barcode->TYPE_QRCODE);
-
-done_testing();
 
 exit 0;

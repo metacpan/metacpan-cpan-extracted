@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use Data::Dumper;
@@ -17,7 +13,7 @@ use JSON;
 {
 
   package MockCLI;
-  our @ISA = qw(CLI::Config::Resolver);
+  our @ISA = qw(Config::Resolver::CLI);
 
   use Config::Resolver;
   use File::Temp qw(tempfile);
@@ -69,9 +65,7 @@ use JSON;
 }
 
 my @option_specs = qw(
-  debug|g dump|d help key|k=s manifest|m=s outfile|o=s
-  parameter-file|p=s pretty|P parameters|V=s plugins=s
-  plugin=s@ resolve|r template=s umask=s warning-level|w=s
+  debug|g dump|d help manifest|m=s outfile|o=s parameter-file|p=s pretty|P parameters|V=s plugins=s plugin=s@ resolve|r template=s umask=s warning-level|w=s
 );
 
 # --- Test 1: Dump the whole object ---

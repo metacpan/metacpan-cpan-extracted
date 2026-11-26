@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::ClaudeSettings 0.008;
+package Dist::Conformance::Check::ClaudeSettings 0.011;
 
 # ABSTRACT: .claude/settings.json enables the plugins of the harness
 
@@ -25,20 +25,26 @@ sub config_schema ($) {
     };
 }
 
-
+# The parsed settings of C<file> in the snapshot.
+# @param   snapshot  InstanceOf["Dist::Conformance::Snapshot"]  the repository
+# @returns HashRef|Undef  the settings, or C<undef> when the file is absent
+# @throws  when the file does not parse as a JSON object
+# @example my $settings = $check->settings($snapshot);
 sub settings ( $self, $snapshot ) {
     my $file = $self->config->{file};
     my $text = $snapshot->content($file) // return undef;
     return Dist::Conformance::Schema::parse_json( $text, $file );
 }
 
-
+# The plugins of C<plugins> that the settings do not enable, in their order.
+# @param   settings  HashRef  the parsed settings, as L<settings|/"settings(snapshot)"> returns them
+# @returns the names of the plugins, as a list
+# @example my @disabled = $check->disabled( $check->settings($snapshot) // {} );
 sub disabled ( $self, $settings ) {
     my $enabled  = ref $settings->{enabledPlugins} eq 'HASH' ? $settings->{enabledPlugins} : {};
     my @disabled = grep { !$enabled->{$_} } @{ $self->config->{plugins} };
     return @disabled;
 }
-
 
 sub check ( $self, $snapshot ) {
     my ( $file, $missing ) = @{ $self->config }{qw{file missing}};
@@ -49,7 +55,6 @@ sub check ( $self, $snapshot ) {
     return ( $missing, 'does not enable ' . join ', ', @disabled ) if @disabled;
     return ( 'pass',   'enables ' . join ', ',         @{ $self->config->{plugins} } );
 }
-
 
 sub update ( $self, $update ) {
     my $settings = eval { $self->settings( $update->snapshot ) };
@@ -78,7 +83,7 @@ Dist::Conformance::Check::ClaudeSettings - .claude/settings.json enables the plu
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -95,20 +100,35 @@ parse is left for a person.
 
 =head1 METHODS
 
-=head2 settings
+=head2 disabled(settings)
 
-C<($snapshot)>.  The parsed settings, C<undef> when the file is absent.  Dies
-when it does not parse.
+The plugins of C<plugins> that the settings do not enable, in their order.
 
-=head2 disabled
+=over 4
 
-C<($settings)>.  The plugins that C<$settings> does not enable.
+=item settings - HashRef - the parsed settings, as L<settings|/"settings(snapshot)"> returns them
 
-=head2 check
+=back
 
-=head2 update
+Returns the names of the plugins, as a list.
 
-Writes the settings, or enables the plugins in them.
+    my @disabled = $check->disabled( $check->settings($snapshot) // {} );
+
+=head2 settings(snapshot)
+
+The parsed settings of C<file> in the snapshot.
+
+=over 4
+
+=item snapshot - InstanceOf["Dist::Conformance::Snapshot"] - the repository
+
+=back
+
+Returns HashRef or Undef, the settings, or C<undef> when the file is absent.
+
+Dies when the file does not parse as a JSON object.
+
+    my $settings = $check->settings($snapshot);
 
 =head1 IN A FLAVOR
 

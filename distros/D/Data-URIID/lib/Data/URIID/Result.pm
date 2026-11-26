@@ -34,7 +34,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}\z/;
 use constant RE_UINT => qr/^[1-9][0-9]*\z/;
 
-our $VERSION = v0.26;
+our $VERSION = v0.27;
 
 use parent 'Data::URIID::Base';
 
@@ -112,6 +112,7 @@ my %attributes = (
 
     ext => {}, # experimental
     tagged_as => {}, # experimental
+    natural_language => {}, # experimental
 );
 
 my %id_conv = (
@@ -174,6 +175,21 @@ my %best_services = (
     'danbooru2chanjp-post-identifier' => 'danbooru2chanjp',
     'denkxweb-hessen-identifier'    => 'denkxweb-hessen',
     'ibbco-identifier'              => 'ibbco',
+    'md-tag-identifier'             => 'term-md',
+);
+
+my %roles_by_identifier = (
+    'e621-post-identifier' => [
+        '52a516d0-25d8-47c7-a6ba-80983e576c54', # proto-file
+        '5401e4cd-3be1-45d8-9a62-eb610bffd299', # e621-post
+    ],
+    'e621-pool-identifier' => [
+        'f92f5ec5-86d7-4278-b57d-9e4a27a0b160', # taglist
+        'd7cfaa77-cb85-4eb1-8ec7-bb3f5b483d11', # pool
+    ],
+    (map {$_ => ['68aa9198-110c-43bb-a8cc-e0a533e2341e']} # spacetime-subject
+        qw(osm-node osm-way geonames-identifier find-a-grave-identifier denkxweb-hessen-identifier)
+    ),
 );
 
 # Load extra services:
@@ -345,6 +361,10 @@ my %url_templates = (
     'wikifunctions' => [
         ['wikifunctions-identifier' => 'https://www.wikifunctions.org/wiki/%s', undef, [qw(info render manage documentation)]],
         ['wikifunctions-identifier' => 'https://www.wikifunctions.org/w/index.php?title=%s&action=raw', undef, [qw(metadata)]],
+    ],
+    'term-md' => [
+        ['md-tag-identifier' => 'https://term.museum-digital.de/md-de/tag/%u', undef, [qw(info render)]],
+        ['md-tag-identifier' => 'https://term.museum-digital.de/md-de/tag/%u/json', undef, [qw(metadata)]],
     ],
 );
 my %digest_url_templates = (
@@ -882,6 +902,24 @@ my %url_parser = (
             action => 'info',
             id => \1,
         },
+        {
+            # https://term.museum-digital.de/md-de/tag/791
+            host => 'term.museum-digital.de',
+            path => qr#^/md-de/tag/([1-9][0-9]*)(?:/navigator)?\z#,
+            source => 'term-md',
+            type => 'md-tag-identifier',
+            action => 'info',
+            id => \1,
+        },
+        {
+            # https://term.museum-digital.de/md-de/tag/791/json
+            host => 'term.museum-digital.de',
+            path => qr#^/md-de/tag/([1-9][0-9]*)(?:/json|/skos)\z#,
+            source => 'term-md',
+            type => 'md-tag-identifier',
+            action => 'metadata',
+            id => \1,
+        },
     ],
 );
 
@@ -923,7 +961,7 @@ my %syntax = (
     'ibbco-identifier'              => qr/^[a-zA-Z0-9]+\z/,
     'unicode-code-point'            => qr/^U\+[0-9A-F]{4,6}\z/,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier sirtx-numerical-identifier furaffinity-post-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier denkxweb-hessen-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier sirtx-numerical-identifier furaffinity-post-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier denkxweb-hessen-identifier md-tag-identifier)),
 );
 
 my %fellig_tables = (
@@ -988,6 +1026,25 @@ sub new {
     $self->_lookup;
     $self->_lookup_with_mode(mode => 'offline');
     $self->_lookup_with_mode(mode => 'online');
+
+    {
+        my %roles;
+
+        foreach my $idtype (keys %roles_by_identifier) {
+            eval {
+                $self->id($idtype);
+                $roles{$_} = undef foreach @{$roles_by_identifier{$idtype}};
+            };
+        }
+
+        if (scalar keys %roles) {
+            $self->{extra_results} = {
+                attributes => {
+                    roles => [map {[Data::Identifier->new(uuid => $_)]} keys %roles],
+                },
+            };
+        }
+    }
 
     return $self;
 }
@@ -1451,7 +1508,7 @@ sub attribute {
 
             @value = @{$value} if ref($value) eq 'ARRAY';
 
-            foreach my $result ($self->{secondary}, values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
+            foreach my $result ($self->{secondary}, _ordered_values($self->{offline_results}), _ordered_values($self->{online_results}), $self->{extra_results}) {
                 next unless defined($result) && defined($result->{attributes});
                 if (defined($value = $result->{attributes}->{$key})) {
                     if (ref($value) eq 'HASH') {
@@ -1545,7 +1602,7 @@ sub digest {
         $self->{offline_results} //= {};
         $self->{online_results}  //= {};
 
-        foreach my $result ($self->{secondary}, values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
+        foreach my $result ($self->{secondary}, values(%{$self->{offline_results}}), values(%{$self->{online_results}}), $self->{extra_results}) {
             next unless defined($result) && defined($result->{digest});
             last if defined($value = $result->{digest}{$key});
         }
@@ -1593,7 +1650,7 @@ sub available_keys {
         $self->{offline_results} //= {};
         $self->{online_results}  //= {};
 
-        foreach my $result ($self->{secondary}, values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
+        foreach my $result ($self->{secondary}, values(%{$self->{offline_results}}), values(%{$self->{online_results}}), $self->{extra_results}) {
             next unless defined($result) && defined($result->{digest});
             %digest = (%digest, %{$result->{digest}});
         }
@@ -1905,6 +1962,24 @@ sub _register_service {
     }
 }
 
+sub _ordered_values {
+    my ($hash) = @_;
+    my @ret;
+
+    return () unless defined $hash;
+    foreach my $key (sort keys %{$hash}) {
+        my $v = $hash->{$key};
+
+        if ($key =~ /^Data::URIID/) { # trust us a bit more.
+            push(@ret, $v);
+        } else {
+            unshift(@ret, $v)
+        }
+    }
+
+    return @ret;
+}
+
 # Converters:
 
 sub _media_subtype_to_uuid {
@@ -2014,7 +2089,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.26
+version v0.27
 
 =head1 SYNOPSIS
 

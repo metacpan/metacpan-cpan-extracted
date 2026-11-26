@@ -1,6 +1,6 @@
 #!perl
 
-use Test2::V0;
+use Test2::V0 -no_srand;
 use Test2::Require::Internet -tcp => [ 'dns.google', 53 ];    # dns.google should map to 8.8.8.8 or 8.8.4.4
 
 use Test::File::ShareDir -share => {

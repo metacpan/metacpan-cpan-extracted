@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income::2025;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 use Moose;
 use namespace::autoclean;
 
@@ -72,7 +72,7 @@ Finance::Tax::Aruba::Income::2025 - Income tax calculator for the year 2025
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 # ABSTRACT: Op tree analysis for perl 5.38 to 5.42
 # PODNAME: Pod::Coverage::More::Analyzer::Perl5_38
 
-package Pod::Coverage::More::Analyzer::Perl5_38 0.003;
+package Pod::Coverage::More::Analyzer::Perl5_38 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -96,7 +96,7 @@ Pod::Coverage::More::Analyzer::Perl5_38 - Op tree analysis for perl 5.38 to 5.42
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 DESCRIPTION
 

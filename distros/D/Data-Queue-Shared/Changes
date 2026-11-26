@@ -1,5 +1,12 @@
 Revision history for Data-Queue-Shared
 
+0.12  2026-11-25
+    - New v2 file format: recreate existing backing files. Str queues reserve
+      their slots when created.
+    - Str: a dead process's lock is taken over in milliseconds, a push the
+      filesystem has no room for returns false with ENOSPC, locking is faster.
+    - Str: lock_timeout, a byte budget for pop_multi/pop_wait_multi, lock stats.
+
 0.11  2026-10-16
     - Keep integer waiters progressing after out-of-order reservations.
     - Recover missed wakes after a peer dies; fix string-space notifications.

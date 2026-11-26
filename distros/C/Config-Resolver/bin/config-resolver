@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#-*- mode: sh; -*-
+# modulino invocation
+
+MODULINO_WRAPPER=config-resolver
+MODULINO_MODULE_NAME=Config::Resolver::CLI
+
+MODULINO_WRAPPER="$MODULINO_WRAPPER" \
+MODULINO_MODULE_NAME="$MODULINO_MODULE_NAME" \
+  perl -M"$MODULINO_MODULE_NAME" \
+  -e 'exit $ENV{MODULINO_MODULE_NAME}->main' \
+  -- "$@"

@@ -1435,6 +1435,18 @@ say how it ended. A setlist, read up to its encore:
 C<ended> says C<stopped>, as C<take_while> cut the reading short, with
 C<Tender> still to come.
 
+C<all> gives an array reference only in scalar context: in a hash, a
+list or an argument, its values are flattened into it. C<all_arrayref>
+gives the reference whatever the context:
+
+    use Ekorn::Pipeline::Sources qw(from_array);
+
+    my %gig = (
+        venue => 'Wembley',
+        songs => Ekorn::Pipeline->new->iterator(from_array('Intro', 'Parklife', 'Song 2'))->all_arrayref,
+    );
+    say "$gig{venue}: @{ $gig{songs} }";    # Wembley: Intro Parklife Song 2
+
 C<first> and C<single> read a value and end the run, so nothing more is
 read, and a source holding a resource, such as a file or a statement's
 lock, lets it go. C<single> reads one more, to warn if there's another:
@@ -4626,6 +4638,16 @@ C<iterator>, not by its C<new>, and a source too. Exports nothing.
 Reads the run to its end, and returns every value still to come; in
 scalar context, as an array reference. Values already waiting at the
 end of the stages, such as a sink of many's result, it takes at once.
+
+See L<Iterators: Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterator">.
+
+=head3 all_arrayref
+
+    my %report = (rows => $next->all_arrayref);
+
+Returns every value still to come, as C<all> does, but always as an
+array reference, whatever the context; an empty one, if there are
+none.
 
 See L<Iterators: Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterator">.
 

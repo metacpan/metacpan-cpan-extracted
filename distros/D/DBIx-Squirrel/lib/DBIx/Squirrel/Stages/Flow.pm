@@ -8,10 +8,12 @@ use Ekorn::Pipeline::Stages::Flow qw(
     take       drop       take_first take_last take_single
     take_while drop_while take_if    drop_if);
 
-# A facade over Ekorn::Pipeline::Stages::Flow, exporting DBIx::Squirrel's
-# own list of its functions, imported from it by name, so a name
-# Ekorn::Pipeline drops fails here, as the module loads, and one it
-# adds isn't exported until it's listed here.
+our $VERSION = 'v4.1.1';
+
+# A plain re-export of Ekorn::Pipeline::Stages::Flow's functions, from
+# DBIx::Squirrel's own list of them, imported from it by name, so a name
+# Ekorn::Pipeline drops fails here, as the module loads, and one it adds
+# isn't exported until it's listed here.
 our @EXPORT    = qw(take drop);    ## no critic (Modules::ProhibitAutomaticExportation)
 our @EXPORT_OK = (
     @EXPORT,

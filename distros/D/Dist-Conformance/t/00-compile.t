@@ -5,17 +5,20 @@ use warnings;
 
 use Test::More;
 
-plan tests => 23 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 26 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Dist/Conformance.pm',
     'Dist/Conformance/Check.pm',
+    'Dist/Conformance/Check/AuthorDeps.pm',
     'Dist/Conformance/Check/ClaudeMd.pm',
     'Dist/Conformance/Check/ClaudeSettings.pm',
     'Dist/Conformance/Check/CriticProfile.pm',
     'Dist/Conformance/Check/DataSchema.pm',
     'Dist/Conformance/Check/DistFiles.pm',
+    'Dist/Conformance/Check/DistIni.pm',
     'Dist/Conformance/Check/GitHooks.pm',
+    'Dist/Conformance/Check/IniTemplate.pm',
     'Dist/Conformance/Check/RefusedIniKeys.pm',
     'Dist/Conformance/Check/SystemPackages.pm',
     'Dist/Conformance/Check/ToolConfiguration.pm',

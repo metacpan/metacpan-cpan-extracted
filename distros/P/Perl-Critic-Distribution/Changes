@@ -1,5 +1,9 @@
 Revision history for Perl-Critic-Distribution
 
+0.003 2026-11-26 TEODESIAN
+    - root_of places a module in blib/lib in lib/ of its distribution, so a policy that reads the distribution sees it during the tests of a build
+    - The POD of each method says what it returns, and how it dies
+
 0.002 2026-10-22 TEODESIAN
     - for_file takes cache, and policy_parameters gives a policy the cache
       and cache_dir parameters that it passes on.

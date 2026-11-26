@@ -59,19 +59,11 @@ sub Commit {
 
     my $sentiment = $response->{result} || 'Neutral';
 
-    # Normalize the result
-    my %sentiment_map = (
-        qr/satisfied/i    => 'Satisfied',
-        qr/dissatisfied/i => 'Dissatisfied',
-        qr/neutral/i      => 'Neutral',
-    );
-
+    # Normalize the result to the first label in the response. Match whole
+    # words, since "Dissatisfied" contains "satisfied".
     my $normalized = 'Neutral';
-    for my $regex ( keys %sentiment_map ) {
-        if ( $sentiment =~ $regex ) {
-            $normalized = $sentiment_map{$regex};
-            last;
-        }
+    if ( $sentiment =~ /\b(dissatisfied|satisfied|neutral)\b/i ) {
+        $normalized = ucfirst lc $1;
     }
 
     RT->Logger->info("Ticket #$ticket_id sentiment: $normalized");

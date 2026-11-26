@@ -1,6 +1,6 @@
 package App::ansipic;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use v5.16;
 use warnings;
@@ -55,7 +55,7 @@ sub perform {
     }
     @ARGV or return usage();
     my $img = eval { $app->image } // do {
-	warn "ansipic: ", $@ =~ s/ at .* line \d+.*//sr, "\n";
+	warn "ansipic: ", $@ =~ s/ at .* line \d+.*//sr =~ s/\n*\z/\n/r;
 	return 2;
     };
     my $status = 0;

@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::BBO::TaxYear;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 use Moose::Role;
 
 # ABSTRACT: A role that implements BBO (turnover tax) logic
@@ -8,8 +8,8 @@ requires qw(
     is_year
 );
 
-# The 7% is made up of BAZV (3%) and BBO (4%). rate is their sum, and can
-# be overridden as a whole.
+# The 7% is made up of BAZV (3%), BBO (2.5%) and BAVP (1.5%). rate is their
+# sum, and can be overridden as a whole.
 has bazv_rate => (
     is      => 'ro',
     isa     => 'Num',
@@ -19,7 +19,13 @@ has bazv_rate => (
 has bbo_rate => (
     is      => 'ro',
     isa     => 'Num',
-    default => 0.04,
+    default => 0.025,
+);
+
+has bavp_rate => (
+    is      => 'ro',
+    isa     => 'Num',
+    default => 0.015,
 );
 
 has rate => (
@@ -31,7 +37,8 @@ has rate => (
 
 sub _build_rate {
     my $self = shift;
-    return sprintf('%.4f', $self->bazv_rate + $self->bbo_rate) + 0;
+    return sprintf('%.4f',
+        $self->bazv_rate + $self->bbo_rate + $self->bavp_rate) + 0;
 }
 
 # Whether import BBO (paid to Customs at the border) is creditable
@@ -54,17 +61,24 @@ sub domestic_tax {
     return $self->_round($amount * $self->rate);
 }
 
-# The BAZV part of the domestic tax. The BBO part is the remainder, so
-# the two always add up to domestic_tax.
+# The BAZV and BAVP parts of the domestic tax. The BBO part is the
+# remainder, so the three always add up to domestic_tax.
 sub domestic_tax_bazv {
     my ($self, $amount) = @_;
     return $self->_round($amount * $self->bazv_rate);
 }
 
+sub domestic_tax_bavp {
+    my ($self, $amount) = @_;
+    return $self->_round($amount * $self->bavp_rate);
+}
+
 sub domestic_tax_bbo {
     my ($self, $amount) = @_;
     return $self->_round(
-        $self->domestic_tax($amount) - $self->domestic_tax_bazv($amount));
+        $self->domestic_tax($amount)
+        - $self->domestic_tax_bazv($amount)
+        - $self->domestic_tax_bavp($amount));
 }
 
 # What you actually keep from a domestic sale once BBO is set aside.
@@ -142,7 +156,7 @@ Finance::Tax::Aruba::Role::BBO::TaxYear - A role that implements BBO (turnover t
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 DESCRIPTION
 
@@ -161,7 +175,8 @@ L<Finance::Tax::Aruba::Role::Income::TaxYear/is_year>.
 
 =head2 rate
 
-The total rate, as a decimal: C<bazv_rate> plus C<bbo_rate>, so 7%.
+The total rate, as a decimal: C<bazv_rate> plus C<bbo_rate> plus
+C<bavp_rate>, so 7%.
 
 =head2 bazv_rate
 
@@ -169,7 +184,11 @@ The BAZV part of the rate, 3%.
 
 =head2 bbo_rate
 
-The BBO part of the rate, 4%.
+The BBO part of the rate, 2.5%.
+
+=head2 bavp_rate
+
+The BAVP part of the rate, 1.5%.
 
 =head2 bbo_at_border
 
@@ -183,9 +202,11 @@ years this applies to.
 
 =head2 domestic_tax_bazv($amount)
 
+=head2 domestic_tax_bavp($amount)
+
 =head2 domestic_tax_bbo($amount)
 
-The BAZV and BBO parts of C<domestic_tax>. They always add up to it.
+The BAZV, BAVP and BBO parts of C<domestic_tax>. They always add up to it.
 
 =head2 domestic_net($amount)
 

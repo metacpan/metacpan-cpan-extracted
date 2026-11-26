@@ -1,7 +1,7 @@
 # ABSTRACT: Add an author test that the POD of each module says what each sub takes, returns, and how it fails
 # PODNAME: Dist::Zilla::Plugin::Test::Pod::Coverage::More
 
-package Dist::Zilla::Plugin::Test::Pod::Coverage::More 0.003;
+package Dist::Zilla::Plugin::Test::Pod::Coverage::More 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -35,7 +35,7 @@ Dist::Zilla::Plugin::Test::Pod::Coverage::More - Add an author test that the POD
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 

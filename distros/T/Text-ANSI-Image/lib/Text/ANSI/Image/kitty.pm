@@ -16,6 +16,7 @@ use v5.16;
 use warnings;
 use parent 'Text::ANSI::Image';
 use MIME::Base64 qw(encode_base64);
+use File::Spec;
 
 # The combining characters for the row and column numbers, from 0, as
 # the kitty protocol defines them: those of UnicodeData.txt 6.0.0 with
@@ -89,10 +90,24 @@ sub render {
     my $id = ((($$ & 0xffff) << 8) | (++$serial & 0xff)) | 0x010000;
     push @{$self->{_queue}}, [ $id, $cols, $rows, $png ];
     my $color = sprintf "\e[38;2;%d;%d;%dm", ($id >> 16) & 255, ($id >> 8) & 255, $id & 255;
+    my $osc = $self->{osc} ? osc($id, $cols, $rows, $file) : '';
     map {
 	my $r = $_;
-	$color . join('', map { $PLACEHOLDER . $DIACRITICS[$r] . $DIACRITICS[$_] } 0 .. $cols - 1) . "\e[39m";
+	$osc . $color . join('', map { $PLACEHOLDER . $DIACRITICS[$r] . $DIACRITICS[$_] } 0 .. $cols - 1) . "\e[39m";
     } 0 .. $rows - 1;
+}
+
+# A private OSC, which terminals ignore, with the id, the size in cells
+# and the file of an image, for a program which draws the image itself
+# where its cells are, as ansi2pdf.  On every row, so that a part of
+# the rows still has it.  None for a file name with a control
+# character, which would end the sequence.
+my $OSC = 7771;
+sub osc {
+    my($id, $cols, $rows, $file) = @_;
+    my $path = File::Spec->rel2abs($file);
+    return '' if $path =~ /[\x00-\x1f\x7f]/;
+    "\e]$OSC;i=$id,c=$cols,r=$rows;$path\e\\";
 }
 
 # Send the images to the terminal, in chunks of 4096 bytes of base64,
@@ -149,7 +164,10 @@ inherit its C<TERM_PROGRAM>, which is then wrong.
 
 An image is at most 297 columns wide and 297 rows high, the number of
 the combining characters.  A pager has to take U+10EEEE as a printable
-character: C<less> 632 or later does with C<LESSUTFCHARDEF=10EEEE:p>.
+character: C<less> 632 or later does with C<LESSUTFCHARDEF=10EEEE:p>,
+and with C<-R> for the colors.  Ghostty keeps an image on the screen
+it is sent to: a pager which goes to the alternate screen after the
+images are sent, as C<less> without C<-X>, does not show them there.
 The cells that a search of C<less> highlights are drawn in its color
 instead of the image.
 

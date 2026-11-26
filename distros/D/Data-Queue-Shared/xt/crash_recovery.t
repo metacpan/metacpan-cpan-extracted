@@ -9,8 +9,7 @@ use Data::Queue::Shared::Str;
 
 # ============================================================
 # Str queue: producer crashes while holding the mutex mid-push.
-# Parent opens the same file-backed queue and expects recovery
-# within ~2s (LOCK_TIMEOUT_SEC).
+# Parent opens the same file-backed queue and expects prompt recovery.
 # ============================================================
 
 use File::Temp qw(tmpnam);
@@ -45,8 +44,7 @@ my $path = tmpnam() . ".$$";
     diag "child $pid killed after ops";
 
     my $t0 = time;
-    # This should succeed within 2s (mutex recovery) if child died holding lock,
-    # or immediately if child released it normally.
+    # Succeeds within milliseconds whether or not the child died holding the lock.
     my $v = $q->pop_wait(3);  # 3s timeout
     my $dt = time - $t0;
     ok defined $v, sprintf('parent can pop after child crash (%.2fs)', $dt);

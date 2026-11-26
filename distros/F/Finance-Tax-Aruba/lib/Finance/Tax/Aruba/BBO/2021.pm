@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::BBO::2021;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 use Moose;
 use namespace::autoclean;
 
@@ -10,7 +10,7 @@ with qw(
 );
 
 has '+bbo_rate' => (
-    default => 0.03,
+    default => 0.015,
 );
 
 has '+bbo_at_border' => (
@@ -40,13 +40,13 @@ Finance::Tax::Aruba::BBO::2021 - BBO calculator for the year 2021
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 DESCRIPTION
 
 BBO calculator for the year 2021.
 
-The rate is 6%: BBO 3% plus BAZV 3%.
+The rate is 6%: BBO 1.5%, BAVP 1.5% and BAZV 3%.
 
 =head1 METHODS
 

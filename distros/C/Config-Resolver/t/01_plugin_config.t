@@ -10,12 +10,14 @@ use Data::Dumper;
 use File::Temp qw(tempdir);
 use File::Spec;
 
+use Config::Resolver::CLI;
+
+# The RC-file parser test needs a protocol name, not an AWS connection.
+# Supply a local test plugin so this unit test has no SSM dependency.
 BEGIN {
-  use FindBin;
-
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-
-  require $ScriptPath;
+  package Config::Resolver::Plugin::SSM;
+  our $PROTOCOL = 'ssm';
+  $INC{'Config/Resolver/Plugin/SSM.pm'} = __FILE__;
 }
 
 my $EMPTY_HOME = tempdir( CLEANUP => 1 );
@@ -31,7 +33,7 @@ my $EMPTY_HOME = tempdir( CLEANUP => 1 );
 
   package MockCLI;
   use Data::Dumper;
-  our @ISA = qw(CLI::Config::Resolver);
+  our @ISA = qw(Config::Resolver::CLI);
 
   # Override init to do nothing
   sub init { }

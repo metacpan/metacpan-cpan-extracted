@@ -1,0 +1,17 @@
+MANIFEST
+COPYING
+Changes
+README
+README.md
+Makefile.PL
+lib/Net/Tools.pm
+lib/Net/Tools/Socket.pm
+lib/Net/Tools/Socket/Err.pm
+lib/Net/Tools/Socket/Pair.pm
+lib/Net/Tools/Socket/Protocols.pm
+t/t1-net-tools-socket.pl
+t/t2-net-tools-socket-protocols.pl
+t/t3-net-tools-socket-err.pl
+t/t4-net-tools-socket-pair.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

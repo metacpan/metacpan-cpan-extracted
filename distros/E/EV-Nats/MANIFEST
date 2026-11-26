@@ -56,6 +56,8 @@ t/16_max_payload.t
 t/17_mock_protocol.t
 t/18_object_kv.t
 t/19_client_guards.t
+t/21_jetstream_mock.t
+t/22_client_state.t
 t/lib/MockNats.pm
 typemap
 xt/01_cluster_failover.t
@@ -80,6 +82,7 @@ xt/19_connect_stress.t
 xt/20_object_interop.t
 xt/21_tls_backpressure.t
 xt/22_permissions.t
+xt/23_fetch_lifecycle.t
 xt/lib/EVNatsHelpers.pm
 xt/release_pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

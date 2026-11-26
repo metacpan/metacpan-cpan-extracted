@@ -7,7 +7,8 @@ use File::Temp qw(tempdir);
 
 # Run the examples in docs/HOWTO.md and docs/REFERENCE.md, each document
 # as one program, so they can't drift from the code, and check that each
-# prints what its comments say. A document's examples share a database,
+# prints what its comments say; those in README.pod are compiled, as the
+# end of this file says. A document's examples share a database,
 # set up by its first, and follow on from each other: the first runs as
 # it is, and each after it in a block of its own, so their names don't
 # clash. An example marked <!-- not run -->, such as a usage synopsis, or
@@ -56,7 +57,6 @@ sub examples ($file) {
     return @examples;
 }
 
-
 # Return what an example's comments say it prints, a line each.
 sub expected ($code) {
     my(@lines, $after, $pending);
@@ -86,6 +86,34 @@ sub expected ($code) {
     return @lines;
 }
 
+# Return the code examples in a POD file, each as the line it starts at
+# and its code: its indented paragraphs, those between blank lines joined
+# with them, unless =for not-run comes before.
+sub pod_examples ($file) {
+    open my $in, '<', $file or die "Can't read $file: $!";
+    my @lines = <$in>;
+    close $in;
+    my(@examples, $code, $start, $blanks, $skip);
+    for my $n (1 .. @lines) {
+        my $line = $lines[$n - 1];
+        if ($line =~ m( \A [\ \t]+ \S )x) {
+            ($code, $start, $blanks) = ('', $n, 0) unless defined $code;
+            $code   .= ("\n" x $blanks) . $line;
+            $blanks  = 0;
+        }
+        elsif ($line !~ m( \S )x) {
+            $blanks++ if defined $code;
+        }
+        else {
+            push @examples, [$start, $code] if defined $code && !$skip;
+            $skip = 0 if defined $code;
+            undef $code;
+            $skip = 1 if $line =~ m( \A =for \s+ not-run \s* \z )x;
+        }
+    }
+    push @examples, [$start, $code] if defined $code && !$skip;
+    return @examples;
+}
 
 # Return true if a line printed is what a comment says, where ... stands
 # for any text.
@@ -136,6 +164,35 @@ for my $doc (@DOCS) {
             ok $ok, "the example at line $line prints what its comments say"
                 or diag "printed:\n", map({ "    $_\n" } @got), "its comments say:\n",
                 map { "    $_\n" } @said;
+        }
+    };
+}
+
+# The README's examples use stand-ins, such as $dbh and %on_my_phone, and
+# follow on from each other, so each is compiled, not run, with every
+# name DBIx::Squirrel::Tooling exports, as Ekorn-Pipeline compiles its
+# README's (roadmap 2026-0049). One that isn't Perl is marked
+# =for not-run.
+my $README = 'README.pod';
+if (-e $README) {
+    subtest $README => sub {
+        my @examples = pod_examples($README);
+        ok @examples, 'it has examples' or return;
+        my $lib = File::Spec->rel2abs('lib');
+        my $dir = tempdir(CLEANUP => 1);
+        for my $example (@examples) {
+            my($line, $code) = @$example;
+            open my $out, '>', "$dir/example.pl"
+                or die "Can't write $dir/example.pl: $!";
+            print { $out } "use v5.36;\nuse DBIx::Squirrel;\n",
+                "use DBIx::Squirrel::Tooling qw(:all);\n",
+                "use Ekorn::Pipeline::Operators;\n",
+                "no strict qw(vars subs);\nno warnings;\n",
+                "sub {\n#line $line \"$README\"\n$code};\n";
+            close $out or die "Can't write $dir/example.pl: $!";
+            my $said = qx(cd "$dir" && "$^X" "-I$lib" -c example.pl 2>&1);
+            is [$?, $said =~ s( ^ example\.pl\ syntax\ OK \n )()xmr], [0, ''],
+                "the example at line $line compiles";
         }
     };
 }

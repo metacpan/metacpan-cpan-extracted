@@ -1,7 +1,7 @@
 package Data::Queue::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load('Data::Queue::Shared', $VERSION);
@@ -169,24 +169,22 @@ Creates or opens a shared queue backed by file C<$path>.
 C<$capacity> is rounded up to the next power of 2.
 When opening an existing file, parameters are read from the stored header.
 Multiple processes can open the same file simultaneously.
-All processes sharing a queue must run the same module version.
+All processes sharing a queue must run the same module version. Files created
+by 0.11 or older must be recreated; opening one croaks.
 
 Pass C<undef> for C<$path> to create an anonymous queue using
 C<MAP_SHARED|MAP_ANONYMOUS>. Anonymous queues are shared with child
 processes via C<fork()> but cannot be opened by unrelated processes.
 
-C<new> and C<new_memfd> reserve the whole segment of an Int, Int32 or Int16
-queue when they create one, so a full filesystem makes them croak instead of
-dying with SIGBUS while they initialize it; set C<DATA_QUEUE_SHARED_SPARSE=1>
-to skip the reservation. On tmpfs and memfd the segment is memory, and a
-memory cgroup too small for it gets an OOM kill rather than a croak. A Str
-queue is created sparse instead: its pages are allocated as they are first
-written, and once the filesystem is full, a push that writes a page not yet
-allocated dies with SIGBUS. Set C<DATA_QUEUE_SHARED_SPARSE=0> to reserve a Str
-queue's whole segment at creation too, so a full filesystem makes the
-constructor croak instead; on tmpfs and memfd that commits the segment's
-memory at once, and a memory cgroup too small for it gets an OOM kill rather
-than a croak.
+C<new> and C<new_memfd> reserve the segment when they create it, so a full
+filesystem makes them croak instead of a later write dying with SIGBUS. An
+Int, Int32 or Int16 queue reserves all of it. A Str queue reserves its header
+and slots and allocates its arena as pushes first reach it: on Linux 5.14 or
+later, a push the filesystem has no room for returns false with C<$!> set to
+C<ENOSPC>. C<DATA_QUEUE_SHARED_SPARSE=0> reserves a Str arena at creation too,
+and C<DATA_QUEUE_SHARED_SPARSE=1> reserves nothing. On tmpfs and memfd the
+segment is memory, and a memory cgroup too small for it gets an OOM kill
+rather than a croak.
 
 =head2 memfd Constructor
 
@@ -243,6 +241,18 @@ C<push_front> inserts at the head -- useful for requeueing failed jobs.
 C<pop_back> removes from the tail -- useful for work-stealing or undo.
 Not available for Int (Vyukov algorithm is strictly FIFO).
 
+=head3 Lock timeout (Str only)
+
+    $q->lock_timeout(0.001);    # wait at most 1 ms for the lock
+    $q->lock_timeout(undef);    # no limit (the default)
+    my $t = $q->lock_timeout;
+
+Str operations take a lock shared by all processes. With a lock timeout set,
+an operation that cannot take it in time changes nothing and fails with C<$!>
+set to C<EAGAIN>; one that finds the queue full or empty sets C<$!> to 0. The
+timeout bounds every lock acquisition of this handle, including those inside
+the C<_wait> methods; see F<eg/sharded.pl>.
+
 =head3 Batch operations
 
     my $n  = $q->push_multi(@values);          # non-blocking, returns pushed count
@@ -254,6 +264,12 @@ Not available for Int (Vyukov algorithm is strictly FIFO).
 
 C<pop_wait_multi> blocks until at least one element is available (or timeout),
 then grabs up to C<$n> elements non-blocking. Returns empty list on timeout.
+
+    my @v  = $q->pop_multi($count, $max_bytes);           # Str only
+    my @v  = $q->pop_wait_multi($n, $timeout, $max_bytes);
+
+On a Str queue, C<$max_bytes> ends the batch before an element that would
+take its total stored bytes past it; the first element comes regardless.
 
 C<push_wait_multi> pushes all values, blocking if the queue is full.
 C<$timeout> is seconds (C<-1> = infinite, C<0> = try once) and bounds the
@@ -277,7 +293,10 @@ whole call: once it has run out, each remaining value gets one try.
 
 Stats keys: C<size>, C<capacity>, C<mmap_size>, C<push_ok>, C<pop_ok>,
 C<push_full>, C<pop_empty>, C<recoveries>, C<push_waiters>, C<pop_waiters>.
-Str queues additionally include C<arena_cap> and C<arena_used>.
+Str queues additionally include C<arena_cap> and C<arena_used>, and for their
+lock C<lock_waits> (acquisitions that had to sleep), C<lock_wait_time> and
+C<lock_wait_max> (seconds), C<lock_timeouts> and C<last_recovery> (epoch
+seconds of the last takeover from a dead holder, 0 if none).
 All counters are approximate under concurrent access (diagnostic only).
 C<push_waiters>/C<pop_waiters> show currently blocked producers/consumers.
 
@@ -315,9 +334,13 @@ all event-loop watchers.
 
 =head2 Crash Safety
 
-If a process dies while holding the Str queue mutex, other processes
-detect the stale lock on acquisition via PID tracking and automatically
-recover after a 2-second lock timeout. Integer queues cannot recover a worker
+A process waiting for the Str queue lock checks whether its holder is alive
+after 1 ms, then at intervals doubling up to 2 seconds, and takes over the
+lock of a holder that died. Processes in different PID namespaces cannot see
+each other's PIDs, so once they share a queue the first check waits 2
+seconds. An operation cut short by its process's death
+either took full effect or left no trace: no element is partially written,
+duplicated or lost. Integer queues cannot recover a worker
 killed after reserving a slot; recreate the queue after such a crash.
 C<sync> flushes pages; it does not make operations transactional across a
 system crash.

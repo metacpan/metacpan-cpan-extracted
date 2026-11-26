@@ -1,4 +1,4 @@
-package Dist::Conformance::Source 0.008;
+package Dist::Conformance::Source 0.011;
 
 # ABSTRACT: Where the standards come from: the flavor files and the templates
 
@@ -12,19 +12,34 @@ use Dist::Conformance::Schema();
 
 has path => q{};
 
-
+# The directory of the whole tree.  A subclass must implement it.
+# @returns InstanceOf["Mojo::File"]  the directory
+# @throws  when the subclass does not implement it
+# @example my $top = $source->root;
 sub root ($self) { die( ref($self) . " does not implement root\n" ) }
 
-
+# A short description of the source for a message, such as the URL and the ref.
+# A subclass must implement it.
+# @returns Str  the description
+# @throws  when the subclass does not implement it
+# @example say 'Flavor from ', $source->describe;
 sub describe ($self) { die( ref($self) . " does not implement describe\n" ) }
 
-
+# The directory that L</path> names.
+# @returns InstanceOf["Mojo::File"]  the directory
+# @throws  as L</root> does
+# @example my $standards = $source->base;
 sub base ($self) {
     my $root = $self->root;
     return $self->path ne q{} ? $root->child( split m{/}, $self->path ) : $root;
 }
 
-
+# The bytes of the file at C<$relative> below L</base>.
+# @param   relative  Str  the path of the file, relative to L</base>
+# @returns Str  the bytes
+# @throws  when there is no such file, and on an absolute path or a path with a
+# C<..> component
+# @example my $flavor_text = $source->file('conformance/troglodyne.yml');
 sub file ( $self, $relative ) {
     Dist::Conformance::Schema::relative_path( $relative, 'the standards' );
     my $file = $self->base->child( split m{/}, $relative );
@@ -32,7 +47,11 @@ sub file ( $self, $relative ) {
     return $file->slurp;
 }
 
-
+# Whether L<file|/"file(relative)"> would find C<$relative>.
+# @param   relative  Str  the path of the file, relative to L</base>
+# @returns Bool
+# @throws  as L</root> does
+# @example my $has = $source->exists_file('templates/perlcriticrc');
 sub exists_file ( $self, $relative ) {
     my $file = $self->base->child( split m{/}, $relative );
     return -e $file && !-d _;
@@ -50,7 +69,7 @@ Dist::Conformance::Source - Where the standards come from: the flavor files and 
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -94,29 +113,67 @@ of the tree.
 
 =head1 METHODS
 
-=head2 root
+=head2 base
 
-The directory of the whole tree, as a L<Mojo::File>.  A subclass must
-implement it.
+The directory that L</path> names.
+
+Returns a Mojo::File object, the directory.
+
+Dies as L</root> does.
+
+    my $standards = $source->base;
 
 =head2 describe
 
-A short description of the source for a message, such as the URL and the ref.
-A subclass must implement it.
+A short description of the source for a message, such as the URL and the ref. A subclass must implement it.
 
-=head2 base
+Returns Str, the description.
 
-The directory that L</path> names, as a L<Mojo::File>.
+Dies when the subclass does not implement it.
 
-=head2 file
+    say 'Flavor from ', $source->describe;
 
-C<($relative)>.  The bytes of the file at C<$relative> below L</base>.  Dies when
-there is no such file, and on an absolute path or a path with a C<..>
-component.
+=head2 exists_file(relative)
 
-=head2 exists_file
+Whether L<file|/"file(relative)"> would find C<$relative>.
 
-C<($relative)>.  Whether L</file> would find C<$relative>.
+=over 4
+
+=item relative - Str - the path of the file, relative to L</base>
+
+=back
+
+Returns Bool.
+
+Dies as L</root> does.
+
+    my $has = $source->exists_file('templates/perlcriticrc');
+
+=head2 file(relative)
+
+The bytes of the file at C<$relative> below L</base>.
+
+=over 4
+
+=item relative - Str - the path of the file, relative to L</base>
+
+=back
+
+Returns Str, the bytes.
+
+Dies when there is no such file, and on an absolute path or a path with a C<..> component.
+
+    my $flavor_text = $source->file('conformance/troglodyne.yml');
+
+=head2 root
+
+The directory of the whole tree.  A subclass must implement it.
+
+Returns a Mojo::File object, the directory.
+
+Dies when the subclass does not implement it.
+
+    my $top = $source->root;
 
 =head1 WRITING A SOURCE
 

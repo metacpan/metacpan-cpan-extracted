@@ -11,6 +11,8 @@ use Ekorn::Pipeline::Context qw();
 
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v4.1.1';
+
 our @EXPORT_OK = qw(iterator result_number result_original);
 
 # Croak at the line that called DBIx::Squirrel.

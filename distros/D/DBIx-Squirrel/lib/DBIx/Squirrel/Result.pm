@@ -9,6 +9,8 @@ use DBIx::Squirrel::Util   qw(install_sub is_name);
 
 use namespace::clean;
 
+our $VERSION = 'v4.1.1';
+
 # Croak at the line that called DBIx::Squirrel.
 our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
 
@@ -46,7 +48,7 @@ sub class_for ($base, $names) {
         next if !is_name($name) || $base->can($name);
         my $n = $position{$name};
         # Without a signature, as it's called for each column read, and
-        # a signature costs about 20 ns a call (roadmap 2026-0028).
+        # a signature costs about 19 ns a call (roadmap 2026-0028).
         install_sub("${class}::$name", sub { $_[0][$n] });
     }
     $position_of{$class} = \%position;

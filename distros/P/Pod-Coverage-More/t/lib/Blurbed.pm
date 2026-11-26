@@ -73,6 +73,13 @@ sub missing ( $snapshot, @paths ) {
     return grep { !$snapshot->{$_} } @paths;
 }
 
+# The port to listen on.
+# @returns 443 when nothing else is set
+# @example my $port = Blurbed::port();
+sub port {
+    return 443;
+}
+
 sub plain {
     return 2;
 }

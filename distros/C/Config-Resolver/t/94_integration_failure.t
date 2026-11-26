@@ -2,11 +2,8 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
+use FindBin;
 
 use Test::More;
 use File::Temp qw(tempfile tempdir);
@@ -15,9 +12,12 @@ use YAML::Tiny qw(Dump);
 
 # --- Find our script and lib paths ---
 my $Bin     = $FindBin::Bin;
-my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver.pl' );
+my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver' );
 my $LibPath = File::Spec->catfile( $Bin, '..', 'lib' );
-my $Perl    = $^X;
+
+# The shell wrapper launches its own Perl interpreter.
+local $ENV{PERL5LIB} = join q{:}, grep { !ref $_ && defined $_ && -d $_ }
+  $LibPath, @INC, split /:/xsm, $ENV{PERL5LIB} // q{};
 
 # --- Test 1: Non-existent manifest file ---
 subtest 'Test Case: Failure (missing manifest file)' => sub {
@@ -28,7 +28,7 @@ subtest 'Test Case: Failure (missing manifest file)' => sub {
   # 2. --- Execute the real script ---
   # We run a command that is *guaranteed* to fail.
   # We must also capture STDERR.
-  my $command       = "$Perl -I$LibPath $Script resolve -m $non_existent_file 2>&1";
+  my $command       = "bash $Script resolve -m $non_existent_file 2>&1";
   my $script_output = qx($command);
 
   # 3. --- Verify the results ---
@@ -61,7 +61,7 @@ subtest 'Test Case: Failure (missing parameter file in job)' => sub {
   close $mf_fh;
 
   # 2. --- Execute ---
-  my $command       = "$Perl -I$LibPath $Script resolve -m $mf_path 2>&1";
+  my $command       = "bash $Script resolve -m $mf_path 2>&1";
   my $script_output = qx($command);
 
   # 3. --- Verify ---

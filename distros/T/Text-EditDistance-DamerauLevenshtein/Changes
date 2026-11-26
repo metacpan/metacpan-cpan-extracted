@@ -1,0 +1,8 @@
+0.03  2026-11-26
+    - work around perl bug GH #25120, fixing Windows/Solaris builds
+
+0.02  2026-11-26
+    - fix Windows build
+
+0.01  2026-11-26
+    - initial release

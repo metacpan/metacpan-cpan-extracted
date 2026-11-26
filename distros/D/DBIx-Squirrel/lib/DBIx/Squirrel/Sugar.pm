@@ -13,6 +13,8 @@ use DBIx::Squirrel::Util   qw(install_sub is_name shift_attrs split_stages);
 
 use namespace::clean;
 
+our $VERSION = 'v4.1.1';
+
 # Croak at the line that called DBIx::Squirrel.
 our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
 
@@ -157,10 +159,10 @@ sub _resolved ($package, $stage) {
 # Run a statement's function: execute the statement with the bind values
 # given, and return its handle, or, with stages, its own or those given
 # after the bind values, return an iterator over the results, or, if the
-# last stage is a sink, its result. The statement is prepared
-# once for each handle, with prepare_cached, which makes a new one,
-# cached in its place, when the one prepared is in use; one taking a list
-# is prepared for the values given, and not cached.
+# last stage is a sink, its result. The statement is prepared once for
+# each handle, with prepare_cached, which makes a new one, cached in its
+# place, when the one prepared is in use; one taking a list is prepared
+# for the values given, and not cached.
 sub _run_statement ($definition, @args) {
     my $dbh       = database($definition->{database});
     my @statement = @$definition{qw(statement attrs)};

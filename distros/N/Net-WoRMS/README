@@ -1,13 +1,39 @@
-NAME
-
-    Net::WoRMS provides functions to query the "World Register of Marine
-    Species".
+NAME - query the "World Register of Marine Species" WoRMS
 
 VERSION
 
-    version 1.7
+    version 1.9
 
 SYNOPSIS
+
+        #!/usr/bin/env perl
+        use strict;
+        use warnings;
+        use Net::WoRMS;
+    
+        # Example settings
+        my $GENUS    = 'Abra';
+        my $SPECIES  = 'Abra alba';
+    
+        # Initialize the service
+        my $WORMS    = Net::WoRMS->new();
+        my $WORMS->init();
+        die "Cannot open service!"
+           if not $WORMS->checkSoap();
+    
+        # Single species info, output CSV
+        $WORMS->changeFormat('CSV');
+        my $id = $WORMS->searchSpeciesID($SPECIES, 0);
+        my $rec = $WORMS->getRecordByID($id);
+        $WORMS->printRecordDef($rec, ' ');
+    
+        # Species info for GENUS, output plain TEXT
+        my $gid = $WORMS->searchSpeciesID($GENUS, 0);
+        $WORMS->changeFormat('CSV');
+        $WORMS->getChildrenByID($gid) or
+           die "No species found for GENUS: '$GENUS'!";
+
+DESCRIPTION
 
     Net::WoRMS bundles WEB access, parsing and formatting capabilities for
     the tool query-worms <https://metacpan.org>, to harvest information
@@ -15,7 +41,7 @@ SYNOPSIS
     http://www.marinespecies.org. The module was built around the module
     SOAP::Lite and is OO implemented using Moo.
 
-MODULE DEPENDENCIES
+DEPENDENCIES
 
     The module uses the packages:
 
@@ -40,7 +66,7 @@ MODULE DEPENDENCIES
 
       to end the switch-case/while-given madness
 
-GLOBAL VARIABLES and CONSTANTS
+CONFIGURATION
 
     $END_POINT = 'http://www.marinespecies.org/aphia.php?p=soap'
 
@@ -111,7 +137,12 @@ METHODS
       Note: All change*(...) functions must be used before the
       initialization phase.
 
- CHANGE METHODS
+    _checkInit($what)
+
+      Internal initialization test to assert the task $what was not
+      recycled.
+
+ CONFIGURATION
 
     changeEndPoint($uri)
 
@@ -137,7 +168,7 @@ METHODS
 
       Get the format dictionary for validation.
 
- QUERY METHODS
+ ASSERTATIONS
 
     checkSoap()
 
@@ -153,6 +184,8 @@ METHODS
 
       Prints the query result (dictionary) via Data::Dumper to STDERR if
       the debug flag is set.
+
+ QUERIES
 
     searchSpeciesID($name, $print)
 
@@ -175,10 +208,26 @@ METHODS
       getBlockChildrenID(...) and prints the result to STDOUT using the
       method printRecord(...).
 
+    searchFuzzy($name, $offs, $fuzzy) EXPERIMENTAL
+
+      The fuzzy search function is experimantal and does not give proper
+      results due to offset maping issues.
+
+ OUTPUT
+
     printRecord($record, $first, $last, $spc)
 
       Prints a record to STDOUT and handles indentation by $spc as well as
       header and trailing aspects by using the flags $first and $last.
+
+    printRecordDef($record, $record, $spc)
+
+      Prints the default plain TEXT record to STDOUT and handles
+      indentation by $spc.
+
+BUGS
+
+    Please report bugs via the issue tracker: https://rt.cpan.org.
 
 AUTHOR
 

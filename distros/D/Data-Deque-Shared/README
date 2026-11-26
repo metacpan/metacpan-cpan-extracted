@@ -34,9 +34,10 @@ DESCRIPTION
     Linux-only. Requires 64-bit Perl. Capacity must be <= 2^31.
 
     Used only as a FIFO ("push_back" + "pop_front"), it's effectively a
-    fixed-slot string queue: 1.3x-4.7x faster than
-    Data::Queue::Shared::Str under multi-producer contention, at the cost of
-    per-slot fixed memory ("capacity x max_len").
+    fixed-slot string queue: 1.3x-4.7x faster than Data::Queue::Shared::Str
+    under multi-producer contention, at the cost of per-slot fixed memory
+    ("capacity x max_len"). For values of widely varying size, see
+    Data::Queue::Shared::Str, which stores each in only the bytes it needs.
 
   Concurrency
     Push and pop are safe under multi-producer / multi-consumer workloads.
@@ -84,10 +85,9 @@ METHODS
     $capacity is the number of slots (must be > 0 and <= 2^31); it is rounded
     up to the next power of two, and "capacity"/"stats" report that rounded
     value. For the Str variant, $max_len is the maximum stored byte length per
-    entry (must be > 0 and < 2 GiB); longer values are truncated at a character
-    boundary for UTF-8 strings, or a byte boundary for byte strings. $mode is
-    an optional octal file permission mode applied only when a backing file
-    is created (default 0600); see "SECURITY".
+    entry (must be > 0 and < 2 GiB); pushing a longer value croaks. $mode is
+    an optional octal file permission mode applied only when a backing file is
+    created (default 0600); see "SECURITY".
 
     "new_memfd" creates an anonymous "memfd" sealed mapping named $name;
     retrieve its descriptor with "memfd" and re-attach in another process

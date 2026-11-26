@@ -1,7 +1,7 @@
 # ABSTRACT: Rex command execution via Net::LibSSH exec channels
 
 package Rex::Interface::Exec::LibSSH;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -113,7 +113,7 @@ Rex::Interface::Exec::LibSSH - Rex command execution via Net::LibSSH exec channe
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -130,7 +130,7 @@ L<Rex::Interface::Connection::LibSSH>, L<Net::LibSSH::Channel>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-libssh/issues>.
 
 =head1 CONTRIBUTING

@@ -24,7 +24,7 @@ my @files = (
     't/author-minimum-version.t',
     't/author-mojibake.t',
     't/author-no-tabs.t',
-    't/author-pod-coverage.t',
+    't/author-pod-coverage-more.t',
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-test-version.t',

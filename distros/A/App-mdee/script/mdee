@@ -35,7 +35,8 @@ mdee - em·dee, Markdown Easy on the Eyes
      -f  --filter           shortcut for --style=filter
      -p  --plain            shortcut for --style=pager
          --[no-]fold        line folding (default: on)
-     -r  --[no-]refill      join paragraph lines (default: off)
+         --[no-]refill      join paragraph lines (default: off)
+     -r                     reverse the default of --refill
          --[no-]table       table formatting (default: on)
          --[no-]trim        trim cell spaces (default: on)
          --[no-]nup         nup paged output (default: on)
@@ -44,6 +45,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]rule        use Unicode rules for tables (default: on)
     --ts --table-style=#    table style: lattice, 3line or simple (default: lattice)
          --cat-v            visualize whitespace via cat-v
+         --[no-]image[=#]   image types to show (default: png,jpeg,gif)
      -w  --width=#          output width (default: terminal width)
          --fold-width=#     fold width (default: pane width - 3 - run-in)
          --runin=#          run-in width for line breaking (default: 4)
@@ -73,7 +75,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.27
+Version 1.29
 
 =cut
 
@@ -188,7 +190,8 @@ declare -A OPTS=(
     [         filter | f   !         # filter mode           ]=
     [          plain | p   !         # plain mode            ]=
     [           fold |               # line folding          ]=_
-    [         refill | r             # join paragraph lines  ]=_
+    [         refill |               # join paragraph lines  ]=_
+    [ reverse-refill | r  +          # reverse refill default]=0
     [          table |               # table formatting      ]=_
     [           trim |               # trim table cell spaces]=1
     [            nup |               # use nup               ]=_
@@ -221,6 +224,7 @@ declare -A OPTS=(
     [   border-style | bs :>pass_nup # border style          ]=
     [    page-number |     >pass_nup # page number           ]=
     [       filename |               # file name label       ]=1
+    [          image |     ?         # image types to show   ]=png,jpeg,gif
     [          cat-v |               # visualize whitespace  ]=
 )
 
@@ -352,13 +356,14 @@ fi
 # choose it.  nup knows which it is and how many columns a sheet has
 # (-P and the rows give the lines of a sheet, which decide the font).
 : ${device:=} ${output:=}
-_paper= _paper_cols=
+_paper= _paper_cols= _paper_lines=
 if [[ $device || $output ]]; then
     _geom=$(nup "${pass_nup[@]}" ${device:+-T} ${device:+"$device"} \
                 ${output:+-o} ${output:+"$output"} --geometry) &&
-        [[ $_geom =~ ^([0-9]+)\ [0-9]+\ (tty|pdf)$ ]] ||
+        [[ $_geom =~ ^([0-9]+)\ ([0-9]+)\ (tty|pdf)$ ]] ||
         die "failed to get the size of the device from nup (App::nup 1.13 or later is required)"
-    [[ ${BASH_REMATCH[2]} == pdf ]] && _paper=1 _paper_cols=${BASH_REMATCH[1]}
+    [[ ${BASH_REMATCH[3]} == pdf ]] &&
+        _paper=1 _paper_cols=${BASH_REMATCH[1]} _paper_lines=${BASH_REMATCH[2]}
 fi
 
 # Set mode: explicit option > light on paper > config default > terminal detection > "light"
@@ -501,9 +506,13 @@ while IFS= read -r _t; do
     fi
 done < <(uniq_array "${theme[@]}")
 
-# After the themes, because fatchap turns off the default
-[[ $refill == _ ]] && refill=${default[refill]:-}
-[[ $refill == 0 ]] && refill=
+# After the themes, because fatchap turns off the default; -r is the
+# reverse of it, when given an odd number of times and neither
+# --refill nor --no-refill is given
+if [[ $refill == _ ]]; then
+    refill=${default[refill]:-}
+    (( reverse_refill % 2 )) && { [[ $refill ]] && refill= || refill=1; }
+fi
 
 # Re-add config.sh settings after the themes so that they take precedence
 md_config+=("${_user_md_config[@]}") pass_md+=("${_user_pass_md[@]}")
@@ -622,7 +631,8 @@ run_greple() {
 
     # Add fold/table/rule/heading_markup params
     [[ $fold  ]] && config_params+=("fold=1,fold_width=$fold_width,fold_runin=$runin,fold_runout=$runout" "table_width=$table_width")
-    [[ $_intact ]] && config_params+=("intact=table")
+    [[ $_intact_parts ]] && config_params+=("intact=$_intact_parts")
+    [[ $_image ]] && config_params+=("image_types=$_image" ${_image_params[@]+"${_image_params[@]}"})
     [[ $table ]] && config_params+=("table=1") || config_params+=("table=0")
     [[ $trim  ]] && config_params+=("table_trim=1") || config_params+=("table_trim=0")
     [[ $rule  ]] && config_params+=("rule=1")  || config_params+=("rule=0")
@@ -686,8 +696,12 @@ run_column() {
 run_cat_v()  { invoke cat-v --nl=0; }
 run_pager()  { invoke ${PAGER:-less}; }
 
-# Set defaults for less environment
-export LESS="${LESS:--R}"
+# Set defaults for less environment.  -X is always added: less does
+# not switch to the alternate screen, so that the last screen stays
+# after it ends, and the images, sent to the screen that the terminal
+# shows (Ghostty keeps them for each screen), are on the screen of less.
+# -+X in the pager command takes it back.
+export LESS="${LESS:--R} -X"
 export LESSANSIENDCHARS="${LESSANSIENDCHARS:-mK}"
 
 # The fold width leaves room for the run-in width, so give nup the
@@ -701,6 +715,101 @@ pass_nup+=("--runin=$runin" "--runout=$runout" "--boundary=$boundary")
 [[ $lateral ]]         && pass_nup+=(--lateral)
 [[ $device ]]          && pass_nup+=(-T "$device")
 [[ $output ]]          && pass_nup+=(-o "$output")
+
+# Images (--image): the md module puts the rows of an image below a
+# line which is an image, and sends its data to the terminal (see
+# Text::ANSI::Image).  Only when the output is the terminal or a
+# pipe, which may go to a pager (not a file, where the rows would stay
+# without the image), and the terminal and the pager can show them:
+# the Unicode placeholders
+# of the kitty graphics protocol, and less 632 or later, which takes
+# the placeholder as a printable character with LESSUTFCHARDEF.
+# TERM_PROGRAM is inherited by a terminal started from another, so it
+# can be wrong; --no-image is the way out then.
+image_terminal() {
+    case ${TERM_PROGRAM:-} in
+        iTerm.app) version_ge "${TERM_PROGRAM_VERSION:-0}" 3.7.3 ;;
+        ghostty)   return 0 ;;
+        *)         [[ ${TERM:-} == xterm-kitty ]] ;;
+    esac
+}
+# the numbers of a version as far as they go: 3.6.0beta2 is 3.6.0
+version_ge() {
+    local IFS=. i
+    local -a a=(${1%%[!0-9.]*}) b=($2)
+    for (( i = 0; i < ${#b[@]}; i++ )); do
+        (( ${a[i]:-0} > ${b[i]} )) && return 0
+        (( ${a[i]:-0} < ${b[i]} )) && return 1
+    done
+    return 0
+}
+# A pager which can show the placeholders: less 632 or later
+image_pager() {
+    local cmd=${1%% *} v
+    [[ ${cmd##*/} == less ]] || return 1
+    v=$("$cmd" --version 2>/dev/null) || return 1
+    [[ $v =~ ^less\ ([0-9]+) ]] && (( BASH_REMATCH[1] >= 632 ))
+}
+# The pagers that may show the output
+image_pagers() {
+    local -a p=()
+    if [[ $nup ]]; then
+        local a nup_pager= no_pager=
+        for a in "${pass_nup[@]}"; do
+            case $a in
+                --no-pager) no_pager=1 ;;
+                --pager=*)  nup_pager=${a#--pager=} ;;
+            esac
+        done
+        if [[ ! $no_pager ]]; then
+            if [[ $nup_pager ]]; then
+                p+=("$nup_pager")
+            else
+                p+=("${NUP_PAGER:-less}")
+                [[ ${NUP_PAGE_PAGER:-} ]] && p+=("$NUP_PAGE_PAGER")
+            fi
+            # a single pane goes to the pager of mdee
+            p+=("${PAGER:-less}")
+        fi
+    elif [[ $style == pager ]]; then
+        p+=("${PAGER:-less}")
+    fi
+    local c
+    for c in "${p[@]}"; do
+        image_pager "$c" || return 1
+    done
+    return 0
+}
+# --image is the types of images shown: those given, or all with no
+# value; --no-image unsets it
+_image_types=
+if [[ -v image ]]; then
+    _image_types=${image:-png,jpeg,gif}
+    for _t in ${_image_types//,/ }; do
+        case $_t in
+            png|jpeg|gif) ;;
+            *) die "--image: unknown type: $_t (png, jpeg or gif)" ;;
+        esac
+    done
+fi
+_image= _image_params=()
+if [[ $_image_types && ( -t 1 || -p /dev/stdout ) && ! $output && ! $_paper && ! ${cat_v:-} ]] \
+    && image_terminal && image_pagers; then
+    _image=${_image_types//,/:}
+    export LESSUTFCHARDEF="${LESSUTFCHARDEF:+$LESSUTFCHARDEF,}10EEEE:p"
+elif [[ $_image_types && $_paper && ! ${cat_v:-} ]]; then
+    # On paper, ansi2pdf draws the images, told of their files by the
+    # rows (image_osc); nothing goes to the terminal.  A cell of
+    # ansi2pdf is half a character wide and 1.2 high.
+    _image=${_image_types//,/:}
+    _image_params=(image_osc=1 image_tty=/dev/null
+                   "image_term=${_paper_cols}x${_paper_lines}:10x24")
+fi
+# the parts kept intact by ansicolumn: tables, and images in one pane
+_intact_parts=
+[[ $_intact ]] && _intact_parts=table
+[[ $_image && $nup ]] && _intact_parts+=${_intact_parts:+:}image
+[[ $_intact_parts ]] && intact_opts=(--intact)
 
 # Make sure pandoc works before anything runs (also in dryrun mode)
 [[ $refill ]] && check_refill
@@ -1022,10 +1131,18 @@ Supported list markers: C<*>, C<+>, C<->, C<1.>, C<1)>, C<#.>, C<#)>.
 The C<#.> and C<#)> forms are the auto-numbered lists of Pandoc's
 Markdown.
 
-=item B<-r>, B<--[no-]refill>
+=item B<--[no-]refill>
 
 Join the lines of each paragraph into one line.  Default is disabled;
 C<default[refill]=1> in the configuration file enables it.
+
+=item B<-r>
+
+Reverse the default of B<--refill>: enable it when the default is
+disabled, and disable it when C<default[refill]=1> enables it, as for
+a file which is not Markdown.  Each B<-r> reverses it again, so
+B<-rr> gives the default back.  B<--[no-]refill> given on the command
+line takes effect over it.
 
 What a paragraph is, a Markdown parser decides: a run of lines at the
 top level, in a block quote, in a list item or in a definition body.
@@ -1156,6 +1273,14 @@ Pass the output through L<cat-v(1)|App::cat::v> to visualize
 whitespace and special characters.  Spaces are shown as C<·>
 and other invisible characters are made visible.  Newline
 visualization is disabled by default.
+
+=item B<-->[B<no->]B<image>[=I<TYPES>]
+
+Show images in the terminal (default: on).  I<TYPES> is a list of
+the types of images to show, separated by commas: C<png>, C<jpeg> and
+C<gif> (default: all of them).  B<--image=png> shows PNG only, and
+B<--no-image> none.  They are shown only in the terminals that
+support them; see L</IMAGES>.
 
 =item B<-w> I<N>, B<--width>=I<N>
 
@@ -1556,6 +1681,103 @@ file as it is.
 
 =back
 
+=head1 IMAGES
+
+B<mdee> shows images in the terminal, below the line that refers to
+them.  The line itself is kept, so the output with C<--no-image> is
+the same text without the images.  When the image is shown, the line
+is markup only: it is shown as it is written, in C<code_info>, the
+color of the info string of a code fence.
+
+=head2 Which Images
+
+An image is shown when its line contains nothing else.  The line is
+one of:
+
+=over 4
+
+=item * a Markdown image, C<![alt](file)>, or one in a link,
+C<[![alt](file)](url)>;
+
+=item * an HTML C<< <img src="file"> >>, alone or inside C<< <p> >>,
+C<< <div> >>, C<< <a> >> or C<< <center> >>.  This is the form which
+is written in C<=begin html> in POD and copied into README.
+
+=back
+
+Images inside a paragraph or a code block are not shown.
+
+=head2 Image Files
+
+The file is read from the local disk, by a path relative to the
+Markdown file or an absolute path.  Nothing is fetched from the
+network, with one exception for GitHub URLs:
+
+    https://raw.githubusercontent.com/OWNER/REPO/BRANCH/PATH
+    https://github.com/OWNER/REPO/blob/BRANCH/PATH
+
+These are read as the file I<PATH> in the git work tree of the Markdown
+file, if one of its remotes is C<github.com/OWNER/REPO>.  The branch is
+ignored.  The README files of CPAN distributions often refer to their
+images this way.
+
+PNG, JPEG and GIF files are shown, those of the types given to
+B<--image>.  The type is detected from the content, not the file name.  JPEG and GIF are converted to PNG with
+C<sips> (macOS) or ImageMagick; without either, they are not shown.
+A PNG much larger than the screen is reduced by the same tools, to
+send less data; without them, it is sent as it is.
+A file that is not found is not shown.
+
+=head2 Size
+
+An image is shown at its pixel size, reduced to fit within the fold
+width and within the terminal height minus four lines.  With nup, an
+image is not split across panes: if it does not fit in the rest of a
+pane, it starts in the next one (requires
+L<ansicolumn(1)|App::ansicolumn> 1.71 or later).
+
+=head2 Conditions
+
+Images are shown only when all of the following are true:
+
+=over 4
+
+=item * The output goes to the terminal or to a pipe, not to a file:
+no C<-o> or C<--cat-v> (see below for paper).  Through a pipe, the image data is
+still sent to the terminal, and the program at the other end shows
+the rows, as C<mdee -f file.md | LESSUTFCHARDEF=10EEEE:p less -R>
+does.
+
+=item * The terminal is iTerm2 3.7.3 or later (C<TERM_PROGRAM=iTerm.app>),
+Ghostty (C<TERM_PROGRAM=ghostty>) or kitty (C<TERM=xterm-kitty>).
+
+=item * The pager is C<less> 632 or later, which supports
+C<LESSUTFCHARDEF>.
+
+=back
+
+The terminal is identified from the environment.  A terminal started
+from another one (for example, by C<open -a> from iTerm2) may inherit
+the wrong C<TERM_PROGRAM>.  Use C<--no-image> in that case.
+
+On paper (C<-T>, or C<-o> with a PDF file), the images are drawn by
+B<ansi2pdf> instead: the rows of an image tell it the file, and
+nothing is sent to the terminal.  PNG and JPEG are drawn; GIF is not.
+This requires B<ansi2pdf> that knows the rows of an image; an older
+one prints them as characters it has no glyph for.
+
+=head2 How It Works
+
+Images are drawn with the Unicode placeholders of the kitty graphics
+protocol.  Each row of an image is a line of special characters, so
+it is laid out in columns and paged like text, but never folded.  The image data is sent
+directly to the terminal once.
+
+As the rows are text, a search in C<less> can match them, as with
+C<.*>.  The matched cells are drawn in the color of the search
+highlight instead of the image; C<ESC-u>, which turns the highlight
+off, shows the image again.
+
 =head1 THEMES
 
 A theme changes how the document looks: the colors, the marks that
@@ -1678,14 +1900,17 @@ User configuration is loaded from:
 This is a shell script that can set defaults and override colors:
 
     # ~/.config/mdee/config.sh
-    default[mode]='dark'             # set default mode
-    default[theme]='warm'            # set default theme(s)
-    default[style]='pager'           # set default style
+    default[mode]=dark               # set default mode
+    default[theme]=warm              # set default theme(s)
+    default[style]=pager             # set default style
     default[width]=170               # set default output width
     default[fold_width]=80           # set default fold width
     default[refill]=1                # join paragraph lines
     default[lateral]=1               # all pages in one row
-    default[base_color]='DarkCyan'   # set default base color
+    default[base_color]=DarkCyan     # set default base color
+
+A value which has spaces or characters special to the shell, as C<< < >>,
+C<< > >>, C<;> or C<|>, is put in quotes: C<< theme_light[base]='<DarkCyan>=y25' >>.
 
 The C<default> associative array supports the following keys:
 
@@ -1712,6 +1937,9 @@ The C<default> associative array supports the following keys:
 =item C<default[base_color]> - Corresponds to C<--base-color> (e.g., C<DarkCyan>)
 
 =back
+
+C<default[refill]> and C<default[lateral]> are on with any value,
+C<1>, C<0> and C<no> alike, and off when empty.
 
 B<Overriding theme colors>
 
@@ -1943,6 +2171,18 @@ B<mdee> sets defaults for these when they are not already defined:
 Default: C<-R>.  The C<-R> option is required for ANSI color
 sequences to be displayed correctly.
 
+B<mdee> always adds C<-X>, whether C<LESS> is defined or not.  With
+it, C<less> does not use the alternate screen: the last page stays on
+the screen after C<less> ends, and images (see L</IMAGES>) are shown
+on the same screen that their data is sent to.  To use the alternate
+screen, give C<-+X> in the pager command, such as
+C<NUP_PAGER="less -+X">.
+
+=item C<LESSUTFCHARDEF>
+
+When images are shown, B<mdee> adds C<10EEEE:p>, so that C<less>
+treats the placeholder character of the images as printable.
+
 =item C<LESSANSIENDCHARS>
 
 Default: C<mK>.  This tells C<less> to recognize ANSI sequences
@@ -2000,6 +2240,14 @@ The rules that C<*> and C<**> follow by default (see L</Emphasis>).
 The rules that C<cjk_friendly=1> follows.  The proposal comes from
 L<commonmark-spec issue #650, Emphasis with CJK punctuation|https://github.com/commonmark/commonmark-spec/issues/650>,
 open since 2020.
+
+=item L<Terminal graphics protocol, Unicode placeholders|https://sw.kovidgoyal.net/kitty/graphics-protocol/#unicode-placeholders>
+
+The protocol by which images are shown (see L</IMAGES>).
+
+=item L<Text::ANSI::Image>
+
+Draws the images as lines of text by the protocol.
 
 =item L<https://github.com/tecolicom/App-mdee>
 

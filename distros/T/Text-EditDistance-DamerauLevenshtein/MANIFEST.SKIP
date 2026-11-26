@@ -1,0 +1,5 @@
+#!include_default
+^docs/
+^maint/
+^[^/]+\.c\z
+\.(?:bs|[io])\z

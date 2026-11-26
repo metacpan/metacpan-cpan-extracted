@@ -1,5 +1,5 @@
 This archive contains the distribution Dist-Zilla-Plugin-Git-ChangelogFromTrailers,
-version 0.001:
+version 0.002:
 
   Build the Changes entry for a release from the Changelog trailers of its commits
 

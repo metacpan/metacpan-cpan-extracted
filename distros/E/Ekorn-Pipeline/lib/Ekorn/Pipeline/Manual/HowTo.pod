@@ -1,6 +1,6 @@
 =encoding utf8
 
-=for stopwords backtrace flatMap Ekorn ekorn bitwise discoverability
+=for stopwords backtrace flatMap Ekorn ekorn bitwise dataset discoverability
 
 =for comment Made from docs/HOWTO.md by scripts/manuals. Edit docs/HOWTO.md and run
 the script, rather than editing this.
@@ -2286,6 +2286,79 @@ The caller got one error, the function read two lines, and the file
 was closed as C<take(1)> stopped the run. The function didn't need to
 know any of that was going to happen.
 
+=head2 Offer a stream, a collection and an index
+
+A module over a dataset can give it three ways, each for a different
+caller:
+
+=over 4
+
+=item *
+
+a B<stream>, a fresh run each time it's called, through the
+caller's stages, read only as it's wanted: for one pass, or a
+dataset too big to hold;
+
+=item *
+
+a B<collection>, every value, read once and kept: for a small
+dataset read again and again;
+
+=item *
+
+an B<index>, built once by a sink and kept: for looking values up
+by a key.
+
+=back
+
+Here the tracks come from memory; from a file or a database, only the
+source changes:
+
+    # A stream: a fresh run of the tracks, through the caller's stages.
+    sub track_stream (@stages) {
+        return Ekorn::Pipeline->new(@stages)->iterator(from_array(@tracks));
+    }
+
+    # A collection: every track, read once and kept, given as a list.
+    sub all_tracks () {
+        state $all = track_stream()->all;    # an array reference, asked for one value
+        return @$all;
+    }
+
+    # An index: each artist's titles, built once by a sink and kept.
+    sub tracks_by_artist () {
+        state $index = track_stream(sink_one {
+            my %titles;    # this run's
+            return (
+                sub ($track) { push @{ $titles{ $track->{artist} } }, $track->{title} },
+                sub ()       { \%titles },
+            );
+        })->();
+        return $index;
+    }
+
+    say join ', ', track_stream(take_if { $_->{plays} > 6000 }, sub { $_->{title} })->all;
+    # Dancing Queen, Girls & Boys, Sunshine of Your Love
+    my @all = all_tracks();
+    say scalar @all;    # 6
+    say join ', ', @{ tracks_by_artist()->{Blur} };    # Girls & Boys, Parklife, Country House
+
+Name each for what it gives, not for how it gets it: C<track_stream>
+and C<all_tracks>, not C<read_tracks> and C<load_tracks>. The stream is
+the one that takes stages, as it's the one that runs each time; a
+caller who wants the collection's values changed runs the stream
+instead.
+
+The collection and the index are kept with C<state>, read once, the
+first time they're asked for, and shared by every caller, so give out
+a copy, as C<all_tracks> gives a list, or say callers mustn't change
+them. A dataset that changes while the program runs needs them made
+again, or a stream instead.
+
+The index is a sink's result, the run's own, rather than a hash a
+stage fills on the side: its hash is made afresh for the run, and the
+run gives it back, so nothing outside the run holds it half-built.
+
 =head2 Take stages for a library that calls you back
 
 Some libraries don't hand out their values: they call you back with
@@ -3006,7 +3079,7 @@ your users' mistakes are reported at their lines.
 B<Require the versions of Ekorn::Pipeline you tested with,> up to
 the next change of the middle number, which is when the way stages
 behave can change. In a C<cpanfile>:
-C<< requires 'Ekorn::Pipeline', '>= v0.3.0, < v0.4.0'; >>
+C<< requires 'Ekorn::Pipeline', '>= v0.4.0, < v0.5.0'; >>
 
 =back
 
@@ -3338,7 +3411,7 @@ Perl 5.36 or later. Its version is 0.x, so its interface may still
 change before 1.0, but the version number says when: a release that
 only fixes or adds moves the last number, and one that changes how
 stages behave, or renames something, moves the middle one. Require
-C<< >= v0.3.0, < v0.4.0 >>, and you get fixes without surprises.
+C<< >= v0.4.0, < v0.5.0 >>, and you get fixes without surprises.
 
 =head2 Where does it shine, and where does it fall short?
 

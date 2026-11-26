@@ -1,7 +1,7 @@
 package EV::Nats::KV;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use EV;
 use EV::Nats::JetStream;
 
@@ -33,6 +33,14 @@ sub _check_key {
 
 sub get {
     my ($self, $key, $cb) = @_;
+    $self->get_entry($key, sub {
+        my ($entry, $err) = @_;
+        $cb->($entry ? $entry->{value} : undef, $err);
+    });
+}
+
+sub get_entry {
+    my ($self, $key, $cb) = @_;
     _check_key($key);
     my $subj = '$KV.' . $self->{bucket} . '.' . $key;
     $self->{js}->_json_api(
@@ -53,7 +61,7 @@ sub get {
 
             require MIME::Base64;
             my $value = MIME::Base64::decode_base64($msg->{data} || '');
-            $cb->($value, undef);
+            $cb->({ value => $value, revision => $msg->{seq} }, undef);
         },
     );
 }
@@ -70,34 +78,13 @@ sub put {
 }
 
 sub _expect_publish {
-    my ($self, $subj, $headers, $value, $cb, $what) = @_;
+    my ($self, $subj, $headers, $value, $cb) = @_;
     my $nats = $self->{js}{nats};
-
-    if ($cb) {
-        my $inbox = $nats->new_inbox;
-        my ($sid, $timer);
-        $sid = $nats->subscribe_max($inbox, sub {
-            my ($s, $payload) = @_;
-            if ($timer) { $timer->stop; undef $timer; }
-            my ($ack, $derr) = EV::Nats::JetStream::decode_json_or_error($payload);
-            return $cb->(undef, $derr) if $derr;
-            return $cb->(undef, "$ack->{error}{description} (code $ack->{error}{code})")
-                if $ack->{error};
-            $cb->($ack->{seq}, undef);
-        }, 1);
-        $timer = $nats->_timer($self->{timeout} / 1000.0, 0, sub {
-            eval { $nats->unsubscribe($sid) };
-            $cb->(undef, "$what timeout");
-        });
-        if (!eval { $nats->hpublish($subj, $headers, $value, $inbox); 1 }) {
-            my $err = $@;
-            $timer->stop;
-            eval { $nats->unsubscribe($sid) };
-            die $err;
-        }
-    } else {
-        $nats->hpublish($subj, $headers, $value);
-    }
+    return $nats->hpublish($subj, $headers, $value) unless $cb;
+    $nats->hrequest($subj, $headers, $value, $self->{js}->_decoded(sub {
+        my ($ack, $err) = @_;
+        $cb->($ack && $ack->{seq}, $err);
+    }), $self->{timeout});
 }
 
 sub create {
@@ -118,9 +105,9 @@ sub create {
                         unless EV::Nats::JetStream::msg_is_tombstone($msg);
                     $self->_expect_publish($subj,
                         "NATS/1.0\r\nNats-Expected-Last-Subject-Sequence: $msg->{seq}\r\n\r\n",
-                        $value, $cb, 'create');
+                        $value, $cb);
                 });
-        } : undef, 'create');
+        } : undef);
 }
 
 sub update {
@@ -131,7 +118,7 @@ sub update {
     my $subj = '$KV.' . $self->{bucket} . '.' . $key;
     $self->_expect_publish($subj,
         "NATS/1.0\r\nNats-Expected-Last-Subject-Sequence: $rev\r\n\r\n",
-        $value, $cb, 'update');
+        $value, $cb);
 }
 
 sub delete {
@@ -167,7 +154,7 @@ sub _fenced_publish {
     return if $ok;
     (my $err = $@ || 'not connected') =~ s/ at \S+ line \d+.*//s;
     $err =~ s/\n\z//;
-    my $t; $t = $nats->_timer(0, 0, sub { undef $t; $cb->(undef, $err) });
+    EV::Nats::JetStream::_defer($nats, sub { $cb->(undef, $err) });
 }
 
 sub keys {
@@ -224,12 +211,12 @@ sub create_bucket {
         deny_delete       => JSON::PP::true(),
         deny_purge        => JSON::PP::false(),
     };
-    $self->{js}->stream_create($config, $cb);
+    $self->{js}->stream_create($config, sub { $cb->(@_[0, 1]) });
 }
 
 sub delete_bucket {
     my ($self, $cb) = @_;
-    $self->{js}->stream_delete($self->{stream}, $cb);
+    $self->{js}->stream_delete($self->{stream}, sub { $cb->(@_[0, 1]) });
 }
 
 sub status {
@@ -310,6 +297,14 @@ bucket name must match C<[a-zA-Z0-9_-]+>.
 Fetch the latest value for C<$key>. Callback: C<($value, $err)>.
 C<$value> is C<undef> if the key does not exist, or has been deleted
 or purged (the tombstone is recognised and surfaces as a clean miss).
+
+=head2 get_entry
+
+    get_entry($key, $cb)
+
+Like L</get>, but the callback receives
+C<< { value => $value, revision => $rev } >>, or C<undef> for a missing
+key; C<revision> is what L</update> expects.
 
 =head2 put
 

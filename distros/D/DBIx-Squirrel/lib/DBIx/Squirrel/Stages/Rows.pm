@@ -14,6 +14,8 @@ use DBIx::Squirrel::Gather  qw(gather);
 
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v4.1.1';
+
 our @EXPORT = qw(pluck as_hash);    ## no critic (Modules::ProhibitAutomaticExportation)
 
 our @EXPORT_OK   = @EXPORT;
@@ -26,7 +28,6 @@ our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
 # give, so pluck() is told from pluck(undef), which croaks, while the
 # signature still croaks for more than one.
 my $ONLY = \'the only column';
-
 
 # Return a stage giving one column of each row, by its name, in any
 # case, or its position, from 0, whether the row is an array, a hash or
@@ -79,7 +80,6 @@ sub _pluck_only () {
         croakf 'Expected a row: an array, a hash or a row object';
     };
 }
-
 
 # Return a stage making each row a hash, keyed by the column names as
 # fetchrow_hashref keys them: arrays and row objects are made into one,

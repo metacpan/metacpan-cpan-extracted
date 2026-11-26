@@ -1,7 +1,7 @@
 # ABSTRACT: Test that the POD of a module says what each sub takes, returns, and how it fails
 # PODNAME: Test::Pod::Coverage::More
 
-package Test::Pod::Coverage::More 0.003;
+package Test::Pod::Coverage::More 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -75,7 +75,7 @@ Test::Pod::Coverage::More - Test that the POD of a module says what each sub tak
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 

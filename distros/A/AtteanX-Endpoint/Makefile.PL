@@ -11,17 +11,14 @@ all_from		'lib/AtteanX/Endpoint.pm';
 author			'Gregory Todd Williams <gwilliams@cpan.org>';
 license			'perl';
 
-test_requires	'Test::Exception'				=> 0;
-test_requires	'Test::Modern'					=> 0;
-test_requires	'Test::Moose'					=> 0;
+test_requires	'Test::Exception'				=> 0.42;
 test_requires	'Test::More'					=> 0.88;
-test_requires	'Test::Roo'						=> 0;
 test_requires	'HTTP::Message::PSGI'			=> 0;
 test_requires	'Test::LWP::UserAgent'			=> 0;
 test_requires	'Test::WWW::Mechanize::PSGI'	=> 0;
 perl_version	'5.014';
 
-requires		'Attean'						=> 0.038;
+requires		'Attean'						=> 0.041;
 requires		'File::ShareDir'				=> 0;
 requires		'HTML::HTML5::Writer'			=> 0;
 requires		'HTTP::Negotiate'				=> 0;
@@ -32,8 +29,8 @@ requires		'List::MoreUtils'				=> 0;
 requires		'Moo'							=> 1.006000;
 requires		'MooX::Log::Any'				=> 0;
 requires		'namespace::clean'				=> 0;
-requires		'Plack'							=> 0;
-requires		'TryCatch'						=> 0;
+requires		'Plack'							=> '1.0054';
+requires		'Try::Tiny'						=> 0;
 requires		'Types::Standard'				=> 0;
 requires		'Config::JFDI'					=> 0;
 

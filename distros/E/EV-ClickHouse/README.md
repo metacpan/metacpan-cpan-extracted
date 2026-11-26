@@ -257,6 +257,25 @@ mixes up responses - connect after forking instead.
     you set that setting yourself, so servers whose default is ZSTD stay
     readable (ZSTD responses are rejected loudly, never misdecoded).
 
+- compress\_method => 'lz4' | 'zstd'
+
+    Native protocol with `compress`: the codec of what the client sends
+    (INSERT data, external tables). Default: `'lz4'`. `'zstd'` needs a
+    build that found libzstd (`EV::ClickHouse->features->{zstd}`) and
+    croaks otherwise; responses stay LZ4.
+
+- compress\_level => $level
+
+    ZSTD level for `compress_method => 'zstd'`. Default: `1`, as
+    ClickHouse's `network_zstd_compression_level`.
+
+- compress\_block\_size => $bytes
+
+    Native protocol with `compress`: the uncompressed size of each
+    compressed frame the client sends, so the server decompresses a Data
+    block a frame at a time. Default: 1048576, as clickhouse-client. `0`
+    compresses each Data block as one frame. At most 1 GiB.
+
 - session\_id => $id
 
     HTTP session id for stateful operations (temporary tables, SET, etc.).
@@ -834,7 +853,8 @@ need the raw integer.
 
 Build capabilities as a hashref, callable on the class or on a
 connection. `lz4` is 1 (LZ4 is bundled); `tls` is 1 when built
-with OpenSSL, 0 otherwise.
+with OpenSSL, 0 otherwise; `zstd` is 1 when built with libzstd
+(`compress_method => 'zstd'`), 0 otherwise.
 
 ## has\_lz4
 
@@ -1523,6 +1543,8 @@ data. Connection-level accessors (`is_connected`, `server_info`,
 - [EV](https://metacpan.org/pod/EV) 4.11 or newer (event loop)
 - zlib (required)
 - OpenSSL (optional, for TLS; auto-detected at build time)
+- libzstd (optional, for `compress_method => 'zstd'`;
+auto-detected at build time, skipped with `perl Makefile.PL --without-zstd`)
 
     LZ4 (for native protocol compression) is bundled with the
     distribution; no system library is needed.
@@ -1862,7 +1884,8 @@ round-trip stable raw values by default; opt into string forms via
 - LowCardinality(T)
 
     Transparent: encodes/decodes as the inner type. Cross-block dictionaries
-    are managed internally.
+    are managed internally. An insert sends each distinct value once per
+    column and block.
 
 - SimpleAggregateFunction / AggregateFunction
 

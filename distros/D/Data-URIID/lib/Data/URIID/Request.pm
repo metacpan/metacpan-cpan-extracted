@@ -23,7 +23,7 @@ use constant {
     BOOL_FALSE => Data::Identifier->new(uuid => '6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1')->register,
 };
 
-our $VERSION = v0.26;
+our $VERSION = v0.27;
 
 my %_attributes = (
     service => {rawtype => 'Data::URIID::Service'},
@@ -113,7 +113,7 @@ Data::URIID::Request - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.26
+version v0.27
 
 =head1 SYNOPSIS
 

@@ -26,6 +26,7 @@ cat <<EOF
 #     [ optional | o ?                 # Optional ]=
 #     [ verbose  | v | ~q              # Deny     ]=
 #     [ array    | A @                 # Array    ]=
+#     [ varargs  | V *                 # Varargs  ]=
 #     [ hash     | H %                 # Hash     ]=
 #     [ integer  | i :=i               # Integer  ]=1
 #     [ pattern  | p :=(^(fast|slow)$) # Regex    ]=fast
@@ -58,6 +59,7 @@ B<Option definition:>
         [ optional | o ?                 # Optional ]=
         [ verbose  | v | ~q              # Deny     ]=
         [ array    | A @                 # Array    ]=
+        [ varargs  | V *                 # Varargs  ]=
         [ hash     | H %                 # Hash     ]=
         [ integer  | i :=i               # Integer  ]=1
         [ pattern  | p :=(^(fast|slow)$) # Regex    ]=fast
@@ -79,7 +81,7 @@ B<Or:>
 
 =head1 VERSION
 
-2.0.0
+2.1.0
 
 =head1 DESCRIPTION
 
@@ -166,10 +168,11 @@ Prefix with C<~> to create a B<negative alias> that negates the option
 
 Argument type specifier:
 
-    (none) or +  Flag (counter)
+    + or (none)  Flag (counter)
     :            Required argument
     ?            Optional argument
     @            Array (multiple values)
+    *            Varargs array (up to --)
     %            Hash (key=value pairs)
 
 =item B<MOD (MODIFIER)>
@@ -267,6 +270,50 @@ To reset existing values: use C<--no-include> on the command line
 (e.g., C<--no-include --include /new/path>), or use C<callback --before>
 to automatically reset before each new value.
 
+=head2 VARARGS ARRAY (C<*>)
+
+Takes a variable number of arguments, up to C<-->, into an array.
+
+    [names|N*]=
+
+    $ script --names alice bob -- file
+    for name in "${names[@]}" ; do echo "$name" ; done    # alice, bob
+
+Every argument up to C<--> is a value, as it is: one starting with
+C<-> is not taken as an option, as in C<--names a -x b -->, and one
+with a space is not split by C<DELIM>.
+
+The C<--> ends the arguments and is removed.  It is required: without
+it, parse fails, instead of taking the files after it by mistake.
+
+Ways to give the arguments:
+
+    --names a b --              a b        up to --
+    -N a b --                   a b        short form
+    --names --                  (none)     no arguments
+
+When the option and a value are given in one argument, in either form,
+only that value is taken, and C<--> is not needed:
+
+    --names=value               value
+    -Nvalue                     value
+
+The C<--> ends only the arguments: the options and files after it are
+parsed as usual.  To end the options too, write another C<-->:
+
+    --names a b -- -- -file
+
+C<--> itself cannot be one of the arguments.
+
+As with C<@>, multiple specifications accumulate, C<--no-names>
+empties the array, and a validation is applied to each argument.
+
+A callback is called once for the option, with all the arguments in
+place of the value; with no arguments, it gets only the option name:
+
+    callback names a 'b c'      # --names a 'b c' --
+    callback names              # --names --
+
 =head2 HASH (C<%>)
 
 Collects C<key=value> pairs into an associative array. Key without value
@@ -290,7 +337,8 @@ work the same way with pass-through options.
 Calls a function when the option is parsed. Default function name is the
 option name with hyphens converted to underscores; use C<getoptlong callback>
 to specify a custom function. Can combine with any type (C<+!>, C<:!>,
-C<?!>, C<@!>, C<%!>).
+C<?!>, C<@!>, C<*!>, C<%!>).  The C<*> type gives all the arguments
+in place of the value, in one call.
 
     [action|a!]=        # Calls action() when specified
     [file|f:!]=         # Calls file() with argument
@@ -383,8 +431,9 @@ in comments when using regex validation.
 Validation occurs before the value is stored and normal callbacks are
 invoked; C<--before> callbacks are called before validation.
 For array options, each element is validated; for hash options, each
-C<key=value> pair is matched as a whole. A validation failure exits
-the script with an error message, regardless of C<EXIT_ON_ERROR>.
+C<key=value> pair is matched as a whole. A validation failure is a
+parse error, which exits the script unless C<EXIT_ON_ERROR> is
+disabled (see L</getoptlong parse>).
 
 =head1 HELP MESSAGE
 
@@ -429,20 +478,29 @@ See L</CONFIGURATION> for available parameters.
 =head2 getoptlong parse
 
 Parse arguments. Always quote C<"$@">. On a parse error, such as an
-undefined option or a missing required argument, the script exits
-with an error message.
+undefined option, a missing required argument or a validation
+failure, the script exits with an error message.
 
     getoptlong parse "$@"
 
-To leave undefined options in the arguments instead, disable
-C<EXIT_ON_ERROR> (see L</CONFIGURATION>).  They are kept with the
-non-option arguments, and C<parse> returns 0.  A short option without
-its required argument is left as well.  A long option without its
-required argument and a validation failure still exit the script.
-Set C<SILENT> to suppress the error messages of B<getopts>.
+To handle the error in the script, disable C<EXIT_ON_ERROR> (see
+L</CONFIGURATION>).  Then C<parse> stops at the first error, and
+returns 1 after the error message.  The arguments are left as they
+are; the options before the error have been set.  Set C<SILENT> to
+suppress the error messages, and show your own.
 
     getoptlong configure EXIT_ON_ERROR= SILENT=1
-    getoptlong parse "$@"
+    getoptlong parse "$@" || { echo "see --help" >&2; exit 2; }
+    eval "$(getoptlong set)"
+
+In the one-liner form, the status of C<parse> is the status of the
+C<.> command:
+
+    . getoptlong.sh OPTS "$@" || exit 2
+
+Undefined options are not left in the arguments.  To leave the
+options of a subcommand to it, disable C<PERMUTE>: C<parse> stops at
+the first non-option argument, the name of the subcommand.
 
 =head2 getoptlong set
 
@@ -525,13 +583,15 @@ Default: C<scriptname [ options ] args>.
 =item B<EXIT_ON_ERROR>
 
 Exit immediately on parse error. Default: enabled.
-Set to empty string to disable: undefined options are left in the
-arguments (see L</getoptlong parse>).  Note that C<0> is not empty,
-and does not disable it.
+Set to empty string to disable: C<parse> returns 1 on an error (see
+L</getoptlong parse>).  Note that C<0> is not empty, and does not
+disable it.
 
 =item B<SILENT>
 
-Suppress error messages. Default: disabled.
+Suppress the error messages of B<getopts>, for short options.  With
+C<EXIT_ON_ERROR> disabled, suppress all the error messages of parsing.
+Default: disabled.
 Set to non-empty value to enable.
 
 =item B<DEBUG>

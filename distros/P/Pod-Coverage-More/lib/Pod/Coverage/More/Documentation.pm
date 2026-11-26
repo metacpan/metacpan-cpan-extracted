@@ -1,7 +1,7 @@
 # ABSTRACT: What the POD of a module says about each of its subs
 # PODNAME: Pod::Coverage::More::Documentation
 
-package Pod::Coverage::More::Documentation 0.003;
+package Pod::Coverage::More::Documentation 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -49,15 +49,20 @@ sub sections {
     return @{ $self->{sections} };
 }
 
-# The first section whose heading names the sub C<name>, or nothing.
+# The section whose heading names the sub C<name>, or nothing.
+# A heading that writes it as a call, as C<name(...)>, C<< $obj->name >> or C<Pkg::name>, comes before one that writes only its bare name,
+# then a shallower heading before a deeper one, then the first in the POD.
 # @param   name  Str  the name of the sub
 # @returns HashRef  the section
 # @example my $section = $doc->section_for('resize');
 sub section_for {
     my ( $self, $name ) = @_;
+    my $best;
     foreach my $section ( @{ $self->{sections} } ) {
-        return $section if any { $_ eq $name } @{ $section->{functions} };
+        my $strength = $section->{strength}{$name} or next;
+        $best = $section if !$best || $strength > $best->{strength}{$name} || ( $strength == $best->{strength}{$name} && $section->{level} < $best->{level} );
     }
+    return $best if $best;
     return;
 }
 
@@ -74,9 +79,6 @@ sub _parser {
     $parser->accept_directive_as_processed(qw{method func attr});
     return $parser;
 }
-
-# An argument list in parentheses, captured without them.
-our $ARGLIST = qr/\(([^()]*)\)/;
 
 # A type word or a parameterized type expression, such as Str, Types::Standard::Int or ArrayRef[HashRef[Str]].
 our $TYPE_NAME   = qr/[[:alpha:]_]\w*(?:::\w+)*/;
@@ -134,32 +136,69 @@ sub _flatten {
     return $text;
 }
 
+# What a heading assigns its call to: a variable, a reference to one, or a list of them in parentheses.
+our $ASSIGNEE = qr/(?:(?:my|our)\s+)? (?:\\?[\$@%]\w+ | \([^()]*\))/;
+our $ASSIGNED = qr/\A $ASSIGNEE \s* =(?![=>~]) \s*/;
+
 sub _heading {
     my ( $self, $text, $line ) = @_;
     $text =~ s/[;#]//g;
-    $text =~ s/\$\w+->//g;
-    $text =~ s/\w+(?:::\w+)*::(?=\w)//g;
+    $text =~ s/\A\s+|\s+\z//g;
 
-    my %args;
-    while ( $text =~ m/(\w+)\s*$ARGLIST/g ) {
-        my ( $function, $list ) = ( $1, $2 );
-        $args{$function} = [ grep { $_ ne q{} } map { s/\A\s+|\s+\z//gr } split m/,/, $list ];
+    my ( %args, %strength, @functions );
+    foreach my $named ( $self->_named_by($text) ) {
+        my $function = $named->{name};
+        push @functions, $function if !$strength{$function};
+        $args{$function} = [ grep { $_ ne q{} } map { s/\A\s+|\s+\z//gr =~ s/\A(\w+)\s*=>.*\z/$1/r } split m/,/, $named->{args} ] if defined $named->{args};
+        my $strength = $named->{call} ? 2 : 1;
+        $strength{$function} = $strength if ( $strength{$function} // 0 ) < $strength;
     }
-    ( my $names = $text ) =~ s/\([^()]*\)//g;
-    my @functions = index( $names, q{,} ) >= 0 ? split( m/\s*,\s*/, $names ) : split( m/\s+/, $names );
-    @functions = grep { m/\A\w+\z/ } map { s/\A\s+|\s+\z//gr } @functions;
     return if !@functions;
 
     return {
-        heading      => $text =~ s/\A\s+|\s+\z//gr,
+        heading      => $text,
         line         => $line,
+        assigns      => $text =~ $ASSIGNED ? 1 : 0,
         functions    => \@functions,
         args         => \%args,
+        strength     => \%strength,
         types        => {},
         returns      => [],
         terminations => [],
         verbatim     => [],
     };
+}
+
+# What may follow the last call or name of a heading: what it returns, after an =, or a description after a dash.
+our $DASH         = qr/[-\N{EM DASH}]-?/;
+our $HEADING_TAIL = qr/\s*=(?![=>~]).*\z | \s+$DASH\s.*\z/;
+
+# One call or name in a heading: an optional invocant, an object or a class, or package,
+# then the name of the sub, then an optional argument list.
+our $INVOCANT     = qr/(?:\$\w+ | \w+(?:::\w+)*) \s*->\s*/;
+our $CALL_ARGS    = qr/\s*\((?<args>[^()]*)\)/;
+our $HEADING_ITEM = qr/(?<invocant>$INVOCANT)? (?<package>(?:\w+::)+)? (?<name>\w+) $CALL_ARGS?/;
+
+# The subs that the heading TEXT names, each a HASHREF with C<name>, C<args>, the text of its argument list or undef,
+# and C<call>, true when the heading writes it as a call rather than as a bare name, in the forms that DESCRIPTION lists.
+sub _named_by {
+    my ( $self, $text ) = @_;
+    $text =~ s/$ASSIGNED//;
+    my ( @items, $spaced );
+    while (1) {
+        $text =~ m/\G$HEADING_ITEM/gc or return;
+        push @items, { name => $+{name}, args => $+{args}, call => ( defined $+{invocant} || defined $+{package} || defined $+{args} ) ? 1 : 0 };
+        last if pos($text) == length $text || $text =~ m/\G$HEADING_TAIL/gc;
+        next if $text                               =~ m/\G\s*,\s*/gc;
+        $text =~ m/\G\s+/gc or return;
+        $spaced = 1;
+    }
+    my $subs = $self->{subs};
+    return @items if !$spaced || !$subs;
+    my $has_call  = any  { $_->{call} } @items;
+    my $all_known = !any { !$subs->{ $_->{name} } } @items;
+    return if !$has_call && !$all_known;
+    return grep { $_->{call} || $subs->{ $_->{name} } } @items;
 }
 
 sub _content {
@@ -286,7 +325,7 @@ Pod::Coverage::More::Documentation - What the POD of a module says about each of
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -300,12 +339,25 @@ version 0.003
 
 Reads the POD of a module into one section per heading that documents subs.
 A heading documents subs when it is a C<=head2>, C<=head3> or C<=head4>, or a C<=method>, C<=func> or C<=attr> of L<Pod::Weaver>.
-It names one or more subs, each with an optional argument list in parentheses:
+It names one or more subs, each with an optional argument list in parentheses,
+called on an object or a class or qualified by its package, and maybe assigned to a variable.
+A C<< key => value >> pair in an argument list names the argument C<key>, a key of a hash of named arguments:
 
     =head2 fun1(arg0, arg1), fun2(arg2)
+    =head2 snapshot($domain, leave_down => $bool)
     =head2 wsSep wsSep2(whee, zap)
     =head2 $obj->some_method(arr)
+    =head2 @names = $obj->first(), $obj->second($x)
+    =head2 \%plan = Some::Class->plan(%args)
     =method Some::Module::fully_qualified($x)
+
+A heading that assigns its call still names its sub, but L<Pod::Coverage::More> takes it for an example, which belongs in a verbatim block.
+
+A heading names subs in one of three forms: a single call or name,
+a list of calls and names separated by commas,
+or a list separated by spaces that has a call in it or that names only subs of the package.
+Any other heading, such as C<=head2 The token cache>, names no sub, although one of its words is the name of a sub.
+When several headings name a sub, C<section_for> prefers a call to a bare name.
 
 A section lasts until the next heading of the same level or a higher one.
 When C<new> was given the names of the subs of the package, a heading that names none of them is not a section of its own,
@@ -340,6 +392,10 @@ C<section_for> returns a HASHREF with these keys:
 =item B<line> - INTEGER - the line of the heading
 
 =item B<functions> - ARRAYREF - the names of the subs that the heading names
+
+=item B<assigns> - BOOLEAN - true when the heading assigns its call to a variable, as C<$paths = $obj-E<gt>paths()>
+
+=item B<strength> - HASHREF - per sub, 2 when the heading writes it as a call, 1 when it writes only its bare name
 
 =item B<args> - HASHREF - per sub, the ARRAYREF of the argument names in its argument list, for a sub that has one
 
@@ -424,7 +480,7 @@ Returns a Pod::Coverage::More::Documentation object, the reader.
 
 =head2 section_for(name)
 
-The first section whose heading names the sub C<name>, or nothing.
+The section whose heading names the sub C<name>, or nothing. A heading that writes it as a call, as C<name(...)>, C<< $obj->name >> or C<Pkg::name>, comes before one that writes only its bare name, then a shallower heading before a deeper one, then the first in the POD.
 
 =over 4
 

@@ -6,10 +6,12 @@ use Exporter qw(import);
 
 use Ekorn::Pipeline::Stages::Batch qw(batch collect);
 
-# A facade over Ekorn::Pipeline::Stages::Batch, exporting DBIx::Squirrel's
-# own list of its functions, imported from it by name, so a name
-# Ekorn::Pipeline drops fails here, as the module loads, and one it
-# adds isn't exported until it's listed here.
+our $VERSION = 'v4.1.1';
+
+# A plain re-export of Ekorn::Pipeline::Stages::Batch's functions, from
+# DBIx::Squirrel's own list of them, imported from it by name, so a name
+# Ekorn::Pipeline drops fails here, as the module loads, and one it adds
+# isn't exported until it's listed here.
 our @EXPORT      = qw(batch collect);      ## no critic (Modules::ProhibitAutomaticExportation)
 our @EXPORT_OK   = @EXPORT;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);

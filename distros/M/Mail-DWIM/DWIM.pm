@@ -6,7 +6,7 @@ use strict;
 use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(mail);
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 our @HTML_MODULES = qw(HTML::FormatText HTML::TreeBuilder MIME::Lite);
 our @ATTACH_MODULES = qw(MIME::Lite MIME::Types);
 
@@ -270,11 +270,13 @@ sub html_msg {
 
     $msg->attach(
       Type => 'text/plain',
+      Encoding => 'quoted-printable',
       Data => $plaintext
     );
 
     $msg->attach(
         Type => 'text/html',
+        Encoding => 'quoted-printable',
         Data => $htmltext,
     );
 
@@ -312,6 +314,7 @@ sub attach_msg {
     );
 
     $msg->attach(Type     => "TEXT",
+                 Encoding => 'quoted-printable',
                  Data     => $text,
                 );
 

@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.21.0 - 2026-11-26
+
+### Fixes
+
+- Read a keyless answer without the bot, carrier, satellite and service flags ([`3feeed6`](https://github.com/internetdata/sdk-perl/commit/3feeed685d38b69dbbdbd23aa819644b32f7ecc2))
+
 ## 1.20.0 - 2026-11-25
 
 ### Features

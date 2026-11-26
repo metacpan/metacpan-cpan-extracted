@@ -1,3 +1,6 @@
+1.29 2026-11-25
+- fix casting error on Win32 (#6) - thanks @twata1
+
 1.28 2021-04-29
 - remove C-only restriction on ->Inline method - thanks @oodler577
 

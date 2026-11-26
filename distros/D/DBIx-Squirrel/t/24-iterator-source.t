@@ -85,6 +85,32 @@ subtest 'all, without stages, fetches the rest at once' => sub {
     ok !grep({ !defined } @$asked), 'fetched in batches, a row at a time';
 };
 
+subtest 'all_arrayref gives one reference, in any context' => sub {
+    my @got = $dbh->iterate("$sql LIMIT 3", sub { $_->[0] })->all_arrayref;
+    is \@got, [[1, 2, 3]], 'in list context';
+
+    my $two = $dbh->iterate("$sql LIMIT 2", sub { $_->[0] });
+    my %got = (rows => $two->all_arrayref, n => 2);
+    is \%got, {rows => [1, 2], n => 2}, 'in a hash constructor';
+
+    my $count = sub { scalar @_ };
+    is $count->($dbh->iterate($sql)->all_arrayref, 'x'), 2, 'as an argument';
+
+    is [$dbh->iterate('UPDATE n SET id = id WHERE 0')->all_arrayref], [[]],
+        'an empty array reference, with nothing to give';
+
+    my $it = $dbh->iterate($sql);
+    $it->next for 1 .. 3;
+    my($asked, $rest) = fetches(sub { $it->all_arrayref });
+    is [map { $_->[0] } @$rest], [4 .. 300], 'without stages, every row left';
+    is $asked,     [undef], 'with one fetch of them all, after the batch, as all';
+    is $it->ended, 'done',  'which ended done';
+    ok !$it->sth->{Active}, 'finishing the statement';
+    is [$it->next],              [],   'so next gives nothing';
+    is [$it->all_arrayref],      [[]], 'nor does all_arrayref again';
+    is $it->reset->all_arrayref, [map { [$_] } 1 .. 300], 'until reset';
+};
+
 subtest 'first and single end the run' => sub {
     my $it  = $dbh->iterate($sql);
     my $run = ($it->next, $it->{run})[1];

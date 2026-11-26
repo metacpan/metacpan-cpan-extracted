@@ -15,7 +15,7 @@ use Carp;
 use Data::Tools;
 use Math::BigFloat;
 
-our $VERSION = '1.52';
+our $VERSION = '1.60';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

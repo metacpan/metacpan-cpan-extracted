@@ -1,5 +1,8 @@
 Revision history for Plack-Middleware-XSRFBlock
 
+0.0.20    2026-11-25 14:23:50+00:00 Europe/London
+ - cleanup: removed the dependency on FindBin::libs
+
 0.0.19    2023-07-14 10:17:10+01:00 Europe/London
  - SECURITY FIX! when *not* using signed cookies, it was possible to
    bypass XSRFBlock by POSTing an empty form value and an empty cookie

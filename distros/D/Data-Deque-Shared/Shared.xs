@@ -8,14 +8,18 @@ static int deq_wait_interrupted(void) { dTHX; return PL_sig_pending != 0; }
 #define DEQ_WAIT_POLL_NS 500000000L
 #include "deque.h"
 
-static inline uint32_t deq_str_length(const char *s, STRLEN len,
-                                      uint32_t max_len, int is_utf8) {
-    if (len > max_len) {
-        len = max_len;
-        /* The first omitted byte must start a character. */
-        if (is_utf8) while (len && ((unsigned char)s[len] & 0xc0) == 0x80) len--;
-    }
-    return (uint32_t)len;
+/* Slot image of a Str value: u32 length (bit 31 = SvUTF8), then the bytes. */
+static uint8_t *deq_str_elem(pTHX_ DeqHandle *h, SV *val, const char *s, STRLEN len) {
+    uint32_t max_len = h->elem_size - sizeof(uint32_t);
+    if (len > max_len)
+        croak("Data::Deque::Shared::Str: value of %" UVuf " bytes exceeds max_len %u",
+              (UV)len, (unsigned)max_len);
+    uint8_t *buf;
+    Newxz(buf, h->elem_size, uint8_t);
+    uint32_t l32 = (uint32_t)len | (SvUTF8(val) ? 0x80000000u : 0u);
+    memcpy(buf, &l32, sizeof l32);
+    memcpy(buf + sizeof l32, s, len);
+    return buf;
 }
 
 static inline int deq_is_object(pTHX_ SV *sv) {
@@ -356,7 +360,7 @@ push_back_wait(self, val, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV_nomg(ST(2));
     int64_t v = (int64_t)val;
     REEXTRACT_DEQ(self);
     RETVAL = deq_perl_push_wait(aTHX_ self, h, &v, sizeof(v), 0, timeout);
@@ -371,7 +375,7 @@ push_front_wait(self, val, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV_nomg(ST(2));
     int64_t v = (int64_t)val;
     REEXTRACT_DEQ(self);
     RETVAL = deq_perl_push_wait(aTHX_ self, h, &v, sizeof(v), 1, timeout);
@@ -407,7 +411,7 @@ pop_front_wait(self, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV_nomg(ST(1));
     int64_t v;
     REEXTRACT_DEQ(self);
     RETVAL = deq_perl_pop_wait(aTHX_ self, h, &v, 0, timeout) ? newSViv((IV)v) : &PL_sv_undef;
@@ -421,7 +425,7 @@ pop_back_wait(self, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV_nomg(ST(1));
     int64_t v;
     REEXTRACT_DEQ(self);
     RETVAL = deq_perl_pop_wait(aTHX_ self, h, &v, 1, timeout) ? newSViv((IV)v) : &PL_sv_undef;
@@ -495,13 +499,7 @@ push_back(self, val)
     STRLEN slen;
     const char *s = SvPV(val, slen);
     REEXTRACT_DEQ(self);
-    uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    slen = deq_str_length(s, slen, max_len, SvUTF8(val));
-    uint8_t *buf;
-    Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
-    memcpy(buf, &l32, sizeof(uint32_t));
-    memcpy(buf + sizeof(uint32_t), s, slen);
+    uint8_t *buf = deq_str_elem(aTHX_ h, val, s, slen);
     RETVAL = deq_try_push_back(h, buf, h->elem_size);
     Safefree(buf);
   OUTPUT:
@@ -517,13 +515,7 @@ push_front(self, val)
     STRLEN slen;
     const char *s = SvPV(val, slen);
     REEXTRACT_DEQ(self);
-    uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    slen = deq_str_length(s, slen, max_len, SvUTF8(val));
-    uint8_t *buf;
-    Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
-    memcpy(buf, &l32, sizeof(uint32_t));
-    memcpy(buf + sizeof(uint32_t), s, slen);
+    uint8_t *buf = deq_str_elem(aTHX_ h, val, s, slen);
     RETVAL = deq_try_push_front(h, buf, h->elem_size);
     Safefree(buf);
   OUTPUT:
@@ -537,17 +529,11 @@ push_back_wait(self, val, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV_nomg(ST(2));
     STRLEN slen;
     const char *s = SvPV(val, slen);
     REEXTRACT_DEQ(self);
-    uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    slen = deq_str_length(s, slen, max_len, SvUTF8(val));
-    uint8_t *buf;
-    Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
-    memcpy(buf, &l32, sizeof(uint32_t));
-    memcpy(buf + sizeof(uint32_t), s, slen);
+    uint8_t *buf = deq_str_elem(aTHX_ h, val, s, slen);
     RETVAL = deq_try_push_back(h, buf, h->elem_size);
     if (RETVAL || timeout == 0) {
         Safefree(buf);
@@ -566,17 +552,11 @@ push_front_wait(self, val, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV_nomg(ST(2));
     STRLEN slen;
     const char *s = SvPV(val, slen);
     REEXTRACT_DEQ(self);
-    uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    slen = deq_str_length(s, slen, max_len, SvUTF8(val));
-    uint8_t *buf;
-    Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
-    memcpy(buf, &l32, sizeof(uint32_t));
-    memcpy(buf + sizeof(uint32_t), s, slen);
+    uint8_t *buf = deq_str_elem(aTHX_ h, val, s, slen);
     RETVAL = deq_try_push_front(h, buf, h->elem_size);
     if (RETVAL || timeout == 0) {
         Safefree(buf);
@@ -642,7 +622,7 @@ pop_front_wait(self, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV_nomg(ST(1));
     uint8_t *buf;
     REEXTRACT_DEQ(self);
     Newx(buf, h->elem_size, uint8_t);
@@ -669,7 +649,7 @@ pop_back_wait(self, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV_nomg(ST(1));
     uint8_t *buf;
     REEXTRACT_DEQ(self);
     Newx(buf, h->elem_size, uint8_t);

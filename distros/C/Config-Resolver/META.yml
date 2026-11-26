@@ -5,16 +5,16 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
-  IO::Scalar: '0'
-  IO::String: '0'
-  JSON: '0'
-  Test::Warn: '0'
-  YAML::Tiny: '0'
+  IO::Scalar: '2.113'
+  IO::String: '1.08'
+  JSON: '4.10'
+  Test::Warn: '0.37'
+  YAML::Tiny: '1.76'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.7901, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,24 +27,26 @@ no_index:
 provides:
   Config::Resolver:
     file: lib/Config/Resolver.pm
-    version: v1.0.10
+    version: 1.0.12
+  Config::Resolver::CLI:
+    file: lib/Config/Resolver/CLI.pm
+    version: 1.0.12
   Config::Resolver::Utils:
     file: lib/Config/Resolver/Utils.pm
-    version: v1.0.10
+    version: 1.0.12
 requires:
-  CLI::Simple: '0'
-  Class::Accessor::Fast: '0'
-  Config::INI::Tiny: '0'
-  JSON: '0'
-  List::Util: '0'
-  Module::Load: '0'
-  Query::Param: '0'
-  Readonly: '0'
-  YAML::Tiny: '0'
+  CLI::Simple: v1.0.9
+  Class::Accessor::Fast: '0.51'
+  Config::INI::Tiny: '0.106'
+  JSON: '4.10'
+  Log::Log4perl: '0'
+  Query::Param: '0.02'
+  Readonly: '2.05'
+  YAML::Tiny: '1.76'
   perl: '5.010'
 resources:
   bugtracker: http://github.com/rlauer6/Config-Resolver/issues
   homepage: http://github.com/rlauer6/Config-Resolver.git
   repository: git://github.com/rlauer6/Config-Resolver.git
-version: v1.0.10
+version: v1.0.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

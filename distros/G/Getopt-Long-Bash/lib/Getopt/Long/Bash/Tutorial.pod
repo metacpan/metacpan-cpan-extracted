@@ -164,7 +164,32 @@ The C<@> suffix creates an array. Try it:
       - *.bak
       - *.tmp
 
-=head2 Example 3: Using Hashes for Key-Value Pairs
+=head2 Example 3: Passing Options to Another Command
+
+To give options to a command used inside the script:
+
+    #!/usr/bin/env bash
+
+    declare -A OPTS=(
+        [ number    | n  ]=
+        [ sort-opts | S *]=
+    )
+
+    . getoptlong.sh OPTS "$@"
+
+    sort "${sort_opts[@]}" "$@" | if [[ $number ]] ; then cat -n ; else cat ; fi
+
+The C<*> suffix takes the arguments up to C<--> as they are, without
+parsing them as options:
+
+    $ ./example.sh --sort-opts -k 2 -n -- data.txt -n
+         1  c 1
+         2  b 2
+         3  a 10
+
+The first C<-n> goes to B<sort>, and the last one is the script's own.
+
+=head2 Example 4: Using Hashes for Key-Value Pairs
 
 For configuration-style options:
 
@@ -191,7 +216,7 @@ The C<%> suffix creates an associative array:
 
 Note: C<-D DEBUG> without a value is treated as C<DEBUG=1>.
 
-=head2 Example 4: Verbosity Levels
+=head2 Example 5: Verbosity Levels
 
 Use C<+> for incremental flags:
 

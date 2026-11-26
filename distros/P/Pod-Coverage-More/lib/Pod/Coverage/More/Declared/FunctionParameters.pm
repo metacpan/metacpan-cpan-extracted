@@ -1,7 +1,7 @@
 # ABSTRACT: Declarations of the signatures of Function::Parameters
 # PODNAME: Pod::Coverage::More::Declared::FunctionParameters
 
-package Pod::Coverage::More::Declared::FunctionParameters 0.003;
+package Pod::Coverage::More::Declared::FunctionParameters 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -80,7 +80,7 @@ Pod::Coverage::More::Declared::FunctionParameters - Declarations of the signatur
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 DESCRIPTION
 

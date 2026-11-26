@@ -1,5 +1,27 @@
 Revision history for Getopt-Long-Bash
 
+2.1.0 2026-11-26T09:29:55Z
+
+    - INCOMPATIBLE CHANGES in EXIT_ON_ERROR.  Scripts which disable
+      EXIT_ON_ERROR to leave undefined options in the arguments, such
+      as the options of a subcommand, have to be updated: disable
+      PERMUTE instead, and give the global options before the
+      subcommand
+    - INCOMPATIBLE: with EXIT_ON_ERROR disabled, getoptlong parse
+      stops at the first error and returns 1, and leaves the
+      arguments as they are.  An undefined option was left in the
+      arguments, and it went wrong in a cluster of short options:
+      "-w170" for an undefined -w gave the argument before it three
+      times
+    - INCOMPATIBLE: a long option without its argument and a
+      validation error also return 1 with EXIT_ON_ERROR disabled.
+      They exited the script regardless of EXIT_ON_ERROR
+    - With EXIT_ON_ERROR disabled, SILENT suppresses all the error
+      messages of parsing, not only those of getopts
+    - Nothing changes with EXIT_ON_ERROR enabled, the default
+    - New option type "*": the arguments up to "--" are collected into
+      an array as they are, as "--names a b --"
+
 2.0.0 2026-11-23T11:38:05Z
 
     - INCOMPATIBLE CHANGES in getoptlong callback.  Scripts which

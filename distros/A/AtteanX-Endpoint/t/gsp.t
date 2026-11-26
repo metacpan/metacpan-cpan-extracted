@@ -5,46 +5,19 @@ use v5.14;
 use warnings;
 no warnings 'redefine';
 
+use Encode qw(encode);
+use URI::Escape qw(uri_escape);
+
 use Attean::RDF;
 use AtteanX::Endpoint;
 use Test::WWW::Mechanize::PSGI;
+use Test::AtteanX::Endpoint;
 
-sub mech_for_nquads {
-	my $allow_update	= shift;
-	my $nquads			= shift;
-	my $config			= {
-		endpoint	=> {
-			service_description => {},
-			html				=> {},
-			load_data			=> 0,
-			update				=> $allow_update,
-		}
-	};
-
-	my $store	= Attean->get_store('Memory')->new();
-	my $model	= Attean::MutableQuadModel->new( store => $store );
-	my $graph	= iri('http://example.org/graph');
-	$model->load_triples('nquads', $graph => $nquads);
-
-
-	my $end		= AtteanX::Endpoint->new( model => $model, conf => $config, graph => $graph );
-	my $app	= sub {
-		my $env 	= shift;
-		my $req 	= Plack::Request->new($env);
-		my $resp	= $end->run( $req );
-		return $resp->finalize;
-	};
-
-	my $mech	= Test::WWW::Mechanize::PSGI->new(app => $app);
-	return $mech;
-}
-
-
-my $mech	= mech_for_nquads(1, <<"END");
-_:b <num> "000" .
-_:b <num> "123" <http://example.org/graph1> .
-_:b <num> "787" <http://example.org/graph2> .
-<doc> <name> "My Document" <http://example.org/graph3> .
+my $mech	= Test::AtteanX::Endpoint->mech_for_nquads(update => 1, <<"END");
+_:b <http://example.org/num> "000" .
+_:b <http://example.org/num> "123" <http://example.org/graph1> .
+_:b <http://example.org/num> "787" <http://example.org/graph2> .
+<http://example.org/doc> <http://example.org/name> "My Document" <http://example.org/graph3> .
 END
 
 subtest 'HEAD default graph' => sub {
@@ -133,6 +106,62 @@ END
 	is( $mech->ct, 'application/n-triples', 'Is application/n-triples' );
 	$mech->content_like(qr#http://example.org/value#);
 	$mech->content_like(qr#rdf/xml value#);
+};
+
+# Returns the character length of the single literal object in $graph, as seen
+# by the query engine. This distinguishes correctly-decoded UTF-8 content from
+# mojibake, which a byte-level round-trip through the GSP endpoint cannot do
+# (the serializer writes latin-1 characters back out as the same bytes).
+sub literal_length {
+	my $graph	= shift;
+	my $sparql	= "SELECT (STRLEN(?o) AS ?len) WHERE { GRAPH <$graph> { ?s ?p ?o } }";
+	$mech->get('/sparql?query=' . uri_escape($sparql), Accept => 'application/sparql-results+json', 'Accept-Encoding' => '');
+	return unless ($mech->success);
+	my $parser	= Attean->get_parser('SPARQLJSON')->new();
+	my ($res)	= $parser->parse_list_from_bytes($mech->content);
+	my $len		= $res->value('len')->value;
+	return $len;
+}
+
+subtest 'PUT named graph (RDF/XML, non-ASCII)' => sub {
+	my $graph	= 'http://example.org/rdfxml-utf8';
+	my $value	= encode('UTF-8', "caf\x{e9} \x{263a}"); # "café" + U+263A WHITE SMILING FACE
+	$mech->put('/gsp?graph=' . uri_escape($graph), 'Content-Type' => 'application/rdf+xml', content => <<"END");
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:eg="http://example.org/">
+  <rdf:Description rdf:about="http://example.org/s" eg:value="$value" />
+</rdf:RDF>
+END
+	ok( $mech->success, 'RDF/XML body with non-ASCII content accepted' );
+	is( literal_length($graph), 6, 'RDF/XML body decoded as UTF-8' );
+};
+
+subtest 'POST multipart upload (RDF/XML, non-ASCII)' => sub {
+	my $graph	= 'http://example.org/upload-rdfxml';
+	my $value	= encode('UTF-8', "caf\x{e9} \x{263a}"); # "café" + U+263A WHITE SMILING FACE
+	my $rdfxml	= <<"END";
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:eg="http://example.org/">
+  <rdf:Description rdf:about="http://example.org/s" eg:value="$value" />
+</rdf:RDF>
+END
+	$mech->post('/gsp?graph=' . uri_escape($graph),
+		Content_Type	=> 'form-data',
+		Content			=> [ data => [ undef, 'data.rdf', Content_Type => 'application/rdf+xml', Content => $rdfxml ] ],
+	);
+	ok( $mech->success, 'RDF/XML upload with non-ASCII content accepted' );
+	is( literal_length($graph), 6, 'RDF/XML upload decoded as UTF-8' );
+};
+
+subtest 'POST multipart upload (Turtle, non-ASCII)' => sub {
+	my $graph	= 'http://example.org/upload-turtle';
+	my $turtle	= encode('UTF-8', qq[<http://example.org/s> <http://example.org/t> "na\x{ef}ve \x{263a}" .\n]); # "naïve" + U+263A WHITE SMILING FACE
+	$mech->post('/gsp?graph=' . uri_escape($graph),
+		Content_Type	=> 'form-data',
+		Content			=> [ data => [ undef, 'data.ttl', Content_Type => 'text/turtle', Content => $turtle ] ],
+	);
+	ok( $mech->success, 'Turtle upload with non-ASCII content accepted' );
+	is( literal_length($graph), 7, 'Turtle upload decoded as UTF-8' );
 };
 
 done_testing();

@@ -11,7 +11,7 @@ my $RE_IDENT = qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 my $RE_TABLE = qr/\A[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?\z/;
 
 BEGIN {
-    our $VERSION = '0.09';
+    our $VERSION = '0.10';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -125,7 +125,8 @@ sub new {
     # 0/'' must reach the setter so e.g. `compress => 0` is honored, not
     # ignored. (Use `exists` rather than `defined` so a deliberate undef
     # is also passed through and rejected by the setter if invalid.)
-    for my $opt (qw(compress tls tls_skip_verify auto_reconnect
+    for my $opt (qw(compress compress_method compress_level compress_block_size
+                    tls tls_skip_verify auto_reconnect
                     keepalive reconnect_delay reconnect_max_delay
                     reconnect_jitter reconnect_max_attempts
                     progress_period http_basic_auth
@@ -2187,6 +2188,25 @@ client pins C<network_compression_method=LZ4> on every query unless
 you set that setting yourself, so servers whose default is ZSTD stay
 readable (ZSTD responses are rejected loudly, never misdecoded).
 
+=item compress_method => 'lz4' | 'zstd'
+
+Native protocol with C<compress>: the codec of what the client sends
+(INSERT data, external tables). Default: C<'lz4'>. C<'zstd'> needs a
+build that found libzstd (C<< EV::ClickHouse->features->{zstd} >>) and
+croaks otherwise; responses stay LZ4.
+
+=item compress_level => $level
+
+ZSTD level for C<compress_method =E<gt> 'zstd'>. Default: C<1>, as
+ClickHouse's C<network_zstd_compression_level>.
+
+=item compress_block_size => $bytes
+
+Native protocol with C<compress>: the uncompressed size of each
+compressed frame the client sends, so the server decompresses a Data
+block a frame at a time. Default: 1048576, as clickhouse-client. C<0>
+compresses each Data block as one frame. At most 1 GiB.
+
 =item session_id => $id
 
 HTTP session id for stateful operations (temporary tables, SET, etc.).
@@ -2795,7 +2815,8 @@ need the raw integer.
 
 Build capabilities as a hashref, callable on the class or on a
 connection. C<lz4> is 1 (LZ4 is bundled); C<tls> is 1 when built
-with OpenSSL, 0 otherwise.
+with OpenSSL, 0 otherwise; C<zstd> is 1 when built with libzstd
+(C<compress_method =E<gt> 'zstd'>), 0 otherwise.
 
 =head2 has_lz4
 
@@ -3494,6 +3515,9 @@ ProfileInfo packet on the native protocol, or from C<X-ClickHouse-Summary>
 
 =item * OpenSSL (optional, for TLS; auto-detected at build time)
 
+=item * libzstd (optional, for C<compress_method =E<gt> 'zstd'>;
+auto-detected at build time, skipped with C<perl Makefile.PL --without-zstd>)
+
 LZ4 (for native protocol compression) is bundled with the
 distribution; no system library is needed.
 
@@ -3857,7 +3881,8 @@ Perl hashref. Keys are stringified.
 =item LowCardinality(T)
 
 Transparent: encodes/decodes as the inner type. Cross-block dictionaries
-are managed internally.
+are managed internally. An insert sends each distinct value once per
+column and block.
 
 =item SimpleAggregateFunction / AggregateFunction
 

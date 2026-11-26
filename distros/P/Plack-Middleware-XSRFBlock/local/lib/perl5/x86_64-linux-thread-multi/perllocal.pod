@@ -1,0 +1,198 @@
+=head2 Wed Nov 25 14:22:14 2026: C<Module> L<ExtUtils::MakeMaker|ExtUtils::MakeMaker>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dakkar/src/plack-middleware-xsrfblock/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 7.78>
+
+=item *
+
+C<EXE_FILES: bin/instmodsh>
+
+=back
+
+=head2 Wed Nov 25 14:22:18 2026: C<Module> L<HTML::Parser|HTML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dakkar/src/plack-middleware-xsrfblock/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.87>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Nov 25 14:22:19 2026: C<Module> L<HTTP::Cookies|HTTP::Cookies>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dakkar/src/plack-middleware-xsrfblock/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 6.12>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Nov 25 14:22:20 2026: C<Module> L<HTTP::Message|HTTP::Message>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dakkar/src/plack-middleware-xsrfblock/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 7.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Nov 25 14:22:21 2026: C<Module> L<LWP|LWP>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dakkar/src/plack-middleware-xsrfblock/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 6.83>
+
+=item *
+
+C<EXE_FILES: bin/lwp-download bin/lwp-dump bin/lwp-mirror bin/lwp-request>
+
+=back
+
+=head2 Wed Nov 25 14:22:22 2026: C<Module> L<parent|parent>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dakkar/src/plack-middleware-xsrfblock/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.244>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Nov 25 14:22:24 2026: C<Module> L<Crypt::SysRandom|Crypt::SysRandom>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dakkar/src/plack-middleware-xsrfblock/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.008>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Nov 25 14:22:26 2026: C<Module> L<Sub::Exporter|Sub::Exporter>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dakkar/src/plack-middleware-xsrfblock/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.992>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Nov 25 14:22:28 2026: C<Module> L<Test::Simple|Test::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dakkar/src/plack-middleware-xsrfblock/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.302226>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

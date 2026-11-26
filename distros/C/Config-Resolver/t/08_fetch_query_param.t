@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use Data::Dumper;
@@ -15,7 +11,7 @@ use Data::Dumper;
 {
 
   package MockCLI;
-  our @ISA = qw(CLI::Config::Resolver);
+  our @ISA = qw(Config::Resolver::CLI);
   sub init { }
 
   # Stub: This is *only* for the -V string
@@ -30,7 +26,7 @@ use Data::Dumper;
 }
 
 # We need the specs that are actually called
-my @option_specs = qw(parameters|V=s parameters_hash);
+my @option_specs = qw(debug|g);
 
 # --- Create one mock object for all tests ---
 my $mock = MockCLI->new(

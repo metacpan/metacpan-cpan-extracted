@@ -1,5 +1,35 @@
 Revision history for Perl extension App-mdee
 
+1.29 2026-11-26T06:47:13Z
+
+    - On paper (-T, or -o with a PDF file), images are drawn by
+      ansi2pdf 0.2.0 or later: the rows of an image tell it the file
+      (image_osc of the md module, Text::ANSI::Image 0.02)
+    - Images are shown when the output goes to a pipe too, not only
+      to the terminal; not to a file
+    - A pane does not end inside a row of a table, nor between the
+      header and the first row (App::ansicolumn 1.72, --table-group)
+    - With --refill, a table that the parser takes for a paragraph no
+      longer makes greple fail when tables are kept intact
+
+1.28 2026-11-25T12:22:42Z
+
+    - Show images in the terminal: a line which is a Markdown image,
+      or an HTML <img>, is followed by the image, drawn by
+      Text::ANSI::Image with the Unicode placeholders of the kitty
+      graphics protocol, in iTerm2 3.7.3 or later, Ghostty and kitty,
+      with less 632 or later.  --image takes the types to show
+      (png,jpeg,gif by default), and --no-image turns it off.  With
+      nup, an image is kept in one pane (App::ansicolumn 1.71)
+    - less is always given -X: the last page stays on the screen after
+      it ends, and the images are on the screen they are sent to
+    - -r is no longer --refill: it reverses the default of --refill, so
+      that it turns refill off where default[refill]=1 turns it on.
+      -rr gives the default back, and --refill and --no-refill take
+      effect over it
+    - default[refill] is read as the other flags: any value which is
+      not empty is on, 0 too
+
 1.27 2026-11-24T07:52:43Z
 
     - Require Getopt::Long::Bash 2.0.0, which has the fix of the

@@ -1,3 +1,66 @@
+Wed Nov 25 17:22:42 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.12]:
+	* Makefile: added by CPAN-Maker-Bootstrapper
+	* .includes/add-plugin.mk: likewise
+	* .includes/bash-completion.mk: likewise
+	* .includes/bootstrap.mk: likewise
+	* .includes/build-init.mk: likewise
+	* .includes/builder.mk: likewise
+	* .includes/git.mk: likewise
+	* .includes/help.mk: likewise
+	* .includes/local.mk: likewise
+	* .includes/modulino.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/test.mk: likewise
+	* .includes/update.mk: likewise
+	* .includes/upgrade.mk: likewise
+	* .includes/version.mk: likewise
+	* .gitignore: likewise
+	* README.md: generated
+	* VERSION: bump
+	* bin/config-resolver.in: new
+	* buildspec.yml: replace _ with -
+	* config.mk: new
+	* cpanfile: generated
+	* lib/Config/Resolver.pm.in
+	* lib/Config/Resolver/CLI.pm.in: renamed from bin/config-resolver.pl.in
+	* lib/Config/Resolver/Utils.pm.in: whitespace
+	* project.mk: new
+	* recommends: new
+	* requires
+	- +Log:Log4perl
+	- bump to recent versions
+	* suggests: new
+	* t/00-config-resolver.t: new
+	* t/01_plugin_config.t: updated to account for Config::Resolver::CLI change
+	* t/02_process_manifest.t: likewise
+	* t/03_cmd_dump.t: likewise
+	* t/04_fetch_file.t: likewise
+	* t/05_resolve_stream.t: likewise
+	* t/06_fetch_parameters.t: likewise
+	* t/07_format_value.t: likewise
+	* t/08_fetch_query_param.t: likewise
+	* t/09_write_output.t: likewise
+	* t/10_from_ini_file.t: likewise
+	* t/11_to_object.t: likewise
+	* t/12_resolve.t: likewise
+	* t/90_integration.t: likewise
+	* t/91_pipelining.t: likewise
+	* t/92_integration_dump.t: likewise
+	* t/93_integration_simple.t: likewise
+	* t/94_integration_failure.t: likewise
+	* t/95_integration_backends.t: likewise
+	* test-requires: generated, bump to recent versions
+
+Mon Dec 15 16:34:57 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.11]:
+	* VERSION: bump
+	* bin/config-resolver.pl.in
+	(build_manifest): remove temp file
+	(init): likewise
+
 Sun Dec  7 11:11:24 2025  Rob Lauer  <rclauer@gmail.com>
 
 	[1.0.10]:

@@ -27,6 +27,8 @@ use overload
     '@{}'    => \&Ekorn::Pipeline::Operators::drain,
     fallback => 1;
 
+our $VERSION = 'v4.1.1';
+
 # Croak at the line that called DBIx::Squirrel.
 our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
 
@@ -84,6 +86,13 @@ sub all ($self) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
         _finish($self);
     }
     return wantarray ? @$all : $all;
+}
+
+# Return the results still to come as an array reference, in any
+# context, so a hash constructor, an argument list or a sub's return
+# can't flatten them, as all's list would be.
+sub all_arrayref ($self) {
+    return scalar $self->all;
 }
 
 # Return the next result, or undef if there's none, and finish the run.
@@ -398,8 +407,8 @@ run out.
 Rows are fetched with L<DBI/fetchall_arrayref>, 2 at first, the least
 that tells whether there's a second, then twice as many each time a
 fetch fills its batch, up to 64. Past 64, each fetch's cost is spread
-so thin that a bigger batch reads hardly any faster, and holds more of
-a wide row's data. L</all> without stages fetches the rest at once.
+so thin that a batch of 1,024 read narrow rows at most 7% faster, and
+would hold more of a wide row's data. L</all> without stages fetches the rest at once.
 Each row is an array, or, with the C<ekorn_slice> attribute, in the
 shape it gives:
 
@@ -446,7 +455,8 @@ finished. L</reset> runs it again, from the start.
 
 Returns the results still to come, reading the run to its end: as a
 list, or, asked for one value, an array reference of them. Either way,
-the statement is finished, and C<next> returns nothing after.
+the statement is finished, and C<next> returns nothing after. For a
+reference whatever the context, use L</all_arrayref>.
 
 Without stages, the rows are the results. So C<all> takes what's left
 of the batch fetched last, and fetches the rest with one
@@ -461,6 +471,20 @@ quicker than a stage:
 Use stages when the rows should come one at a time, from C<next>, or
 may stop early, or should go with the statement, as in a Sugar
 statement.
+
+=head2 all_arrayref
+
+    $results = $it->all_arrayref;
+
+Returns the results still to come as an array reference, whatever the
+context it's called in, reading the run to its end as L</all> does.
+In a hash constructor, an argument list or a sub's return, C<all>
+gives a list, flattened into what's around it, unless you write
+C<scalar>; C<all_arrayref> gives one reference:
+
+    my %report = (rows => $it->all_arrayref, title => 'Artists');
+
+With no results left, it returns an empty array reference.
 
 =head2 first
 

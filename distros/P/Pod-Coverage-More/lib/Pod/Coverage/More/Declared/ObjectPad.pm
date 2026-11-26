@@ -1,7 +1,7 @@
 # ABSTRACT: Declarations of the classes of Object::Pad
 # PODNAME: Pod::Coverage::More::Declared::ObjectPad
 
-package Pod::Coverage::More::Declared::ObjectPad 0.003;
+package Pod::Coverage::More::Declared::ObjectPad 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -81,7 +81,7 @@ Pod::Coverage::More::Declared::ObjectPad - Declarations of the classes of Object
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::BBO::2023;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 use Moose;
 use namespace::autoclean;
 
@@ -7,10 +7,6 @@ use namespace::autoclean;
 
 with qw(
     Finance::Tax::Aruba::Role::BBO::TaxYear
-);
-
-has '+bbo_rate' => (
-    default => 0.03,
 );
 
 has '+bbo_at_border' => (
@@ -40,13 +36,13 @@ Finance::Tax::Aruba::BBO::2023 - BBO calculator for the year 2023
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 DESCRIPTION
 
 BBO calculator for the year 2023.
 
-The rate is 6%: BBO 3% plus BAZV 3%.
+The rate is 7%: BBO 2.5%, BAVP 1.5% and BAZV 3%.
 
 =head1 METHODS
 

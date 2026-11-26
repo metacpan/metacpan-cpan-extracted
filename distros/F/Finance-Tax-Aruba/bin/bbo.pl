@@ -58,6 +58,9 @@ sub _p { return sprintf('%.2f', shift) }
 my @rows = (
     ['Domestic sales',       _p($opts{domestic})],
     [sprintf('BBO (%s%%)', $calc->bbo_rate * 100), _p($calc->domestic_tax_bbo($opts{domestic}))],
+    ($calc->bavp_rate
+        ? [sprintf('BAVP (%s%%)', $calc->bavp_rate * 100), _p($calc->domestic_tax_bavp($opts{domestic}))]
+        : ()),
     [sprintf('BAZV (%s%%)', $calc->bazv_rate * 100), _p($calc->domestic_tax_bazv($opts{domestic}))],
     ['Domestic BBO owed',    _p($calc->domestic_tax($opts{domestic}))],
     ['Domestic net (kept)',  _p($calc->domestic_net($opts{domestic}))],
@@ -89,7 +92,7 @@ bbo.pl - A BBO (Aruba turnover tax) calculator
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -102,7 +105,8 @@ version 0.015
 Calculate BBO (Belasting op Bedrijfsomzetten), Aruba's turnover tax, for a
 filing period, including the import credit against domestic BBO owed.
 
-The BBO owed is the BBO part (4%) and the BAZV part (3%) combined, 7% in total.
+The BBO owed is the BBO part (2.5%), the BAVP part (1.5%) and the BAZV part
+(3%) combined, 7% in total.
 
 =head1 OPTIONS
 

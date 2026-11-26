@@ -34,28 +34,18 @@ for my $i (1 .. $dq->capacity) {
 }
 ok $dq->is_empty;
 
-# Max-len truncation
-my $dq2 = Data::Deque::Shared::Str->new(undef, 5, 4);
-ok $dq2->push_back("abcdefgh"), 'push long string';
-is $dq2->pop_front, "abcd", 'string truncated to max_len';
-
+# max_len counts bytes; a longer value croaks and stores nothing
 for my $push (qw(push_back push_front push_back_wait push_front_wait)) {
-    for my $case ([2, chr(0x20ac), ''],
-                  [3, 'a' . chr(0x20ac), 'a'],
-                  [4, 'a' . chr(0x20ac) . 'b', 'a' . chr(0x20ac)],
-                  [4, 'a' . chr(0x1f642), 'a']) {
-        my ($max, $input, $expected) = @$case;
-        my $d = Data::Deque::Shared::Str->new(undef, 1, $max);
-        ok $d->$push($input), "$push: push Unicode with max_len=$max";
-        my $got = $d->pop_front;
-        ok utf8::is_utf8($got) && utf8::valid($got), "$push: valid UTF-8 after truncation";
-        is $got, $expected, "$push: truncates at a character boundary";
-    }
-    my $d = Data::Deque::Shared::Str->new(undef, 1, 2);
-    $d->$push("\xe2\x82\xac");
-    my $got = $d->pop_back;
-    is $got, "\xe2\x82", "$push: byte strings retain byte truncation";
-    ok !utf8::is_utf8($got), "$push: byte string stays unflagged";
+    my $d = Data::Deque::Shared::Str->new(undef, 4, 4);
+    ok $d->$push('abcd'), "$push: a value of max_len bytes fits";
+    ok $d->$push('a' . chr(0x20ac)), "$push: so does a 4-byte UTF-8 string";
+    eval { $d->$push('abcde') };
+    like $@, qr/value of 5 bytes exceeds max_len 4/, "$push: a longer byte string croaks";
+    eval { $d->$push('ab' . chr(0x20ac)) };
+    like $@, qr/value of 5 bytes exceeds max_len 4/, "$push: so does a longer UTF-8 string";
+    is $d->size, 2, "$push: the refused values were not stored";
+    my @got = sort map { $d->pop_front } 1 .. 2;
+    is_deeply \@got, [sort 'abcd', 'a' . chr(0x20ac)], "$push: stored values round-trip";
 }
 
 # Empty string allowed

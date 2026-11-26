@@ -29,12 +29,12 @@ ansipic [options] file ...
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 EXAMPLES
 
     ansipic logo.png
-    ansipic -w 2/ *.png | less -R
+    ansipic -w 2/ *.png | LESSUTFCHARDEF=10EEEE:p less -RX
     ansipic images/*.png | ansicolumn -c 2
 
 =head1 DESCRIPTION
@@ -52,12 +52,54 @@ by C<less> and put in columns by L<ansicolumn(1)|App::ansicolumn>, as
 any other text.
 
 PNG, JPEG and GIF files are shown.  The image itself is sent to the
-terminal (F</dev/tty>), so the lines may go to a pipe or a file, and
-are shown when they come to the terminal.  C<less> needs
-C<LESSUTFCHARDEF=10EEEE:p> (C<less> 632 or later) to show them.
+terminal (F</dev/tty>), so the lines may go to a pipe, and are shown
+when they come to the terminal.
 
 A file which is not shown is told on the standard error, and the
 status is 1.
+
+=head1 TERMINALS
+
+The images are drawn by the Unicode placeholders of the kitty graphics
+protocol, which these terminals support:
+
+=over 4
+
+=item * kitty
+
+=item * Ghostty (cmux too, which is built on it)
+
+=item * iTerm2 3.7.3 or later
+
+=back
+
+The terminal is told by the environment: C<TERM_PROGRAM> is
+C<ghostty>, or C<iTerm.app> with C<TERM_PROGRAM_VERSION> 3.7.3 or
+later, or C<TERM> is C<xterm-kitty>.  In another terminal, B<ansipic>
+shows nothing, and ends with the status 2.
+
+The environment may be wrong.  A terminal started from another one,
+as by C<open -a> from iTerm2, may inherit its C<TERM_PROGRAM>; in
+C<tmux> or C<screen>, the terminal outside is not told.  When the
+terminal does support the protocol, B<-m kitty> shows the images
+anyway.
+
+To page the lines by C<less>, C<less> has to take the placeholder
+character U+10EEEE as a printable one: C<less> 632 or later does with
+C<LESSUTFCHARDEF=10EEEE:p>.  C<-R> passes the colors, which are the
+ids of the images, and C<-X> keeps C<less> on the screen where the
+images are: Ghostty keeps an image on the screen it is sent to, and
+does not show it on the alternate screen.
+
+    ansipic *.png | LESSUTFCHARDEF=10EEEE:p less -RX
+
+A search of C<less> which matches the lines, as with C<.*>, draws the
+cells in the color of its highlight instead of the image; C<ESC-u>
+shows the image again.
+
+The image is sent to the terminal, not to the output.  The output
+saved in a file shows no image when it is shown later, unless the
+terminal still has the image.
 
 =head1 OPTIONS
 

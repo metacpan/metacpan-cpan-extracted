@@ -21,7 +21,7 @@ use Data::URIID::Service;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.26;
+our $VERSION = v0.27;
 
 my %names = (
     service => {
@@ -74,6 +74,7 @@ my %names = (
         'denkxweb-hessen'   => '05bbc5d4-b77f-48bb-b458-97ddc16ab48f', # denkxweb.denkmalpflege-hessen.de
         'ibbco'             => '39b7c20f-5521-49ec-9292-5794131e4291', # ibb.co
         'wikifunctions'     => 'd98d0c76-e970-4303-bb63-13df8edc51fb', # www.wikifunctions.org
+        'term-md'           => 'faa67ebc-4113-42b5-8338-77e6350d54ef', # term.museum-digital.de
 
         # schemes using namespace 0883381d-1d01-4aa2-bd15-e8bb7ac7673d
         'scheme-ni'         => '0293c674-7576-572e-ab19-81d8e1ce0300',
@@ -139,6 +140,7 @@ my %names = (
         'denkxweb-hessen-identifier'    => '3b215e80-0df1-4b77-aa25-69df66db7b3b', # P1769
         'ibbco-identifier'              => '308d4b1c-6007-42d0-8d83-c13c92c03426',
         'unicode-code-point'            => '5f167223-cc9c-4b2f-9928-9fe1b253b560',
+        'md-tag-identifier'             => '96dee3b8-f287-433b-9d25-0f205f062c50',
     },
     action => {
         #What about: search/lookup? list? content?
@@ -277,6 +279,11 @@ sub lookup {
             $secondary{attributes}{final_file_size} //= {'*' => $data->{properties}{size}} if defined $data->{properties}{size};
             $secondary{attributes}{roles} = [[Data::Identifier->new(sid => 17)]];
             $secondary{digest} = $data->{digests};
+        } elsif ($uri->isa('Lingua::Generic::Interface::Word')) {
+            $secondary{attributes} //= {};
+            $secondary{attributes}{natural_language} //= {'*' => [[$uri->natural_language]]};
+            eval { $secondary{attributes}{tagged_as} //= {'*' => [[$uri->concepts]]} };
+            $uri = $uri->as('Data::Identifier');
         } else {
             my $id = eval {Data::Identifier->new(from => $uri)};
 
@@ -319,6 +326,7 @@ sub lookup {
             if ($type eq 'qrcode') {
                 # Bit more relaxed URLs...
                 $uri =~ s#^www\.#https://www.#; # Try to add missing protocol.
+                $uri =~ s/^TerminID_//;
                 $type = 'auto';
             }
 
@@ -576,7 +584,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.26
+version v0.27
 
 =head1 SYNOPSIS
 

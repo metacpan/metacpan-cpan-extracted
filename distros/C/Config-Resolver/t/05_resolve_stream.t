@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use IO::String;  # Core module for creating in-memory filehandles
@@ -40,7 +36,7 @@ use IO::String;  # Core module for creating in-memory filehandles
 {
 
   package MockCLI;
-  our @ISA = qw(CLI::Config::Resolver);
+  our @ISA = qw(Config::Resolver::CLI);
 
   # Override init to do nothing
   sub init { }

@@ -6,12 +6,16 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-WoRMS
+provides:
+  Net::WoRMS:
+    file: lib/Net/WoRMS.pm
+    version: '1.9'
 requires:
   Data::Dumper: '2.10'
   Moo: '2.0'
@@ -20,7 +24,7 @@ requires:
   SOAP::Lite: '0.711'
   Syntax::Keyword::Match: '0.15'
   perl: '5.020'
-version: '1.7'
+version: '1.9'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: GPL-3.0-only

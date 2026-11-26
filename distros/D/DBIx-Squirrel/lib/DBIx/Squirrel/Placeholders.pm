@@ -10,6 +10,8 @@ use DBIx::Squirrel::Errors qw(croakf);
 
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v4.1.1';
+
 our @EXPORT_OK = qw(
     expand_lists
     is_numbered
@@ -212,9 +214,8 @@ sub _values_for ($binds, $args) {
     croakf 'Expected one value for each placeholder (two for %s)',
         join ', ', sort keys %twice
         if %twice;
-    # Each key given is the statement's, so as many as it has are all of
-    # them.
-    return \%given if keys %given == keys %$binds;
+    # Each key given is the statement's, so any it has that weren't given
+    # are missing.
     my @missing = sort grep { !exists $given{$_} } keys %$binds;
     croakf 'Expected a value for each placeholder (none for %s)',
         join(', ', @missing)

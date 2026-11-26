@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use Data::Dumper;
@@ -16,7 +12,7 @@ use JSON qw(to_json);  # We'll need this to test pretty-print
 {
 
   package MockCLI;
-  our @ISA = qw(CLI::Config::Resolver);
+  our @ISA = qw(Config::Resolver::CLI);
   sub init { }
 
   # Stubs for the accessors format_value uses
@@ -25,7 +21,7 @@ use JSON qw(to_json);  # We'll need this to test pretty-print
 }
 
 # We only need the specs that are actually called
-my @option_specs = qw(warning-level|w=s pretty|P);
+my @option_specs = qw(debug|g);
 
 # --- Create one mock object for all tests ---
 my $mock = MockCLI->new(

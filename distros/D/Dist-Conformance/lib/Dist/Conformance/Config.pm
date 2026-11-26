@@ -1,4 +1,4 @@
-package Dist::Conformance::Config 0.008;
+package Dist::Conformance::Config 0.011;
 
 # ABSTRACT: .conformance.yml, which picks the flavor of a repository and its source
 
@@ -65,7 +65,7 @@ Dist::Conformance::Config - .conformance.yml, which picks the flavor of a reposi
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -102,16 +102,40 @@ differently from the flavor.
 
 =head1 FUNCTIONS
 
-=head2 load
+=head2 load($snapshot)
 
-C<($snapshot)>.  The validated F<.conformance.yml> of the snapshot, with the
-defaults filled in.  Dies when the file is missing, does not parse or is not
-valid.
+The validated F<.conformance.yml> of the snapshot, with the defaults filled
+in.
 
-=head2 validate
+=over 4
 
-C<($data)>.  C<$data> checked against C<%SCHEMA>, with the defaults filled in,
-for a caller that has the configuration without the file.
+=item snapshot - InstanceOf["Dist::Conformance::Snapshot"] - the repository
+
+=back
+
+Returns HashRef, the configuration.
+
+Dies when the file is missing, does not parse or is not valid.
+
+    my $config = Dist::Conformance::Config::load($snapshot);
+
+=head2 validate($data)
+
+C<$data> checked against C<%SCHEMA>, with the defaults filled in, for a caller
+that has the configuration without the file.
+
+=over 4
+
+=item data - HashRef - the configuration
+
+=back
+
+Returns HashRef, a copy of C<$data> with the defaults filled in.
+
+Dies when the data is not valid, with a message that starts with
+C<.conformance.yml is not valid:>.
+
+    my $config = Dist::Conformance::Config::validate( { flavor => 'troglodyne', source => { directory => '/bogus/standards' } } );
 
 =head1 KEYS
 

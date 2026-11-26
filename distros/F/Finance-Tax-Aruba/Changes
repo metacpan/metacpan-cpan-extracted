@@ -9,6 +9,11 @@ TODO:
     * Add Profit tax
     * Add tourist levy
 
+0.016     2026-11-25 20:47:55Z
+
+    * Fix the BBO rate split: BBO, BAVP and BAZV are 1.5% + 1.5% + 3% up to
+      2022 and 2.5% + 1.5% + 3% from 2023
+
 0.015     2026-11-24 04:36:34Z
 
     * Add BBO (turnover tax) calculations and bbo.pl for 2020 and later

@@ -58,16 +58,17 @@ belongs in `dist.ini`.
 ## Delegation
 
 Delegate behavior-relevant code to the right agent instead of touching it
-yourself — principle and lane are in `.claude/rules/net-libssh-rules.md`.
+yourself — the delegation lock is a shared house rule (skilletor bundle
+`getty-cpan-dist@getty`); lanes and hazards are in `.claude/rules/net-libssh-rules.md`.
 
 | Task | Agent |
 |---|---|
 | Implement / refactor / debug behavior-relevant code | `net-libssh-worker` (default) |
 | Write/extend tests | `net-libssh-test-writer` |
 | Write/maintain POD | `net-libssh-doc-writer` |
-| Pre-release audit | `net-libssh-release-checker` |
+| Commits, `Changes`, card → done, pre-release audit | `net-libssh-release-manager` |
 
-The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the
+The agents carry their skills via `skills:` (see `.claude/agents/`); the
 main agent delegates rather than loading them. Skill sources live under
 `.claude/skills/`. The XS knowledge is split in two: `perl-xs` holds the general
 Perl/C boundary rules (magic-based objects and their free hooks, typemap syntax
@@ -75,5 +76,5 @@ and its escaping trap, refcounting, `ppport.h`, testing for crashes and leaks),
 while `net-libssh-core` holds what is specific to this distribution — the three
 object types, the generation counter that makes `disconnect()` survivable, and
 the API contracts `Rex::LibSSH` depends on. `perl-xs`, `getty-perl-core`,
-`getty-perl-release-author-getty` and `kanban-issues-karr-cli` are hardlinked
-shared skills; `net-libssh-core` is owned here.
+`getty-perl-release-author-getty` and the `kanban-issues-karr-*` skills are installed by
+skilletor; `net-libssh-core` and `net-libssh-hazards` are owned here.

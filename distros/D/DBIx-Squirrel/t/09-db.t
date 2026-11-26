@@ -244,6 +244,22 @@ subtest 'so do the select methods' => sub {
         'selectall_hashref';
 };
 
+# A bind that fails returns what a prepare that fails does: undef from
+# the methods returning a reference, nothing from the others (roadmap
+# 2026-0049).
+subtest 'the select methods, when bind fails' => sub {
+    my $dbh = DBIx::Squirrel->connect(@source[0 .. 2], {RaiseError => 0});
+    no warnings 'redefine';    ## no critic (TestingAndDebugging::ProhibitNoWarnings)
+    local *DBIx::Squirrel::st::bind = sub { return };
+    for my $method (qw(selectrow_arrayref selectrow_hashref selectall_arrayref))
+    {
+        is [$dbh->$method('SELECT :x', undef, x => 1)], [undef], $method;
+    }
+    for my $method (qw(selectrow_array selectcol_arrayref)) {
+        is [$dbh->$method('SELECT :x', undef, x => 1)], [], $method;
+    }
+};
+
 subtest 'do takes bind values without attributes' => sub {
     my $dbh = connect_both()->{squirrel};
     is $dbh->do(
@@ -653,6 +669,38 @@ subtest 'prepare_cached keeps statements rewritten the same apart' => sub {
     $_->finish for $ab, $ba;
     ref_is $dbh->prepare_cached('SELECT :b, :a'), $ba,
         'and the same statement still gets the cached handle';
+};
+
+# The DBI's prepare_cached calls the handle's prepare, which is ours, and
+# keeps what was studied on the handle it makes; a subclass's prepare
+# that goes straight to the DBI's keeps nothing, and prepare_cached adds
+# it (roadmap 2026-0049).
+subtest "prepare_cached, after a subclass's prepare that skips ours" => sub {
+
+    package Unstudied {    ## no critic (Modules::ProhibitMultiplePackages)
+        our @ISA = 'DBIx::Squirrel';
+    }
+
+    package Unstudied::db {    ## no critic (Modules::ProhibitMultiplePackages)
+        our @ISA = 'DBIx::Squirrel::db';
+
+
+        sub prepare ($self, @args) {
+            return $self->DBI::db::prepare(@args);
+        }
+    }
+
+    package Unstudied::st {    ## no critic (Modules::ProhibitMultiplePackages)
+        our @ISA = 'DBIx::Squirrel::st';
+    }
+
+    my $dbh = Unstudied->connect(@source);
+    my $sth = $dbh->prepare_cached('SELECT :a, :b');
+    is $sth->{private_ekorn}{Placeholders}, {1 => ':a', 2 => ':b'},
+        'keeps what was studied';
+    $sth->execute(b => 2, a => 1);
+    is $sth->fetchrow_arrayref, [1, 2], 'and binds by name';
+    $sth->finish;
 };
 
 done_testing;

@@ -26,10 +26,10 @@ no_index:
 provides:
   App::ansipic:
     file: lib/App/ansipic.pm
-    version: '0.01'
+    version: '0.02'
   Text::ANSI::Image:
     file: lib/Text/ANSI/Image.pm
-    version: '0.01'
+    version: '0.02'
   Text::ANSI::Image::kitty:
     file: lib/Text/ANSI/Image/kitty.pm
 requires:
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/tecolicom/Text-ANSI-Image/issues
   homepage: https://github.com/tecolicom/Text-ANSI-Image
   repository: https://github.com/tecolicom/Text-ANSI-Image.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

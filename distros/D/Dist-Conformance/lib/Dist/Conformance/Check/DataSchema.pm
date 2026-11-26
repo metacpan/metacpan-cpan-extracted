@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::DataSchema 0.008;
+package Dist::Conformance::Check::DataSchema 0.011;
 
 # ABSTRACT: A JSON, YAML or INI file parses and matches a schema
 
@@ -39,14 +39,16 @@ sub from_config ( $class, %arguments ) {
     return $self;
 }
 
-
+# C<json>, C<yaml> or C<ini>: C<format>, or the format that the extension of
+# C<file> says.
+# @returns Str|Undef  the format, or C<undef> when neither says one
+# @example my $format = $check->file_format;
 sub file_format ($self) {
     my $config = $self->config;
     return $config->{format} if defined $config->{format};
     my ($extension) = $config->{file} =~ m/[.]([^.\/]+)\z/;
     return defined $extension ? $FORMAT_OF_EXTENSION{ lc $extension } : undef;
 }
-
 
 sub check ( $self, $snapshot ) {
     my ( $file, $schema ) = @{ $self->config }{qw{file schema}};
@@ -69,7 +71,7 @@ Dist::Conformance::Check::DataSchema - A JSON, YAML or INI file parses and match
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -81,7 +83,7 @@ fails when the file does not parse as a JSON object, a YAML mapping or an INI
 file, or does not match C<schema>, and passes otherwise.
 
 An INI file, such as F<dist.ini>, is a hash of its sections by their whole
-header, as L<Dist::Conformance::Schema/parse_ini> says.  So a schema can refuse
+header, as L<Dist::Conformance::Schema/"parse_ini($text, $where)"> says.  So a schema can refuse
 a key of a plugin:
 
     checks:
@@ -114,18 +116,36 @@ nothing.  It says what is wrong when the check fails.
 
 =head2 from_config
 
-The same as L<Dist::Conformance::Check/from_config>.  It also dies when there
-is no C<format> and the name of C<file> does not say one.
+The same as L<Dist::Conformance::Check/"from_config(where, name, config)">, which takes the same
+arguments.
+
+=over 4
+
+=item name - Str - the name of the check in the flavor
+
+=item where - Str - optional: names the configuration in an error; default
+C<the check NAME>
+
+=back
+
+Returns a Dist::Conformance::Check::DataSchema object.
+
+Dies when the schema refuses the configuration, and when there is no
+C<format> and the name of C<file> does not say one.
+
+    my $check = Dist::Conformance::Check::DataSchema->from_config(
+        name   => 'PerlSlop',
+        config => { file => '.perl-slop.json', schema => { type => 'object' } },
+        source => $source,
+    );
 
 =head2 file_format
 
-C<json> or C<yaml>: C<format>, or the format that the extension of C<file>
-says.  Undefined when neither says one.
+C<json>, C<yaml> or C<ini>: C<format>, or the format that the extension of C<file> says.
 
-=head2 check
+Returns Str or Undef, the format, or C<undef> when neither says one.
 
-C<($snapshot)>.  The status and the message that L</DESCRIPTION> says, for the
-file in C<$snapshot>.
+    my $format = $check->file_format;
 
 =head1 IN A FLAVOR
 

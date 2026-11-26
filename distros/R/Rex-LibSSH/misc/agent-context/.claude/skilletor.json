@@ -14,12 +14,13 @@
       "getty-git-commit-style@getty",
       "getty-git-usage@getty",
       "getty-perl-core@getty",
-      "getty-perl-pod@karr",
-      "getty-perl-release-author-getty@karr",
       "kanban-issues-karr-coordination@karr",
       "kanban-issues-karr-ticket@karr",
       "perl-release-dist-ini@getty",
       "rex@getty"
+    ],
+    "bundles": [
+      "getty-cpan-dist@getty"
     ]
   },
   "targets": [

@@ -4,7 +4,7 @@ Plack::Middleware::XSRFBlock - Block XSRF Attacks with minimal changes to your a
 
 # VERSION
 
-version 0.0.19
+version 0.0.20
 
 # SYNOPSIS
 
@@ -227,7 +227,7 @@ log through the PSGI logger, if defined
 # EXPLANATION
 
 This module is similar in nature and intention to
-[Plack::Middleware::CSRFBlock](https://metacpan.org/pod/Plack::Middleware::CSRFBlock) but implements the xSRF prevention in a
+[Plack::Middleware::CSRFBlock](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ACSRFBlock) but implements the xSRF prevention in a
 different manner.
 
 The solution implemented in this module is based on a CodingHorror article -
@@ -252,7 +252,7 @@ The driving comment behind this implementation is from
 
 ## What's wrong with Plack::Middleware::CSRFBlock?
 
-[Plack::Middleware::CSRFBlock](https://metacpan.org/pod/Plack::Middleware::CSRFBlock) is a great module.
+[Plack::Middleware::CSRFBlock](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ACSRFBlock) is a great module.
 It does a great job of preventing CSRF behaviour with minimal effort.
 
 However when we tried to use it uses the session to store information - which
@@ -285,8 +285,8 @@ to force into the existing module.
 
 ## SEE ALSO
 
-[Plack::Middleware::CSRFBlock](https://metacpan.org/pod/Plack::Middleware::CSRFBlock),
-[Plack::Middleware](https://metacpan.org/pod/Plack::Middleware),
+[Plack::Middleware::CSRFBlock](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ACSRFBlock),
+[Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware),
 [Plack](https://metacpan.org/pod/Plack)
 
 ## BUILD STATUS

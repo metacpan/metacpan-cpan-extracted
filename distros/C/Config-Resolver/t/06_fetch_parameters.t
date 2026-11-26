@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use Data::Dumper;
@@ -15,7 +11,7 @@ use Data::Dumper;
 {
 
   package MockCLI;
-  our @ISA = qw(CLI::Config::Resolver);
+  our @ISA = qw(Config::Resolver::CLI);
 
   # Override init to do nothing
   sub init { }
@@ -51,10 +47,7 @@ use Data::Dumper;
 }
 
 my @option_specs = qw(
-  debug|g dump|d help key|k=s manifest|m=s outfile|o=s
-  parameter-file|p=s pretty|P parameters|V=s plugins=s parameter=s
-  plugin=s@ resolve|r template=s umask=s warning-level|w=s
-  parameters_hash
+  debug|g dump|d help key|k=s manifest|m=s outfile|o=s pretty|P parameters|V=s plugins=s parameter=s plugin=s@ resolve|r template=s umask=s warning-level|w=s
 );
 
 # --- Test 1: Simple load (no pre-existing params) ---
@@ -63,7 +56,6 @@ subtest 'Test Case: Simple parameter file load' => sub {
   my $mock = MockCLI->new(
     commands      => { resolve => sub { }, dump => sub { } },
     option_specs  => \@option_specs,
-    extra_options => qw['parameters_hash'],
   );
 
   my $file_data = { file_key => 'from_file' };
@@ -86,7 +78,6 @@ subtest 'Test Case: File parameters merge and override existing' => sub {
   my $mock = MockCLI->new(
     commands      => { resolve => sub { }, dump => sub { } },
     option_specs  => \@option_specs,
-    extra_options => qw['parameters_hash'],
   );
 
   # 1. Set up pre-existing parameters using the CORRECT accessor
@@ -127,7 +118,6 @@ subtest 'Test Case: No parameter file' => sub {
   my $mock = MockCLI->new(
     commands      => { resolve => sub { }, dump => sub { } },
     option_specs  => \@option_specs,
-    extra_options => qw['parameters_hash'],
   );
 
   my $existing_data = { old_key => 'is_preserved' };

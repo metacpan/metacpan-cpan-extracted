@@ -5,15 +5,42 @@ package Net::WoRMS;
 # ======================================================================
 # ABSTRACT: Service object to query the "World Register of Marine Species" WoRMS.
 # ======================================================================
-=head1 NAME
-
-Net::WoRMS provides functions to query the "World Register of Marine Species".
+=head1 NAME - query the "World Register of Marine Species" WoRMS
 
 =head1 VERSION
 
-version 1.7
+version 1.9
 
 =head1 SYNOPSIS
+
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use Net::WoRMS;
+
+    # Example settings
+    my $GENUS    = 'Abra';
+    my $SPECIES  = 'Abra alba';
+
+    # Initialize the service
+    my $WORMS    = Net::WoRMS->new();
+    my $WORMS->init();
+    die "Cannot open service!"
+       if not $WORMS->checkSoap();
+
+    # Single species info, output CSV
+    $WORMS->changeFormat('CSV');
+    my $id = $WORMS->searchSpeciesID($SPECIES, 0);
+    my $rec = $WORMS->getRecordByID($id);
+    $WORMS->printRecordDef($rec, ' ');
+
+    # Species info for GENUS, output plain TEXT
+    my $gid = $WORMS->searchSpeciesID($GENUS, 0);
+    $WORMS->changeFormat('CSV');
+    $WORMS->getChildrenByID($gid) or
+       die "No species found for GENUS: '$GENUS'!";
+
+=head1 DESCRIPTION
 
 Net::WoRMS bundles WEB access, parsing and formatting capabilities for
 the tool L<query-worms|https://metacpan.org>, to harvest information
@@ -30,9 +57,11 @@ use warnings;
 use utf8;
 use open qw(:std :utf8);
 
-our $VERSION = 1.7;
+our $VERSION = 1.9;
 
-=head1 MODULE DEPENDENCIES
+# ----------------------------------------------------------------------
+
+=head1 DEPENDENCIES
 
 The module uses the packages:
 
@@ -76,7 +105,9 @@ no warnings 'once';
 no warnings 'experimental';
 no warnings 'experimental::signatures';
 
-=head1 GLOBAL VARIABLES and CONSTANTS
+# ---------------------------------------------------------------------
+
+=head1 CONFIGURATION
 
 =over
 
@@ -133,8 +164,7 @@ my @ORDER_SCORE =
        RNK_FAMILY RNK_GENUS CITATION/;
 
 # Field names SQL / CSV
-my @ORDER_DOT =
-    qw/APHIA.ID NAME AUTHOR RANK STATUS VALID.APHIA.ID VALID.NAME
+my @ORDER_DOT = qw/APHIA.ID NAME AUTHOR RANK STATUS VALID.APHIA.ID VALID.NAME
        VALID.AUTHOR KINGDOM PHYLUM CLASS ORDER
        FAMILY GENUS CITATION/;
 
@@ -153,6 +183,8 @@ my %ORDER_HASH = (
 # Index         0   1   2   3   4   5   6   7   8   9
 my @TYPE = qw (INT STR STR STR STR INT STR STR STR STR
                STR STR STR STR STR);
+
+# ----------------------------------------------------------------------
 
 =head1 FIELDS
 
@@ -206,6 +238,11 @@ Initializes the SOAP client.
 Note: All C<change*(...)> functions must be used before the
 initialization phase.
 
+=item _checkInit($what)
+
+Internal initialization test to assert the task C<$what> was not
+recycled.
+
 =back
 
 =cut
@@ -221,7 +258,9 @@ sub _checkInit($self, $what) {
         "initialization of the connection!" if $self->Soap;
 }
 
-=head2 CHANGE METHODS
+# ----------------------------------------------------------------------
+
+=head2 CONFIGURATION
 
 =over
 
@@ -276,14 +315,15 @@ sub changeDebug($self, $debug) {
 }
 
 sub changeFormat($self, $format) {
-    $self->_checkInit('FORMAT');
+    # $self->_checkInit('FORMAT');
     $self->_set_Format($format);
 }
 
 sub getFormats($self) { return \%FORMATS; }
 
+# ----------------------------------------------------------------------
 
-=head2 QUERY METHODS
+=head2 ASSERTATIONS
 
 =over
 
@@ -301,6 +341,30 @@ case of an communication error.
 
 Prints the query result (dictionary) via L<Data::Dumper> to C<STDERR> if
 the debug flag is set.
+
+=back
+
+=cut
+
+sub checkSoap($self) {
+    my $res = $self->Soap;
+    die "Missing connection!" if not $res;
+    return $res;
+}
+
+sub checkError($self, $response) {
+   die "ERROR: ".$response->faultstring."!\n" if $response->fault;
+}
+
+sub checkDebug($self, $result) {
+    print STDERR "DGB BEGIN:\n",Dumper($result),"EOF\n" if $self->Debug;
+}
+
+# ----------------------------------------------------------------
+
+=head2 QUERIES
+
+=over
 
 =item searchSpeciesID($name, $print)
 
@@ -323,10 +387,10 @@ Retrieves all children under a given AphiaID using the method
 C<getBlockChildrenID(...)> and prints the result to C<STDOUT> using the
 method C<printRecord(...)>.
 
-=item printRecord($record, $first, $last, $spc)
+=item searchFuzzy($name, $offs, $fuzzy)  EXPERIMENTAL
 
-Prints a record to C<STDOUT> and handles indentation by C<$spc> as well
-as header and trailing aspects by using the flags C<$first> and C<$last>.
+The fuzzy search function is experimantal and does not give
+proper results due to offset maping issues.
 
 =back
 
@@ -334,19 +398,6 @@ as header and trailing aspects by using the flags C<$first> and C<$last>.
 
 # Query functions ------------------------------------------------------
 
-sub checkSoap($self) {
-    my $res = $self->Soap;
-    die "Missing connection!" if not $res;
-    return $res;
-}
-
-sub checkError($self, $response) {
-   die "ERROR: ".$response->faultstring."!\n" if $response->fault;
-}
-
-sub checkDebug($self, $result) {
-    print STDERR "DGB BEGIN:\n",Dumper($result),"EOF\n" if $self->Debug;
-}
 
 # Request to WORMS for a specific taxon by name ------------------------
 sub searchSpeciesID($self, $name, $print) {
@@ -420,7 +471,7 @@ sub searchFuzzy($self, $name, $offs, $fuzzy) {
 
 sub getChildrenByID($self, $sid) {
     my $offs=0; my $total = 0; my $num=1;
-    print "\nWORMS.CHILDREN ID $sid \n" if $FORMAT eq "DUMP";
+    print "\nWORMS.CHILDREN ID $sid \n" if $FORMAT eq "TEXT";
     while ($num > 0) {
         my $found = $self->getBlockChildrenByID($sid, $offs);
         last if not $found;
@@ -439,9 +490,31 @@ sub getChildrenByID($self, $sid) {
       case('TEXT') { print "EOF\n" }
       case('SQL' ) { print ";\n" if $total >0; }
     }
+    print "\n# WORMS.CHILDREN ID $sid TOTAL: $total\n"
+        if $FORMAT eq "TEXT";
+    $total;
 }
 
 # Output service routine record DUMP, CSV and SQL ----------------------
+
+=head2 OUTPUT
+
+=over
+
+=item printRecord($record, $first, $last, $spc)
+
+Prints a record to C<STDOUT> and handles indentation by C<$spc> as well
+as header and trailing aspects by using the flags C<$first> and C<$last>.
+
+=item printRecordDef($record, $record, $spc)
+
+Prints the default plain TEXT record to C<STDOUT> and handles
+indentation by C<$spc>.
+
+=back
+
+=cut
+
 # @TODO this is a mess rewrite
 sub printRecord($self, $record, $first, $last, $spc) {
     # asign header section
@@ -514,7 +587,7 @@ sub printRecordDef($self, $record, $spc) {
     print "\n", $spc, "WORMS ID $id \n";
     foreach my $k (keys %rechash)  {
         my $value =  $rechash{$k};
-        $value =~ s/'/\\'/g; # Franzoesische Authoren unerwuenscht
+        $value =~ s/'/\`\'/g if $value; # Franzoesische Authoren unerwuenscht
 	print $spc, "  INT  APHIA.ID       ", $value, "\n"  if $k =~ m/^AphiaID/;
         print $spc, "  STR  AUTHOR         '",$value, "'\n" if $k =~ m/^authority/;
         print $spc, "  STR  NAME           '",$value, "'\n" if $k =~ m/^scientificname/;
@@ -532,7 +605,14 @@ sub printRecordDef($self, $record, $spc) {
         print $spc, "  STR  GENUS          '",$value, "'\n" if $k =~ m/^genus/;
     }
     print $spc, "EOF \n";
+    1
 }
+
+=head1 BUGS
+
+Please report bugs via the issue tracker: L<https://rt.cpan.org>.
+
+=cut
 
 =head1 AUTHOR
 

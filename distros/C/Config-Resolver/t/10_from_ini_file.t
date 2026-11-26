@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use Data::Dumper;
@@ -20,7 +16,7 @@ subtest 'Test Case: Globals only' => sub {
   my $expected = { foo => 'bar', baz => '123' };
 
   # Call the sub directly in its package
-  my $result = CLI::Config::Resolver::from_ini_file($content);
+  my $result = Config::Resolver::CLI::from_ini_file($content);
   is_deeply( $result, $expected, 'Correctly parses global section' );
 };
 
@@ -32,7 +28,7 @@ subtest 'Test Case: Sections only' => sub {
     section2 => { baz => '123' },
   };
 
-  my $result = CLI::Config::Resolver::from_ini_file($content);
+  my $result = Config::Resolver::CLI::from_ini_file($content);
   is_deeply( $result, $expected, 'Correctly parses sections' );
 };
 
@@ -44,7 +40,7 @@ subtest 'Test Case: Globals and sections' => sub {
     section1   => { foo => 'bar' },
   };
 
-  my $result = CLI::Config::Resolver::from_ini_file($content);
+  my $result = Config::Resolver::CLI::from_ini_file($content);
   is_deeply( $result, $expected, 'Correctly merges globals and sections' );
 };
 

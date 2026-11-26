@@ -21,6 +21,21 @@ use Data::Queue::Shared;
 use Data::Queue::Shared::Int; use Data::Queue::Shared::Int32;
 use Data::Queue::Shared::Int16; use Data::Queue::Shared::Str;
 my ($mnt, $class, @args) = @ARGV;
+if ($class eq 'fill') {
+    my $q = Data::Queue::Shared::Str->new("$mnt/x.shm", 4096, 1 << 24);
+    my ($n, $intact) = (0, 0);
+    $! = 0;
+    $n++ while $q->push(sprintf '%05d%s', $n, 'x' x 4090);
+    my $err = $! + 0 ? "$!" : 'no error';
+    $! = 0;
+    my $front = $q->push_front('y' x 4096) ? 'stored' : "$!";
+    $! = 0;
+    my $multi = $q->push_multi('z' x 4096, 'z') . " $!";
+    while (defined(my $v = $q->pop)) { $intact++ if $v eq sprintf '%05d%s', $intact, 'x' x 4090 }
+    print "pushed $n, then $err; popped $intact intact\n";
+    print "push_front at the arena top: $front\npush_multi: $multi\n";
+    exit;
+}
 my $h = eval { "Data::Queue::Shared::$class"->new("$mnt/x.shm", @args) };
 print $h ? "created\n" : "refused: $@";
 P
@@ -59,5 +74,12 @@ diag $out unless $out =~ /^refused/;
 ($sig, $out) = on_small_tmpfs('', @str);
 is $sig, 0, 'Str segment by default: no signal';
 like $out, qr/^created/, '  and the sparse Str segment is created';
+
+($sig, $out) = on_small_tmpfs('', 'fill');
+is $sig, 0, 'filling a sparse Str arena past the filesystem does not kill the process';
+like $out, qr/^pushed (\d+), then No space left on device; popped \1 intact$/m, '  push fails with ENOSPC, earlier values intact';
+like $out, qr/^push_front at the arena top: No space left on device$/m, '  so does push_front';
+like $out, qr/^push_multi: 0 No space left on device$/m, '  and push_multi'
+    or diag $out;
 
 done_testing;

@@ -2,11 +2,8 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
+use FindBin;
 
 use Test::More;
 use File::Temp qw(tempfile);
@@ -16,9 +13,12 @@ use Config::Resolver::Utils qw(slurp_file);
 
 # --- Find our script and lib paths ---
 my $Bin     = $FindBin::Bin;
-my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver.pl' );
+my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver' );
 my $LibPath = File::Spec->catfile( $Bin, '..', 'lib' );
-my $Perl    = $^X;  # Get the path to the current perl executable
+
+# The shell wrapper launches its own Perl interpreter.
+local $ENV{PERL5LIB} = join q{:}, grep { !ref $_ && defined $_ && -d $_ }
+  $LibPath, @INC, split /:/xsm, $ENV{PERL5LIB} // q{};
 
 # --- Test 1: Full end-to-end "batteries included" run ---
 subtest 'Test Case: End-to-end built-in backends (env and file)' => sub {
@@ -46,7 +46,7 @@ subtest 'Test Case: End-to-end built-in backends (env and file)' => sub {
   close $t_fh;
 
   # 2. --- Execute the real script ---
-  my $command = "$Perl -I$LibPath $Script resolve -p $p_path -t $t_path";
+  my $command = "bash $Script resolve -p $p_path -t $t_path";
 
   # We must run this inside a 'local' block to set the ENV var
   my $script_output;

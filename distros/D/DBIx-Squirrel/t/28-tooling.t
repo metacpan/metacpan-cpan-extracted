@@ -30,7 +30,6 @@ my %module = (
     words   => ['Ekorn::Pipeline::Factories'],
 );
 
-
 # The names a module exports, by default or on request, sorted.
 sub exported_by ($module) {
     no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -39,7 +38,6 @@ sub exported_by ($module) {
     my @sorted = sort keys %names;
     return @sorted;
 }
-
 
 # The names a Tooling's tag holds, sorted.
 sub tag ($name, $of = $tooling) {

@@ -425,7 +425,11 @@ static void pe_sys_multiplex(NV timeout) {
 	    while (ev) {
 		int fd = ev->fd;
 		struct stat buf;
+#ifdef WIN32
+		if (fd >= 0 && PerlLIO_fstat(fd, (struct w32_stat*) &buf) < 0 && errno == EBADF) {
+#else
 		if (fd >= 0 && PerlLIO_fstat(fd, &buf) < 0 && errno == EBADF) {
+#endif
 		    warn("Event: '%s' was unexpectedly closed",
 			 SvPV(ev->base.desc, n_a));
 		    pe_io_reset_handle((pe_watcher*) ev);

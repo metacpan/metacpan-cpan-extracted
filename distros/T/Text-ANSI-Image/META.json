@@ -62,11 +62,11 @@
    "provides" : {
       "App::ansipic" : {
          "file" : "lib/App/ansipic.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Text::ANSI::Image" : {
          "file" : "lib/Text/ANSI/Image.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Text::ANSI::Image::kitty" : {
          "file" : "lib/Text/ANSI/Image/kitty.pm"
@@ -84,7 +84,7 @@
          "web" : "https://github.com/tecolicom/Text-ANSI-Image"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

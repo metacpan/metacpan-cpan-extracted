@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::Workflows 0.008;
+package Dist::Conformance::Check::Workflows 0.011;
 
 # ABSTRACT: The CI workflows exist
 
@@ -20,13 +20,16 @@ sub config_schema ($) {
     };
 }
 
-
+# The required workflows that the snapshot does not have, by their file names,
+# in sorted order.
+# @param   snapshot  InstanceOf["Dist::Conformance::Snapshot"]  the repository
+# @returns the file names, as a list
+# @example my @missing = $check->missing_workflows($snapshot);
 sub missing_workflows ( $self, $snapshot ) {
     my ( $directory, $required ) = @{ $self->config }{qw{directory required}};
     my @missing = grep { local ($_) = $_; !$snapshot->contains("$directory/$_") } sort keys %$required;
     return @missing;
 }
-
 
 sub check ( $self, $snapshot ) {
     my ( $directory, $required ) = @{ $self->config }{qw{directory required}};
@@ -38,7 +41,6 @@ sub check ( $self, $snapshot ) {
     return ( 'fail', 'missing: ' . join ', ', map { "$directory/$_" } @missing ) if @missing;
     return ( 'pass', 'all present' );
 }
-
 
 sub update ( $self, $update ) {
     my ( $directory, $required ) = @{ $self->config }{qw{directory required}};
@@ -65,7 +67,7 @@ Dist::Conformance::Check::Workflows - The CI workflows exist
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -77,15 +79,19 @@ The update writes each missing workflow from its template.
 
 =head1 METHODS
 
-=head2 missing_workflows
+=head2 missing_workflows(snapshot)
 
-C<($snapshot)>.  The required workflows that the snapshot does not have.
+The required workflows that the snapshot does not have, by their file names, in sorted order.
 
-=head2 check
+=over 4
 
-=head2 update
+=item snapshot - InstanceOf["Dist::Conformance::Snapshot"] - the repository
 
-Writes each missing workflow from its template.
+=back
+
+Returns the file names, as a list.
+
+    my @missing = $check->missing_workflows($snapshot);
 
 =head1 IN A FLAVOR
 

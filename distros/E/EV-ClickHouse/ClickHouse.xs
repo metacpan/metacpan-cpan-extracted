@@ -18,7 +18,6 @@
 
 #define CH_MAX_DECOMPRESS_SIZE (128 * 1024 * 1024)  /* 128 MB safety limit */
 
-#ifdef HAVE_LZ4
 /* Bundled LZ4, compiled separately in lz4_unit.c. */
 #if defined(__GNUC__) && __GNUC__ >= 4
 #  define LZ4LIB_VISIBILITY __attribute__ ((visibility ("hidden")))
@@ -27,8 +26,13 @@
 #include "cityhash.h"
 
 #define CH_LZ4_METHOD     0x82
+#define CH_ZSTD_METHOD    0x90
 #define CH_CHECKSUM_SIZE  16
 #define CH_COMPRESS_HEADER_SIZE 9   /* 1 (method) + 4 (compressed_size) + 4 (uncompressed_size) */
+#define CH_COMPRESS_BLOCK_SIZE (1024 * 1024)  /* as clickhouse-client's max_compress_block_size */
+
+#ifdef HAVE_ZSTD
+#include <zstd.h>
 #endif
 
 #ifdef HAVE_OPENSSL
@@ -203,6 +207,9 @@ struct ev_clickhouse_s {
     char *session_id;
     char *query_log_comment;        /* prepended as a SQL block comment per query */
     int compress;
+    int compress_zstd;              /* outgoing native frames in ZSTD, not LZ4 */
+    int compress_level;             /* ZSTD level */
+    size_t compress_block_size;     /* bytes per outgoing frame; 0: one per Data block */
     double connect_timeout;
     HV *default_settings;           /* connection-level ClickHouse settings */
 
@@ -215,6 +222,7 @@ struct ev_clickhouse_s {
     SV *on_log;                     /* native SERVER_LOG packets */
     SV *on_failover;                /* multi-host: ($oh, $op, $nh, $np, $msg) */
     char *last_tls_error;           /* OpenSSL error from last failed handshake */
+    char *connect_err;              /* a connect that failed at once, reported from the loop */
     char    **failover_hosts;       /* parallel arrays: hosts + ports.        */
     unsigned int *failover_ports;   /* NULL if multi-host failover disabled.  */
     int       failover_n;
@@ -376,6 +384,7 @@ static void capture_tls_error(ev_clickhouse_t *self);
 
 #define CLEAR_PERSISTENT_STATE(self) do { \
     CLEAR_STR((self)->last_tls_error); \
+    CLEAR_STR((self)->connect_err); \
     CLEAR_STR((self)->last_query_id); \
     CLEAR_STR((self)->host); \
     CLEAR_STR((self)->user); \
@@ -997,23 +1006,33 @@ static int ch_tls_active(ev_clickhouse_t *self) {
 #endif
 }
 
-/* Build-time capabilities for features()/has_lz4()/has_tls().
+/* Build-time capabilities for features()/has_tls().
  * File scope: xsubpp mangles preprocessor conditionals inside
  * braced XSUB bodies, so the XSUBs below call these instead. */
-static int ch_have_lz4(void) {
-#ifdef HAVE_LZ4
-    return 1;
-#else
-    return 0;
-#endif
-}
-
 static int ch_have_tls(void) {
 #ifdef HAVE_OPENSSL
     return 1;
 #else
     return 0;
 #endif
+}
+
+static int ch_have_zstd(void) {
+#ifdef HAVE_ZSTD
+    return 1;
+#else
+    return 0;
+#endif
+}
+
+/* sv as a whole number in [lo, hi], without coercing undef or junk to 0 */
+static int ch_int_arg(pTHX_ SV *sv, NV lo, NV hi, NV *out) {
+    NV v;
+    if (!SvOK(sv) || SvROK(sv) || !looks_like_number(sv)) return 0;
+    v = SvNV(sv);
+    if (!(v >= lo && v <= hi) || v != (NV)(IV)v) return 0;
+    *out = v;
+    return 1;
 }
 
 static int cleanup_connection(ev_clickhouse_t *self, int reconnecting) {
@@ -1799,6 +1818,8 @@ CODE:
     RETVAL->loop_sv = SvREFCNT_inc(SvRV(loop_sv));
     RETVAL->fd = -1;
     RETVAL->protocol = PROTO_HTTP;
+    RETVAL->compress_level = 1;
+    RETVAL->compress_block_size = CH_COMPRESS_BLOCK_SIZE;
     ngx_queue_init(&RETVAL->cb_queue);
     ngx_queue_init(&RETVAL->send_queue);
 
@@ -2675,8 +2696,9 @@ features(SV *thing)
 CODE:
 {
     HV *h = newHV();
-    (void)hv_stores(h, "lz4", newSViv(ch_have_lz4()));
+    (void)hv_stores(h, "lz4", newSViv(1));
     (void)hv_stores(h, "tls", newSViv(ch_have_tls()));
+    (void)hv_stores(h, "zstd", newSViv(ch_have_zstd()));
     PERL_UNUSED_VAR(thing);
     RETVAL = newRV_noinc((SV *)h);
 }
@@ -2688,7 +2710,7 @@ has_lz4(SV *thing)
 CODE:
 {
     PERL_UNUSED_VAR(thing);
-    RETVAL = ch_have_lz4();
+    RETVAL = 1;
 }
 OUTPUT:
     RETVAL
@@ -2752,6 +2774,42 @@ _set_compress(EV::ClickHouse self, int val)
 CODE:
 {
     self->compress = val;
+}
+
+void
+_set_compress_method(EV::ClickHouse self, SV *method_sv)
+CODE:
+{
+    const char *method = SvOK(method_sv) ? SvPV_nolen(method_sv) : "";
+    if (strEQ(method, "lz4") || strEQ(method, "LZ4"))
+        self->compress_zstd = 0;
+    else if (strEQ(method, "zstd") || strEQ(method, "ZSTD")) {
+        if (!ch_have_zstd())
+            croak("EV::ClickHouse: compress_method 'zstd' needs a build with libzstd");
+        self->compress_zstd = 1;
+    }
+    else
+        croak("EV::ClickHouse: unknown compress_method '%s' (expected 'lz4' or 'zstd')", method);
+}
+
+void
+_set_compress_level(EV::ClickHouse self, SV *level)
+CODE:
+{
+    NV v;
+    if (!ch_int_arg(aTHX_ level, -131072, 22, &v))
+        croak("EV::ClickHouse: compress_level must be an integer from -131072 to 22");
+    self->compress_level = (int)v;
+}
+
+void
+_set_compress_block_size(EV::ClickHouse self, SV *size)
+CODE:
+{
+    NV v;
+    if (!ch_int_arg(aTHX_ size, 0, 1073741824.0, &v))
+        croak("EV::ClickHouse: compress_block_size must be an integer from 0 to 1 GiB");
+    self->compress_block_size = (size_t)v;
 }
 
 void

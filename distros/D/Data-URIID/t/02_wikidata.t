@@ -5,7 +5,7 @@ use warnings;
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
     
-use Test::More;
+use Test::More tests => 16;
 
 use_ok('Data::URIID');
 
@@ -26,7 +26,5 @@ foreach my $uri (qw(
     is($result->id('uuid'), '8a46cc5e-5c8f-5ec3-b73f-37d3748e7a55', 'to UUID test');
     is($result->id('uri'), 'http://www.wikidata.org/entity/Q1', 'to URI test');
 }
-
-done_testing();
 
 exit 0;

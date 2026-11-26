@@ -1,7 +1,7 @@
 # ABSTRACT: Infer arguments, return values and termination of subs from their compiled op trees
 # PODNAME: Pod::Coverage::More::Analyzer
 
-package Pod::Coverage::More::Analyzer 0.003;
+package Pod::Coverage::More::Analyzer 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -94,7 +94,7 @@ sub new {
     my ($class) = @_;
     my $backend = $class eq __PACKAGE__ ? backend_for($]) : $class;
     require_module($backend) if $backend ne $class;
-    return bless( {}, $backend );
+    return bless( { never_returns => {} }, $backend );
 }
 
 # The subclass that handles the perl C<version>.
@@ -186,6 +186,7 @@ sub analyze_sub {
         usage      => {},
         returns    => [],
         dies       => [],
+        ends_in    => [],
     );
 
     if ( $cv->CvFLAGS & B::CVf_CONST ) {
@@ -223,6 +224,7 @@ sub analyze_sub {
     $walker->_walk( $cv->ROOT, [] );
     push @{ $rec{returns} }, map { +{ %$_, implicit => 1 } } $walker->_implicit_returns( $cv->ROOT );
     $walker->finish_sub( \%rec );
+    $rec{never_returns} = ( !@{ $rec{returns} } && any { !$_->{caught} } @{ $rec{dies} }, @{ delete $rec{ends_in} } ) ? 1 : 0;
 
     # A class taken from the invocant is the package or a subclass, and an object of either is an instance of the package.
     my ($invocant) = grep { $_->{index} == 0 && defined $_->{name} } @{ $rec{params} };
@@ -440,7 +442,9 @@ sub classify {
     }
     if ( $name eq 'entersub' ) {
         my ($target) = $self->_call_target($op);
-        return $target // { type => 'call' };
+        return { type => 'call' } if !$target;
+        return                    if $self->_never_returns($target);
+        return $target;
     }
     return _weak( { type => 'boolean' } ) if $BOOLEAN_OPS{$name};
     if ( $NUMBER_OPS{$name} ) {
@@ -527,7 +531,11 @@ sub _padname {
     return undef if !$targ;
     my $padname = $self->{cv}->PADLIST->ARRAYelt(0)->ARRAYelt($targ);
     return undef if !$padname || B::class($padname) eq 'SPECIAL';
-    return $padname->PVX;
+    my $name = $padname->PVX;
+
+    # The pad entry of a placeholder with a default, as $ = undef, is its sigil alone.
+    return undef if !defined $name || $name =~ m/\A[\$\@%&]?\z/;
+    return $name;
 }
 
 sub _padval {
@@ -707,6 +715,7 @@ sub _on_sassign {
 }
 
 # A list assignment to lexicals, from @_ or from one shift of it.
+# An undef among the lexicals is a parameter with no name, at its position.
 sub _on_aassign {
     my ( $self, $op )  = @_;
     my ( $rhs,  $lhs ) = _kids($op);
@@ -715,14 +724,14 @@ sub _on_aassign {
     my @values = _significant_kids($rhs);
     my @targets;
     foreach my $kid ( _significant_kids($lhs) ) {
-        push @targets, $kid if $kid->name =~ m/\Apad[ash]v\z/;
+        push @targets, $kid if $kid->name =~ m/\A(?:pad[ash]v|undef)\z/;
     }
     return if @values != 1 || !@targets;
 
     if ( $self->_is_args_array( $values[0] ) ) {
         foreach my $target (@targets) {
-            my $name = $self->_padname( $target->targ );
-            if ( $target->name eq 'padsv' ) {
+            my $name = $self->_target_name($target);
+            if ( !_is_list_target($target) ) {
                 $self->_add_param( name => $name, index => $self->{shifted}++, source => 'list' );
             }
             else {
@@ -733,13 +742,13 @@ sub _on_aassign {
     }
     elsif ( $self->_is_args_shift( $values[0] ) ) {
         $self->{consumed}{ ${ _unwrap( $values[0] ) } } = 1;
-        $self->_add_param( name => $self->_padname( $targets[0]->targ ), index => $self->{shifted}++, source => 'shift' );
+        $self->_add_param( name => $self->_target_name( $targets[0] ), index => $self->{shifted}++, source => 'shift' );
     }
     elsif ( my $checked = $self->_checked_call( $values[0] ) ) {
         my @types = @{ $checked->{types} };
         foreach my $target (@targets) {
-            my $name = $self->_padname( $target->targ );
-            if ( $target->name ne 'padsv' ) {
+            my $name = $self->_target_name($target);
+            if ( _is_list_target($target) ) {
                 $self->_add_param( name => $name, index => $self->{shifted}, source => 'checked' );
                 last;
             }
@@ -753,6 +762,19 @@ sub _on_aassign {
         }
     }
     return;
+}
+
+# The name of the lexical that a target of a list assignment declares, or undef for an undef placeholder.
+sub _target_name {
+    my ( $self, $target ) = @_;
+    return undef if $target->name eq q{undef};
+    return $self->_padname( $target->targ );
+}
+
+# Whether a target of a list assignment is an array or a hash, which takes the rest of the list.
+sub _is_list_target {
+    my ($target) = @_;
+    return $target->name eq 'padav' || $target->name eq 'padhv';
 }
 
 # A call that checks the arguments of the sub, such as $check->(@_), validate(\@_, ...) or validate_pos(@_, ...):
@@ -1046,7 +1068,11 @@ sub _call_target {
     my $cvop = _unwrap($target);
     $cvop = _unwrap( ( _kids($cvop) )[0] ) if $cvop->name eq 'rv2cv' && _kids($cvop);
     if ( $cvop->name eq 'gv' ) {
-        return ( { type => 'call', function => _sub_fullname( $self->_gv($cvop) ) }, \@args );
+        my $gv = $self->_gv($cvop);
+        return ( { type => 'call', function => _sub_fullname($gv), $gv->STASH->NAME eq $self->{rec}{package} ? ( cv => $gv->CV ) : () }, \@args );
+    }
+    if ( $cvop->name eq 'padcv' ) {
+        return ( { type => 'call', lexical => $self->_padname( $cvop->targ ) =~ s/\A&//r, cv => $self->_padval( $cvop->targ ) }, \@args );
     }
     if ( $cvop->name eq 'padsv' ) {
         return ( { type => 'call', coderef => $self->_padname( $cvop->targ ) }, \@args );
@@ -1074,7 +1100,27 @@ sub _on_entersub {
     if ( defined $target->{function} && $TERMINATORS{ $target->{function} } ) {
         $self->_add_death( $target->{function}, $ancestors );
     }
+    elsif ( $self->_never_returns($target) ) {
+        push @{ $self->{rec}{ends_in} }, { via => $target->{lexical} // $target->{function}, caught => _is_caught($ancestors) ? 1 : 0 };
+    }
     return;
+}
+
+# Whether the call TARGET never returns: a terminator, as croak, or a sub whose record says that it never returns.
+# Only a sub of the package or a lexical sub has a CV in its target, so that the analysis stays in the code at hand.
+sub _never_returns {
+    my ( $self, $target ) = @_;
+    return 1 if $target->{type} eq 'method' && $TERMINATING_METHODS{ $target->{method} // q{} };
+    return 1 if defined $target->{function} && $TERMINATORS{ $target->{function} };
+    my $cv = $target->{cv} or return 0;
+    return 0 if B::class($cv) ne 'CV' || !${ $cv->ROOT };
+
+    # A sub that calls itself is taken to return while its own analysis runs.
+    my $memo = $self->{never_returns};
+    return $memo->{$$cv} if exists $memo->{$$cv};
+    $memo->{$$cv} = 0;
+    my $rec = $self->analyze_sub( $cv->object_2svref, $target->{lexical} // $cv->GV->NAME, $self->{rec}{package} );
+    return $memo->{$$cv} = $rec->{never_returns};
 }
 
 # Records METHOD as called on the variable that INVOCANT reads, when it reads one.
@@ -1185,7 +1231,7 @@ Pod::Coverage::More::Analyzer - Infer arguments, return values and termination o
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -1386,6 +1432,10 @@ C<constraint>, the L<Type::Tiny> constraint that the value satisfies when the ev
 C<weak>, true when the value is the result of an operator, which overloading can change, plus details per type
 
 =item B<dies> - ARRAYREF - one HASHREF per explicit termination, with C<via>, C<line> and C<caught>
+
+=item B<never_returns> - BOOLEAN - true when no path of the sub returns: each ends in a termination outside C<eval>,
+or in a call of a sub of its package or a lexical sub that never returns, as a helper that dies for an abstract method.
+The value of such a call is no return value, and the call is no termination of the sub's own
 
 =back
 

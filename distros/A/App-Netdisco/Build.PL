@@ -4,6 +4,16 @@ use warnings;
 use lib q(./lib);
 use App::Netdisco::Builder;
 
+sub snmp_info_minimum {
+  my $file = 'lib/App/Netdisco/Util/SNMP.pm';
+  open my $fh, '<', $file or die "Build.PL: cannot read $file: $!\n";
+  while (my $line = <$fh>) {
+    return $1 if $line =~ m/^use\s+SNMP::Info\s+([\d.]+)\s*;/;
+  }
+  die "Build.PL: $file has no 'use SNMP::Info VERSION;' line. "
+    ."That line sets Netdisco's SNMP::Info minimum; restore it.\n";
+}
+
 App::Netdisco::Builder->new(
   module_name => 'App::Netdisco',
   license     => 'bsd',
@@ -51,7 +61,7 @@ App::Netdisco::Builder->new(
     'DBIx::Class' => '0.082844',
     'DBIx::Class::Helpers' => '2.037000',
     'Daemon::Control' => '0.001006',
-    'Dancer' => '1.3132',
+    'Dancer' => '1.3400',
     'Dancer::Plugin::Auth::Extensible' => '0.30',
     'Dancer::Plugin::DBIC' => '0.2001',
     'Dancer::Plugin::Passphrase' => '2.0.1',
@@ -77,7 +87,7 @@ App::Netdisco::Builder->new(
     'IO::Socket::SSL' => '2.048',
     'JSON' => '2.90',
     'JSON::PP' => '0',
-    'JSON::XS' => '4.04',
+    'JSON::XS' => '4.05',
     'List::Util' => '1.70',
     'List::MoreUtils' => '0.428',
     'MIME::Base64' => '3.13',
@@ -86,7 +96,7 @@ App::Netdisco::Builder->new(
     'Moo' => '1.001000',
     'MCE' => '1.866',
     'Net::Domain' => '1.23',
-    'Net::DNS' => '1.57',
+    'Net::DNS' => '1.58',
     'Net::LDAP' => '0',
     'Net::OpenSSH' => '0',
     'Net::Ping' => '2.75', # is core
@@ -112,7 +122,7 @@ App::Netdisco::Builder->new(
     'Scope::Guard' => 0,
     'Sereal' => '0',
     'Session::Storage::Secure' => '1.000',
-    'SNMP::Info' => '3.985002',
+    'SNMP::Info' => snmp_info_minimum(), # set on the use line in App::Netdisco::Util::SNMP
     'Socket' => '2.041',
     'Socket6' => '0.23',
     'SQL::Abstract' => '2.000003',
@@ -143,7 +153,7 @@ App::Netdisco::Builder->new(
     # an old copy of an unnamed dependency (xt/bin/cpan-audit-coverage).
     'Capture::Tiny' => '0.24',
     'Compress::Raw::Bzip2' => '2.031',
-    'Convert::ASN1' => '0.28',
+    'Convert::ASN1' => '0.37',
     'Crypt::CBC' => '3.07',
     'Crypt::SaltedHash' => '0.10',
     'Data::Entropy' => '0.010',

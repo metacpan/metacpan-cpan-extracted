@@ -5,7 +5,7 @@
 # hostname rather than none, and an unset cache_options, which is documented
 # as optional but was dereferenced unconditionally on every cached call.
 
-use Test2::V0;
+use Test2::V0 -no_srand;
 
 use Test2::Require::Module 'CHI';
 

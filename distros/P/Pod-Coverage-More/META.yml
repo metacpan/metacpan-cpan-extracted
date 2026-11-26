@@ -47,61 +47,61 @@ no_index:
 provides:
   Dist::Zilla::Plugin::Test::Pod::Coverage::More:
     file: lib/Dist/Zilla/Plugin/Test/Pod/Coverage/More.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More:
     file: lib/Pod/Coverage/More.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Analyzer:
     file: lib/Pod/Coverage/More/Analyzer.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Analyzer::Perl5_36:
     file: lib/Pod/Coverage/More/Analyzer/Perl5_36.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Analyzer::Perl5_38:
     file: lib/Pod/Coverage/More/Analyzer/Perl5_38.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Analyzer::Perl5_44:
     file: lib/Pod/Coverage/More/Analyzer/Perl5_44.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Blurb:
     file: lib/Pod/Coverage/More/Blurb.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Declared:
     file: lib/Pod/Coverage/More/Declared.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Declared::ClassTiny:
     file: lib/Pod/Coverage/More/Declared/ClassTiny.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Declared::FunctionParameters:
     file: lib/Pod/Coverage/More/Declared/FunctionParameters.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Declared::Kavorka:
     file: lib/Pod/Coverage/More/Declared/Kavorka.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Declared::MOP:
     file: lib/Pod/Coverage/More/Declared/MOP.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Declared::ObjectPad:
     file: lib/Pod/Coverage/More/Declared/ObjectPad.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Declared::TypeParams:
     file: lib/Pod/Coverage/More/Declared/TypeParams.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Documentation:
     file: lib/Pod/Coverage/More/Documentation.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Generator:
     file: lib/Pod/Coverage/More/Generator.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Coverage::More::Types:
     file: lib/Pod/Coverage/More/Types.pm
-    version: '0.003'
+    version: '0.005'
   Pod::Weaver::Section::Blurbs:
     file: lib/Pod/Weaver/Section/Blurbs.pm
-    version: '0.003'
+    version: '0.005'
   Test::Pod::Coverage::More:
     file: lib/Test/Pod/Coverage/More.pm
-    version: '0.003'
+    version: '0.005'
 requires:
   B: '0'
   Capture::Tiny: '0'
@@ -138,7 +138,7 @@ resources:
   bugtracker: https://github.com/teodesian/Pod-Coverage-More/issues
   homepage: https://github.com/teodesian/Pod-Coverage-More
   repository: https://github.com/teodesian/Pod-Coverage-More.git
-version: '0.003'
+version: '0.005'
 x_contributors:
   - 'troglodyne-robot <trogbot@troglodyne.net>'
 x_generated_by_perl: v5.44.0

@@ -26,4 +26,24 @@ sub hook {
     return;
 }
 
+=head2 template_files(@loaded_recipes)
+
+=over 4
+
+=item @loaded_recipes - Str - the recipes that the caller loaded
+
+=back
+
+Returns nothing.
+
+    $object->template_files('mail');
+
+=cut
+
+sub template_files {
+    my ( $self, @loaded_recipes ) = @_;
+    $self->{recipes} = \@loaded_recipes;
+    return;
+}
+
 1;

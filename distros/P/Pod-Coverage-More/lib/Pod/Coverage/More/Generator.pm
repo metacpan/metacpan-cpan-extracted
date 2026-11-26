@@ -1,7 +1,7 @@
 # ABSTRACT: Write the POD of each sub from its blurb and the analysis of its code
 # PODNAME: Pod::Coverage::More::Generator
 
-package Pod::Coverage::More::Generator 0.003;
+package Pod::Coverage::More::Generator 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -39,10 +39,17 @@ sub sections {
     my @sections;
     foreach my $name ( sort $coverage->public_subs ) {
         my $blurb = $blurbs->{$name} or next;
-        next if $coverage->section_for($name) || $self->_parent_has_blurb($name);
+        next if $coverage->own_section_for($name);
+        next if !_has_tag($blurb) && ( $coverage->section_for($name) || $self->_parent_has_blurb($name) );
         push @sections, { name => $name, pod => _section( $name, $blurb, $analysis->{$name} ) };
     }
     return @sections;
+}
+
+# Whether BLURB has a tag, which makes it the documentation of an override rather than a comment on it.
+sub _has_tag {
+    my ($blurb) = @_;
+    return @{ $blurb->{params} } || $blurb->{returns} || @{ $blurb->{throws} } || @{ $blurb->{examples} } ? 1 : 0;
 }
 
 # Whether a parent class has a blurb for the sub NAME, which becomes its section when the parent is woven.
@@ -212,7 +219,7 @@ Pod::Coverage::More::Generator - Write the POD of each sub from its blurb and th
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -224,9 +231,13 @@ version 0.003
 =head1 DESCRIPTION
 
 Writes a POD section for each public sub that has a blurb, as L<Pod::Coverage::More::Blurb> reads it,
-and no POD of its own or of a parent class.  An override of a sub that a parent class has a blurb for gets none either,
-because the section of the parent documents it.  A sub without a blurb gets no section:
+and no section in the POD of its own package.  A sub without a blurb gets no section:
 the blurb is how a sub opts in, as C<# ABSTRACT:> is how a module does.
+
+An override, a sub that the POD or a blurb of a parent class documents, gets a section when its blurb has at least one tag,
+C<@param>, C<@returns>, C<@throws> or C<@example>, and then L<Pod::Coverage::More> checks it against that section.
+A comment with no tag above an override is no documentation of it: it gets no section,
+and the checks read the section of the parent, as they do for an override with no comment.
 
 A section says what the blurb says, and fills in what the code declares where the blurb is silent:
 

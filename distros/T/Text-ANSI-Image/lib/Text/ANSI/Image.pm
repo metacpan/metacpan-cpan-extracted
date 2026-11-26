@@ -1,6 +1,6 @@
 package Text::ANSI::Image;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use v5.16;
 use warnings;
@@ -48,6 +48,7 @@ sub new {
 	width => 0,		# columns that an image may take
 	rows  => 0,		# rows that an image may take
 	types => undef,		# types of images shown, all by default
+	osc   => 0,		# tell the file of each image (kitty)
 	%opt,
     }, $class;
     $obj->terminal;		# a wrong size dies here
@@ -249,7 +250,7 @@ Text::ANSI::Image - images as lines of text for the terminal
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 DESCRIPTION
 
@@ -323,6 +324,16 @@ terminal width, and its height but four lines).
 =item B<types> => [ I<TYPE>, ... ]
 
 The types of images shown: C<png>, C<jpeg> and C<gif> (default: all).
+
+=item B<osc> => I<BOOL>
+
+Put a private OSC at the beginning of each row, which tells the id of
+the image, its size in cells and the absolute path of the file, for a
+program which draws the image itself where its cells are, as
+L<ansi2pdf|https://github.com/tecolicom/App-ansi2pdf> does (default:
+off; C<kitty> only).  Terminals ignore it:
+
+    ESC ] 7771 ; i=ID,c=COLS,r=ROWS ; FILE ESC \
 
 =back
 

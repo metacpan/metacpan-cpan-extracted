@@ -28,6 +28,44 @@ An explicit `--claim NAME` still wins. Agents in separate worktrees already
 differ by name; several agents in the **same** directory take
 `karr agent-name --unique` (`karr-8fa`).
 
+## The board is the exchange — keep it pushed
+
+Other agents, sessions and machines see a card only once it is on the remote;
+one that stays local does not exist for them. So every mutating command pulls
+first and pushes `refs/karr/*` after, and that is the point of the board, not a
+side effect: never ask before a board write, never save findings up for later.
+The push is not a publish-gate action, and a "don't push" in a plan or brief
+means commits and tags, not the board. `--local-only` is for a configured remote
+that cannot be reached, never for avoiding the push; `karr sync` publishes what
+it wrote once the remote answers again. A push that fails (credentials,
+rejected) goes at the top of your report — not into a sub-bullet, and not
+a reason to stay local for the rest of the session. Card text is as public as
+the repository: no secrets, no home-directory paths.
+
+What a failed push says, and what to do:
+
+- **`karr: write access to the remote … was denied`** — the remote will not
+  take writes from this clone (no credentials, a read-only key). Usually
+  nothing was changed: the command's change was taken back, and the clone is now
+  read-only for the board. If the message instead says part of the change
+  "could not be taken back and is still in this clone", those cards exist here
+  only: `karr sync` publishes them once the access works. A rate limit or a
+  ref the remote refuses itself (a hook) is a different failure and does not
+  make the clone read-only. Fix the access if you may (the message names how: usually a
+  push URL over SSH, `git remote set-url --push origin git@…`), then run the
+  command again. If you may not, the denial goes at the top of your report.
+- **`karr: this clone is read-only for the board … Nothing was changed.`** —
+  the same state, met by a later write; the write was refused after the pull,
+  `--local-only` included. Reads keep working. Same answer.
+- **`karr: this clone cannot write the board …`** or **`karr: changes still not
+  on the remote …`** on any command, `list` included — a warning, on STDERR
+  only. It is the cue to act, not noise: fix the access, or run `karr sync`
+  once the remote answers. A card marked `(saved in this clone, not on the
+  remote)` exists in this clone only until then.
+- **`karr readonly`** shows the state. Never run `karr readonly on` yourself:
+  that declares the clone read-only for good, which is the call of
+  the clone's maintainer. `karr readonly off` is for after the access was fixed.
+
 ## Read the board
 
 ```bash

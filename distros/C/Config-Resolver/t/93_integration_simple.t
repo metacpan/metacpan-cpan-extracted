@@ -2,11 +2,8 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
+use FindBin;
 
 use Test::More;
 use File::Temp qw(tempfile);
@@ -15,9 +12,12 @@ use JSON qw(to_json from_json);
 
 # --- Find our script and lib paths ---
 my $Bin     = $FindBin::Bin;
-my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver.pl' );
+my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver' );
 my $LibPath = File::Spec->catfile( $Bin, '..', 'lib' );
-my $Perl    = $^X;
+
+# The shell wrapper launches its own Perl interpreter.
+local $ENV{PERL5LIB} = join q{:}, grep { !ref $_ && defined $_ && -d $_ }
+  $LibPath, @INC, split /:/xsm, $ENV{PERL5LIB} // q{};
 
 # --- Test 1: Simple resolve (no manifest) ---
 subtest 'Test Case: End-to-end simple resolve (-p and -t)' => sub {
@@ -35,7 +35,7 @@ subtest 'Test Case: End-to-end simple resolve (-p and -t)' => sub {
   # This time, we are not using a manifest.
   # We are testing the -p and -t flags directly.
   # Output should go to STDOUT.
-  my $command       = "$Perl -I$LibPath $Script resolve -p $p_path -t $t_path";
+  my $command       = "bash $Script resolve -p $p_path -t $t_path";
   my $script_output = qx($command);
 
   # 3. --- Verify the results ---
@@ -60,7 +60,7 @@ subtest 'Test Case: End-to-end simple resolve (no -t)' => sub {
   # We are testing the "no template" branch of resolve()
   # This should dump the resolved parameters hash to STDOUT
   # (and it will be compact JSON because of our 'format=s' fix)
-  my $command       = "$Perl -I$LibPath $Script resolve -p $p_path";
+  my $command       = "bash $Script resolve -p $p_path";
   my $script_output = qx($command);
 
   # 3. --- Verify ---

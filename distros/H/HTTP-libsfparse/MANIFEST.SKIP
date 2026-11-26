@@ -1,0 +1,27 @@
+# Version control and editor leftovers
+^\.git/
+^\.gitignore$
+^\.build/
+~$
+\.bak$
+\.orig$
+\.rej$
+
+# Build products
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^MYMETA\.
+\.o$
+\.bs$
+\.so$
+^libsfparse\.c$
+^libsfparse\.xsc$
+^tmp/
+
+# Previously built distributions
+^HTTP-libsfparse-[0-9._]+/
+^HTTP-libsfparse-[0-9._]+\.tar\.gz$
+^HTTP-StructuredField-[0-9._]+/
+^HTTP-StructuredField-[0-9._]+\.tar\.gz$

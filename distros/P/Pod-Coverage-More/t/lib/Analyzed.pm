@@ -211,4 +211,39 @@ sub logs_only {
     return;
 }
 
+sub listed_undef_last {
+    my ( $self, $elem, undef ) = @_;
+    return $elem;
+}
+
+sub listed_undef_first {
+    my ( undef, $value ) = @_;
+    return $value;
+}
+
+my sub refuses ( $class, $what ) {
+    die "$class does not say $what\n";
+}
+
+sub abstract_via_lexical {
+    my ($class) = @_;
+    return refuses( $class, 'abstract_via_lexical' );
+}
+
+sub refuses_too {
+    my ( $class, $what ) = @_;
+    die "$class does not say $what\n";
+}
+
+sub abstract_via_package {
+    my ($class) = @_;
+    return refuses_too( $class, 'abstract_via_package' );
+}
+
+sub sometimes_refuses {
+    my ( $class, $flag ) = @_;
+    return refuses( $class, 'sometimes' ) if $flag;
+    return 1;
+}
+
 1;

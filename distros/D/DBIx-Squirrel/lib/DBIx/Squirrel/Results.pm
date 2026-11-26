@@ -9,6 +9,8 @@ use DBIx::Squirrel::Result   qw();
 
 use namespace::clean;
 
+our $VERSION = 'v4.1.1';
+
 our @ISA = ('DBIx::Squirrel::Iterator');
 
 # Croak at the line that called DBIx::Squirrel.
@@ -30,7 +32,7 @@ sub _row_maker ($self, $sth) {    ## no critic (Subroutines::ProhibitUnusedPriva
     return undef unless $names;    ## no critic (Subroutines::ProhibitExplicitReturnUndef)
     my $class = _base_class($self)->class_for($names);
     # Without a signature, as it's called for each row, and a signature
-    # costs about 20 ns a call (roadmap 2026-0028).
+    # costs about 19 ns a call (roadmap 2026-0028).
     return sub { bless $_[0], $class };
 }
 

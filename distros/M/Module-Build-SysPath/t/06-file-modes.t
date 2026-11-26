@@ -132,7 +132,12 @@ sub ship_config {
 subtest 'final modes for installed payloads and configuration variants' => sub {
     $dist->child('conf', 'public.cfg')->spew("ordinary configuration\n");
     $dist->child('state', 'seed')->spew("initial state\n");
-    $dist->child('MANIFEST')->append("conf/public.cfg\nstate/seed\n");
+    my $manifest = $dist->child('MANIFEST');
+    # Release distributions ship the manifest read-only.
+    my @manifest_stat = stat($manifest) or die "cannot stat '$manifest': $!";
+    chmod(($manifest_stat[2] & 07777) | 0200, $manifest)
+        or die "cannot chmod '$manifest': $!";
+    $manifest->append("conf/public.cfg\nstate/seed\n");
     my $declaration = <<'PERL';
 {
     './conf/acme-test-syspath.cfg' => 0640,

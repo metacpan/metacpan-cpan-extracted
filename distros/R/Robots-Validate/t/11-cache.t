@@ -1,6 +1,6 @@
 #!perl
 
-use Test2::V0;
+use Test2::V0 -no_srand;
 use Test2::Require::Module 'CHI';
 
 use Test::File::ShareDir -share => {

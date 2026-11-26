@@ -186,14 +186,72 @@ subtest 'absent and false are different values, natively' => sub {
     is($result->is_vpn // 0, 0, 'and reads an absent field as false too');
     ok(!exists $result->location->{city}, 'a paid member of a shared object is absent too');
     is_deeply([$result->fields], [qw(
-        is_bogon is_tor is_relay is_hosting is_bot is_anycast is_carrier is_satellite is_ssh is_smtp
-        is_web is_dns_resolver is_bittorrent tor relay location asn company hostname abuse
+        is_bogon is_tor is_relay is_hosting is_anycast tor relay location asn company hostname abuse
     )], 'fields lists what was served, in wire order');
     is_deeply([sort keys %{ $result->raw }], [sort keys %{ lookup_body(is_hosting => \0) }], 'raw is the wire body');
     # raw keeps the JSON booleans, so it re-encodes to true/false rather than 1/0.
     like(Mojo::JSON::encode_json($result->raw), qr/"is_hosting":false/, 'raw round-trips as JSON');
     eval { $result->has('is_bananas') };
     like($@, qr/unknown field/, 'has croaks on a name that is not a field');
+};
+
+# Unlimited answers none of the eight flags a paid plan or the trial adds, so an
+# answer without them reads, and each reads as absent where it was never served.
+subtest 'the paid flags are absent from an Unlimited answer and present on a paid one' => sub {
+    my @paid = @InternetDataTest::PAID_FLAGS;
+    my $unlimited = lookup_body();
+    my %served_true = map { ($_ => \1) } @paid;
+    my %served_false = map { ($_ => \0) } @paid;
+    my $body;
+    my $origin = InternetDataTest::Origin->new(sub {
+        my ($c) = @_;
+        return $c->render(json => { results => { '9.9.9.1' => lookup_body(ip => '9.9.9.1'),
+            '9.9.9.2' => lookup_body(ip => '9.9.9.2', %served_true) }, errors => {} })
+            if $c->req->url->path->to_string eq '/batch';
+        $c->render(json => $body);
+    });
+    my $client = InternetData->new(base_url => $origin->url, retries => 0, cache_size => 0);
+
+    $body = $unlimited;
+    for my $call (['lookup', sub { $client->lookup('9.9.9.9') }], ['my_ip', sub { $client->my_ip }]) {
+        my $result = eval { $call->[1]->() };
+        ok($result, "$call->[0]: an answer without the eight is read") or do { diag("$@"); next };
+        for my $flag (@paid) {
+            is($result->has($flag), 0, "$call->[0]: $flag is not in the plan");
+            is($result->$flag, undef, "$call->[0]: $flag reads as undef, never as false");
+            ok(!exists $result->{$flag}, "$call->[0]: $flag has no key at all");
+        }
+        is($result->is_anycast, 0, "$call->[0]: what Unlimited serves is read");
+        is_deeply([$result->fields], [qw(is_bogon is_tor is_relay is_anycast tor relay location asn company hostname abuse)],
+            "$call->[0]: fields lists none of the eight");
+    }
+
+    $body = lookup_body(%served_true);
+    my $paid = eval { $client->lookup('9.9.9.9') };
+    ok($paid, 'an answer carrying the eight is read') or diag("$@");
+    for my $flag (@paid) {
+        is($paid->has($flag), 1, "$flag served");
+        is($paid->$flag, 1, "$flag served true reads as 1");
+    }
+    $body = lookup_body(%served_false);
+    my $false = eval { $client->lookup('9.9.9.9') };
+    for my $flag (@paid) {
+        is($false->has($flag), 1, "$flag served false is still served");
+        is($false->$flag, 0, "$flag served false reads as 0");
+    }
+
+    $body = lookup_body(is_bot => \1, bot => { provider => 'p' });
+    my $some = eval { $client->lookup('9.9.9.9') };
+    is_deeply([map { $some->has($_) } @paid], [1, (0) x 7], 'one served flag leaves the other seven absent');
+
+    my $answers = $client->lookup_batch(['9.9.9.1', '9.9.9.2']);
+    is($answers->{'9.9.9.1'}->has('is_bot'), 0, 'a batch entry without the eight is read, and lacks them');
+    is($answers->{'9.9.9.2'}->is_web, 1, 'and one with them reads them');
+
+    $body = lookup_body(asn => { map { $_ => $unlimited->{asn}{$_} } qw(asn name domain prefix country) });
+    my $untyped = eval { $client->lookup('9.9.9.9') };
+    ok($untyped, 'an ASN without its network type is read') or diag("$@");
+    ok(!exists $untyped->asn->{type}, 'and has no type');
 };
 
 subtest 'an AS or a domain answer keeps absent apart from false too' => sub {
@@ -503,7 +561,12 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['lookup, a flag of 1', 'lookup', { %$lookup, is_tor => 1 }],
         ['lookup, is_bogon of null', 'lookup', { %$lookup, is_bogon => undef }],
         ['lookup, no is_anycast', 'lookup', { %$lookup, is_anycast => undef }],
-        ['lookup, no is_bot', 'lookup', { map { $_ => $lookup->{$_} } grep { $_ ne 'is_bot' } keys %$lookup }],
+        (map { (["lookup, $_ of null", 'lookup', { %$lookup, $_ => undef }],
+            ["lookup, $_ of \"false\"", 'lookup', { %$lookup, $_ => 'false' }],
+            ["lookup, $_ of 0", 'lookup', { %$lookup, $_ => 0 }]) } @InternetDataTest::PAID_FLAGS),
+        ['lookup, an ASN type of null', 'lookup', { %$lookup, asn => { %{ $lookup->{asn} }, type => undef } }],
+        ['lookup, an ASN type of 1', 'lookup', { %$lookup, asn => { %{ $lookup->{asn} }, type => 1 } }],
+        ['lookup, an ASN without its prefix', 'lookup', { %$lookup, asn => { map { $_ => $lookup->{asn}{$_} } qw(asn name domain type) } }],
         ['lookup, a bot of "x"', 'lookup', { %$lookup, bot => 'x' }],
         ['lookup, a bot whose agents is a string', 'lookup', { %$lookup, bot => { agents => 'Googlebot' } }],
         ['lookup, a bot verified of "true"', 'lookup', { %$lookup, bot => { verified => 'true' } }],

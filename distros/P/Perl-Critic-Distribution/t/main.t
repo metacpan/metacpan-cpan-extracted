@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 use 5.014;
 use strict;
 use warnings FATAL => 'all';
@@ -58,7 +58,11 @@ sub counter {
             my ( $ppi, $file, $area ) = @_;
             $seen{calls}++;
             $seen{docs}{$file} = Scalar::Util::refaddr($ppi);
-            return { area => $area, subs => [ map { $_->name } @{ $ppi->find('PPI::Statement::Sub') || [] } ] };
+            my @subs;
+            foreach my $sub ( @{ $ppi->find('PPI::Statement::Sub') || [] } ) {
+                push @subs, $sub->name;
+            }
+            return { area => $area, subs => \@subs };
         },
     );
     return \%seen;
@@ -90,6 +94,12 @@ subtest 'root_of and for_file' => sub {
     make_path("$root/t/lib");
     write_file( "$root/t/lib/Helper.pm", "package Helper;\n1;\n" );
     is_deeply( [ $D->root_of("$root/t/lib/Helper.pm") ], [ $root, 't' ], 'a module under t/lib is in t, because the nearest root decides' );
+
+    make_path( "$root/blib/lib/Some", "$root/blib/script" );
+    write_file( "$root/blib/lib/Some/Thing.pm", "package Some::Thing;\nsub it { 1 }\n1;\n" );
+    write_file( "$root/blib/script/run",        "#!/usr/bin/perl\nSome::go();\n" );
+    is_deeply( [ $D->root_of("$root/blib/lib/Some/Thing.pm") ], [ $root, 'lib' ], 'a module that the build copied to blib/lib is in lib' );
+    is_deeply( [ $D->root_of("$root/blib/script/run") ],        [],               'but blib is not lib for anything else in it' );
 
     my $loose = Cwd::abs_path( tempdir( CLEANUP => 1 ) );
     make_path("$loose/lib");
@@ -326,7 +336,9 @@ subtest 'for_file, with the parameters of a policy' => sub {
 
 subtest 'called_by_perl' => sub {
     my %name = map { $_ => 1 } $D->called_by_perl();
-    ok( $name{$_},   "$_ is called by perl" ) for qw{BEGIN DESTROY import AUTOLOAD BUILD FETCH};
+    foreach my $called (qw{BEGIN DESTROY import AUTOLOAD BUILD FETCH}) {
+        ok( $name{$called}, "$called is called by perl" );
+    }
     ok( !$name{new}, 'and new is not, because code calls it' );
 };
 

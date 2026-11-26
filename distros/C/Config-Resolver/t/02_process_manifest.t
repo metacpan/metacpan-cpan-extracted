@@ -4,11 +4,7 @@ use strict;
 use warnings;
 
 # --- Lesson 1: Load Modulino at Compile Time ---
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use Data::Dumper;
@@ -21,11 +17,15 @@ use YAML::Tiny qw(Dump);
   package MockCLI;
 
   # --- Lesson 2: Set up Inheritance ---
-  our @ISA = qw(CLI::Config::Resolver);
+  our @ISA = qw(Config::Resolver::CLI);
 
   # --- Lesson 3: Override init ---
   # This stops the real, complex init() from running.
   sub init { }
+
+  # process_manifest() logs progress; these tests only exercise its
+  # manifest-handling behavior, not logging.
+  sub get_logger { return bless {}, 'MockCLI::Logger'; }
 
   # --- Mock Methods (Stubs and Spies) ---
 
@@ -54,13 +54,14 @@ use YAML::Tiny qw(Dump);
   sub set_template       { $_[0]->{_called_template} = $_[1]; }
   sub set_outfile        { $_[0]->{_called_outfile}  = $_[1]; }
   sub set_umask          { $_[0]->{_called_umask}    = $_[1]; }
+  package MockCLI::Logger;
+
+  sub info { return; }
 }
 
-# This list comes from your config-resolver.pl
+# This list contains the CLI option specifications
 my @option_specs = qw(
-  debug|g dump|d help key|k=s manifest|m=s outfile|o=s
-  parameter-file|p=s pretty|P parameters|V=s plugins=s
-  plugin=s@ resolve|r template=s umask=s warning-level|w=s
+  debug|g dump|d help key|k=s pretty|P parameters|V=s plugins=s plugin=s@ resolve|r warning-level|w=s
 );
 
 # --- Test 1: Basic Job (No Globals) ---

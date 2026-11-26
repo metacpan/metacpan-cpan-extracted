@@ -1,7 +1,7 @@
 # ABSTRACT: Declarations of the attributes of Moose, Mouse and Moo classes
 # PODNAME: Pod::Coverage::More::Declared::MOP
 
-package Pod::Coverage::More::Declared::MOP 0.003;
+package Pod::Coverage::More::Declared::MOP 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -113,7 +113,7 @@ Pod::Coverage::More::Declared::MOP - Declarations of the attributes of Moose, Mo
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 DESCRIPTION
 

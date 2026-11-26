@@ -1,5 +1,9 @@
 Revision history for Module-Build-SysPath
 
+0.21    25 November 2026
+    - Fix integration tests run by non-root users from release distributions
+      that ship read-only fixtures. (GitHub issue #6, Slaven Rezić)
+
 0.20    15 November 2026
     - Add the perl-module-build-syspath agent skill in docs/skills/ describing
       how to install and locate files with Module::Build::SysPath and Sys::Path.

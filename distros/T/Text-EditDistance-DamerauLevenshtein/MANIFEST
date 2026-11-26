@@ -1,0 +1,14 @@
+Changes
+DamerauLevenshtein.xs
+lib/Text/EditDistance/DamerauLevenshtein.pm
+Makefile.PL
+Makefile_PL_settings.plx
+Makefile_PL_settings_maint.plx
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01-basic.t
+xedistance.h
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from lib/Text/EditDistance/DamerauLevenshtein.pm POD (added by maint/eumm-fixup.pl)

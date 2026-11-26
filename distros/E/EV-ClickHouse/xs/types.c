@@ -2355,21 +2355,234 @@ static void write_col_prefix(native_buf_t *b, col_type_t *ct) {
     }
 }
 
-/* Write the LowCardinality serialization-type + num_keys header for a
- * trivial 1:1 dictionary encoding (every value becomes its own dict
- * entry). Returns idx_size via *out_idx_size for the caller's index-write loop. */
-static void lc_write_keys_header(native_buf_t *b, uint64_t nrows, size_t *out_idx_size) {
-    int key_type;
-    size_t idx_size;
-    uint64_t ser_type, nk = nrows;
-    if (nrows <= 0xFF)        { key_type = 0; idx_size = 1; }
-    else if (nrows <= 0xFFFF) { key_type = 1; idx_size = 2; }
-    else                      { key_type = 2; idx_size = 4; }
+/* --- LowCardinality dictionaries ---
+ * A column's distinct values travel once, in first-seen order, and each
+ * row as its key. Values compare by their encoded bytes: the plain types
+ * a dictionary holds have one encoding per value. */
+
+typedef struct {
+    native_buf_t dict;  /* the keys' encoded values, back to back */
+    size_t *koff;       /* key k is dict[koff[k] .. koff[k + 1]) */
+    uint64_t *khash;
+    uint64_t nkeys, kcap;
+    uint64_t base;      /* keys below it (the NULL slot) are never matched */
+    uint32_t *slots;    /* key + 1; 0 is free */
+    size_t mask;
+    uint32_t *idx;      /* each row's key */
+    uint64_t nidx, icap;
+    int distinct;       /* values seen so far were nearly all new: no more lookups */
+} lc_dict_t;
+
+/* Lookups stop, checked every LC_SAMPLE_ROWS rows, once the column has
+ * LC_MIN_KEYS keys and more than LC_DISTINCT_TENTHS of its rows were new:
+ * a dictionary below that size still pays for itself on the wire */
+#define LC_SAMPLE_ROWS 4096
+#define LC_MIN_KEYS 32768
+#define LC_DISTINCT_TENTHS 9
+
+static uint64_t lc_seed;
+
+static uint64_t lc_mix(uint64_t h) {
+    h ^= h >> 33;
+    h *= 0xff51afd7ed558ccdULL;
+    h ^= h >> 33;
+    h *= 0xc4ceb9fe1a85ec53ULL;
+    h ^= h >> 33;
+    return h;
+}
+
+static uint64_t lc_hash(const char *p, size_t n) {
+    uint64_t h = lc_seed ^ ((uint64_t)n * 0x9e3779b97f4a7c15ULL), k;
+    while (n >= 8) {
+        memcpy(&k, p, 8);
+        h = (h ^ k) * 0x9e3779b97f4a7c15ULL;
+        h ^= h >> 29;
+        p += 8;
+        n -= 8;
+    }
+    if (n) {
+        k = 0;
+        memcpy(&k, p, n);
+        h = (h ^ k) * 0x9e3779b97f4a7c15ULL;
+        h ^= h >> 29;
+    }
+    return lc_mix(h);
+}
+
+static void lc_dict_init(lc_dict_t *d, uint64_t nrows) {
+    if (!lc_seed)
+        lc_seed = lc_mix((uint64_t)time(NULL) ^ ((uint64_t)getpid() << 32)
+                         ^ (uint64_t)(uintptr_t)&lc_seed) | 1;
+    nbuf_init(&d->dict);
+    d->kcap = 16;
+    Newx(d->koff, d->kcap, size_t);
+    Newx(d->khash, d->kcap, uint64_t);
+    d->koff[0] = 0;
+    d->nkeys = d->base = 0;
+    d->distinct = 0;
+    Newxz(d->slots, 16, uint32_t);
+    d->mask = 15;
+    d->icap = nrows ? nrows : 1;
+    Newx(d->idx, d->icap, uint32_t);
+    d->nidx = 0;
+}
+
+static void lc_dict_free(lc_dict_t *d) {
+    Safefree(d->dict.data);
+    Safefree(d->koff);
+    Safefree(d->khash);
+    Safefree(d->slots);
+    Safefree(d->idx);
+}
+
+static void lc_dict_push_key(lc_dict_t *d, const char *p, size_t n, uint64_t h) {
+    if (d->nkeys + 1 >= d->kcap) {
+        d->kcap *= 2;
+        Renew(d->koff, d->kcap, size_t);
+        Renew(d->khash, d->kcap, uint64_t);
+    }
+    nbuf_append(&d->dict, p, n);
+    d->khash[d->nkeys] = h;
+    d->koff[++d->nkeys] = d->dict.len;
+}
+
+static void lc_dict_grow(lc_dict_t *d) {
+    size_t n = (d->mask + 1) * 2;
+    uint64_t k;
+    Safefree(d->slots);
+    Newxz(d->slots, n, uint32_t);
+    d->mask = n - 1;
+    for (k = d->base; k < d->nkeys; k++) {
+        size_t i = (size_t)d->khash[k] & d->mask;
+        while (d->slots[i]) i = (i + 1) & d->mask;
+        d->slots[i] = (uint32_t)k + 1;
+    }
+}
+
+/* The key of the value p[0..n), added if new; 0 once keys run out of uint32 */
+static int lc_dict_add(lc_dict_t *d, const char *p, size_t n, uint32_t *key) {
+    uint64_t h = lc_hash(p, n);
+    size_t i = (size_t)h & d->mask;
+    uint32_t s;
+    while ((s = d->slots[i])) {
+        uint64_t k = s - 1;
+        if (d->khash[k] == h && d->koff[k + 1] - d->koff[k] == n
+            && memcmp(d->dict.data + d->koff[k], p, n) == 0) {
+            *key = (uint32_t)k;
+            return 1;
+        }
+        i = (i + 1) & d->mask;
+    }
+    if (d->nkeys >= 0xFFFFFFFEULL) return 0;
+    d->slots[i] = (uint32_t)d->nkeys + 1;
+    *key = (uint32_t)d->nkeys;
+    lc_dict_push_key(d, p, n, h);
+    if (2 * (d->nkeys - d->base) > d->mask + 1) lc_dict_grow(d);
+    return 1;
+}
+
+static void lc_dict_row(lc_dict_t *d, uint32_t key) {
+    if (d->nidx == d->icap) {
+        d->icap *= 2;
+        Renew(d->idx, d->icap, uint32_t);
+    }
+    d->idx[d->nidx++] = key;
+}
+
+/* Length of the encoded value at buf[pos] of a dictionary type: fixed
+ * size or a length-prefixed String; 0 if it runs past len or the type is
+ * neither. */
+static size_t lc_value_len(const char *buf, size_t len, size_t pos, col_type_t *ct) {
+    size_t fsz = col_type_fixed_size(ct), q = pos;
+    uint64_t n = 0;
+    int shift = 0;
+    if (fsz) return fsz <= len - pos ? fsz : 0;
+    if (ct->code != CT_STRING) return 0;
+    while (q < len && shift < 64) {
+        unsigned char c = (unsigned char)buf[q++];
+        n |= (uint64_t)(c & 0x7F) << shift;
+        if (!(c & 0x80))
+            return n <= len - q ? (q - pos) + (size_t)n : 0;
+        shift += 7;
+    }
+    return 0;
+}
+
+/* Add the nvals values ct's encoder wrote back to back into buf[0..len),
+ * one row each; a set nulls[i] makes row i the NULL key 0. 0 if a value
+ * cannot be delimited. */
+static int lc_dict_feed(lc_dict_t *d, const char *buf, size_t len, uint64_t nvals,
+                        col_type_t *ct, const uint8_t *nulls) {
+    size_t pos = 0;
+    uint64_t i;
+    for (i = 0; i < nvals; i++) {
+        size_t n = lc_value_len(buf, len, pos, ct);
+        uint32_t key = 0;
+        if (!n) return 0;
+        if (nulls && nulls[i])
+            ;
+        else if (d->distinct) {
+            /* a key per value, as many as the server would hash anyway */
+            if (d->nkeys >= 0xFFFFFFFEULL) return 0;
+            key = (uint32_t)d->nkeys++;
+            nbuf_append(&d->dict, buf + pos, n);
+        }
+        else if (!lc_dict_add(d, buf + pos, n, &key))
+            return 0;
+        lc_dict_row(d, key);
+        pos += n;
+        if (!d->distinct && d->nidx % LC_SAMPLE_ROWS == 0
+            && d->nkeys - d->base >= LC_MIN_KEYS
+            && (d->nkeys - d->base) * 10 > d->nidx * LC_DISTINCT_TENTHS)
+            d->distinct = 1;
+    }
+    return pos == len;
+}
+
+/* The index type of nk keys: UInt8, UInt16 or UInt32, as 0, 1 or 2 */
+static int lc_key_type(uint64_t nk) {
+    return nk <= 0x100 ? 0 : nk <= 0x10000 ? 1 : 2;
+}
+
+/* serialization type, keys, rows' keys at the narrowest width that holds them */
+static void lc_dict_write(native_buf_t *b, const lc_dict_t *d) {
+    uint64_t ser_type, nk = d->nkeys, ni = d->nidx, i;
+    int key_type = lc_key_type(nk);
+    size_t w = (size_t)1 << key_type;
+    char *o;
     /* HasAdditionalKeys | NeedUpdateDictionary */
     ser_type = (uint64_t)key_type | (1ULL << 9) | (1ULL << 10);
     nbuf_append(b, (const char *)&ser_type, 8);
     nbuf_append(b, (const char *)&nk, 8);
-    *out_idx_size = idx_size;
+    nbuf_append(b, d->dict.data, d->dict.len);
+    nbuf_append(b, (const char *)&ni, 8);
+    nbuf_grow(b, (size_t)ni * w);
+    o = b->data + b->len;
+    if (w == 1)      for (i = 0; i < ni; i++) o[i] = (char)(uint8_t)d->idx[i];
+    else if (w == 2) for (i = 0; i < ni; i++) { uint16_t v = (uint16_t)d->idx[i]; memcpy(o + 2 * i, &v, 2); }
+    else             memcpy(o, d->idx, (size_t)ni * 4);
+    b->len += (size_t)ni * w;
+}
+
+/* A LowCardinality column of nrows rows from raw, its values as the
+ * dictionary type's encoder wrote them: the rows, or with nulls the NULL
+ * placeholder and then the rows. 0 if the values cannot be delimited or
+ * run past 2^32 keys. */
+static int lc_encode(native_buf_t *b, const native_buf_t *raw, uint64_t nrows,
+                     col_type_t *dict_ct, const uint8_t *nulls) {
+    lc_dict_t d;
+    size_t pos = 0;
+    int ok;
+    lc_dict_init(&d, nrows);
+    if (nulls && (pos = lc_value_len(raw->data, raw->len, 0, dict_ct))) {
+        lc_dict_push_key(&d, raw->data, pos, 0);
+        d.base = 1;
+    }
+    ok = (!nulls || pos)
+        && lc_dict_feed(&d, raw->data + pos, raw->len - pos, nrows, dict_ct, nulls);
+    if (ok) lc_dict_write(b, &d);
+    lc_dict_free(&d);
+    return ok;
 }
 
 /* An Enum type's default value, as on the server: its smallest code. */
@@ -2427,32 +2640,6 @@ static SV *nullable_inner_zero_sv(pTHX_ col_type_t *t) {
     if (len == 1 && p[0] == '0')
         return newSViv(0);
     return newSVpvn(p, len);
-}
-
-/* Write num_indices + identity-mapped indices [0..nrows-1] for a trivial
- * LowCardinality 1:1 dictionary. */
-static void lc_write_indices(native_buf_t *b, uint64_t nrows, size_t idx_size) {
-    uint64_t i, ni = nrows;
-    nbuf_append(b, (const char *)&ni, 8);
-    for (i = 0; i < nrows; i++) {
-        if (idx_size == 1)      { uint8_t idx = (uint8_t)i;  nbuf_append(b, (const char *)&idx, 1); }
-        else if (idx_size == 2) { uint16_t idx = (uint16_t)i; nbuf_append(b, (const char *)&idx, 2); }
-        else                    { uint32_t idx = (uint32_t)i; nbuf_append(b, (const char *)&idx, 4); }
-    }
-}
-
-/* Write num_indices + per-row indices for an LC(Nullable) dictionary
- * whose slot 0 is NULL: null rows map to 0, row i maps to i + 1. */
-static void lc_write_nullable_indices(native_buf_t *b, uint64_t nrows,
-                                      size_t idx_size, uint8_t *nulls) {
-    uint64_t i, ni = nrows;
-    nbuf_append(b, (const char *)&ni, 8);
-    for (i = 0; i < nrows; i++) {
-        uint64_t v = nulls[i] ? 0 : i + 1;
-        if (idx_size == 1)      { uint8_t idx = (uint8_t)v;  nbuf_append(b, (const char *)&idx, 1); }
-        else if (idx_size == 2) { uint16_t idx = (uint16_t)v; nbuf_append(b, (const char *)&idx, 2); }
-        else                    { uint32_t idx = (uint32_t)v; nbuf_append(b, (const char *)&idx, 4); }
-    }
 }
 
 /* Parse "YYYY-MM-DD HH:MM:SS[.fff...]" into a DateTime64 scaled int64
@@ -3760,15 +3947,13 @@ static int encode_column_text(native_buf_t *b,
         }
     }
     case CT_LOWCARDINALITY: {
-        /* Trivial 1:1 dictionary: each value is its own dict entry. */
-        size_t idx_size;
         native_buf_t dict_buf;
         int rc;
 
         if (nrows == 0) return 1;
         if (ct->inner->code == CT_NULLABLE) {
             /* Dict travels as plain T with slot 0 reserved for NULL:
-             * [T default] + rows (nulls substituted), null->0 else i+1. */
+             * [T default] + rows (nulls substituted), a null row -> 0. */
             const char **dvals;
             size_t *dlens;
             uint8_t *nulls;
@@ -3791,28 +3976,22 @@ static int encode_column_text(native_buf_t *b,
                     dlens[i + 1] = value_lens[i];
                 }
             }
-            lc_write_keys_header(b, nrows + 1, &idx_size);
             nbuf_init(&dict_buf);
             rc = encode_column_text(&dict_buf, dvals, dlens, nrows + 1,
                                     ct->inner->inner);
             Safefree(dvals);
             Safefree(dlens);
-            if (!rc) { Safefree(dict_buf.data); Safefree(nulls); return 0; }
-            nbuf_append(b, dict_buf.data, dict_buf.len);
+            rc = rc && lc_encode(b, &dict_buf, nrows, ct->inner->inner, nulls);
             Safefree(dict_buf.data);
-            lc_write_nullable_indices(b, nrows, idx_size, nulls);
             Safefree(nulls);
-            return 1;
+            return rc;
         }
 
-        lc_write_keys_header(b, nrows, &idx_size);
         nbuf_init(&dict_buf);
-        rc = encode_column_text(&dict_buf, values, value_lens, nrows, ct->inner);
-        if (!rc) { Safefree(dict_buf.data); return 0; }
-        nbuf_append(b, dict_buf.data, dict_buf.len);
+        rc = encode_column_text(&dict_buf, values, value_lens, nrows, ct->inner)
+          && lc_encode(b, &dict_buf, nrows, ct->inner, NULL);
         Safefree(dict_buf.data);
-        lc_write_indices(b, nrows, idx_size);
-        return 1;
+        return rc;
     }
     default:
         return 0;  /* unsupported type — fall back to inline SQL */
@@ -4519,14 +4698,13 @@ static int encode_column_sv(pTHX_ native_buf_t *b,
         }
     }
     case CT_LOWCARDINALITY: {
-        size_t idx_size;
         native_buf_t dict_buf;
         int rc;
 
         if (nrows == 0) return 1;
         if (ct->inner->code == CT_NULLABLE) {
             /* Dict travels as plain T with slot 0 reserved for NULL:
-             * [T default] + rows (nulls substituted), null->0 else i+1. */
+             * [T default] + rows (nulls substituted), a null row -> 0. */
             SV **dvals;
             uint8_t *nulls;
             SV *zero_sv = nullable_inner_zero_sv(aTHX_ ct->inner->inner);
@@ -4542,28 +4720,22 @@ static int encode_column_sv(pTHX_ native_buf_t *b,
                     dvals[i + 1] = values[i];
                 }
             }
-            lc_write_keys_header(b, nrows + 1, &idx_size);
             nbuf_init(&dict_buf);
             rc = encode_column_sv(aTHX_ &dict_buf, dvals, nrows + 1,
                                   ct->inner->inner);
             Safefree(dvals);
             SvREFCNT_dec(zero_sv);
-            if (!rc) { Safefree(dict_buf.data); Safefree(nulls); return 0; }
-            nbuf_append(b, dict_buf.data, dict_buf.len);
+            rc = rc && lc_encode(b, &dict_buf, nrows, ct->inner->inner, nulls);
             Safefree(dict_buf.data);
-            lc_write_nullable_indices(b, nrows, idx_size, nulls);
             Safefree(nulls);
-            return 1;
+            return rc;
         }
 
-        lc_write_keys_header(b, nrows, &idx_size);
         nbuf_init(&dict_buf);
-        rc = encode_column_sv(aTHX_ &dict_buf, values, nrows, ct->inner);
-        if (!rc) { Safefree(dict_buf.data); return 0; }
-        nbuf_append(b, dict_buf.data, dict_buf.len);
+        rc = encode_column_sv(aTHX_ &dict_buf, values, nrows, ct->inner)
+          && lc_encode(b, &dict_buf, nrows, ct->inner, NULL);
         Safefree(dict_buf.data);
-        lc_write_indices(b, nrows, idx_size);
-        return 1;
+        return rc;
     }
     case CT_ARRAY: {
         /* Each value must be an AV ref. Wire format: offsets + flat inner data */
@@ -4972,41 +5144,16 @@ static int encode_column_sv(pTHX_ native_buf_t *b,
     }
 }
 
-/*
- * Wrap a filled Data block body into a CLIENT_DATA packet with optional LZ4 + empty trailing block.
- * Consumes body->data (frees it). Returns malloc'd packet, or NULL on failure.
- */
+/* A filled Data block body as a CLIENT_DATA packet plus the empty trailing
+ * block. Consumes body->data. Returns the malloc'd packet. */
 static char* wrap_data_block(ev_clickhouse_t *self, native_buf_t *body, size_t *out_len) {
     native_buf_t pkt;
 
     nbuf_init(&pkt);
     nbuf_varuint(&pkt, CLIENT_DATA);
     nbuf_cstring(&pkt, "");   /* table name — outside compression */
-
-  #ifdef HAVE_LZ4
-    if (self->compress) {
-        char *compressed;
-        size_t comp_len;
-        compressed = ch_lz4_compress(body->data, body->len, &comp_len);
-        Safefree(body->data);
-        body->data = NULL;
-        if (compressed) {
-            nbuf_append(&pkt, compressed, comp_len);
-            Safefree(compressed);
-        } else {
-            Safefree(pkt.data);
-            *out_len = 0;
-            return NULL;
-        }
-    } else
-  #endif
-    {
-        nbuf_append(&pkt, body->data, body->len);
-        Safefree(body->data);
-        body->data = NULL;
-    }
-
-    nbuf_empty_data_block(&pkt, self->compress);
+    nbuf_put_block(&pkt, body, self);
+    nbuf_empty_data_block(&pkt, self);
 
     *out_len = pkt.len;
     return pkt.data;
@@ -6654,9 +6801,10 @@ static int enc_col_mode(const col_type_t *ct) {
 
 typedef struct {
     int mode;
-    native_buf_t data;    /* values, array elements or LC dictionary */
+    native_buf_t data;    /* values or array elements */
     native_buf_t aux;     /* null map or array offsets */
     uint64_t base;        /* array elements so far */
+    lc_dict_t *lc;        /* ENC_LC */
 } enc_col_t;
 
 typedef struct {
@@ -6673,6 +6821,10 @@ static void enc_ctx_free(pTHX_ void *p) {
     for (c = 0; c < x->ncols; c++) {
         Safefree(x->cols[c].data.data);
         Safefree(x->cols[c].aux.data);
+        if (x->cols[c].lc) {
+            lc_dict_free(x->cols[c].lc);
+            Safefree(x->cols[c].lc);
+        }
     }
     Safefree(x->cols);
     Safefree(x->vals);
@@ -6724,13 +6876,6 @@ static void enc_split_chunk(enc_col_t *ec, const native_buf_t *tmp, SSize_t n) {
         }
         ec->base += off;
         nbuf_append(&ec->data, tmp->data + n * 8, tmp->len - (size_t)n * 8);
-        break;
-    }
-    case ENC_LC: {
-        /* ser_type, num_keys, dictionary, num_indices, indices */
-        int key_type = (unsigned char)tmp->data[0];
-        size_t w = key_type == 0 ? 1 : key_type == 1 ? 2 : 4;
-        nbuf_append(&ec->data, tmp->data + 16, tmp->len - 24 - (size_t)n * w);
         break;
     }
     default:
@@ -6796,6 +6941,10 @@ static char* build_native_insert_data_from_av(pTHX_ ev_clickhouse_t *self,
             nbuf_reserve(&ec->aux, (size_t)nrows);
         else if (ec->mode == ENC_ARRAY)
             nbuf_reserve(&ec->aux, 8 * (size_t)nrows);
+        else if (ec->mode == ENC_LC) {
+            Newx(ec->lc, 1, lc_dict_t);
+            lc_dict_init(ec->lc, (uint64_t)nrows);
+        }
     }
 
     /* A failing column stops the work on itself and every later column,
@@ -6818,6 +6967,12 @@ static char* build_native_insert_data_from_av(pTHX_ ev_clickhouse_t *self,
             if (ec->mode == ENC_PLAIN) {
                 ok = encode_column_sv(aTHX_ &ec->data, x->vals, (uint64_t)n,
                                       col_types[c]);
+            } else if (ec->mode == ENC_LC) {
+                x->tmp.len = 0;
+                ok = encode_column_sv(aTHX_ &x->tmp, x->vals, (uint64_t)n,
+                                      col_types[c]->inner)
+                  && lc_dict_feed(ec->lc, x->tmp.data, x->tmp.len, (uint64_t)n,
+                                  col_types[c]->inner, NULL);
             } else {
                 x->tmp.len = 0;
                 ok = encode_column_sv(aTHX_ &x->tmp, x->vals, (uint64_t)n,
@@ -6827,7 +6982,7 @@ static char* build_native_insert_data_from_av(pTHX_ ev_clickhouse_t *self,
             if (!ok) {
                 fail = c; fail_r0 = r0; fail_n = n; fail_nodef = -1;
             }
-            else if (r0 == 0 && n < nrows
+            else if (r0 == 0 && n < nrows && ec->mode != ENC_LC
                      && !(ec->mode == ENC_PLAIN && col_type_fixed_size(col_types[c])))
                 nbuf_reserve(&ec->data,
                     (size_t)((double)ec->data.len / n * nrows * 1.1) + 64);
@@ -6872,7 +7027,9 @@ static char* build_native_insert_data_from_av(pTHX_ ev_clickhouse_t *self,
     for (c = 0; c < num_cols; c++) {
         need += col_name_lens[c] + col_type_lens[c] + 64
               + x->cols[c].data.len + x->cols[c].aux.len;
-        if (x->cols[c].mode == ENC_LC) need += 24 + 4 * (size_t)nrows;
+        if (x->cols[c].mode == ENC_LC)
+            need += 24 + x->cols[c].lc->dict.len
+                  + ((size_t)nrows << lc_key_type(x->cols[c].lc->nkeys));
     }
     nbuf_init(&x->out);
     nbuf_reserve(&x->out, need);
@@ -6890,10 +7047,10 @@ static char* build_native_insert_data_from_av(pTHX_ ev_clickhouse_t *self,
         nbuf_u8(&x->out, 0);  /* has_custom_serialization = false */
         write_col_prefix(&x->out, col_types[c]);
         if (ec->mode == ENC_LC) {
-            size_t idx_size;
-            lc_write_keys_header(&x->out, (uint64_t)nrows, &idx_size);
-            nbuf_append(&x->out, ec->data.data, ec->data.len);
-            lc_write_indices(&x->out, (uint64_t)nrows, idx_size);
+            lc_dict_write(&x->out, ec->lc);
+            lc_dict_free(ec->lc);
+            Safefree(ec->lc);
+            ec->lc = NULL;
         } else {
             nbuf_append(&x->out, ec->aux.data, ec->aux.len);
             nbuf_append(&x->out, ec->data.data, ec->data.len);
@@ -6903,7 +7060,7 @@ static char* build_native_insert_data_from_av(pTHX_ ev_clickhouse_t *self,
     }
 
     if (!self->compress) {
-        nbuf_empty_data_block(&x->out, 0);
+        nbuf_empty_data_block(&x->out, self);
         pkt = x->out.data;
         *out_len = x->out.len;
     } else {
@@ -7147,30 +7304,10 @@ static char* build_external_tables(pTHX_ ev_clickhouse_t *self, HV *external,
             }
         }
 
-        /* [CLIENT_DATA] [table name] [block — optionally LZ4-compressed] */
+        /* [CLIENT_DATA] [table name] [block — optionally compressed] */
         nbuf_varuint(&out, CLIENT_DATA);
         nbuf_string(&out, tname, (size_t)tnlen);
-      #ifdef HAVE_LZ4
-        if (self->compress) {
-            char *comp;
-            size_t comp_len;
-            comp = ch_lz4_compress(body.data, body.len, &comp_len);
-            Safefree(body.data);
-            body.data = NULL;
-            if (!comp) {
-                snprintf(errbuf, errbuf_sz, "external table '%s': LZ4 "
-                         "compression failed", tname);
-                goto fail;
-            }
-            nbuf_append(&out, comp, comp_len);
-            Safefree(comp);
-        } else
-      #endif
-        {
-            nbuf_append(&out, body.data, body.len);
-            Safefree(body.data);
-            body.data = NULL;
-        }
+        nbuf_put_block(&out, &body, self);
     }
 
     *out_len = out.len;

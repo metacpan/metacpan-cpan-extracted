@@ -30,5 +30,5 @@ requires:
   Time::JulianDay: '0'
 resources:
   repository: https://github.com/cade-vs/perl-data-tools.git
-version: '1.52'
+version: '1.60'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

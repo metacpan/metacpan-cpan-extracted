@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Git::ChangelogFromTrailers 0.001;
+package Dist::Zilla::Plugin::Git::ChangelogFromTrailers 0.002;
 
 # ABSTRACT: Build the Changes entry for a release from the Changelog trailers of its commits
 
@@ -13,7 +13,7 @@ with 'Dist::Zilla::Role::FileGatherer', 'Dist::Zilla::Role::BeforeRelease';
 
 use Dist::Zilla::File::InMemory ();
 use Git::Wrapper                ();
-use List::Util                  qw{first max uniq};
+use List::Util                  qw{any first max uniq};
 use version                     ();
 use namespace::autoclean;    ## no critic (ProhibitUnusedImports) loaded for its effect, which removes the imports from the class
 
@@ -60,7 +60,11 @@ has _git => (
     default  => sub { Git::Wrapper->new( $_[0]->zilla->root->stringify ) },
 );
 
-
+# The name of the last release tag: of the tags that are reachable from HEAD
+# and match version_regexp, the one with the highest version.
+# @returns Str|Undef  the name of the tag, or undef if no tag matches
+# @throws  dies with a Git::Wrapper::Exception when git tag fails
+# @example my $tag = $plugin->last_release_tag;
 sub last_release_tag {
     my ($self) = @_;
     my $regexp = $self->version_regexp;
@@ -78,7 +82,11 @@ sub last_release_tag {
     return first { $version_of{$_} == $highest } sort keys %version_of;
 }
 
-
+# The values of the trailers in the commits since the last release tag, in the
+# order that L</Trailers> describes.  Nothing when the repository has no commit.
+# @returns Str  the values, as a list
+# @throws  dies with a Git::Wrapper::Exception when git tag or git log fails
+# @example my @items = $plugin->items;
 sub items {
     my ($self) = @_;
     my $git = $self->_git;
@@ -89,16 +97,58 @@ sub items {
     my $tag = $self->last_release_tag;
     my $key = $self->trailer;
 
-    # Git::Wrapper refuses --format in log, so RUN gives the raw lines: one value
-    # to a line, and an empty line for a commit with no trailer.
-    my @values = $git->RUN(
-        log => { reverse => 1, format => "%(trailers:key=$key,valueonly,unfold)" },
+    # Git::Wrapper refuses --format in log, so RUN gives the raw lines.  Each
+    # commit starts with a record separator, and a unit separator divides the
+    # trailers that git reads from the whole message.
+    my $log = join "\n", $git->RUN(
+        log => { reverse => 1, format => "%x1e%(trailers:key=$key,valueonly,unfold)%x1f%B" },
         defined $tag ? "$tag..HEAD" : 'HEAD',
     );
+    my @values;
+    foreach my $commit ( grep { $_ ne q{} } split /\x1e/, $log ) {
+        my ( $trailers, $message ) = split /\x1f/, $commit, 2;
+        push @values, $self->trailers_in( $message // q{} ), split /\n/, $trailers;
+    }
     return uniq grep { $_ ne q{} } map { s/^\s+//r =~ s/\s+\z//r } @values;
 }
 
+# The values of the trailers of L</trailer> in each paragraph of the commit
+# message C<$message> that is a block of trailers, in their order.  A paragraph
+# is such a block when its first line is a trailer, and each line after it is a
+# trailer or continues the one above it with leading whitespace.  A continued
+# trailer is joined into one line.  git reads trailers only from the last
+# paragraph, so this finds those that a squash merge left above it.
+# @param   message  Str  the whole commit message
+# @returns Str  the values, as a list
+# @example my @values = $plugin->trailers_in("Subject\n\nChangelog: A change\n\nCo-authored-by: A. Tester <tester\@test.test>");
+sub trailers_in {
+    my ( $self, $message ) = @_;
+    my $key = lc $self->trailer;
+    my @values;
+    foreach my $paragraph ( split /\n[ \t]*\n/, $message ) {
+        my @lines = grep { $_ ne q{} } split /\n/, $paragraph;
+        next if !@lines || $lines[0] !~ m/\A[[:alnum:]][[:alnum:]-]*\s*:/;
+        next if any { !m/\A(?:[[:alnum:]][[:alnum:]-]*\s*:|\s+\S)/ } @lines;
+        my @trailers;
+        foreach my $line (@lines) {
+            if ( $line =~ m/\A\s/ ) {
+                $trailers[-1] .= q{ } . ( $line =~ s/\A\s+//r );
+                next;
+            }
+            push @trailers, $line;
+        }
+        foreach my $trailer (@trailers) {
+            my ( $name, $value ) = $trailer =~ m/\A([[:alnum:]][[:alnum:]-]*)\s*:\s*(.*)\z/;
+            push @values, $value if lc $name eq $key;
+        }
+    }
+    return @values;
+}
 
+# Add an empty F<Changes> to the build if the repository has none, as
+# L<Dist::Zilla::Role::FileGatherer> asks.
+# @returns nothing
+# @example $plugin->gather_files;
 sub gather_files {
     my ($self) = @_;
     return if -e $self->zilla->root->child( $self->filename );
@@ -113,6 +163,15 @@ sub gather_files {
     return;
 }
 
+sub _changes_file {
+    my ($self) = @_;
+    my $name = $self->filename;
+    foreach my $file ( @{ $self->zilla->files } ) {
+        return $file if $file->name eq $name;
+    }
+    return;
+}
+
 sub _build_entry {
     my ($self) = @_;
     my @items = $self->items;
@@ -120,10 +179,14 @@ sub _build_entry {
     return join q{}, $self->section_header, "\n", map { "    - $_\n" } @items;
 }
 
-
+# Add the entry to F<Changes> in the build, as L<Dist::Zilla::Role::FileMunger>
+# asks.  If no commit has a trailer, leave it as it is.
+# @returns nothing
+# @throws  by log_fatal when the build has no F<Changes>
+# @example $plugin->munge_files;
 sub munge_files {
     my ($self) = @_;
-    my $file = first { $_->name eq $self->filename } @{ $self->zilla->files };
+    my $file = $self->_changes_file;
     $self->log_fatal( [ 'failed to find %s in the distribution', $self->filename ] ) unless $file;
 
     my $entry = $self->_entry;
@@ -140,7 +203,12 @@ sub munge_files {
     return;
 }
 
-
+# Check that the release can write its entry, as
+# L<Dist::Zilla::Role::BeforeRelease> asks.
+# @returns nothing
+# @throws  by log_fatal when no commit since the last release has a trailer, or
+#   when this plugin is below C<[Git::Commit]> in F<dist.ini>
+# @example $plugin->before_release;
 sub before_release {
     my ($self) = @_;
     $self->log_fatal( [ 'no %s trailers in the commits since the last release', $self->trailer ] )
@@ -159,7 +227,7 @@ sub after_release {
     my ($self) = @_;
     return unless defined $self->_changes;
 
-    my $file    = first { $_->name eq $self->filename } @{ $self->zilla->files };
+    my $file    = $self->_changes_file;
     my $iolayer = sprintf ':raw:encoding(%s)', $file->encoding;
     $self->log_debug( [ 'updating contents of %s on disk', $self->update_filename ] );
     my $changes = $self->zilla->root->child( $self->update_filename );
@@ -187,7 +255,7 @@ Dist::Zilla::Plugin::Git::ChangelogFromTrailers - Build the Changes entry for a 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -211,7 +279,8 @@ messages do not.
 
 This plugin reads the C<Changelog> trailers of the commits since the last
 release tag.  A trailer is a C<Key: value> line in the last paragraph of a
-commit message, as L<git-interpret-trailers(1)> describes.  The plugin writes
+commit message, as L<git-interpret-trailers(1)> describes, or in any other
+paragraph that holds only trailers.  The plugin writes
 one entry for the trailers at the top of F<Changes> in the build.  When the
 release succeeds, it writes the same entry to F<Changes> in the repository, so
 that C<[Git::Commit]> commits it with the release.
@@ -237,7 +306,16 @@ The value of each trailer is the text of one item, so a commit can have more
 than one.  The key does not depend on case.  A trailer that continues on the
 next line is joined into one line.
 
-The items are in the order of their commits, the oldest first.  A value that
+git reads trailers only from the last paragraph, but a squash merge on GitHub
+leaves them in an earlier one.  It moves each C<Co-authored-by> trailer of the
+pull request into a paragraph of its own at the end, and it joins the messages
+of the commits of the pull request into one body.  So the plugin also reads
+each paragraph whose first line is a trailer, and whose every line is a trailer
+or continues the one above it with leading whitespace.  A paragraph of prose
+counts for nothing, although one of its lines starts with the key.
+
+The items are in the order of their commits, the oldest first, and in the
+order of the message within a commit.  A value that
 is the same as an earlier one is left out, so a merge commit can repeat the
 trailers of its branch.  A commit with no trailer adds nothing.
 
@@ -276,33 +354,80 @@ is the version.  The default matches C<1.002> and C<v1.002>.
 
 =head1 METHODS
 
-=head2 last_release_tag
+=head2 after_release
 
-Return the name of the last release tag, or undef if there is none.
+Write F<Changes> of the build to the repository, as
+L<Dist::Zilla::Role::AfterRelease> asks.  If the plugin made it, run
+C<git add --intent-to-add> on it, so that C<[Git::Commit]> commits it.
 
-=head2 items
+Returns nothing.
 
-Return the values of the trailers in the commits since the last release tag, in
-the order that L</Trailers> describes.
+Dies when F<Changes> cannot be written, and with a Git::Wrapper::Exception when
+git add fails.
 
-=head2 gather_files
-
-Add an empty F<Changes> to the build if the repository has none.
-
-=head2 munge_files
-
-Add the entry to F<Changes> in the build.  If no commit has a trailer, leave
-it as it is.
+    $plugin->after_release;
 
 =head2 before_release
 
-Stop the release if no commit since the last release has a trailer, or if this
-plugin is below C<[Git::Commit]> in F<dist.ini>.
+Check that the release can write its entry, as L<Dist::Zilla::Role::BeforeRelease> asks.
 
-=head2 after_release
+Returns nothing.
 
-Write F<Changes> of the build to the repository.  If the plugin made it, run
-C<git add --intent-to-add> on it, so that C<[Git::Commit]> commits it.
+Dies by log_fatal when no commit since the last release has a trailer, or when this plugin is below C<[Git::Commit]> in F<dist.ini>.
+
+    $plugin->before_release;
+
+=head2 gather_files
+
+Add an empty F<Changes> to the build if the repository has none, as L<Dist::Zilla::Role::FileGatherer> asks.
+
+Returns nothing.
+
+    $plugin->gather_files;
+
+=head2 items
+
+The values of the trailers in the commits since the last release tag, in the order that L</Trailers> describes.  Nothing when the repository has no commit.
+
+Returns Str, the values, as a list.
+
+Dies with a Git::Wrapper::Exception when git tag or git log fails.
+
+    my @items = $plugin->items;
+
+=head2 last_release_tag
+
+The name of the last release tag: of the tags that are reachable from HEAD and match version_regexp, the one with the highest version.
+
+Returns Str or Undef, the name of the tag, or undef if no tag matches.
+
+Dies with a Git::Wrapper::Exception when git tag fails.
+
+    my $tag = $plugin->last_release_tag;
+
+=head2 munge_files
+
+Add the entry to F<Changes> in the build, as L<Dist::Zilla::Role::FileMunger> asks.  If no commit has a trailer, leave it as it is.
+
+Returns nothing.
+
+Dies by log_fatal when the build has no F<Changes>.
+
+    $plugin->munge_files;
+
+=head2 trailers_in(message)
+
+The values of the trailers of L</trailer> in each paragraph of the commit message C<$message> that is a block of trailers, in their order.  A paragraph is such a block when its first line is a trailer, and each line after it is a trailer or continues the one above it with leading whitespace.  A continued trailer is joined into one line.  git reads trailers only from the last paragraph, so this finds those that a squash merge left above it.
+
+=over 4
+
+=item message - Str - the whole commit message
+
+=back
+
+Returns Str, the values, as a list.
+
+    my @values = $plugin->trailers_in("Subject\n\nChangelog: A change\n\nCo-authored-by: A. Tester <tester\@test.test>");
 
 =head1 SEE ALSO
 
@@ -346,6 +471,22 @@ Current Maintainers:
 =item *
 
 George S. Baugh <george@troglodyne.net>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=for stopwords troglodyne-bot troglodyne-robot
+
+=over 4
+
+=item *
+
+troglodyne-bot <troglodyne-bot@users.noreply.github.com>
+
+=item *
+
+troglodyne-robot <trogbot@troglodyne.net>
 
 =back
 

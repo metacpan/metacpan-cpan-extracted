@@ -50,6 +50,12 @@
 #define DEFAULT_MAX_PAYLOAD (1024 * 1024)
 #define MAX_SERVER_POOL 64
 
+/* user inbox_prefix limit; the stored prefix adds ".<16 hex>." */
+#define MAX_INBOX_BASE 64
+#define INBOX_PREFIX_SIZE (MAX_INBOX_BASE + 20)
+/* an inbox: the prefix plus a decimal uint64 */
+#define INBOX_SUBJ_SIZE (INBOX_PREFIX_SIZE + 24)
+
 #define PARSE_OP       0
 #define PARSE_MSG_BODY 1
 
@@ -66,10 +72,13 @@
     STMT_START { SV *_pin = (handler); SvREFCNT_inc_simple_void_NN(_pin); \
                  call_sv(_pin, (flags)); SvREFCNT_dec(_pin); } STMT_END
 
+/* a connection is on its way: writes queue until the handshake */
+#define NATS_PENDING(self) \
+    ((self)->connecting || ((self)->reconnect_enabled && (self)->reconnect_timer_active))
+
 #define NATS_CROAK_UNLESS_CONNECTED(self) \
     do { \
-        if (!(self)->connected && !(self)->connecting && \
-            !((self)->reconnect_enabled && (self)->reconnect_timer_active)) \
+        if (!(self)->connected && !NATS_PENDING(self)) \
             croak("not connected"); \
     } while(0)
 
@@ -195,10 +204,14 @@ struct nats_s {
     int echo;
     int no_responders;
 
-    char inbox_prefix[32];
+    char inbox_prefix[INBOX_PREFIX_SIZE];
     uint64_t next_req_id;
     ngx_queue_t req_queue;
     uint64_t inbox_sub_sid;
+
+    /* one-shot internal callbacks fired when the connection drops */
+    ngx_queue_t disc_watch;
+    uint64_t next_watch_id;
 
     int parse_state;
     int msg_type;
@@ -238,6 +251,8 @@ struct nats_s {
 
     /* PONG callback queue (for flush) */
     ngx_queue_t pong_cbs;
+    /* flushes made before the handshake completed; PINGed after it */
+    ngx_queue_t flush_wait;
 
     /* NKey auth */
     char *nkey_seed;     /* Ed25519 seed (base32-encoded) */
@@ -277,6 +292,12 @@ typedef struct nats_req_s {
     ngx_queue_t queue;
 } nats_req_t;
 
+typedef struct nats_watch_s {
+    uint64_t id;
+    SV *cb;
+    ngx_queue_t queue;
+} nats_watch_t;
+
 /* ================================================================
  * Forward declarations
  * ================================================================ */
@@ -297,6 +318,7 @@ static void nats_on_reconnect_timer(struct ev_loop *loop, ev_timer *w, int reven
 static void nats_on_ping_timer(struct ev_loop *loop, ev_timer *w, int revents);
 static void nats_send_connect(nats_t *self);
 static void nats_try_write(nats_t *self);
+static void nats_schedule_write(nats_t *self);
 static void nats_process_line(nats_t *self, char *line, size_t len);
 static void nats_process_msg(nats_t *self, char *payload, size_t len);
 static void nats_emit_error(nats_t *self, const char *err);
@@ -304,7 +326,7 @@ static void nats_cleanup(nats_t *self);
 static void nats_destroy_now(nats_t *self);
 static void nats_start_ping_timer(nats_t *self);
 static void nats_drain_waiting(nats_t *self);
-static void nats_setup_inbox(nats_t *self);
+static void nats_setup_inbox(nats_t *self, const char *base);
 static nats_sub_t *nats_find_sub(nats_t *self, uint64_t sid);
 static void nats_remove_sub(nats_t *self, nats_sub_t *sub);
 static void nats_cancel_all_requests(nats_t *self, const char *err);
@@ -891,13 +913,28 @@ static void nats_gen_hex(char *buf, int nbytes)
     }
 }
 
-static void nats_setup_inbox(nats_t *self)
+static void nats_setup_inbox(nats_t *self, const char *base)
 {
     char hex[20];
     nats_gen_hex(hex, 8);
     snprintf(self->inbox_prefix, sizeof(self->inbox_prefix),
-             "_INBOX.%.16s.", hex);
+             "%s.%.16s.", base, hex);
     self->next_req_id = 1;
+}
+
+static int nats_inbox_base_ok(const char *p, size_t len)
+{
+    size_t i;
+    if (len == 0 || len > MAX_INBOX_BASE || p[0] == '.' || p[len - 1] == '.')
+        return 0;
+    for (i = 0; i < len; i++) {
+        unsigned char c = (unsigned char)p[i];
+        if (c <= 0x20 || c == 0x7f || c == '*' || c == '>')
+            return 0;
+        if (c == '.' && p[i + 1] == '.')
+            return 0;
+    }
+    return 1;
 }
 
 /* ================================================================
@@ -1037,6 +1074,102 @@ static void nats_cancel_all_requests(nats_t *self, const char *err)
     }
 }
 
+/* One-shot; a watcher added by a callback waits for the next drop. */
+static void nats_fire_disc_watchers(nats_t *self)
+{
+    uint64_t last = self->next_watch_id;
+    while (!ngx_queue_empty(&self->disc_watch)) {
+        ngx_queue_t *q = ngx_queue_head(&self->disc_watch);
+        nats_watch_t *w = ngx_queue_data(q, nats_watch_t, queue);
+        if (w->id > last)
+            break;
+        ngx_queue_remove(q);
+        SV *cb = w->cb;
+        Safefree(w);
+        {
+            dSP;
+            ENTER; SAVETMPS;
+            SAVEFREESV(cb);
+            PUSHMARK(SP);
+            PUTBACK;
+            call_sv(cb, G_DISCARD);
+            FREETMPS; LEAVE;
+        }
+    }
+}
+
+/* Fail kind-0 flush callbacks with "disconnected"; free markers silently.
+   Detached first, so a callback that flushes again cannot loop here. */
+static void nats_fail_pong_queue(ngx_queue_t *live)
+{
+    ngx_queue_t detached, *head = &detached;
+    if (ngx_queue_empty(live))
+        return;
+    ngx_queue_init(head);
+    ngx_queue_add(head, live);
+    ngx_queue_init(live);
+    while (!ngx_queue_empty(head)) {
+        ngx_queue_t *pq = ngx_queue_head(head);
+        nats_pong_cb_t *pcb = ngx_queue_data(pq, nats_pong_cb_t, queue);
+        ngx_queue_remove(pq);
+        if (pcb->kind == 0 && pcb->cb) {
+            dSP;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            EXTEND(SP, 1);
+            PUSHs(sv_2mortal(newSVpvn("disconnected", 12)));
+            PUTBACK;
+            call_sv(pcb->cb, G_DISCARD);
+            FREETMPS; LEAVE;
+            SvREFCNT_dec(pcb->cb);
+        }
+        Safefree(pcb);
+    }
+}
+
+static void nats_free_pong_queue(ngx_queue_t *head)
+{
+    while (!ngx_queue_empty(head)) {
+        ngx_queue_t *pq = ngx_queue_head(head);
+        nats_pong_cb_t *pcb = ngx_queue_data(pq, nats_pong_cb_t, queue);
+        ngx_queue_remove(pq);
+        CLEAR_HANDLER(pcb->cb);
+        Safefree(pcb);
+    }
+}
+
+typedef struct {
+    SV *cb;
+    const char *err;
+} nats_deferred_err_t;
+
+static void nats_on_deferred_err(int revents, void *arg)
+{
+    nats_deferred_err_t *d = (nats_deferred_err_t *)arg;
+    SV *cb = d->cb;
+    const char *err = d->err;
+    (void)revents;
+    Safefree(d);
+    dSP;
+    ENTER; SAVETMPS;
+    SAVEFREESV(cb);
+    PUSHMARK(SP);
+    EXTEND(SP, 1);
+    PUSHs(sv_2mortal(newSVpv(err, 0)));
+    PUTBACK;
+    call_sv(cb, G_DISCARD);
+    FREETMPS; LEAVE;
+}
+
+static void nats_defer_err(nats_t *self, SV *cb, const char *err)
+{
+    nats_deferred_err_t *d;
+    Newx(d, 1, nats_deferred_err_t);
+    d->cb = newSVsv(cb);
+    d->err = err;
+    ev_once(self->loop, -1, 0, 0., nats_on_deferred_err, d);
+}
+
 static void nats_skip_waiting(nats_t *self)
 {
     while (!ngx_queue_empty(&self->wait_queue)) {
@@ -1084,26 +1217,9 @@ static void nats_cleanup(nats_t *self)
     self->wbuf_off = 0;
 
     nats_cancel_all_requests(self, "disconnected");
+    nats_fire_disc_watchers(self);
 
-    /* Drain pending PONG callbacks: fire kind-0 flush cbs with an error so
-       callers don't hang; drain markers and placeholders are freed silently. */
-    while (!ngx_queue_empty(&self->pong_cbs)) {
-        ngx_queue_t *pq = ngx_queue_head(&self->pong_cbs);
-        nats_pong_cb_t *pcb = ngx_queue_data(pq, nats_pong_cb_t, queue);
-        ngx_queue_remove(pq);
-        if (pcb->kind == 0 && pcb->cb) {
-            dSP;
-            ENTER; SAVETMPS;
-            PUSHMARK(SP);
-            EXTEND(SP, 1);
-            PUSHs(sv_2mortal(newSVpvn("disconnected", 12)));
-            PUTBACK;
-            call_sv(pcb->cb, G_DISCARD);
-            FREETMPS; LEAVE;
-            SvREFCNT_dec(pcb->cb);
-        }
-        Safefree(pcb);
-    }
+    nats_fail_pong_queue(&self->pong_cbs);
     /* Drain marker (drain_cb) is a separate field, fired on PONG normally;
        on cleanup it would otherwise leak. Fire it with error too.
        Take the callback before firing: a drain_cb that disconnects must
@@ -1725,6 +1841,17 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
                must queue behind it, not jump ahead of it. */
             nats_drain_waiting(self);
 
+            /* flushes made while connecting fence that backlog */
+            if (self->connected && !ngx_queue_empty(&self->flush_wait)) {
+                while (!ngx_queue_empty(&self->flush_wait)) {
+                    ngx_queue_t *fq = ngx_queue_head(&self->flush_wait);
+                    ngx_queue_remove(fq);
+                    wbuf_append(self, "PING\r\n", 6);
+                    ngx_queue_insert_tail(&self->pong_cbs, fq);
+                }
+                nats_schedule_write(self);
+            }
+
             if (self->connected && self->on_connect) {
                 dSP;
                 ENTER; SAVETMPS;
@@ -2326,8 +2453,7 @@ static void nats_queue_write(nats_t *self, const char *data, size_t len)
     if (self->connected) {
         wbuf_append(self, data, len);
         nats_schedule_write(self);
-    } else if (self->connecting ||
-               (self->reconnect_enabled && self->reconnect_timer_active)) {
+    } else if (NATS_PENDING(self)) {
         /* Cap the outage backlog: without it a hot publisher during a long
            partition queues without bound. */
         if (!nats_queue_cap_ok(self, len))
@@ -2356,6 +2482,7 @@ static void nats_schedule_reconnect(nats_t *self)
        connect, don't stomp on it. */
     if (self->fd >= 0 || self->connecting || self->reconnect_timer_active)
         return;
+    int gave_up = 0;
     if (!self->intentional_disconnect && self->reconnect_enabled) {
         if (self->max_reconnect_attempts == 0 ||
             self->reconnect_attempts < self->max_reconnect_attempts) {
@@ -2376,9 +2503,13 @@ static void nats_schedule_reconnect(nats_t *self)
             ev_timer_start(self->loop, &self->reconnect_timer);
             self->reconnect_timer_active = 1;
         } else {
-            nats_emit_error(self, "max reconnect attempts reached");
+            gave_up = 1;
         }
     }
+    /* the connection a queued flush waited for has failed */
+    nats_fail_pong_queue(&self->flush_wait);
+    if (gave_up)
+        nats_emit_error(self, "max reconnect attempts reached");
 }
 
 static void nats_free_server_pool(nats_t *self)
@@ -2560,6 +2691,7 @@ static void nats_after_connect(nats_t *self, int fd, int rv)
             ev_timer_stop(self->loop, &self->connect_timer);
             self->connect_timer_active = 0;
         }
+        ev_now_update(self->loop);
         ev_timer_set(&self->connect_timer, self->connect_timeout_ms / 1000.0, 0.0);
         ev_timer_start(self->loop, &self->connect_timer);
         self->connect_timer_active = 1;
@@ -2598,12 +2730,14 @@ static void nats_destroy_now(nats_t *self)
     }
     nats_skip_waiting(self);
 
-    while (!ngx_queue_empty(&self->pong_cbs)) {
-        ngx_queue_t *pq = ngx_queue_head(&self->pong_cbs);
-        nats_pong_cb_t *pcb = ngx_queue_data(pq, nats_pong_cb_t, queue);
-        ngx_queue_remove(pq);
-        CLEAR_HANDLER(pcb->cb);
-        Safefree(pcb);
+    nats_free_pong_queue(&self->pong_cbs);
+    nats_free_pong_queue(&self->flush_wait);
+    while (!ngx_queue_empty(&self->disc_watch)) {
+        ngx_queue_t *q = ngx_queue_head(&self->disc_watch);
+        nats_watch_t *w = ngx_queue_data(q, nats_watch_t, queue);
+        ngx_queue_remove(q);
+        CLEAR_HANDLER(w->cb);
+        Safefree(w);
     }
 
     while (!ngx_queue_empty(&self->subs)) {
@@ -2651,6 +2785,18 @@ static void nats_destroy_now(nats_t *self)
     Safefree(self);
 }
 
+static int nats_socket(int domain, int type, int protocol)
+{
+#ifdef SOCK_CLOEXEC
+    return socket(domain, type | SOCK_CLOEXEC, protocol);
+#else
+    int fd = socket(domain, type, protocol);
+    if (fd >= 0)
+        fcntl(fd, F_SETFD, FD_CLOEXEC);
+    return fd;
+#endif
+}
+
 static void nats_connect_tcp(nats_t *self)
 {
     struct addrinfo hints, *rp;
@@ -2678,7 +2824,7 @@ static void nats_connect_tcp(nats_t *self)
     }
 
     for (rp = self->ai_next; rp != NULL; rp = rp->ai_next) {
-        fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        fd = nats_socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (fd < 0) continue;
 
         fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
@@ -2722,7 +2868,7 @@ static void nats_connect_unix(nats_t *self)
         return;
     }
 
-    fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    fd = nats_socket(AF_UNIX, SOCK_STREAM, 0);
     if (fd < 0) {
         nats_emit_error(self, strerror(errno));
         nats_schedule_reconnect(self);
@@ -2753,6 +2899,114 @@ static void nats_do_connect(nats_t *self)
         nats_connect_unix(self);
     else
         nats_connect_tcp(self);
+}
+
+/* request() and hrequest(): headers is NULL for a plain PUB */
+static void nats_request(nats_t *self, SV *subject, SV *headers, SV *payload,
+                         SV *cb, int timeout_ms)
+{
+    char reply_subj[INBOX_SUBJ_SIZE];
+    char hdr[MAX_CONTROL_LINE];
+    STRLEN subj_len, pay_len, h_len = 0;
+    const char *subj_pv, *pay_pv, *h_pv = NULL;
+
+    NATS_CROAK_UNLESS_CONNECTED(self);
+
+    if (!SvOK(subject))
+        croak("subject required");
+    subj_pv = SvPV(subject, subj_len);
+    if (subj_len == 0)
+        croak("subject must not be empty");
+    if (!nats_field_ok(subj_pv, subj_len))
+        croak("subject must not contain whitespace");
+    if (headers) {
+        if (!SvOK(headers))
+            croak("headers required");
+        h_pv = SvPV(headers, h_len);
+        if (h_len == 0)
+            croak("headers must not be empty");
+        if (h_len < 8 || memcmp(h_pv, "NATS/1.0", 8) != 0)
+            croak("headers must start with NATS/1.0");
+    }
+    if (SvOK(payload)) {
+        pay_pv = SvPV(payload, pay_len);
+    } else {
+        pay_pv = "";
+        pay_len = 0;
+    }
+
+    if (self->max_payload > 0 && h_len + pay_len > (size_t)self->max_payload)
+        croak("%s exceeds max_payload (%d)", h_pv ? "message" : "payload",
+              self->max_payload);
+
+    if (!self->inbox_sub_sid) {
+        char inbox_wild[INBOX_PREFIX_SIZE + 2];
+        snprintf(inbox_wild, sizeof(inbox_wild), "%s*", self->inbox_prefix);
+
+        /* Format before allocating: a cap refusal here must leave
+           inbox_sub_sid unset so the next request retries cleanly. */
+        char sbuf[MAX_CONTROL_LINE];
+        int sn = snprintf(sbuf, sizeof(sbuf), "SUB %s %" UVuf "\r\n",
+                          inbox_wild, (UV)self->next_sid);
+        NATS_CLAMP_LEN(sn, sizeof(sbuf));
+        if (!nats_queue_cap_ok(self, sn))
+            croak("reconnect buffer full (%" UVuf " byte limit)",
+                  (UV)self->reconnect_buf_size);
+
+        nats_sub_t *sub;
+        Newxz(sub, 1, nats_sub_t);
+        sub->sid = self->next_sid++;
+        sub->subject = newSVpv(inbox_wild, 0);
+        sub->cb = NULL;
+        sub->queue_group = NULL;
+        nats_register_sub(self, sub);
+        self->inbox_sub_sid = sub->sid;
+
+        nats_queue_write(self, sbuf, sn);
+    }
+
+    uint64_t req_id = self->next_req_id++;
+    snprintf(reply_subj, sizeof(reply_subj), "%s%" UVuf, self->inbox_prefix, (UV)req_id);
+
+    int hdr_len = h_pv
+        ? snprintf(hdr, sizeof(hdr), "HPUB %.*s %s %lu %lu\r\n",
+                   (int)subj_len, subj_pv, reply_subj,
+                   (unsigned long)h_len, (unsigned long)(h_len + pay_len))
+        : snprintf(hdr, sizeof(hdr), "PUB %.*s %s %lu\r\n",
+                   (int)subj_len, subj_pv, reply_subj, (unsigned long)pay_len);
+    NATS_CLAMP_LEN(hdr_len, sizeof(hdr));
+
+    size_t total = hdr_len + h_len + pay_len + 2;
+    if (!nats_queue_cap_ok(self, total))
+        croak("reconnect buffer full (%" UVuf " byte limit)",
+              (UV)self->reconnect_buf_size);
+
+    self->msgs_out++;
+    self->bytes_out += h_len + pay_len;
+
+    nats_req_t *req;
+    Newxz(req, 1, nats_req_t);
+    req->req_id = req_id;
+    req->cb = newSVsv(cb);
+    ngx_queue_insert_tail(&self->req_queue, &req->queue);
+
+    if (timeout_ms > 0) {
+        ev_now_update(self->loop);
+        ev_timer_init(&req->timer, nats_on_request_timeout, timeout_ms / 1000.0, 0.0);
+        ev_timer_start(self->loop, &req->timer);
+        req->timer_active = 1;
+    }
+
+    char *buf;
+    Newx(buf, total, char);
+    memcpy(buf, hdr, hdr_len);
+    if (h_len > 0) memcpy(buf + hdr_len, h_pv, h_len);
+    if (pay_len > 0) memcpy(buf + hdr_len + h_len, pay_pv, pay_len);
+    buf[total - 2] = '\r';
+    buf[total - 1] = '\n';
+
+    nats_queue_write(self, buf, total);
+    Safefree(buf);
 }
 
 /* ================================================================
@@ -2812,9 +3066,11 @@ new(class, ...)
 
     ngx_queue_init(&self->server_pool);
     ngx_queue_init(&self->pong_cbs);
+    ngx_queue_init(&self->flush_wait);
+    ngx_queue_init(&self->disc_watch);
     self->sub_map = newHV();
 
-    nats_setup_inbox(self);
+    nats_setup_inbox(self, "_INBOX");
 
     SV *guard = sv_2mortal(newRV_noinc(newSViv(PTR2IV(self))));
     sv_bless(guard, gv_stashpv(class, GV_ADD));
@@ -2897,6 +3153,15 @@ new(class, ...)
                 self->on_slow_consumer = SvOK(val) ? newSVsv(val) : NULL;
             else if (strcmp(key, "on_lame_duck") == 0)
                 self->on_ldm = SvOK(val) ? newSVsv(val) : NULL;
+            else if (strcmp(key, "inbox_prefix") == 0) {
+                if (SvOK(val)) {
+                    STRLEN blen;
+                    const char *base = SvPV(val, blen);
+                    if (!nats_inbox_base_ok(base, blen))
+                        croak("EV::Nats::new: invalid 'inbox_prefix'");
+                    nats_setup_inbox(self, base);
+                }
+            }
             else if (strcmp(key, "loop") == 0) {
                 if (!SvOK(val)) {
                     /* undef: keep the default loop */
@@ -3002,6 +3267,7 @@ _timer(self, after, repeat, cb)
   CODE:
     {
         dSP;
+        ev_now_update(self->loop);
         ENTER; SAVETMPS;
         PUSHMARK(SP);
         EXTEND(SP, 4);
@@ -3018,6 +3284,36 @@ _timer(self, after, repeat, cb)
     }
   OUTPUT:
     RETVAL
+
+UV
+_watch_disconnect(self, cb)
+    EV::Nats self
+    SV *cb
+  CODE:
+    nats_watch_t *w;
+    Newxz(w, 1, nats_watch_t);
+    w->id = ++self->next_watch_id;
+    w->cb = newSVsv(cb);
+    ngx_queue_insert_tail(&self->disc_watch, &w->queue);
+    RETVAL = (UV)w->id;
+  OUTPUT:
+    RETVAL
+
+void
+_unwatch_disconnect(self, id)
+    EV::Nats self
+    UV id
+  CODE:
+    ngx_queue_t *q;
+    ngx_queue_foreach(q, &self->disc_watch) {
+        nats_watch_t *w = ngx_queue_data(q, nats_watch_t, queue);
+        if (w->id == (uint64_t)id) {
+            ngx_queue_remove(q);
+            SvREFCNT_dec(w->cb);
+            Safefree(w);
+            break;
+        }
+    }
 
 void
 publish(self, subject, payload = &PL_sv_undef, reply = NULL)
@@ -3235,8 +3531,7 @@ unsubscribe(self, sid, max_msgs = 0)
        subscribe(). When fully disconnected (no reconnect armed) the
        local-only update is enough; nats_resub_all will not resubscribe
        a removed sub on the next reconnect. */
-    int can_queue = self->connected || self->connecting
-                  || (self->reconnect_enabled && self->reconnect_timer_active);
+    int can_queue = self->connected || NATS_PENDING(self);
 
     if (max_msgs > 0) {
         nats_sub_t *sub = nats_find_sub(self, (uint64_t)sid);
@@ -3262,93 +3557,19 @@ request(self, subject, payload, cb, timeout_ms = 5000)
     SV *payload
     SV *cb
     int timeout_ms
-  PREINIT:
-    char reply_subj[80];
-    char hdr[MAX_CONTROL_LINE];
-    STRLEN subj_len, pay_len;
-    const char *subj_pv, *pay_pv;
   CODE:
-    NATS_CROAK_UNLESS_CONNECTED(self);
+    nats_request(self, subject, NULL, payload, cb, timeout_ms);
 
-    if (!SvOK(subject))
-        croak("subject required");
-    subj_pv = SvPV(subject, subj_len);
-    if (subj_len == 0)
-        croak("subject must not be empty");
-    if (!nats_field_ok(subj_pv, subj_len))
-        croak("subject must not contain whitespace");
-    if (SvOK(payload)) {
-        pay_pv = SvPV(payload, pay_len);
-    } else {
-        pay_pv = "";
-        pay_len = 0;
-    }
-
-    if (self->max_payload > 0 && pay_len > (size_t)self->max_payload)
-        croak("payload exceeds max_payload (%d)", self->max_payload);
-
-    if (!self->inbox_sub_sid) {
-        char inbox_wild[48];
-        snprintf(inbox_wild, sizeof(inbox_wild), "%s*", self->inbox_prefix);
-
-        /* Format before allocating: a cap refusal here must leave
-           inbox_sub_sid unset so the next request retries cleanly. */
-        char sbuf[MAX_CONTROL_LINE];
-        int sn = snprintf(sbuf, sizeof(sbuf), "SUB %s %" UVuf "\r\n",
-                          inbox_wild, (UV)self->next_sid);
-        NATS_CLAMP_LEN(sn, sizeof(sbuf));
-        if (!nats_queue_cap_ok(self, sn))
-            croak("reconnect buffer full (%" UVuf " byte limit)",
-                  (UV)self->reconnect_buf_size);
-
-        nats_sub_t *sub;
-        Newxz(sub, 1, nats_sub_t);
-        sub->sid = self->next_sid++;
-        sub->subject = newSVpv(inbox_wild, 0);
-        sub->cb = NULL;
-        sub->queue_group = NULL;
-        nats_register_sub(self, sub);
-        self->inbox_sub_sid = sub->sid;
-
-        nats_queue_write(self, sbuf, sn);
-    }
-
-    uint64_t req_id = self->next_req_id++;
-    snprintf(reply_subj, sizeof(reply_subj), "%s%" UVuf, self->inbox_prefix, (UV)req_id);
-
-    int hdr_len = snprintf(hdr, sizeof(hdr), "PUB %.*s %s %lu\r\n",
-                           (int)subj_len, subj_pv, reply_subj, (unsigned long)pay_len);
-    NATS_CLAMP_LEN(hdr_len, sizeof(hdr));
-
-    size_t total = hdr_len + pay_len + 2;
-    if (!nats_queue_cap_ok(self, total))
-        croak("reconnect buffer full (%" UVuf " byte limit)",
-              (UV)self->reconnect_buf_size);
-
-    self->msgs_out++;
-    self->bytes_out += pay_len;
-
-    nats_req_t *req;
-    Newxz(req, 1, nats_req_t);
-    req->req_id = req_id;
-    req->cb = newSVsv(cb);
-    ngx_queue_insert_tail(&self->req_queue, &req->queue);
-
-    if (timeout_ms > 0) {
-        ev_timer_init(&req->timer, nats_on_request_timeout, timeout_ms / 1000.0, 0.0);
-        ev_timer_start(self->loop, &req->timer);
-        req->timer_active = 1;
-    }
-
-    char *buf;
-    Newx(buf, total, char);
-    memcpy(buf, hdr, hdr_len);
-    if (pay_len > 0) memcpy(buf + hdr_len, pay_pv, pay_len);
-    buf[hdr_len + pay_len] = '\r';
-    buf[hdr_len + pay_len + 1] = '\n';
-
-    nats_queue_write(self, buf, total);
-    Safefree(buf);
+void
+hrequest(self, subject, headers, payload, cb, timeout_ms = 5000)
+    EV::Nats self
+    SV *subject
+    SV *headers
+    SV *payload
+    SV *cb
+    int timeout_ms
+  CODE:
+    nats_request(self, subject, headers, payload, cb, timeout_ms);
 
 void
 ping(self)
@@ -3366,21 +3587,30 @@ void
 flush(self, cb = NULL)
     EV::Nats self
     SV *cb
+  PREINIT:
+    nats_pong_cb_t *pcb;
   CODE:
-    if (!self->connected)
-        croak("not connected");
+    if (cb && !SvOK(cb))
+        cb = NULL;
+    if (!self->connected && !NATS_PENDING(self)) {
+        if (!cb)
+            croak("not connected");
+        nats_defer_err(self, cb, "not connected");
+        XSRETURN_EMPTY;
+    }
+    Newxz(pcb, 1, nats_pong_cb_t);
+    if (cb)
+        pcb->cb = newSVsv(cb);
+    if (!self->connected) {
+        ngx_queue_insert_tail(&self->flush_wait, &pcb->queue);
+        XSRETURN_EMPTY;
+    }
     wbuf_append(self, "PING\r\n", 6);
     /* Queue before the write, always (a NULL-cb placeholder without a
        callback): on a synchronous write failure nats_cleanup drains this
        entry instead of stranding it, and the 1:1 PING/PONG accounting
        survives a cb-less flush. */
-    {
-        nats_pong_cb_t *pcb;
-        Newxz(pcb, 1, nats_pong_cb_t);
-        if (cb && SvOK(cb))
-            pcb->cb = newSVsv(cb);
-        ngx_queue_insert_tail(&self->pong_cbs, &pcb->queue);
-    }
+    ngx_queue_insert_tail(&self->pong_cbs, &pcb->queue);
     nats_try_write(self);
 
 SV *
@@ -3430,6 +3660,9 @@ reconnect(self, enable, ...)
     if (!enable && self->reconnect_timer_active) {
         ev_timer_stop(self->loop, &self->reconnect_timer);
         self->reconnect_timer_active = 0;
+        if (self->owner_sv)
+            sv_2mortal(SvREFCNT_inc(self->owner_sv));
+        nats_fail_pong_queue(&self->flush_wait);
     }
     if (items > 2) self->reconnect_delay_ms = SvIV(ST(2));
     if (items > 3) self->max_reconnect_attempts = SvIV(ST(3));
@@ -3605,7 +3838,7 @@ new_inbox(self)
     EV::Nats self
   CODE:
   {
-    char inbox[80];
+    char inbox[INBOX_SUBJ_SIZE];
     int len = snprintf(inbox, sizeof(inbox), "%s%" UVuf, self->inbox_prefix, (UV)self->next_req_id++);
     RETVAL = newSVpvn(inbox, len);
   }

@@ -2,6 +2,41 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.4.2 2026-11-25
+
+    An iterator's values as an array reference, whatever the context.
+
+    Ekorn::Pipeline::Iterator has all_arrayref, which gives every value
+    still to come as an array reference, in a hash, an argument list or
+    a sub's return as well as in scalar context, where all would give a
+    list. It ships roadmap 2026-0055, and only adds.
+
+    - Ekorn::Pipeline::Iterator's all_arrayref returns every value
+      still to come as an array reference, whatever the context it's
+      called in, and an empty one if there are none: all's array
+      reference, without its dependence on context, so
+      { rows => $next->all_arrayref } can't be flattened. all is as it
+      was. (roadmap 2026-0055)
+
+v0.4.1 2026-11-25
+
+    A documentation release: a new recipe in the how-to, and its advice
+    on versions brought up to date.
+
+    The how-to shows a module offering a dataset as a stream, a
+    collection and an index, and advises requiring the v0.4 series,
+    where v0.4.0's still advised v0.3's. It ships roadmap 2026-0054,
+    and changes only the docs.
+
+    - The how-to's advice on which versions of Ekorn::Pipeline to
+      require gives >= v0.4.0, < v0.5.0, the current series, where it
+      gave v0.3's.
+    - The how-to's chapter 9 has a recipe, "Offer a stream, a collection
+      and an index": a function giving a fresh run through the caller's
+      stages, one giving every value read once and kept, and one giving
+      an index a sink built once, and when each suits. (roadmap
+      2026-0054)
+
 v0.4.0 2026-11-25
 
     pipe gives what a pipeline gives, in either context.

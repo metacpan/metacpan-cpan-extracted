@@ -1,5 +1,21 @@
 Revision history for Pod-Coverage-More
 
+0.005 2026-11-25 TEODESIAN
+    - A placeholder with a default in a signature, such as $ = undef, has no name, so the POD may call it anything
+
+0.004 2026-11-25 TEODESIAN
+    - Accept any names in the POD for the arguments that an anonymous slurpy parameter of a signature takes
+    - Accept any name in the POD for an undef placeholder in a list assignment from @_, at its position
+    - Read a heading that calls a method on a class, assigns the call to a variable, or names two calls; a heading of prose no longer names a sub by one of its words, and a call names its sub before a bare name
+    - Let an override take fewer arguments than the section of its parent documents
+    - Weave the blurb of an override when it has a tag, so that the override is checked against its own section rather than its parent's
+    - Read every type of Types::Standard in the POD, such as Enum, Tuple and ConsumerOf, not only those that Pod::Coverage::More::Types imports
+    - Take the documented arguments of an abstract method, which takes only its invocant and never returns, as the interface of its overrides, whether it reads the invocant with shift or from @_
+    - Read a key => value pair in the argument list of a heading as the key of a named argument
+    - Fail the examples check for a heading that assigns its call to a variable, which is an example and belongs in a verbatim block
+    - Write a @returns that starts with a number, such as "443 when ...", as text, rather than dying on it as a type
+    - Keep the indentation of each line of an example written on consecutive @example lines
+
 0.003 2026-11-25 TEODESIAN
     - Leave the files for development, such as dist.ini and CLAUDE.md, out of the tarball
     - Declare aspell and its English dictionary as system packages in META.json, so that a host that installs them checks the spelling of the POD

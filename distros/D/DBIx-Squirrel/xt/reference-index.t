@@ -10,8 +10,9 @@ use Test2::Plugin::NoWarnings;
 # the module can call; each has a synopsis, says "Exported by default."
 # or "Exported upon request." as it's exported, and ends with a link to a
 # section of the reference, which doesn't open with the synopsis again
-# (2026-0042); Tooling names each of its tags; and an internal module
-# lists nothing.
+# (2026-0042), or to where Ekorn's index links it; Tooling names each
+# of its tags, and lists the names it exports from Ekorn (2026-0051);
+# and an internal module lists nothing.
 # An author test, as the reference isn't in the distribution.
 
 use B          qw();
@@ -34,6 +35,10 @@ my %INTERNAL = (
     'DBIx::Squirrel::Result'  => [qw(class_for)],
 );
 
+# Ekorn::Pipeline's reference, on GitHub: an entry for one of its names
+# may link there (2026-0051, D3).
+my $EKORN
+    = 'https://github.com/nukopian/Ekorn-Pipeline/blob/main/docs/REFERENCE.md#';
 
 # Return the key a name sorts by: in any case, with one starting with a
 # symbol last.
@@ -43,7 +48,6 @@ sub sort_key ($name) {
     return $key;
 }
 
-
 # Return a heading's anchor, as GitHub makes it.
 sub anchor ($heading) {
     my $anchor = lc $heading;
@@ -51,7 +55,6 @@ sub anchor ($heading) {
     $anchor =~ s( \  )(-)xg;
     return $anchor;
 }
-
 
 # Return the anchors of the reference's headings before the index, each
 # true if its section opens with a synopsis, and the index's entries, in
@@ -85,6 +88,34 @@ sub index_entries () {
     return \%anchors, @entries;
 }
 
+# Return the anchor on GitHub of the section each name's entry in
+# Ekorn::Pipeline's index links to, by name, or undef if its manual isn't
+# installed. The manual's POD links by heading, to the first of that
+# name, whose anchor on GitHub is the heading's own, without a suffix.
+sub ekorn_index_links () {
+    my($pod) = grep { -e } map { "$_/Ekorn/Pipeline/Manual/Reference.pod" } @INC
+        or return undef;    ## no critic (Subroutines::ProhibitExplicitReturnUndef)
+    open my $in, '<', $pod or die "Can't read $pod: $!";
+    my(%link, $in_index, $name);
+    while (my $line = <$in>) {
+        if (my($level, $text) = $line =~ m( \A =head(\d) \  (.+?) \s* \z )x) {
+            $in_index = $text eq 'Index' if $level == 1;
+            $name     = $in_index && $level == 3 ? $text : undef;
+        }
+        elsif (defined $name && $line =~ m( \A See \  L< [^|]* \| / "([^"]+)" > )x) {
+            (my $heading = $1)
+                =~ s( [A-Z] < (?: <+ \s (.*?) \s >+ | ([^<>]*) > ) )( $1 // $2 )xge;
+            $link{$name} //= anchor($heading);
+            undef $name;
+        }
+        else {
+            # added by Perltidy
+        }
+    }
+    close $in;
+    return \%link;
+}
+
 
 # Return the module each file under lib is: .pm and .pod alike.
 sub modules () {
@@ -95,7 +126,6 @@ sub modules () {
     );
     return sort map { s( \A lib/ | \. \w+ \z )()xgr =~ s( / )(::)xgr } @files;
 }
-
 
 # Return a module's public names: what it exports, and the subs it
 # defines, but for import and those starting with _.
@@ -115,7 +145,8 @@ sub public_names ($module) {
 
 
 my($anchors, @entries) = index_entries();
-my @modules = modules();
+my @modules     = modules();
+my $ekorn_links = ekorn_index_links();
 
 is [map { $_->{module} } @entries],
     [sort { sort_key($a) cmp sort_key($b) } @modules],
@@ -127,9 +158,11 @@ for my $entry (@entries) {
     is \@names, [sort { sort_key($a) cmp sort_key($b) } @names],
         "$module: its names A to Z";
     is [
-        map  { $_->[0] }
-        grep { $_->[1] !~ m( \s See \s+ \[ [^\]]+ \] \( \#[^\)]+ \) \. \s* \z )xs }
-            @{ $entry->{names} }
+        map { $_->[0] }
+        grep {
+            $_->[1]
+                !~ m( \s See \s+ \[ [^\]]+ \] \( (?: \# | \Q$EKORN\E ) [^\)]+ \) \. \s* \z )xs
+        } @{ $entry->{names} }
         ],
         [], "$module: each name ends with a link to where it's described";
 
@@ -141,15 +174,34 @@ for my $entry (@entries) {
         grep { $_->[1] !~ m( ^```perl\n .+? ^```$ )xms } @{ $entry->{names} }
         ],
         [], "$module: each name has a synopsis";
-    my %to = map {
-        my($to)
-            = $_->[1] =~ m( \s See \s+ \[ [^\]]+ \] \( \# ([^\)]+) \) \. \s* \z )xs;
-        ($_->[0] => $to)
-    } @{ $entry->{names} };
+    my(%to, %to_ekorn);
+    for my $name (@{ $entry->{names} }) {
+        my($ekorn, $to)
+            = $name->[1]
+            =~ m( \s See \s+ \[ [^\]]+ \] \( (\# | \Q$EKORN\E) ([^\)]+) \) \. \s* \z )xs;
+        if (defined $ekorn && $ekorn ne '#') {
+            $to_ekorn{$name->[0]} = $to;
+        }
+        else {
+            $to{$name->[0]} = $to;
+        }
+    }
     is [grep { !defined $to{$_} || !exists $anchors->{$to{$_}} } sort keys %to],
         [], "$module: each name links to a section of the reference";
     is [grep { defined $to{$_} && $anchors->{$to{$_}} } sort keys %to],
         [], "$module: no section it links to opens with a synopsis";
+
+    # A link to Ekorn's reference goes where its index links the name
+    # (2026-0051, D3).
+    next unless %to_ekorn;
+SKIP:
+    {
+        skip "Ekorn::Pipeline::Manual::Reference isn't installed", 1
+            unless $ekorn_links;
+        is [grep { ($ekorn_links->{$_} // '') ne $to_ekorn{$_} } sort keys %to_ekorn],
+            [],
+            "$module: each link to Ekorn's reference goes where its index links the name";
+    }
 }
 
 for my $entry (@entries) {
@@ -163,9 +215,24 @@ for my $entry (@entries) {
     require $file;
     no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-    # Tooling lists no names, but says what its tags are.
+    # Tooling lists the names it exports that no other module of
+    # DBIx::Squirrel's does, Ekorn::Pipeline's, each upon request
+    # (2026-0051, D1), and says what its tags are.
     if ($module eq 'DBIx::Squirrel::Tooling') {
-        is [sort keys %listed], [], "$module: lists no names";
+        my %ours;
+        for my $other (grep { $_ ne $module && !m( ::Manual:: )x } @modules) {
+            (my $file = "$other.pm") =~ s( :: )(/)xg;
+            require $file;
+            $ours{$_} = 1 for @{ "${other}::EXPORT" }, @{ "${other}::EXPORT_OK" };
+        }
+        my @ekorn = grep { !$ours{$_} } @{ "${module}::EXPORT_OK" };
+        is [sort keys %listed], [sort @ekorn],
+            "$module: lists the names it exports from Ekorn";
+        is [
+            grep { $listed{$_} !~ m( \s Exported \s+ upon \s+ request \. )x }
+            sort keys %listed
+            ],
+            [], "$module: says they're exported upon request";
         my @tags = sort keys %{ "${module}::EXPORT_TAGS" };
         is [grep { $about !~ m( `:\Q$_\E` )x } @tags], [], "$module: names each tag";
         next;

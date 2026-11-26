@@ -9,7 +9,7 @@ use Carp 'croak';
 
 our @EXPORT_OK = qw(to_boolean is_hash is_array slurp_file);
 
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.12';
 
 use parent qw(Exporter);
 
@@ -31,7 +31,7 @@ sub slurp_file {
 }
 
 ########################################################################
-sub choose(&) { return $_[0]->(); }  ## no critic
+sub choose(&) { return $_[0]->(); } ## no critic
 ########################################################################
 sub _is { return ref $_[0] && ( reftype( $_[0] ) eq $_[1] || ref $_[0] eq $_[1] ); }
 ########################################################################

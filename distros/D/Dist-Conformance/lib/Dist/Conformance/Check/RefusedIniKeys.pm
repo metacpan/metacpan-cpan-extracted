@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::RefusedIniKeys 0.008;
+package Dist::Conformance::Check::RefusedIniKeys 0.011;
 
 # ABSTRACT: An INI file, such as dist.ini, sets no key that the flavor refuses, and the update removes each one
 
@@ -32,7 +32,13 @@ sub config_schema ($) {
     };
 }
 
-
+# The lines of the INI file C<$text> that set a refused key, in their order.
+# @param   text  Str  the text of the INI file
+# @returns the lines, as a list of hash references with the C<line>, counted from
+# 0, the C<section>, the C<key> and the C<reason>
+# @throws  when the text does not parse, with the message of
+# L<Dist::Conformance::Schema/"parse_ini($text, $where)">
+# @example my @refused = $check->refused( $snapshot->content('dist.ini') );
 sub refused ( $self, $text ) {
     my $config = $self->config;
     Dist::Conformance::Schema::parse_ini( $text, $config->{file} );
@@ -56,7 +62,6 @@ sub refused ( $self, $text ) {
     return @refused;
 }
 
-
 sub check ( $self, $snapshot ) {
     my $file    = $self->config->{file};
     my $text    = $snapshot->content($file) // return ( $self->config->{missing}, "there is no $file" );
@@ -65,7 +70,6 @@ sub check ( $self, $snapshot ) {
     return ( 'pass', 'sets no key that the flavor refuses' )     if !@refused;
     return ( 'fail', "$file sets " . join '; ', map { "$_->{key} in [$_->{section}], which $_->{reason}" } @refused );
 }
-
 
 sub update ( $self, $update ) {
     my $file    = $self->config->{file};
@@ -94,7 +98,7 @@ Dist::Conformance::Check::RefusedIniKeys - An INI file, such as dist.ini, sets n
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -108,7 +112,7 @@ wrong and not how to fix it.
 This check fails when a section of C<file> sets a key that C<refuse> names for
 it, and the detail names each such key, its section and the reason.  It passes
 when there is none.  The file is read as
-L<Dist::Conformance::Schema/parse_ini> reads it, and a file that does not parse
+L<Dist::Conformance::Schema/"parse_ini($text, $where)"> reads it, and a file that does not parse
 fails.
 
 A section of C<refuse> is the name of a plugin.  It matches the section with
@@ -125,21 +129,21 @@ does not parse is left for a person.
 
 =head1 METHODS
 
-=head2 refused
+=head2 refused(text)
 
-C<($text)>.  The lines of the INI file C<$text> that set a refused key, in
-their order, as hash references with the C<line>, counted from 0, the
-C<section>, the C<key> and the C<reason>.  Dies when the text does not parse.
+The lines of the INI file C<$text> that set a refused key, in their order.
 
-=head2 check
+=over 4
 
-C<($snapshot)>.  The status and the detail that L</DESCRIPTION> says, for the
-file in C<$snapshot>.
+=item text - Str - the text of the INI file
 
-=head2 update
+=back
 
-Removes each line that sets a refused key, or says what is wrong when the file
-does not parse.
+Returns the lines, as a list of hash references with the C<line>, counted from 0, the C<section>, the C<key> and the C<reason>.
+
+Dies when the text does not parse, with the message of L<Dist::Conformance::Schema/"parse_ini($text, $where)">.
+
+    my @refused = $check->refused( $snapshot->content('dist.ini') );
 
 =head1 IN A FLAVOR
 

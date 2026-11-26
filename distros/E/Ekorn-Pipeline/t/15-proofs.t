@@ -653,6 +653,38 @@ subtest 'An iterator gives all, first or single (D59)' => sub {
     }));
     is [$next->all], [1, 2], 'and stopped part way through a step';
     is $next->ended, 'stopped';
+
+    # all_arrayref: all's array reference, whatever the context.
+    $next = $class->new(sub { $_ * 2 })->iterator(from_array(1 .. 4));
+    is [$next->()], [2], 'pulled once';
+    is [$next->all_arrayref], [[4, 6, 8]],
+        'all_arrayref: one array reference, in list context';
+    is $next->ended,        'done', 'read to its end';
+    is $next->all_arrayref, [],     'and an empty one, once spent';
+    my %report = (
+        rows  => $class->new->iterator(from_array(1, 2))->all_arrayref,
+        title => 'Hits',
+    );
+    is \%report, {rows => [1, 2], title => 'Hits'},
+        'not flattened in a hash constructor';
+    my $count_args = sub (@args) { return scalar @args };
+    is $count_args->($class->new->iterator(from_array(1, 2, 3))->all_arrayref),
+        1,
+        'one argument, in an argument list';
+    is [$class->new->iterator(from_array())->all_arrayref], [[]],
+        'an empty array reference, not an empty list, if none';
+    my $returns = sub () {
+        return $class->new->iterator(from_array(5, 6))->all_arrayref;
+    };
+    is [$returns->()], [[5, 6]],
+        "returned from a sub, whatever its caller's context";
+    $next = $class->new(keep_all)->iterator(from_array(1 .. 4));
+    is [$next->()],           [1],         "a list sink's result, pulled once";
+    is [$next->all_arrayref], [[2, 3, 4]], 'then the rest of it, in bulk';
+    is $next->ended,          'done';
+    $next = $class->new(take(2))->iterator(from_array(1 .. 4));
+    is $next->all_arrayref, [1, 2], 'and cut short by a stop';
+    is $next->ended, 'stopped';
 };
 
 subtest "An iterator's code reference, taken once (D63)" => sub {

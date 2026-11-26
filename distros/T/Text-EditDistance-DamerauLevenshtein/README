@@ -1,0 +1,44 @@
+NAME
+
+    Text::EditDistance::DamerauLevenshtein - Damerau-Levenshtein edit
+    distance
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this module with the
+    perldoc command.
+
+        perldoc Text::EditDistance::DamerauLevenshtein
+
+    You can also look for information at:
+
+    *   MetaCPAN:
+        <https://metacpan.org/pod/Text::EditDistance::DamerauLevenshtein>
+
+    *   The source repository on Codeberg:
+        <https://codeberg.org/mauke/Text-EditDistance-DamerauLevenshtein>
+
+    *   The module's bug tracker:
+        <https://codeberg.org/mauke/Text-EditDistance-DamerauLevenshtein/iss
+        ues>
+
+COPYRIGHT & LICENSE
+
+    Copyright 2026 Lukas Mai.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License (version 3) as
+    published by the Free Software Foundation.
+
+    See <https://www.gnu.org/licenses/agpl-3.0.html#license-text> for more
+    information.
+

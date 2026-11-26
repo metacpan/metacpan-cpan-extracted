@@ -547,7 +547,8 @@ subtest 'failed drain leaves no ghost marker behind' => sub {
 
 subtest 'KV delete/purge while down report async errors' => sub {
     plan tests => 8;
-    my $nats = dead_nats();
+    # The flush fence waits for the reconnect attempt and fails with it.
+    my $nats = dead_nats(reconnect_delay => 100, max_reconnect_delay => 200);
     my $js = EV::Nats::JetStream->new(nats => $nats);
     my $kv = EV::Nats::KV->new(js => $js, bucket => 'bkt');
 
@@ -562,7 +563,7 @@ subtest 'KV delete/purge while down report async errors' => sub {
         $after = 1;
         run_guarded(2);
         ok $fired, "$op cb fired";
-        like $err, qr/not connected/, "$op cb reports the outage";
+        like $err, qr/\A(?:not connected|disconnected)\z/, "$op cb reports the outage";
     }
     $nats->disconnect;
 };
@@ -781,7 +782,7 @@ subtest 'refused fetch tears down its inbox sub' => sub {
     $nats->disconnect;
 };
 
-subtest 'refused KV create tears down its inbox sub' => sub {
+subtest 'refused KV create leaves only the shared request inbox' => sub {
     plan tests => 3;
     my $nats = dead_nats(reconnect_buf_size => 100);
     $nats->publish('s', 'x' x 16);
@@ -791,7 +792,7 @@ subtest 'refused KV create tears down its inbox sub' => sub {
     eval { $kv->create('k', 'v', sub { $calls++ }); 1 };
     like $@, qr/reconnect buffer/, 'create past the cap croaks';
     run_guarded(0.6);   # past the 200ms timer
-    is $nats->subscription_count, 0, 'inbox sub torn down';
+    is $nats->subscription_count, 1, 'no subscription beyond the request inbox';
     is $calls, 0, 'no stray callback after the croak';
     $nats->disconnect;
 };
@@ -854,7 +855,7 @@ subtest 'reply inbox timeouts complete even when reconnect buffer is full' => su
         my $js = EV::Nats::JetStream->new(nats => $nats, timeout => 50);
         my $kv = EV::Nats::KV->new(js => $js, bucket => 'b');
         my ($calls, $result, $err) = (0);
-        my $cb = sub { $calls++; ($result, $err) = @_; EV::break };
+        my $cb = sub { $calls++; ($result, $err) = @_ };
         if ($op eq 'js_publish_h') {
             $js->js_publish_h('s', "NATS/1.0\r\n\r\n", 'x', $cb);
         } elsif ($op eq 'create') {
@@ -869,15 +870,43 @@ subtest 'reply inbox timeouts complete even when reconnect buffer is full' => su
         $nats->publish('s', 'x' x 80);   # leaves no room for the UNSUB
         run_guarded(2);
         is $calls, 1, "$op callback fired exactly once";
+        is $err, 'disconnected', "$op in flight failed with the dropped connection";
+        is $nats->subscription_count, $op eq 'fetch' ? 0 : 1, "$op left no inbox of its own";
+        $nats->disconnect;
+        $mock->stop;
+    }
+
+    # Started while reconnecting, with the buffer then filled: the timeout
+    # path must complete although its UNSUB cannot be queued.
+    for my $op (qw(js_publish_h create update fetch)) {
+        my $nats = EV::Nats->new(
+            reconnect => 1, reconnect_delay => 10_000, reconnect_buf_size => 400,
+            on_error => sub {},
+        );
+        $nats->connect_unix("/nonexistent-ev-nats-$$.sock");
+        my $js = EV::Nats::JetStream->new(nats => $nats, timeout => 50);
+        my $kv = EV::Nats::KV->new(js => $js, bucket => 'b');
+        my ($calls, $result, $err) = (0);
+        my $cb = sub { $calls++; ($result, $err) = @_ };
+        if ($op eq 'js_publish_h') {
+            $js->js_publish_h('s', "NATS/1.0\r\n\r\n", 'x', $cb);
+        } elsif ($op eq 'create') {
+            $kv->create('key', 'x', $cb);
+        } elsif ($op eq 'update') {
+            $kv->update('key', 'x', 1, $cb);
+        } else {
+            $js->fetch('S', 'C', { expires => 10_000_000 }, $cb);
+        }
+        1 while eval { $nats->unsubscribe(9); 1 };   # no room left for an UNSUB
+        run_guarded(1.5);
+        is $calls, 1, "$op (reconnecting) callback fired exactly once";
         if ($op eq 'fetch') {
-            is_deeply $result, [], 'fetch safety timeout completed with an empty batch';
-            ok !defined $err, 'fetch cleanup did not replace its result with an error';
+            is_deeply [$result, $err], [[], undef], 'fetch safety timeout completed with an empty batch';
         } else {
             like $err, qr/timeout/, "$op reported its timeout";
         }
-        is $nats->subscription_count, 0, "$op reply inbox removed locally";
+        is $nats->subscription_count, $op eq 'fetch' ? 0 : 1, "$op (reconnecting) left no inbox of its own";
         $nats->disconnect;
-        $mock->stop;
     }
 };
 
@@ -912,7 +941,7 @@ subtest 'JetStream and KV timers use the connection loop' => sub {
         $loop->run;
         is $calls, 1, "$op timeout fired on the custom loop";
         like $err, qr/timeout/, "$op reported its timeout" unless $op eq 'fetch';
-        is $nats->subscription_count, 0, "$op inbox cleaned up";
+        is $nats->subscription_count, 1, "$op left only the shared request inbox";
     }
     my $dead = EV::Nats->new(loop => $loop, on_error => sub {});
     $dead->connect('127.0.0.1', dead_port());
@@ -928,7 +957,7 @@ subtest 'JetStream and KV timers use the connection loop' => sub {
     $mock->stop;
 };
 
-subtest 'refused js_publish_h tears down its inbox sub' => sub {
+subtest 'refused js_publish_h leaves only the shared request inbox' => sub {
     plan tests => 3;
     my $nats = dead_nats(reconnect_buf_size => 100);
     $nats->publish('s', 'x' x 16);
@@ -937,7 +966,7 @@ subtest 'refused js_publish_h tears down its inbox sub' => sub {
     eval { $js->js_publish_h('s', "NATS/1.0\r\n\r\n", 'x', sub { $calls++ }); 1 };
     like $@, qr/reconnect buffer/, 'js_publish_h past the cap croaks';
     run_guarded(0.6);
-    is $nats->subscription_count, 0, 'inbox sub torn down';
+    is $nats->subscription_count, 1, 'no subscription beyond the request inbox';
     is $calls, 0, 'no stray callback after the croak';
     $nats->disconnect;
 };

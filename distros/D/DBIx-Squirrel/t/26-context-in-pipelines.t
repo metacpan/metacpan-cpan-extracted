@@ -58,6 +58,17 @@ subtest 'result_original, through |' => sub {
     is $ending, [[3, undef]], 'undef, for a value a flush gives';
 };
 
+# A pipeline of the caller's own, reading a chain made from an iterator,
+# gets the statement's row too, as Context's POD promises: Ekorn passed
+# on the chain's own values before its v0.3.16 (roadmap 2026-0049).
+subtest 'result_original, in a pipeline reading a | chain' => sub {
+    my $chain = $dbh->iterate($sql) | pluck('name');
+    my $run
+        = Ekorn::Pipeline->new(sub { [$_, result_original] })->iterator($chain);
+    is [$run->all], [map { [$names[$_], [$_ + 1, $names[$_]]] } 0 .. 2],
+        'the row each value came from';
+};
+
 # From roadmap 2026-0032, result_number is Ekorn's, counting in every
 # run (D1), and result_original falls back to Ekorn's outside a run
 # reading a statement (D2); iterator is still only the iterator's (D3).

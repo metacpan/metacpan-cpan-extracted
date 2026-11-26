@@ -43,14 +43,18 @@ subtest type_of_usage => sub {
 };
 
 subtest type_named => sub {
-    is( name_of( type_named('HASHREF') ),                           'HashRef',       "a POD type word, in upper case" );
-    is( name_of( type_named('integer') ),                           'Int',           "or in lower case" );
-    is( name_of( type_named('MIXED') ),                             'Any',           "MIXED takes anything" );
-    is( name_of( type_named('ARRAY') ),                             'ArrayRef',      "a container word names a reference to one" );
-    is( name_of( type_named('ArrayRef[Int]') ),                     'ArrayRef[Int]', "a Types::Standard expression" );
-    is( name_of( type_named('NoSuchType') ),                        q{-},            "a name that no library has" );
-    is( name_of( type_named(undef) ),                               q{-},            "no name" );
-    is( name_of( type_named('fail2ban reads C<%> as a variable') ), q{-},            "prose with a % in it names no type, and warns of nothing" );
+    is( name_of( type_named('HASHREF') ),                           'HashRef',           "a POD type word, in upper case" );
+    is( name_of( type_named('integer') ),                           'Int',               "or in lower case" );
+    is( name_of( type_named('MIXED') ),                             'Any',               "MIXED takes anything" );
+    is( name_of( type_named('ARRAY') ),                             'ArrayRef',          "a container word names a reference to one" );
+    is( name_of( type_named('ArrayRef[Int]') ),                     'ArrayRef[Int]',     "a Types::Standard expression" );
+    is( name_of( type_named('ConsumerOf["Foo"]') ),                 'ConsumerOf["Foo"]', "a Types::Standard expression whose type Pod::Coverage::More::Types does not import" );
+    is( name_of( type_named('Enum["a","b"]') ),                     'Enum["a","b"]',     "such as Enum" );
+    is( name_of( type_named('Tuple[Int,Str]') ),                    'Tuple[Int,Str]',    "and Tuple" );
+    is( name_of( type_named('443') ),                               q{-},                "a number names no type" );
+    is( name_of( type_named('NoSuchType') ),                        q{-},                "a name that no library has" );
+    is( name_of( type_named(undef) ),                               q{-},                "no name" );
+    is( name_of( type_named('fail2ban reads C<%> as a variable') ), q{-},                "prose with a % in it names no type, and warns of nothing" );
 };
 
 done_testing;

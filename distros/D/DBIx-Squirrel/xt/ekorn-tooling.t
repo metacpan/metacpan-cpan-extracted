@@ -11,7 +11,6 @@ use Test2::Plugin::NoWarnings;
 use DBIx::Squirrel::Tooling  ();
 use Ekorn::Pipeline::Tooling ();
 
-
 # The names a Tooling's tag holds, sorted.
 sub tag ($name, $of) {
     no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNoStrict)

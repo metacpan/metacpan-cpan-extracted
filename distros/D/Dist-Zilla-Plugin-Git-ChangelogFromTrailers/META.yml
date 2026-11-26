@@ -31,7 +31,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::Git::ChangelogFromTrailers:
     file: lib/Dist/Zilla/Plugin/Git/ChangelogFromTrailers.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Dist::Zilla::File::InMemory: '0'
   Dist::Zilla::Plugin::NextRelease: '0'
@@ -50,7 +50,19 @@ resources:
   bugtracker: https://github.com/Troglodyne-Internet-Widgets/Dist-Zilla-Plugin-Git-ChangelogFromTrailers/issues
   homepage: https://github.com/Troglodyne-Internet-Widgets/Dist-Zilla-Plugin-Git-ChangelogFromTrailers
   repository: https://github.com/Troglodyne-Internet-Widgets/Dist-Zilla-Plugin-Git-ChangelogFromTrailers.git
-version: '0.001'
+version: '0.002'
+x_contributors:
+  - 'troglodyne-bot <troglodyne-bot@users.noreply.github.com>'
+  - 'troglodyne-robot <trogbot@troglodyne.net>'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT
+x_system_packages:
+  aspell:
+    deb: aspell
+    rpm: aspell
+    test: 'aspell --version'
+  aspell-en:
+    deb: aspell-en
+    rpm: aspell-en
+    test: 'aspell --lang=en_US -a'

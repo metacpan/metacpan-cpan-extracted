@@ -3,7 +3,7 @@ use warnings;
 
 package RT::Extension::AI;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require RT::Extension::AI::Provider;
 require RT::Extension::AI::Provider::OpenAI;
@@ -95,7 +95,7 @@ Here is a sample configuration with Gemini:
              url     => 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
              prompts => {
                 summarize_ticket => 'You are a helpdesk assistant. Summarize the ticket conversation precisely. Focus on key points, decisions made, and any follow-up actions required.',
-                assess_sentiment => 'Classify the overall sentiment as Satisfied, Dissatisfied, or Neutral. Provide reasoning if possible.',
+                assess_sentiment => 'Classify the overall sentiment as Satisfied, Dissatisfied, or Neutral. Reply with only that one word.',
                 adjust_tone => 'Paraphrase the text for clarity and professionalism. Ensure the tone is polite, concise, and customer-friendly.',
                 suggest_response => 'Provide clear, practical advice or suggestions based on the given question or scenario.',
                 translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',
@@ -130,7 +130,7 @@ Below shows a sample configuration with OpenAI:
             },
             prompts => {
                 summarize_ticket => 'You are a helpdesk assistant. Summarize the ticket conversation precisely. Focus on key points, decisions made, and any follow-up actions required.',
-                assess_sentiment => 'Classify the overall sentiment as Satisfied, Dissatisfied, or Neutral. Provide reasoning if possible.',
+                assess_sentiment => 'Classify the overall sentiment as Satisfied, Dissatisfied, or Neutral. Reply with only that one word.',
                 adjust_tone => 'Paraphrase the text for clarity and professionalism. Ensure the tone is polite, concise, and customer-friendly.',
                 suggest_response => 'Provide clear, practical advice or suggestions based on the given question or scenario.',
                 translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',
@@ -165,7 +165,7 @@ Below shows a sample configuration with Claude (Anthropic):
             },
             prompts => {
                 summarize_ticket => 'You are a helpdesk assistant. Summarize the ticket conversation precisely. Focus on key points, decisions made, and any follow-up actions required.',
-                assess_sentiment => 'Classify the overall sentiment as Satisfied, Dissatisfied, or Neutral. Provide reasoning if possible.',
+                assess_sentiment => 'Classify the overall sentiment as Satisfied, Dissatisfied, or Neutral. Reply with only that one word.',
                 adjust_tone => 'Paraphrase the text for clarity and professionalism. Ensure the tone is polite, concise, and customer-friendly.',
                 suggest_response => 'Provide clear, practical advice or suggestions based on the given question or scenario.',
                 translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',

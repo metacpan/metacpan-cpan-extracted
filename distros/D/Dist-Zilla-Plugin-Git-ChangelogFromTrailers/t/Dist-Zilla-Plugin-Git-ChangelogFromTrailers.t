@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 use 5.020;
 use strict;
 use warnings FATAL => 'all';
@@ -63,11 +63,14 @@ T2->subtest(
         $git->redefine(
             RUN => sub {
                 ( undef, undef, @args ) = @_;
-                return ( 'First', q{}, q{}, '  Second  ', 'Third', q{}, 'First' );
+
+                # Each commit starts with a record separator, and a unit separator ends its trailers.
+                my ( $rs, $us ) = ( chr 0x1e, chr 0x1f );
+                return ( "${rs}First${us}One", q{}, "Changes-Entry: First", "${rs}${us}None", "${rs}  Second  ", "Third${us}Two", q{}, "Changes-Entry: Hidden", q{}, 'Co-authored-by: A. Tester', "${rs}First${us}Three" );
             }
         );
-        T2->is( [ $p->items ],    [qw{First Second Third}],                         'each value is an item, trimmed, with no empty or repeated ones' );
-        T2->is( $args[0]{format}, '%(trailers:key=Changes-Entry,valueonly,unfold)', 'it reads the trailer that the configuration names' );
+        T2->is( [ $p->items ],    [qw{First Hidden Second Third}],                            'each value is an item, trimmed, with no empty or repeated ones, and those of an earlier paragraph first' );
+        T2->is( $args[0]{format}, '%x1e%(trailers:key=Changes-Entry,valueonly,unfold)%x1f%B', 'it reads the trailer that the configuration names, and the whole message' );
         T2->ok( $args[0]{reverse}, 'oldest commit first' );
         T2->is( $args[1], '1.000..HEAD', 'with a tag, only the commits after it count' );
 
@@ -77,6 +80,17 @@ T2->subtest(
 
         $git->redefine( rev_parse => sub { die "fatal: Needed a single revision\n" } );
         T2->is( [ $p->items ], [], 'a repository with no commits has no items' );
+    }
+);
+
+T2->subtest(
+    trailers_in => sub {
+        my $p = plugin();
+        T2->is( [ $p->trailers_in("Subject\n\nWhy.\n\nChangelog: A change\n  that wraps\nchangelog: Another\n\nCo-authored-by: A. Tester") ], [ 'A change that wraps', 'Another' ], 'a paragraph of trailers that is not the last, in any case, with continued lines joined' );
+        T2->is( [ $p->trailers_in("Subject\n\n* First\n\nChangelog: One\n\n* Second\n\nChangelog: Two\nSigned-off-by: A. Tester") ],          [qw{One Two}],                        'and each such paragraph, as a squash of two commits has them' );
+        T2->is( [ $p->trailers_in("Subject\n\nThe release reads the\nChangelog: trailers of the commits.") ],                                 [],                                   'not a paragraph that has prose in it, although a line starts with the key' );
+        T2->is( [ $p->trailers_in("Subject\n\n  Changelog: indented\n\nNot-Changelog: x") ],                                                  [],                                   'nor a paragraph that starts with a continued line, nor another key' );
+        T2->is( [ $p->trailers_in(q{}) ],                                                                                                     [],                                   'and nothing from an empty message' );
     }
 );
 

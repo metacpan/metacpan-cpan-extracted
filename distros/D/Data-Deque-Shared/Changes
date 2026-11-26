@@ -1,5 +1,8 @@
 Revision history for Data::Deque::Shared
 
+0.13  2026-11-25
+    - Str: pushing a value longer than max_len croaks instead of truncating it.
+
 0.12  2026-10-16
     - New v3 file format: recreate existing backing files.
     - Fix concurrent slot ownership and progress after a waiting peer dies.

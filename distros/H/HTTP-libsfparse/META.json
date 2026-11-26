@@ -1,0 +1,61 @@
+{
+   "abstract" : "parse RFC 9651 HTTP Structured Fields using libsfparse",
+   "author" : [
+      "Robert Rothenberg <perl@rhizomnic.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150014",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTTP-libsfparse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "XSLoader" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "JSON::PP" : "2.27103",
+            "MIME::Base64" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/robrwo/perl-HTTP-StructuredField"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_contributors" : [
+      "Paul Johnson <paul@pjcj.net>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

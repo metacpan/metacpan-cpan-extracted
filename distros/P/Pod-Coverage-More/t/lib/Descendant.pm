@@ -17,4 +17,10 @@ sub hook {
     return;
 }
 
+sub template_files {
+    my ($self) = @_;
+    $self->{recipes} = [];
+    return;
+}
+
 1;

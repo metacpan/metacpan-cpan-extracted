@@ -25,22 +25,23 @@
     - [3.2.2. Sourcing the Library](#322-sourcing-the-library)
     - [3.2.3. Initializing getoptlong](#323-initializing-getoptlong)
     - [3.2.4. Parsing Command-Line Arguments](#324-parsing-command-line-arguments)
-    - [3.2.5. Setting Parsed Results to Variables](#325-setting-parsed-results-to-variables)
+    - [3.2.5. Setting Positional Parameters](#325-setting-positional-parameters)
     - [3.2.6. Accessing and Using Variables](#326-accessing-and-using-variables)
 - [4. Detailed Option Definition](#4-detailed-option-definition)
   - [4.1. Basic Syntax](#41-basic-syntax)
   - [4.2. Option Types and Type Specifiers](#42-option-types-and-type-specifiers)
     - [4.2.1. Flag Options (No Suffix or `+`)](#421-flag-options-no-suffix-or-)
-    - [4.2.2. Required Argument Options (`:`)](#422-required-argument-options--)
-    - [4.2.3. Optional Argument Options (`?`)](#423-optional-argument-options--)
-    - [4.2.4. Array Options (`@`)](#424-array-options--)
-    - [4.2.5. Hash Options (`%`)](#425-hash-options--)
-    - [4.2.6. Callback Options (`!`)](#426-callback-options--)
+    - [4.2.2. Required Argument Options (`:`)](#422-required-argument-options-)
+    - [4.2.3. Optional Argument Options (`?`)](#423-optional-argument-options-)
+    - [4.2.4. Array Options (`@`)](#424-array-options-)
+    - [4.2.5. Varargs Array Options (`*`)](#425-varargs-array-options-)
+    - [4.2.6. Hash Options (`%`)](#426-hash-options-)
+    - [4.2.7. Callback Options (`!`)](#427-callback-options-)
   - [4.3. Specifying Destination Variable Name](#43-specifying-destination-variable-name)
   - [4.4. Value Validation](#44-value-validation)
     - [4.4.1. Integer Validation (`=i`)](#441-integer-validation-i)
     - [4.4.2. Float Validation (`=f`)](#442-float-validation-f)
-    - [4.4.3. Custom Regex Validation (`=(<regex>)`](#443-custom-regex-validation-regex)
+    - [4.4.3. Custom Regex Validation (`=(<regex>)`)](#443-custom-regex-validation-regex)
 - [5. Help Message Generation and Customization](#5-help-message-generation-and-customization)
   - [5.1. Automatic Help Option](#51-automatic-help-option)
   - [5.2. Help Message Content](#52-help-message-content)
@@ -49,8 +50,8 @@
     - [5.2.3. Displaying Initial (Default) Values](#523-displaying-initial-default-values)
     - [5.2.4. Treating Flag Options as Counters](#524-treating-flag-options-as-counters)
   - [5.3. Overall Help Message Format](#53-overall-help-message-format)
-    - [5.3.1. Customizing Synopsis (`USAGE` Setting)](#531-customizing-synopsis-usage-setting)
-    - [5.3.2. Manual Display with `getoptlong help`](#532-manual-display-with-getoptlong-help)
+    - [5.3.1. Customizing Synopsis (Usage Line)](#531-customizing-synopsis-usage-line)
+    - [5.3.2. Manual Display with `getoptlong help [SYNOPSIS_ARGUMENT]`](#532-manual-display-with-getoptlong-help-synopsis_argument)
   - [5.4. Help Message Structure](#54-help-message-structure)
 - [6. Advanced Topics](#6-advanced-topics)
   - [6.1. Callback Function Details](#61-callback-function-details)
@@ -58,17 +59,18 @@
     - [6.1.2. Pre-processing Callbacks (`--before` / `-b`)](#612-pre-processing-callbacks---before---b)
     - [6.1.3. Error Handling in Callback Functions](#613-error-handling-in-callback-functions)
     - [6.1.4. Custom Validation using Callbacks](#614-custom-validation-using-callbacks)
-  - [6.2. Specifying Destination Variable](#62-specifying-destination-variable)
-  - [6.3. Option Pass-through](#63-option-pass-through)
-  - [6.4. Runtime Configuration Changes (`getoptlong configure`)](#64-runtime-configuration-changes-getoptlong-configure)
-  - [6.5. Dumping Internal State (`getoptlong dump`)](#65-dumping-internal-state-getoptlong-dump)
+  - [6.2. Option Pass-through](#62-option-pass-through)
+    - [6.2.1. General Argument Pass-through (using `PERMUTE` and `--`)](#621-general-argument-pass-through-using-permute-and---)
+    - [6.2.2. Specific Option Collection (using `>` in Option Definition)](#622-specific-option-collection-using--in-option-definition)
+  - [6.3. Runtime Configuration Changes (`getoptlong configure`)](#63-runtime-configuration-changes-getoptlong-configure)
+  - [6.4. Dumping Internal State (`getoptlong dump`)](#64-dumping-internal-state-getoptlong-dump)
 - [7. Command Reference](#7-command-reference)
   - [7.1. `getoptlong init <opts_array_name> [CONFIGURATIONS...]`](#71-getoptlong-init-opts_array_name-configurations)
-  - [7.2. `getoptlong parse "$@"`](#72-getoptlong-parse--)
+  - [7.2. `getoptlong parse "$@"`](#72-getoptlong-parse-)
   - [7.3. `getoptlong set`](#73-getoptlong-set)
   - [7.4. `getoptlong callback [-b|--before] <opt_name> [callback_function [args...]]`](#74-getoptlong-callback--b--before-opt_name-callback_function-args)
-  - [7.5. `getoptlong configure <CONFIG_PARAM=VALUE> ...`](#75-getoptlong-configure-config_paramvalue--)
-  - [7.6. `getoptlong dump [-a|--all]`](#76-getoptlong-dump--a---all)
+  - [7.5. `getoptlong configure <CONFIG_PARAM=VALUE> ...`](#75-getoptlong-configure-config_paramvalue-)
+  - [7.6. `getoptlong dump [-a|--all]`](#76-getoptlong-dump--a--all)
   - [7.7. `getoptlong help [SYNOPSIS]`](#77-getoptlong-help-synopsis)
   - [7.8. `getoptlong version`](#78-getoptlong-version)
 - [8. Practical Examples](#8-practical-examples)
@@ -215,7 +217,7 @@ getoptlong init OPTS
 
 During initialization, you can also specify various configuration parameters that control option parsing behavior. See Section "7.1. `getoptlong init ...`" for details.
 
-Example: Store non-option arguments in the `ARGS` array, and leave undefined options in it instead of exiting with an error.
+Example: Store non-option arguments in the `ARGS` array, and return from `getoptlong parse` on an error instead of exiting.
 
 ```bash
 declare -a ARGS # It's good practice to declare the array specified by PERMUTE beforehand
@@ -230,7 +232,7 @@ Pass all script arguments (`"$@"`) to the `getoptlong parse` command to parse th
 getoptlong parse "$@"
 ```
 
-On a parse error, such as an undefined option or a missing required argument, `getoptlong parse` displays an error message and exits the script (`EXIT_ON_ERROR`, enabled by default).  If `EXIT_ON_ERROR` is disabled, undefined options are left in the arguments instead.  See Section "7.2. `getoptlong parse`" for details.
+On a parse error, such as an undefined option or a missing required argument, `getoptlong parse` displays an error message and exits the script (`EXIT_ON_ERROR`, enabled by default).  If `EXIT_ON_ERROR` is disabled, it returns `1` instead, and the script handles the error.  See Section "7.2. `getoptlong parse`" for details.
 
 #### 3.2.5. Setting Positional Parameters
 
@@ -353,11 +355,11 @@ declare -A OPTS=(
 
     *   `!`: Callback. The specified function (or a default one based on the option name or `destination`) is called when this option is parsed. See Section 3.3 if specifying a destination variable.
 
-    *   `>`: Passthrough. The option and its argument (if any) are collected into a specified array. This must follow a `type`. See Section "5.3. Option Pass-through".
+    *   `>`: Passthrough. The option and its argument (if any) are collected into a specified array. This must follow a `type`. See Section "6.2. Option Pass-through".
 
     These can be combined (e.g., `!>`).
 
-*   **`destination`:** (Optional) Specifies a custom variable name where the option's value will be stored. This name appears directly after the `type_char` and any `modifiers`.  See Section "3.3. Specifying Destination Variable Name" for full details and examples.
+*   **`destination`:** (Optional) Specifies a custom variable name where the option's value will be stored. This name appears directly after the `type_char` and any `modifiers`.  See Section "4.3. Specifying Destination Variable Name" for full details and examples.
 
 *   **`=<validation>`:** (Optional) Specifies validation for the argument's value. This follows the `destination` if present, or the `type`/`modifier` otherwise.  See details in Section "4.4. Value Validation". Examples: `=i` (integer), `=f` (float), `=(<regex>)`.
 
@@ -455,7 +457,47 @@ Accept multiple values as an array.
 
 *   **Use Cases:** Multiple input files, multiple configuration items.
 
-#### 4.2.5. Hash Options (`%`)
+#### 4.2.5. Varargs Array Options (`*`)
+
+Take a variable number of arguments, up to `--`, into an array.
+
+```bash
+declare -A OPTS=(
+    [ names | N* # Names to greet ]=
+)
+```
+
+```
+$ script --names alice bob -- file
+```
+
+```bash
+for name in "${names[@]}" ; do echo "$name" ; done    # alice, bob
+```
+
+*   **Stored as They Are:** Every argument up to `--` is a value, as it is: one starting with `-` is not taken as an option, as in `--names a -x b --`, and one with a space is not split by `DELIM`.
+
+*   **The `--`:** It ends the arguments and is removed.  It is required: without it, parse fails, instead of taking the files after it by mistake.
+
+*   **Ways to Give the Arguments:**
+
+    | Arguments         | Stored    |                 |
+    |-------------------|-----------|-----------------|
+    | `--names a b --`  | `a b`     | up to `--`      |
+    | `-N a b --`       | `a b`     | short form      |
+    | `--names --`      | (none)    | no arguments    |
+
+*   **A Value in One Argument:** When the option and a value are given in one argument, in either form, only that value is taken, and `--` is not needed: `--names=value` and `-Nvalue` store `value`.
+
+*   **After the `--`:** The `--` ends only the arguments: the options and files after it are parsed as usual.  To end the options too, write another `--`: `--names a b -- -- -file`.  `--` itself cannot be one of the arguments.
+
+*   **As with Array Options:** Multiple specifications accumulate, `--no-names` empties the array, and a validation is applied to each argument.
+
+*   **Callback:** A callback is called once for the option, with all the arguments in place of the value: `--names a 'b c' --` calls `callback names a 'b c'`, where `callback` is the function.  With no arguments, it gets only the option name.
+
+*   **Use Cases:** A list of values given as separate arguments.
+
+#### 4.2.6. Hash Options (`%`)
 
 Accept `key=value` pairs as an associative array (hash).
 
@@ -476,9 +518,9 @@ Accept `key=value` pairs as an associative array (hash).
 
 *   **Use Cases:** Environment variable-like settings, information managed as key-value pairs.
 
-#### 4.2.6. Callback Options (`!`)
+#### 4.2.7. Callback Options (`!`)
 
-When the option is parsed, the specified callback function is called. This `!` specifier can be appended to any of the above option types (`+`, `:`, `?`, `@`, `%`).
+When the option is parsed, the specified callback function is called. This `!` specifier can be appended to any of the above option types (`+`, `:`, `?`, `@`, `*`, `%`).
 
 *   **Definition Examples:**
     *   `[execute|x! # Execute a command]` (flag type callback)
@@ -495,7 +537,7 @@ When the option is parsed, the specified callback function is called. This `!` s
 
 By default, `getoptlong.sh` stores the value of a parsed option (e.g., `--my-option value`) into a shell variable derived from the option's long name (e.g., `$my_option`, with hyphens replaced by underscores).  However, you can specify a custom variable name for an option's value directly within its definition string.
 
-This is achieved by writing the desired variable name directly after the option type specifier (e.g., `+`, `:`, `?`, `@`, `%`) and any modifiers (e.g., `!`, `-`).
+This is achieved by writing the desired variable name directly after the option type specifier (e.g., `+`, `:`, `?`, `@`, `*`, `%`) and any modifiers (e.g., `!`, `-`).
 
 *   **Syntax in Option Definition:** Refer back to Section "4.1. Basic Syntax" for the full structure: `long_name[|short_name...][<type_char>[<modifiers>]][DEST_VAR_NAME][=<validation_type>] # Description` The `DEST_VAR_NAME` is the custom variable name.
 
@@ -538,7 +580,7 @@ Validates if the argument is an integer.
 
 *   **Definition Example:** `[count|c:COUNT=i # Number of iterations]` (assuming COUNT is the destination variable) or `[count|c:=i # Number of iterations]` (if using default variable name).
 
-*   **Behavior:** If the argument is not an integer, an error message is displayed, and the script exits.  This does not depend on `EXIT_ON_ERROR`.
+*   **Behavior:** If the argument is not an integer, an error message is displayed, and the script exits.  This is a parse error: with `EXIT_ON_ERROR` disabled, `getoptlong parse` returns `1` instead.
 
 *   Applicable to array options (`@...=i`) and the value part of hash options (`%...=i`).
 
@@ -768,7 +810,7 @@ By default, callback functions are called **after** the option's value has been 
 
     *   Then the long name of the option (e.g., `my-option`).  Without registered arguments, it is `$1`.
 
-    *   Then the parsed value of the option. For flags, it's `1` (or an empty string if specified with `no-`). For options taking arguments, it's the argument value. For arrays or hashes, it's the last parsed element or pair.  Without registered arguments, it is `$2`.
+    *   Then the parsed value of the option. For flags, it's `1` (or an empty string if specified with `no-`). For options taking arguments, it's the argument value. For arrays or hashes, it's the last parsed element or pair.  For the `*` type, all the arguments up to `--` are given in place of the value, in one call; with no arguments, nothing is given.  Without registered arguments, it is `$2`.
 
 *   **Example:**
 
@@ -847,11 +889,11 @@ If an error occurs within a callback function, the function itself is responsibl
 
 Complex validation that cannot be handled by the option definition's validation features (`=i`, `=f`, `=(regex)`) can be implemented using callback functions. Typically, a normal (post-processing) callback receives the value and executes the validation logic.
 
-### 6.3. Option Pass-through
+### 6.2. Option Pass-through
 
 Sometimes you want to pass some of the options received by your script directly to another internal or external command. `getoptlong.sh` offers two main ways to achieve this: general argument pass-through and specific option collection.
 
-#### 6.3.1. General Argument Pass-through (using `PERMUTE` and `--`)
+#### 6.2.1. General Argument Pass-through (using `PERMUTE` and `--`)
 
 This method is suitable when you want to pass all arguments after a certain point, or all non-option arguments, to another command.
 
@@ -865,7 +907,7 @@ This method is suitable when you want to pass all arguments after a certain poin
 
     *   By default, if an option not defined in the `OPTS` array is passed, it is an error, and the script exits.
 
-    *   If `EXIT_ON_ERROR` is disabled (`EXIT_ON_ERROR=`), undefined options are not errors: they are left in the arguments, together with the non-option arguments, in the array specified by `PERMUTE` (or `GOL_ARGV`), and `getoptlong parse` returns `0`.  An undefined short option is still reported by `getopts`; set `SILENT` to suppress it.  An argument given to an undefined option as a separate word is left as another argument.  See `ex/silent.sh` for an example.
+    *   If `EXIT_ON_ERROR` is disabled (`EXIT_ON_ERROR=`), `getoptlong parse` stops at the undefined option and returns `1`, leaving the arguments as they are.  Undefined options are not left in the arguments: to give options to another command, use `--`, or disable `PERMUTE` so that parsing stops at the first non-option argument (see Section "8.2. Script with Subcommands (Simple Version)" and `ex/silent.sh`).
 
 *   **How to Achieve Pass-through (General Approaches):**
 
@@ -882,7 +924,7 @@ This method is suitable when you want to pass all arguments after a certain poin
 
     2.  **Usage as a Wrapper Script and Manual Splitting:** If your script is a wrapper for a specific command, process its own options, then pass the remaining or transformed arguments to that command. Using `--` for explicit separation is robust.  (Example code omitted for brevity, see previous version if needed)
 
-#### 6.3.2. Specific Option Collection (using `>` in Option Definition)
+#### 6.2.2. Specific Option Collection (using `>` in Option Definition)
 
 This method allows you to collect specific options, along with their potential values, into a designated array as they are parsed. This is useful when you want to gather certain options for later processing or to pass them selectively to another function or command.
 
@@ -913,7 +955,7 @@ To use this feature, append a greater-than symbol (`>`) to the option type speci
     *   The array where options are collected is determined by the string following the `>` (and other type specifiers like `!` or `:`).  For example, in `[myopt|m:>destination_array]`, options will be collected into the `destination_array`.
     *   If no array name is specified after the `>` (e.g., `[myopt|m:>]`), the options are collected into an array named after the option's long name, with hyphens converted to underscores (e.g., `myopt` would collect into `myopt` array, or if defined as `my-opt`, it would collect into `my_opt` array).
 
-*   **Combining with Other Types:** The `>` specifier must appear *after* any primary type specifier (`+`, `:`, `?`, `@`, `%`).  It can be combined with the callback modifier `!`. The primary type specifier cannot be omitted when using `>`, as this would make it ambiguous with a hyphen in a long option name.
+*   **Combining with Other Types:** The `>` specifier must appear *after* any primary type specifier (`+`, `:`, `?`, `@`, `*`, `%`).  It can be combined with the callback modifier `!`. The primary type specifier cannot be omitted when using `>`, as this would make it ambiguous with a hyphen in a long option name.
 
     *   Correct: `[myopt|m:!>log_array # Log this option then collect it (flag type)]`
         The `+` (flag type) is explicitly stated. The callback `!` executes, then the option is passed to `log_array`.
@@ -935,7 +977,7 @@ To use this feature, append a greater-than symbol (`>`) to the option type speci
 
 This specific option collection provides a flexible way to gather arguments that might not be directly used by the script's main logic but are important for other parts of the process or for passing to sub-commands.
 
-### 6.4. Runtime Configuration Changes (`getoptlong configure`)
+### 6.3. Runtime Configuration Changes (`getoptlong configure`)
 
 Some parameters set with `getoptlong init` can be changed later using the `getoptlong configure` command.
 
@@ -946,16 +988,16 @@ Some parameters set with `getoptlong init` can be changed later using the `getop
     ```bash
     getoptlong init OPTS
     # ... some processing ...
-    # Temporarily leave undefined options in the arguments instead of exiting
+    # Temporarily handle a parse error here instead of exiting
     getoptlong configure EXIT_ON_ERROR= SILENT=1
-    getoptlong parse "${some_args[@]}"
+    getoptlong parse "${some_args[@]}" || echo "invalid options in some_args" >&2
     # Revert
     getoptlong configure EXIT_ON_ERROR=1 SILENT=
     ```
 
 *   **Note:** Not all parameters are suitable for runtime changes. It's safest to use this for changing flags that control parsing behavior (`EXIT_ON_ERROR`, `SILENT`, `DEBUG`, `DELIM`). Parameters like `PREFIX` or those affecting option definitions themselves might not work as expected if changed after `init`.
 
-### 6.5. Dumping Internal State (`getoptlong dump`)
+### 6.4. Dumping Internal State (`getoptlong dump`)
 
 For debugging purposes, you may want to inspect the option definition information and current values held internally by `getoptlong.sh`. Use the `getoptlong dump` command.
 
@@ -1003,15 +1045,15 @@ Initializes the library, loading option definitions and settings. This command m
 
     *   **`PREFIX=<string>`**: Specifies a prefix to be added to variable names set by `getoptlong set`. For example, with `PREFIX=MYAPP_` and an option `--option`, the variable `$MYAPP_option` would be set.  Default is an empty string (no prefix).
 
-    *   **`HELP=<SPEC>`**: Customizes the automatically added help option. See Section "4.1. Automatic Help Option" for details. Default: `help|h#show help`.
+    *   **`HELP=<SPEC>`**: Customizes the automatically added help option. See Section "5.1. Automatic Help Option" for details. Default: `help|h#show help`.
 
-    *   **`USAGE=<string>`**: Specifies the synopsis string for the help message. See Section "4.3.1. Customizing Synopsis (`USAGE` Setting)" for details. If not set, the synopsis is typically not displayed unless `getoptlong help` is called with an argument.
+    *   **`USAGE=<string>`**: Specifies the synopsis string for the help message. See Section "5.3.1. Customizing Synopsis (Usage Line)" for details. If not set, the synopsis is typically not displayed unless `getoptlong help` is called with an argument.
 
-    *   **`EXIT_ON_ERROR=<BOOL>`**: Whether to exit the script on a parse error.  Default is enabled (exit).  If disabled, undefined options are left in the arguments instead of being errors.  See Section "7.2. `getoptlong parse`" for details.
+    *   **`EXIT_ON_ERROR=<BOOL>`**: Whether to exit the script on a parse error.  Default is enabled (exit).  If disabled, `getoptlong parse` returns `1` on an error.  See Section "7.2. `getoptlong parse`" for details.
 
     *   **`DELIM=<string>`**: Specifies the set of characters used to delimit multiple values or pairs within a single argument string for array (`@`) or hash (`%`) options.  Default is space, tab, comma (behavior similar to Bash's IFS). For example, `DELIM=,:` would delimit by comma and colon.
 
-    *   **`SILENT=<BOOL>`**: Whether to suppress error messages of `getopts`.  Default is disabled (display).
+    *   **`SILENT=<BOOL>`**: Whether to suppress error messages of `getopts`, for short options.  With `EXIT_ON_ERROR` disabled, all the error messages of parsing are suppressed.  Default is disabled (display).
 
     *   **`DEBUG=<BOOL>`**: Whether to enable debug messages.  Default is disabled.
 
@@ -1025,9 +1067,9 @@ Parses command-line arguments according to the defined options.
 
 *   **Return Value**:
 
-    *   Returns exit code `0`.  On a parse error, such as an undefined option or a missing required argument, it displays an error message and exits the script, as `EXIT_ON_ERROR` is enabled by default.  There is no need to check the return value.
-    *   If `EXIT_ON_ERROR` is disabled, an undefined option and a short option without its required argument are not errors: they are left in the arguments, and the command returns `0`.  An error message of `getopts` is displayed for a short option unless `SILENT` is set.
-    *   A long option without its required argument and a validation error exit the script regardless of `EXIT_ON_ERROR`.
+    *   Returns exit code `0`.  On a parse error, such as an undefined option, a missing required argument or a validation error, it displays an error message and exits the script, as `EXIT_ON_ERROR` is enabled by default.  There is no need to check the return value.
+    *   If `EXIT_ON_ERROR` is disabled, it stops at the first error, displays the error message, and returns `1`.  The arguments are left as they are, and the options before the error have been set.  All the error messages are suppressed by `SILENT`.
+    *   In the one-liner form, the return value is that of the `.` command: `. getoptlong.sh OPTS "$@" || exit 2`.
 
 ### 7.3. `getoptlong set`
 
@@ -1073,7 +1115,7 @@ Dumps (displays) the internal state of `getoptlong.sh` (option definitions, curr
 
 ### 7.7. `getoptlong help [SYNOPSIS]`
 
-Manually displays the generated help message based on the current option definitions and configurations.  See Section "4.3.2. Manual Display with `getoptlong help`" for full details on its behavior, including how the optional `SYNOPSIS` argument is handled.
+Manually displays the generated help message based on the current option definitions and configurations.  See Section "5.3.2. Manual Display with `getoptlong help [SYNOPSIS_ARGUMENT]`" for full details on its behavior, including how the optional `SYNOPSIS` argument is handled.
 
 This command is also executed internally when the automatic help option (e.g., `--help`) is invoked.
 
@@ -1196,16 +1238,15 @@ declare -A GlobalOPTS=(
     [verbose|v+ # Verbose output ]=0
     [help|h     # Display help ]=
 )
-getoptlong init GlobalOPTS
-declare -a RemainingArgs
-# Parse only global options. Leave the rest, including the options of
-# the subcommand, in RemainingArgs without error messages.
-getoptlong configure EXIT_ON_ERROR= SILENT=1 PERMUTE=RemainingArgs
+# Parse only global options.  With PERMUTE disabled, parsing stops at
+# the first non-option argument, the subcommand, and leaves it and its
+# options in the arguments.
+getoptlong init GlobalOPTS PERMUTE=
 getoptlong parse "$@"
-eval "$(getoptlong set)" # Set variables for global options
+eval "$(getoptlong set)" # Set variables for global options, and shift them
 
 # If global help requested or no subcommand, show overall help
-if [[ -n $help ]] || (( ${#RemainingArgs[@]} == 0 )); then
+if [[ -n $help ]] || (( $# == 0 )); then
     echo "Usage: $(basename "$0") [global_options] <subcommand> [subcommand_options]"
     echo ""
     echo "Global Options:"
@@ -1217,9 +1258,9 @@ if [[ -n $help ]] || (( ${#RemainingArgs[@]} == 0 )); then
     exit 0
 fi
 
-subcommand="${RemainingArgs[0]}"
-# Subcommand arguments are RemainingArgs excluding the subcommand itself
-SubcommandArgs=("${RemainingArgs[@]:1}")
+subcommand="$1"
+# Subcommand arguments are the arguments after the subcommand
+SubcommandArgs=("${@:2}")
 
 case "$subcommand" in
     commit)
@@ -1280,7 +1321,7 @@ esac
 
 *   Calling `getoptlong init` and `parse` multiple times.
 
-*   Using `PERMUTE` to separate the subcommand and its arguments.
+*   Disabling `PERMUTE` to stop at the subcommand: global options are given before it, and the options after it are left to the subcommand.
 
 *   Consideration for per-subcommand help display (defining `help|h` in each OPTS).
 
@@ -1310,7 +1351,7 @@ Within the option definition array (`OPTS`), you can use special keys in the for
 
 *   **`&HELP=<SPEC>`**
 
-    *   Description: Customizes the definition of the auto-generated help option.  Overrides the `HELP` parameter of `getoptlong init`.  See Section "4.1. Automatic Help Option" for more details.
+    *   Description: Customizes the definition of the auto-generated help option.  Overrides the `HELP` parameter of `getoptlong init`.  See Section "5.1. Automatic Help Option" for more details.
 
     *   Example: `[&HELP]="show-usage|u#Usage guide"`
 
@@ -1318,7 +1359,7 @@ Within the option definition array (`OPTS`), you can use special keys in the for
 
 *   **`&USAGE=<string>`**
 
-    *   Description: Specifies the usage (Synopsis) string to be displayed at the beginning of the help message. Overrides the `USAGE` parameter of `getoptlong init`.  See Section "4.3.1. Customizing Synopsis (`USAGE` Setting)" for more details.
+    *   Description: Specifies the usage (Synopsis) string to be displayed at the beginning of the help message. Overrides the `USAGE` parameter of `getoptlong init`.  See Section "5.3.1. Customizing Synopsis (Usage Line)" for more details.
 
     *   Example: `[&USAGE]="Usage: $(basename "$0") [OPTIONS] SOURCE DEST"`
 

@@ -323,6 +323,29 @@ subtest 'device and output' => sub {
     ok !-e "$dir/g.txt", '--geometry writes no file for tty';
 };
 
+# On paper, the start of each pane is marked for ansi2pdf (ansicolumn
+# --pane-osc), so that the text of a PDF is in the order of the panes;
+# an ansi2pdf of the test keeps what it is given
+subtest 'panes marked on paper' => sub {
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    open my $fh, '>', "$dir/ansi2pdf" or die;
+    print $fh "#!/bin/sh\n",
+        "case \" \$* \" in *' --geometry '*) echo '100 40'; exit;; esac\n",
+        "cat > $dir/in.txt\n";
+    close $fh;
+    chmod 0755, "$dir/ansi2pdf";
+    local $ENV{PATH} = "$dir:$ENV{PATH}";
+    my $read = sub { local $/; open my $fh, '<', "$dir/in.txt" or return ''; <$fh> };
+    optex('-Mup', '-C2', '-T', 'a4', '-o', 'x.pdf', '--', 'perl', '-e', 'print "$_\n" for 1..60')->run;
+    my $n = () = $read->() =~ /\e\]7772;\e\\/g;
+    is $n, 2, 'a mark for each pane';
+    like $read->(), qr/\e\]7772;\e\x5c1\b/, 'at the start of the text';
+    unlink "$dir/in.txt";
+    my $tty = optex('-Mup', '-C2', '--pager', "cat > $dir/in.txt", '--', 'echo', 'hello')->run;
+    like   $read->(), qr/hello/, 'to the pager';
+    unlike $read->(), qr/\e\]7772;/, 'no mark on the terminal';
+};
+
 # --highlight gives ansicolumn the option to read the files through
 # the highlighter
 subtest 'highlight' => sub {

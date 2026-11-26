@@ -3,7 +3,7 @@ package Module::Build::SysPath;
 use warnings;
 use strict;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use base 'Module::Build';
 use Sys::Path 0.11;

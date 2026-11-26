@@ -1,0 +1,19 @@
+
+Revision history for Perl extension Data::Tools::Process
+
+1.60 (pending)
+
+   - first Data-Tools-Process release: Data::Tools::Process,
+     Data::Tools::Process::Forks and Data::Tools::Process::ForkPool split
+     from Data::Tools 1.52, module names did not change; earlier history is
+     in Data::Tools Changes. the changes since Data::Tools 1.52 follow
+   - Data::Tools::Process added daemonize_here(), same as daemonize() but
+     stays in the current directory, daemonize() options documented
+     (CHDIR, UMASK, STDOUT, STDERR, CLOSE_ALL_FDS)
+   - added Data::Tools::Process::ForkPool, pools of forked worker processes
+     (process groups) with messages to/from the workers over socket pairs
+     (Net::Tools::Socket::Pair), requires Net::Tools and Exception::Sink;
+     fpool_fork_one() creates the pool if needed, fpool_wait_one() returns
+     ( $pid, $exit, $signal, $status ) in list context ($status is the raw
+     wait status)
+   - fork tests moved to tt/

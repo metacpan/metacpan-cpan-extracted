@@ -13,7 +13,7 @@ use Ekorn::Pipeline::Stage  qw();
 use namespace::clean;
 
 # Croak at the line that called Ekorn::Pipeline.
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.2';
 
 our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 
@@ -73,7 +73,7 @@ sub chain ($before, $after, $swapped = undef, @) {
 # class of sources of its own can overload @{} with this.
 sub drain ($source, @) {
     _check_in_force('@{}');
-    return scalar Ekorn::Pipeline->new->iterator($source)->all;
+    return Ekorn::Pipeline->new->iterator($source)->all_arrayref;
 }
 
 # Return true if the object given offers a source's role method.

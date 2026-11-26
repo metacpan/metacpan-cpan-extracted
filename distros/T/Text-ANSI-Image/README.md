@@ -13,7 +13,7 @@ Text::ANSI::Image - images as lines of text for the terminal
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # DESCRIPTION
 
@@ -77,6 +77,16 @@ them.
     - **types** => \[ _TYPE_, ... \]
 
         The types of images shown: `png`, `jpeg` and `gif` (default: all).
+
+    - **osc** => _BOOL_
+
+        Put a private OSC at the beginning of each row, which tells the id of
+        the image, its size in cells and the absolute path of the file, for a
+        program which draws the image itself where its cells are, as
+        [ansi2pdf](https://github.com/tecolicom/App-ansi2pdf) does (default:
+        off; `kitty` only).  Terminals ignore it:
+
+            ESC ] 7771 ; i=ID,c=COLS,r=ROWS ; FILE ESC \
 
 - **rows**(_FILE_, _OPTIONS_)
 

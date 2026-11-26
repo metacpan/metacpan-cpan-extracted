@@ -20,6 +20,8 @@ use DBIx::Squirrel::Util   qw(
 
 use namespace::clean;
 
+our $VERSION = 'v4.1.1';
+
 our @ISA = ('DBI::db', 'Ekorn::Pipeline::Pipes');
 
 # Croak at the line that called DBIx::Squirrel.
@@ -320,9 +322,10 @@ sub selectall_array ($self, $statement, @args) {
 # returns through them, and return what comes out, as a pipeline called
 # with values does. The attributes may be left out, as with do.
 #
-# A statement that can't be prepared returns what the DBI's method does,
-# without RaiseError: undef from those returning a reference to one row
-# or all of them, and nothing from the others.
+# A statement that can't be prepared, or have its values bound, returns
+# what the DBI's method does, without RaiseError: undef from those
+# returning a reference to one row or all of them, and nothing from the
+# others.
 sub _select ($self, $method, $statement, $before, @args) {
     state %UNDEF = map { ($_ => 1) } qw(
         selectrow_arrayref selectrow_hashref selectall_arrayref
@@ -346,7 +349,8 @@ sub _select ($self, $method, $statement, $before, @args) {
         my @values = DBIx::Squirrel::st::_unwrap($sth, @args);    ## no critic (Subroutines::ProtectPrivateSubs)
         if ($sth->{private_ekorn}{Binds}) {
             DBIx::Squirrel::st::_check_bound($sth) unless @values;    ## no critic (Subroutines::ProtectPrivateSubs)
-            $sth->bind(@values) or return          if @values;
+            return $UNDEF{$method} ? undef : ()
+                if @values && !$sth->bind(@values);
             @values = ();
         }
         my $super = "SUPER::$method";
@@ -379,11 +383,11 @@ sub _select_through (
 # studied once for each handle, which keeps what was found in its
 # private_ekorn_studied attribute, keyed by the statement and, with
 # DBD::Pg, its placeholder options, as they can be changed on the
-# handle. Each statement handle has a copy of its own of
-# what the statement handle keeps, as an iterator adds to it. The handle
-# keeps no more than $STUDIED statements, so statements made as the
-# program runs can't fill memory: when it has that many, it evicts
-# $EVICTED of those used least, as _evict says (roadmap 2026-0030).
+# handle. Each statement handle has a copy of its own of what the
+# statement handle keeps, as an iterator adds to it. The handle keeps no
+# more than $STUDIED statements, so statements made as the program runs
+# can't fill memory: when it has that many, it evicts $EVICTED of those
+# used least, as _evict says (roadmap 2026-0030).
 sub _study ($self, $statement, $attrs) {
     state $STUDIED = 1000;
     state $EVICTED = 125;

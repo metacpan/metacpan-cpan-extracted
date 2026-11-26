@@ -5,7 +5,7 @@
 # match the rule's domain; without a limit that is one lookup per name, each
 # for a distinct name and so each a cache miss resolved upstream.
 
-use Test2::V0;
+use Test2::V0 -no_srand;
 
 use Net::DNS::Resolver::Mock;
 

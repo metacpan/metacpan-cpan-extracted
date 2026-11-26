@@ -6,7 +6,7 @@
 # bad_robot turns into a true answer.  KNOWN ISSUES records that robot rDNS
 # "may randomly fail", so this is not a rare input.
 
-use Test2::V0;
+use Test2::V0 -no_srand;
 
 use Net::DNS::Resolver::Mock;
 

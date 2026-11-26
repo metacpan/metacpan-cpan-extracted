@@ -59,6 +59,7 @@ t/27-sinks.t
 t/28-tooling.t
 t/29-objects.t
 t/30-execute-array.t
+t/31-versions.t
 xt/ekorn-tooling.t
 xt/examples.t
 xt/manuals.t

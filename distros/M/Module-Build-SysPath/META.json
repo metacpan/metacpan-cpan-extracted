@@ -46,7 +46,7 @@
    "provides" : {
       "Module::Build::SysPath" : {
          "file" : "lib/Module/Build/SysPath.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/jozef/Module-Build-SysPath"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

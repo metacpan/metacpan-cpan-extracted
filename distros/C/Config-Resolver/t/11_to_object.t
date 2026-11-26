@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use Data::Dumper;
@@ -19,7 +15,7 @@ subtest 'Test Case: Valid JSON' => sub {
   my $expected = { foo => 'bar', baz => [1] };
 
   # Call the sub directly in its package
-  my $result = CLI::Config::Resolver::to_object($content);
+  my $result = Config::Resolver::CLI::to_object($content);
   is_deeply( $result, $expected, 'Correctly parses JSON string' );
 };
 
@@ -30,7 +26,7 @@ subtest 'Test Case: Valid YAML' => sub {
   my $content  = "---\nfoo: bar\nbaz: 1\n";
   my $expected = { foo => 'bar', baz => 1 };
 
-  my $result = CLI::Config::Resolver::to_object($content);
+  my $result = Config::Resolver::CLI::to_object($content);
   is_deeply( $result, $expected, 'Correctly falls back to parsing YAML' );
 };
 
@@ -40,7 +36,7 @@ subtest 'Test Case: Valid INI' => sub {
   my $content  = "foo = bar\n[section]\nbaz = buz\n";
   my $expected = { foo => 'bar', section => { baz => 'buz' } };
 
-  my $result = CLI::Config::Resolver::to_object($content);
+  my $result = Config::Resolver::CLI::to_object($content);
   is_deeply( $result, $expected, 'Correctly falls back to parsing INI' );
 };
 
@@ -48,7 +44,7 @@ subtest 'Test Case: Valid INI' => sub {
 subtest 'Test Case: Plain text' => sub {
   my $content = "this is just a string";
 
-  my $result = CLI::Config::Resolver::to_object($content);
+  my $result = Config::Resolver::CLI::to_object($content);
   is( $result, undef, 'Correctly returns undef for plain text' );
 };
 

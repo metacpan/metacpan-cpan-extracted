@@ -1,141 +1,72 @@
 Revision history for Perl extension BoardStreams
 
-v0.0.36 2023-02-28T10:02:17Z
+v0.0.56 2026-11-25T15:18:08Z
 
-    - fixed important bug
+    - Server and clients now check a protocol version in place of the
+      library version: a whole number, BoardStreams::PROTOCOL_VERSION,
+      currently 1, which goes up only when a release makes the protocol
+      incompatible with earlier ones. Library versions no longer have to
+      match. The first heartbeat announces it as "protocol", and the
+      reason for a refusal is now "protocol_mismatch"
+    - INCOMPATIBLE: because the announcement itself changed, this release
+      does not work with clients or servers of v0.0.55 and earlier
 
-v0.0.35 2023-02-27T19:22:45Z
+v0.0.55 2026-11-25T14:20:08Z
 
-    - lock_stream_p now optionally accepts more than one stream
+    - Added BoardStreams::Client, a Perl client that is a port of the
+      JavaScript one: it connects over a WebSocket with Mojo::UserAgent
+      and exposes channels through RxPerl observables and Mojo promises
 
-v0.0.34 2023-02-16T19:00:26Z
+v0.0.54 2026-11-25T07:27:20Z
 
-    - fixed important bug
+    - A process announces the schema version it works with, and a process
+      whose code only knows an older one stops serving when it hears that,
+      instead of going on using upgraded tables the old way
+    - Kicks, deletions and these announcements are now confined to the
+      PostgreSQL schema that holds the tables, so that applications
+      sharing a database no longer hear each other's
 
-v0.0.33 2023-02-15T15:55:31Z
+    - Added delete_channel, which deletes a channel's state and history
+      and removes its members, telling them
+    - Schema version 2, applied automatically: bs_event and bs_request now
+      reference bs_channel with "on delete cascade" (rows left over from
+      channels deleted by hand are removed by the migration), and a new
+      table bs_floor keeps sequence numbers of deleted channels from
+      being reused. New channels therefore no longer necessarily start
+      at sequence number 0
 
-    - fixed minor bug
+v0.0.53 2026-11-25T01:04:49Z
 
-v0.0.32 2023-02-01T13:13:48Z
+    - Added kick_all, which removes every member from a channel
 
-    - updated to allow running with RxPerl v6.18.0
+v0.0.52 2026-11-24T23:30:32Z
 
-v0.0.31 2023-01-22T22:04:48Z
+    - A server process that cannot receive PostgreSQL notifications now
+      closes all its WebSocket connections and refuses new ones until it
+      can, instead of keeping browsers connected and catching up later.
+      It checks every listener_check_interval seconds (new option,
+      default 5) that notifications still arrive. A PostgreSQL restart is
+      therefore visible to browsers as a disconnection
 
-    - allow { limit => 'all' } in join handler return value
+    - Added kick and disconnect, on the hub (for all of a user's browsers,
+      across server processes) and on the handler context (for the browser
+      being served), and the "identify" plugin option that tells users
+      apart. The JavaScript client does not reconnect after a disconnect
 
-v0.0.30 2023-01-09T23:37:24Z
+v0.0.51 2026-11-24T21:34:41Z
 
-    - added version numbers to all modules of the distro
+    - The first heartbeat of a connection now announces the version, and
+      the JavaScript client refuses to work with a server of any other
+      version (reason "version_mismatch"). Clients older than this change
+      are not affected by it
 
-v0.0.29 2023-01-09T16:52:45Z
+    - Added the lazy_migrate plugin option, which postpones creating the
+      tables until they are first needed
+    - The tables are now also created on first use if PostgreSQL could not
+      be reached at startup and update() is called before any browser
+      connects
 
-    - complete rewrite, completely breaking backwards compatibility
-
-v0.0.23 2021-09-08T23:14:09Z
-
-    - upgraded version of Mojo::Pg dependency to 4.26, and removed
-      some previously necessary, inefficient code
-    - increased efficiency of Perl client, with op_share
-
-v0.0.22 2021-02-28T03:24:32Z
-
-    - perl client also pings the server
-
-v0.0.21 2021-02-21T18:21:32Z
-
-    - client pings the server, not the opposite
-
-v0.0.20 2021-02-20T18:16:37Z
-
-    - changed cleanup sub's parameters
-
-v0.0.19 2021-02-20T13:42:48Z
-
-    - workaround for upstream database issue
-
-v0.0.18 2021-02-20T03:19:11Z
-
-    - action, request, leave handlers require client to have joined
-    - subsequent joins do not execute the join handler
-    - create_channel returns false if channel already existed
-    - allow lock_state when IOLoop is not running
-    - more efficient global_cleanup
-
-v0.0.17 2021-02-18T04:32:19Z
-
-    - added cleanup_interval config option
-    - patchState (and patch_state) do nothing if diff is null/undefined
-    - changed meaning of heartbeat_timeout
-    - fixed race condition in global_cleanup method
-
-v0.0.16 2021-02-16T20:53:00Z
-
-    - fixed bug where Perl client had trouble processing nonref state
-
-v0.0.15 2021-02-15T12:44:55Z
-
-    - fixed missing dependency
-    - upped dependency on Mojo::Pg
-
-v0.0.14 2021-02-12T10:48:26Z
-
-    - circumvention of an upstream database issue
-
-v0.0.13 2021-02-10T17:41:31Z
-
-    - added begin and $tx->lock_state methods
-    - removed no_txn option from lock_state
-    - fixed bug that could cause incosistency
-
-v0.0.12 2021-02-10T12:04:27Z
-
-    - get_state returns undef if channel does not exist
-    - renamed add_action, add_request helper methods to on_action and on_request
-    - removed warning when attempting to join a channel that does not exist
-
-v0.0.11 2021-02-06T13:53:03Z
-
-    - added channel option to not store events in db
-    - added bs.delete_events helper
-
-v0.0.10 2021-02-05T14:52:54Z
-
-    - more resilient handling of disconnect from Pg
-    - removed dependency to CryptX
-
-v0.0.9 2021-02-02T08:09:17Z
-
-    - allow multiple events per lock_state
-    - optimized delivery speed of large messages from server
-    - $client = BoardStreams::Client->new instead of BoardStreams::Client::Manager->new
-    - fixed bug in message-splitting algorithm
-
-v0.0.8 2021-01-31T16:45:41Z
-
-    - overcame MOJO_MAX_WEBSOCKET_SIZE limit for server-to-client messages
-
-v0.0.7 2021-01-31T06:21:58Z
-
-    - fixed potential synchronicity issue
-
-v0.0.6 2021-01-30T11:40:02Z
-
-    - overcame pg notify payload size limit
-
-v0.0.5 2021-01-30T04:40:19Z
-
-    - added $VERSION package var everywhere
-
-v0.0.4 2021-01-30T04:23:14Z
-
-    - various improvements
-
-v0.0.3 2021-01-22T20:36:06Z
-
-    - renamed exception classes
-
-v0.0.2 2021-01-21T21:32:18Z
+v0.0.50 2026-11-24T18:39:51Z
 
     - original version
 

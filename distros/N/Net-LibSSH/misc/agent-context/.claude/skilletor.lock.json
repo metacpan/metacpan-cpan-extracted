@@ -1,0 +1,142 @@
+{
+  "rules/agent-delegation": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.agent-delegation.md": "sha256:8bf456d1ba6af3b52280a249691b23147056e5dbf78c239341c933d1aa8b7859"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/board-karr": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.board-karr.md": "sha256:d2625183700555025909df0868acfd8b9a8ca87f488459889a671114bcffe417"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/engineering-discipline": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.engineering-discipline.md": "sha256:177d01585bdd5fa273685e3f65aeafe9d8c0d2fdfaa94916f9f6fa74234615b8"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/getty-cpan-release": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.getty-cpan-release.md": "sha256:f0a3fb481dc5ca68179b17eaf36a85f76c5b709fd66e1b9bbb19f500f7189738"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/publish-gate": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.publish-gate.md": "sha256:c0546fba12454e42a0ba791dfa69f1489bd951e24105dae3cfd04a058fafba50"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "skills/getty-git-commit-style": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-commit-style/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-commit-style/SKILL.md": "sha256:963737950246919ce106a36f26b7350c6830975e7d6539b05cb17a6bf89c0e35"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "skills/getty-git-usage": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-usage/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-usage/SKILL.md": "sha256:5223f6a93e947b5a7b554141235fc663da3f093c6d1e7c57501a0f9de7c4688a"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "skills/getty-perl-core": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-core/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-core/SKILL.md": "sha256:204d50a28c1c8216845efc649aa7e4c0184c61c57aa0c72cc1898ce2889d7ed1",
+      "skills/getty-perl-core/references/dbic.md": "sha256:ab308272fa65891d02fa1a36326f6fe7c5972ce95fa4323c1cb36e08cf519627"
+    }
+  },
+  "skills/getty-perl-pod": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-pod/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-pod/SKILL.md": "sha256:1d581608ebe7341dbbc69c5b3a70b3645d6f1eb810ba2a9555ee920d252b9f8f"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "skills/getty-perl-release-author-getty": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-release-author-getty/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-release-author-getty/SKILL.md": "sha256:0425dd6bfc3c2ac53d73625b8b96ca0cfb9f3dbae913810af3672b44691c4052",
+      "skills/getty-perl-release-author-getty/references/bundle-options.md": "sha256:fd2e147f125607d747ca4e94756a04fffd5ffedffb41ce50f0676e5cb19520a0",
+      "skills/getty-perl-release-author-getty/references/license.md": "sha256:a74b6496b2400cb854123e0aae128a75764e905b2046fba6f32c080825514cca"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "skills/kanban-issues-karr-coordination": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-coordination/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-coordination/SKILL.md": "sha256:9e7bbe5bd7089a73a816a346fd811970a224c95cec1b43ecc06d6925660955a6",
+      "skills/kanban-issues-karr-coordination/references/cards.md": "sha256:ed1ed17fdffa756e8ee8ff5d72a3a22c3e414abdaadc9b0fc0ba08e176d95340",
+      "skills/kanban-issues-karr-coordination/references/claims.md": "sha256:81459998fe329f30bc6c10fcf750955fa2b6134e13093e59df5970c335e3aadb",
+      "skills/kanban-issues-karr-coordination/references/config.md": "sha256:1220e5d2069af5b760fc76572dbedeccda00f0ee51c3c770040a454671c15430",
+      "skills/kanban-issues-karr-coordination/references/cross-board.md": "sha256:7ece9e04470ebcd738dbd20b4ea372cbb730de10af27ab33ce0eb068be453a8d",
+      "skills/kanban-issues-karr-coordination/references/queries.md": "sha256:0c4c38c7aa36f050a61f4abdc79a2531b58b0148e57ca9e56581a31a5e9d63c8",
+      "skills/kanban-issues-karr-coordination/references/setup.md": "sha256:d90667962ec6301eb994d5a463f9441979711c031e67073dac3f98d584983a61",
+      "skills/kanban-issues-karr-coordination/references/storage.md": "sha256:48d1b3666639afc7ef7b4c88355433111e878b65598b072bfdbaba8bc823c763"
+    }
+  },
+  "skills/kanban-issues-karr-ticket": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-ticket/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-ticket/SKILL.md": "sha256:de4fc9e5abf481fbd7df727cc909a4ee37abaf7bdde27edf57d0fd8cf5e73825"
+    }
+  },
+  "skills/perl-xs": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/perl-xs/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/perl-xs/SKILL.md": "sha256:64f041e1df862637ea30e67e48501767446d10784a6f9429b03c7c319b4e128e",
+      "skills/perl-xs/references/build-and-test.md": "sha256:9cd36303ea776eb58e1407f0395cdf434b4d0594615c69bad8987d26ded69481",
+      "skills/perl-xs/references/objects-and-memory.md": "sha256:3ecfd1650a69b0fbb809a7fae278e98119eea419006f956b8e4d25e282f5b610",
+      "skills/perl-xs/references/typemap.md": "sha256:7e6156acac9837be69bd4dfd8f999c4a3b4a49b8f3bddb35a838904ed99c1203",
+      "skills/perl-xs/references/xsub-anatomy.md": "sha256:78bae981f79e359bd40f591eaefbf29fcad4c589ef31ba3c998511777ddbd975"
+    }
+  }
+}

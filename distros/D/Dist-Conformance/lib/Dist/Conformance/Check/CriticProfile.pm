@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::CriticProfile 0.008;
+package Dist::Conformance::Check::CriticProfile 0.011;
 
 # ABSTRACT: The perlcritic profile is its template, with the overrides of the repository
 
@@ -6,7 +6,7 @@ use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
 no autovivification;
-use Mojo::Base 'Dist::Conformance::Check', -signatures;
+use Mojo::Base 'Dist::Conformance::Check::IniTemplate', -signatures;
 
 use Config::Tiny();
 
@@ -68,24 +68,38 @@ sub parameter_of ($line) {
 
 
 sub rewrite ( $lines, $overlay ) {
-    my ( @out, %seen, $after );
-    for my $line (@$lines) {
-        my ($key) = parameter_of($line);
-        my $kept = $line;
-        if ( defined $key && exists $overlay->{$key} ) {
-            $seen{$key} = 1;
-            next if !defined $overlay->{$key};
-            $kept = "$key = $overlay->{$key}\n";
-        }
-        push @out, $kept;
-        $after = scalar @out if defined $key;
-    }
-    my @new = map { "$_ = $overlay->{$_}\n" } grep { !$seen{$_} && defined $overlay->{$_} } sort keys %$overlay;
-    splice @out, $after // 0, 0, @new;
-    return @out;
+    return __PACKAGE__->rewrite_lines( $lines, $overlay );
 }
 
+# How Perl::Critic reads a line, a section and a profile, for
+# L<Dist::Conformance::Check::IniTemplate>.
+sub line_header    ( $, $line )    { return header_of($line) }
+sub line_parameter ( $, $line )    { return parameter_of($line) }
+sub section_of     ( $, $header )  { return policy_of($header) }
+sub on_header      ( $, $name, $ ) { return "[$name]\n" }
+sub comment ($)                { return q{#} }
+sub parse ( $, $text, $where ) { return profile_of( $text, $where ) }
 
+# A policy that an override turns off keeps its section, as C<[-Name]>, with
+# its parameters removed.
+sub off_lines ( $, $name, $body ) {
+    my %gone;
+    for my $line (@$body) {
+        my ($key) = parameter_of($line);
+        $gone{$key} = undef if defined $key;
+    }
+    return ( "[-$name]\n", rewrite( $body, \%gone ) );
+}
+
+sub compare ( $self, $text, $want ) {
+    my ( $file, $template ) = @{ $self->config }{qw{file template}};
+    return differences( profile_of( $text, $file ), profile_of( $want, $template ) );
+}
+
+# The entries of C<overrides>, by the short name of each policy.
+# @returns HashRef  from the name of each policy to C<off> or its parameters
+# @throws  on a name that is not that of a policy, and on two entries for one policy
+# @example my $overrides = $check->overrides;
 sub overrides ($self) {
     my %overrides;
     for my $given ( sort keys %{ $self->config->{overrides} } ) {
@@ -97,57 +111,21 @@ sub overrides ($self) {
     return \%overrides;
 }
 
-
-sub expected ($self) {
-    my $template = $self->config->{template};
-    my ( $text, @unfilled ) = $self->template($template);
-    die( "$template needs the variables " . join( ', ', @unfilled ) . " in .conformance.yml: nothing sets them\n" ) if @unfilled;
-    my $standard = profile_of( $text, $template )->{policies};
-    my $given    = $self->overrides;
+# The entries of C<overrides>, by the full name of each policy, as the
+# template C<$standard> names it.
+# @param   standard  HashRef  the template, as L<profile_of|/"profile_of($text, $where)"> returns it
+# @returns HashRef  from the name of each policy to C<off> or its parameters
+# @throws  on a name that is not that of a policy, and on two entries for one policy
+# @example my $overrides = $check->resolved_overrides($standard);
+sub resolved_overrides ( $self, $standard ) {
+    my $given = $self->overrides;
     my %overrides;
     for my $as ( sort keys %$given ) {
-        my $name = full_name( $as, $standard );
+        my $name = full_name( $as, $standard->{policies} );
         die "overrides names the policy $name twice\n" if exists $overrides{$name};
         $overrides{$name} = $given->{$as};
     }
-    my $overrides = \%overrides;
-
-    $text .= "\n" if $text =~ m/[^\n]\z/;
-    my @lines   = split /^/, $text;
-    my @headers = grep { defined header_of( $lines[$_] ) } 0 .. $#lines;
-    my @bodies  = ( [ 0, $headers[0] // scalar @lines ] );
-    push @bodies, map { [ $headers[$_] + 1, $headers[ $_ + 1 ] // scalar @lines ] } 0 .. $#headers;
-
-    my @out = rewrite( [ @lines[ $bodies[0][0] .. $bodies[0][1] - 1 ] ], $self->config->{settings} );
-    my %named;
-    for my $i ( 0 .. $#headers ) {
-        my $name = ( policy_of( header_of( $lines[ $headers[$i] ] ) ) )[1];
-        my @body = @lines[ $bodies[ $i + 1 ][0] .. $bodies[ $i + 1 ][1] - 1 ];
-        my $want = $overrides->{$name};
-        $named{$name} = 1;
-        if ( !defined $want ) {
-            push @out, $lines[ $headers[$i] ], @body;
-        }
-        elsif ( $want eq 'off' ) {
-            my %gone;
-            for my $line (@body) {
-                my ($key) = parameter_of($line);
-                $gone{$key} = undef if defined $key;
-            }
-            push @out, "[-$name]\n", rewrite( \@body, \%gone );
-        }
-        else {
-            push @out, "[$name]\n", rewrite( \@body, $want );
-        }
-    }
-
-    my @own = grep { !$named{$_} } sort keys %$overrides;
-    push @out, "\n# The overrides of .conformance.yml\n" if @own;
-    for my $name (@own) {
-        my $want = $overrides->{$name};
-        push @out, ref $want ? ( "[$name]\n", rewrite( [], $want ) ) : "[-$name]\n";
-    }
-    return join q{}, @out;
+    return \%overrides;
 }
 
 
@@ -173,26 +151,6 @@ sub differences ( $have, $want ) {
     }
     push @differences, 'sets other global settings' if !$same->( $have->{settings}, $want->{settings} );
     return @differences;
-}
-
-
-sub check ( $self, $snapshot ) {
-    my ( $file, $template ) = @{ $self->config }{qw{file template}};
-    my $text = $snapshot->content($file) // return ( 'fail', "$file is missing" );
-    my $want = $self->expected;
-    return ( 'pass', "is $template with the overrides" ) if $text eq $want;
-    my $have        = eval { profile_of( $text, $file ) } // return ( 'fail', Dist::Conformance::Schema::first_line($@) . ', and conformance update replaces it' );
-    my @differences = differences( $have, profile_of( $want, $template ) );
-    return ( 'info', "differs from $template with the overrides only in comments and layout, which conformance update rewrites" ) if !@differences;
-    return ( 'fail', join( '; ', @differences ) . ', which conformance update corrects' );
-}
-
-
-sub update ( $self, $update ) {
-    my $want = eval { $self->expected };
-    return $update->by_hand( Dist::Conformance::Schema::first_line($@) . ': ' . $self->name . ' cannot write ' . $self->config->{file} ) if !defined $want;
-    $update->write( $self->config->{file}, $want );
-    return;
 }
 
 
@@ -251,7 +209,7 @@ Dist::Conformance::Check::CriticProfile - The perlcritic profile is its template
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -293,6 +251,14 @@ override changes stays on its line, a new parameter goes after the last
 parameter of its section, and a policy that the template does not name goes at
 the end of the file.
 
+The check passes when the profile is the text that the template and the
+overrides make.  It reports C<info> when the profile differs from that text
+only in comments and layout, so that Perl::Critic reads both the same.  It
+fails when the profile is missing, does not parse, or makes Perl::Critic read
+other policies, parameters or settings, and the detail names each difference.
+
+The update writes that text to the profile when the file differs from it.
+
 The check passes when the profile is that text.  It fails when the file is
 missing, and when it differs in what Perl::Critic reads: a policy that it
 lacks, a policy that neither the template nor the overrides name, a policy
@@ -305,98 +271,207 @@ parameter, every profile that does not follow fails, and the update brings it
 along.  A policy that the template drops leaves every profile, unless an
 override names it.
 
+L<Dist::Conformance::Check::IniTemplate> writes the text, and this check tells
+it how Perl::Critic reads a profile: a section is a policy, C<[-Name]> turns it
+off, and a comment starts with C<#> or C<;>.
+
 The update writes the text whenever the file differs from it, also in the
 comments.  It replaces whatever the file had, so run C<conformance adopt>
 before the first update of a profile that has changes of its own.  See
-L</adopt>.  A template with a placeholder that nothing fills is not written:
+L<adopt|/"adopt($snapshot)">.  A template with a placeholder that nothing fills is not written:
 the update says which variables it needs.
 
 =head1 METHODS
 
+=head2 adopt($snapshot)
+
+The C<overrides> and C<settings> that make L<expected|Dist::Conformance::Check::IniTemplate/"expected($snapshot)"> read as the profile in
+C<$snapshot> reads now.  A policy that the template names and the profile
+lacks is not adopted: the profile lacked it because the template gained it
+later.  A policy that the profile names by the last parts of a name that the
+template gives in full, such as C<ProhibitLeadingZeros> for
+C<Plicease::ProhibitLeadingZeros>, is the policy of the template, as
+Perl::Critic reads it, and is adopted by the full name.
+
+=over 4
+
+=item snapshot - InstanceOf["Dist::Conformance::Snapshot"] - the repository
+
+=back
+
+Returns HashRef or undef: the keys that hold something, C<undef> when the
+profile needs neither key, and nothing when the profile is missing.
+
+Dies when either the profile or the template does not parse, and when a
+placeholder has no variable.
+
+    my $keys = $check->adopt($snapshot);
+
 =head2 overrides
 
-The entries of C<overrides>, by the short name of each policy.  Dies on a name
-that is not that of a policy, and on two entries for one policy.
+The entries of C<overrides>, by the short name of each policy.
 
-=head2 expected
+Returns HashRef, from the name of each policy to C<off> or its parameters.
 
-The text that the profile must be: the template, its placeholders filled in,
-with the overrides and the settings applied, as L</DESCRIPTION> says.  Dies
-when a placeholder has no variable, and when the template does not parse.
+Dies on a name that is not that of a policy, and on two entries for one policy.
 
-=head2 check
+    my $overrides = $check->overrides;
 
-C<($snapshot)>.  The status and the detail that L</DESCRIPTION> says, for the
-profile in C<$snapshot>.
+=head2 resolved_overrides(standard)
 
-=head2 update
+The entries of C<overrides>, by the full name of each policy, as the template C<$standard> names it.
 
-Writes L</expected> to the profile when the file differs from it.
+=over 4
 
-=head2 adopt
+=item standard - HashRef - the template, as L<profile_of|/"profile_of($text, $where)"> returns it
 
-C<($snapshot)>.  The C<overrides> and C<settings> that make L</expected> read
-as the profile in C<$snapshot> reads now, as a hash reference with the keys
-that hold something.  Nothing when the profile is missing, or needs neither.
-A policy that the template names and the profile lacks is not adopted: the
-profile lacked it because the template gained it later.  A policy that the
-profile names by the last parts of a name that the template gives in full,
-such as C<ProhibitLeadingZeros> for C<Plicease::ProhibitLeadingZeros>, is the
-policy of the template, as Perl::Critic reads it, and is adopted by the full
-name.  Dies when either does
-not parse, and when a placeholder has no variable.
+=back
+
+Returns HashRef, from the name of each policy to C<off> or its parameters.
+
+Dies on a name that is not that of a policy, and on two entries for one policy.
+
+    my $overrides = $check->resolved_overrides($standard);
 
 =head1 FUNCTIONS
 
-=head2 policy_of
+=head2 policy_of($section)
 
-C<($section)>.  Whether the header C<$section> of a profile turns its policy
-off, and the short name of the policy.
+Whether the header C<$section> of a profile turns its policy off, and the
+short name of the policy, without C<Perl::Critic::Policy::>.
 
-=head2 profile_of
+=over 4
 
-C<($text, $where)>.  What Perl::Critic reads from the profile C<$text>, as a
-hash reference: C<settings>, the global settings, and C<policies>, from the
-short name of each policy that a section names to a hash reference with C<off>,
-whether it turns the policy off, and C<parameters>.  Dies, naming C<$where>,
-when it does not parse.
+=item section - Str - the header, without its brackets
 
-=head2 header_of
+=back
 
-C<($line)>.  The section that the line C<$line> of a profile starts, as
-L<Config::Tiny> reads it, with its inline C< ; > comment: C<undef> when it
-starts none.
+Returns a boolean and the name, as a list.
 
-=head2 parameter_of
+    my ( $off, $name ) = policy_of('-Perl::Critic::Policy::Variables::ProhibitPunctuationVars');
 
-C<($line)>.  The key and the value that the line C<$line> of a profile sets, as
-L<Config::Tiny> reads them, or nothing for a line that sets none.
+=head2 profile_of($text, $where)
 
-=head2 rewrite
+What Perl::Critic reads from the profile C<$text>.
 
-C<(\@lines, \%overlay)>.  The lines C<@lines> of a section, without its
-header, with the parameters of C<%overlay> over theirs: a key that it sets to
-a value has that value on its line, a key that it sets to C<undef> loses its
-line, and a key that the lines lack gets a line after their last parameter, or
-first when they have none.  The other lines stay as they were.
+=over 4
 
-=head2 differences
+=item text - Str - the profile
 
-C<($have, $want)>.  How the profile C<$have> differs from C<$want>, both as
-L</profile_of> returns them, as phrases for a person.  Empty when Perl::Critic
-reads both the same.
+=item where - Str - names the profile in an error
 
-=head2 full_name
+=back
 
-C<($name, \%policies)>.  The name in C<%policies> that ends with C<::$name>,
-when C<$name> is not a key there and exactly one name ends so.  C<$name>
-otherwise.
+Returns HashRef, with C<settings>, the global settings, and C<policies>, from
+the short name of each policy that a section names to a hash reference with
+C<off>, whether it turns the policy off, and C<parameters>.
 
-=head2 overlay
+Dies, naming C<$where>, when the text does not parse.
 
-C<(\%from, \%to)>.  The overlay that turns the parameters C<%from> into C<%to>:
-each key of C<%to> whose value differs, and C<undef> for each key that only
-C<%from> has.
+    my $profile = profile_of( "severity = 3\n[-Variables::ProhibitPunctuationVars]\n", '.perlcriticrc' );
+
+=head2 header_of($line)
+
+The section that the line C<$line> of a profile starts, as L<Config::Tiny>
+reads it, with its inline C< ; > comment.
+
+=over 4
+
+=item line - Str - one line of a profile
+
+=back
+
+Returns Str, the header without its brackets, or C<undef> when the line starts
+no section.
+
+    my $header = header_of("[Variables::ProhibitPunctuationVars] ; a comment\n");
+
+=head2 parameter_of($line)
+
+The key and the value that the line C<$line> of a profile sets, as
+L<Config::Tiny> reads them.
+
+=over 4
+
+=item line - Str - one line of a profile
+
+=back
+
+Returns the key and the value, as a list, or an empty list for a line that
+sets none, such as a comment.
+
+    my ( $key, $value ) = parameter_of("severity = 3\n");
+
+=head2 rewrite(\@lines, \%overlay)
+
+The lines C<@lines> of a section, without its header, with the parameters of
+C<%overlay> over theirs: a key that it sets to a value has that value on its
+line, a key that it sets to C<undef> loses its line, and a key that the lines
+lack gets a line after their last parameter, or first when they have none.
+The other lines stay as they were.
+
+=over 4
+
+=item lines - ArrayRef[Str] - the lines of the section, each with its newline
+
+=item overlay - HashRef - from each key to its new value, or to C<undef>
+
+=back
+
+Returns the new lines, as a list.
+
+    my @lines = rewrite( [ "# a comment\n", "max = 3\n" ], { max => 5 } );
+
+=head2 differences($have, $want)
+
+How the profile C<$have> differs from C<$want>, as phrases for a person.
+
+=over 4
+
+=item have - HashRef - the profile that the repository has, as L<profile_of|/"profile_of($text, $where)"> returns it
+
+=item want - HashRef - the profile that it must have, as L<profile_of|/"profile_of($text, $where)"> returns it
+
+=back
+
+Returns the phrases, as a list, which is empty when Perl::Critic reads both
+the same.
+
+    my @differences = differences( profile_of( $text, $file ), profile_of( $expected, $template ) );
+
+=head2 full_name($name, \%policies)
+
+The name in C<%policies> that ends with C<::$name>, when C<$name> is not a key
+there and exactly one name ends so.
+
+=over 4
+
+=item name - Str - the name of a policy, maybe its last parts only
+
+=item policies - HashRef - keyed by the names of the policies of a profile
+
+=back
+
+Returns Str, that name, or else C<$name>.
+
+    my $name = full_name( 'ProhibitLeadingZeros', $profile->{policies} );
+
+=head2 overlay(\%from, \%to)
+
+The overlay that turns the parameters C<%from> into C<%to>: each key of
+C<%to> whose value differs, and C<undef> for each key that only C<%from> has.
+
+=over 4
+
+=item from - HashRef - the parameters to start from
+
+=item to - HashRef - the parameters to end with
+
+=back
+
+Returns HashRef, the overlay, as L<rewrite|/"rewrite(\@lines, \%overlay)"> takes it.
+
+    my $overlay = overlay( { max => 3, min => 1 }, { max => 5 } );
 
 =head1 IN A FLAVOR
 

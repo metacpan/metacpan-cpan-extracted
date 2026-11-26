@@ -11,7 +11,7 @@ use Plack::Builder;
 use Plack::Test;
 use Plack::Session::State::Cookie;
 
-use FindBin::libs;
+use lib 't/lib';
 use Test::XSRFBlock::App;
 use Test::XSRFBlock::Util ':all';
 

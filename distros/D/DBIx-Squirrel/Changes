@@ -2,6 +2,81 @@ Revision history for DBIx-Squirrel
 
 Unreleased
 
+v4.1.1 2026-11-26
+
+    Documentation only: the reference's index lists the names
+    DBIx::Squirrel::Tooling exports from Ekorn::Pipeline.
+
+    It ships roadmap 2026-0051. The code is v4.1.0's, but for each
+    module's version. Requires Ekorn::Pipeline >= v0.4.0, < v0.5.0, as
+    before.
+
+    - The reference's index has an entry, under
+      DBIx::Squirrel::Tooling, for each of the 25 names it exports from
+      Ekorn::Pipeline's modules: its sources, sinks, JSON and CSV, and
+      its words, such as pipeline, generator and yield. Each says what
+      it does and which module it's from, and links to where this
+      reference or Ekorn's shows it in use (roadmap 2026-0051).
+
+v4.1.0 2026-11-25
+
+    An iterator's all_arrayref, which always gives an array reference,
+    as Ekorn::Pipeline's iterator's does.
+
+    It ships roadmap 2026-0050, from a message of Ekorn-Pipeline's, and
+    2026-0029, which has CI scan for secrets with betterleaks in place
+    of gitleaks. Requires Ekorn::Pipeline >= v0.4.0, < v0.5.0, as
+    before.
+
+    - all_arrayref, on an iterator, returns the results still to come
+      as an array reference, whatever the context, so a hash
+      constructor, an argument list or a sub's return can't flatten
+      them, as all's list is; it matches Ekorn::Pipeline::Iterator's,
+      and needs no newer Ekorn::Pipeline (roadmap 2026-0050).
+
+v4.0.0 2026-11-25
+
+    Version 4: pipe gives what a pipeline gives, as in Ekorn::Pipeline
+    v0.4.0, now required; and a quality release, from a review.
+
+    It ships roadmap 2026-0048, from a task of Ekorn-Pipeline's, and
+    2026-0049, the fixes from a review of the code, tests and docs.
+    Requires Ekorn::Pipeline >= v0.4.0, < v0.5.0.
+
+    - pipe, on a database or statement handle, gives in scalar context
+      what a pipeline of the same stages gives: how many results, or a
+      sink's result, a list sink's as an array reference, and 1 with
+      no stages. It gave the first result, or undef. For one value,
+      read it in list context, my($first) = $dbh->pipe(...), or end
+      with keep_first (roadmap 2026-0048).
+    - Requires Ekorn::Pipeline v0.4.0 or later, below v0.5.0, for
+      pipe; v0.4.0 carries v0.3.16's fix, which passes a statement's
+      row to a pipeline reading a | chain made from its iterator, as
+      result_original (roadmap 2026-0048).
+    - Every module has a $VERSION, the distribution's, so a caller can
+      ask for one, as use DBIx::Squirrel::Tooling v4.0.0; a test keeps
+      them in step (roadmap 2026-0049).
+    - A select method whose values fail to bind, without RaiseError,
+      returns undef where it returns a reference, as when its
+      statement fails to prepare, not an empty list (roadmap
+      2026-0049).
+    - The reference has "Upgrading from 3.x", for pipe, and the README
+      and DBIx::Squirrel's POD say this is version 4 (roadmap
+      2026-0049).
+    - The iterator's POD and the reference give the measured figure
+      for a batch bigger than 64 rows: at most 7% faster, for narrow
+      rows (roadmap 2026-0049).
+    - Tests: a pipeline of your own reading a | chain made from an
+      iterator gets the row from result_original, as Context's POD
+      promises; prepare_cached keeps what was studied after a
+      subclass's prepare that skips DBIx::Squirrel's; the README's
+      examples compile (roadmap 2026-0049).
+    - Code: an unreachable return in the placeholders' values goes;
+      comments say "re-export", not "facade", give one figure for a
+      signature's cost, and are rewrapped where edits left them
+      short; one blank line above a commented sub, in tests and
+      scripts too (roadmap 2026-0049).
+
 v3.6.1 2026-11-24
 
     result_original is Ekorn::Pipeline's own, and a stage reading it

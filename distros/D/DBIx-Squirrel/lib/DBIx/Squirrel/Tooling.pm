@@ -28,6 +28,8 @@ use DBIx::Squirrel::Stages::Batch qw(:all);
 use DBIx::Squirrel::Stages::Taps  qw(:all);
 use DBIx::Squirrel::Stages::Rows  qw(:all);
 
+our $VERSION = 'v4.1.1';
+
 our %EXPORT_TAGS = (
     core => [qw(Stop gather)],
     flow => [
@@ -62,7 +64,6 @@ our @EXPORT_OK = do {
 $EXPORT_TAGS{all} = [@EXPORT_OK];
 
 1;
-
 __END__
 
 =encoding utf8

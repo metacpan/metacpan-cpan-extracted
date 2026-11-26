@@ -15,6 +15,7 @@ getoptlong - Option parsing that does what you mean, for Bash
         [ optional | o ?                 # Optional ]=
         [ verbose  | v | ~q              # Deny     ]=
         [ array    | A @                 # Array    ]=
+        [ varargs  | V *                 # Varargs  ]=
         [ hash     | H %                 # Hash     ]=
         [ integer  | i :=i               # Integer  ]=1
         [ pattern  | p :=(^(fast|slow)$) # Regex    ]=fast
@@ -36,7 +37,7 @@ getoptlong - Option parsing that does what you mean, for Bash
 
 # VERSION
 
-2.0.0
+2.1.0
 
 # DESCRIPTION
 
@@ -121,10 +122,11 @@ The key format is:
 
     Argument type specifier:
 
-        (none) or +  Flag (counter)
+        + or (none)  Flag (counter)
         :            Required argument
         ?            Optional argument
         @            Array (multiple values)
+        *            Varargs array (up to --)
         %            Hash (key=value pairs)
 
 - **MOD (MODIFIER)**
@@ -220,6 +222,50 @@ To reset existing values: use `--no-include` on the command line
 (e.g., `--no-include --include /new/path`), or use `callback --before`
 to automatically reset before each new value.
 
+## VARARGS ARRAY (`*`)
+
+Takes a variable number of arguments, up to `--`, into an array.
+
+    [names|N*]=
+
+    $ script --names alice bob -- file
+    for name in "${names[@]}" ; do echo "$name" ; done    # alice, bob
+
+Every argument up to `--` is a value, as it is: one starting with
+`-` is not taken as an option, as in `--names a -x b --`, and one
+with a space is not split by `DELIM`.
+
+The `--` ends the arguments and is removed.  It is required: without
+it, parse fails, instead of taking the files after it by mistake.
+
+Ways to give the arguments:
+
+    --names a b --              a b        up to --
+    -N a b --                   a b        short form
+    --names --                  (none)     no arguments
+
+When the option and a value are given in one argument, in either form,
+only that value is taken, and `--` is not needed:
+
+    --names=value               value
+    -Nvalue                     value
+
+The `--` ends only the arguments: the options and files after it are
+parsed as usual.  To end the options too, write another `--`:
+
+    --names a b -- -- -file
+
+`--` itself cannot be one of the arguments.
+
+As with `@`, multiple specifications accumulate, `--no-names`
+empties the array, and a validation is applied to each argument.
+
+A callback is called once for the option, with all the arguments in
+place of the value; with no arguments, it gets only the option name:
+
+    callback names a 'b c'      # --names a 'b c' --
+    callback names              # --names --
+
 ## HASH (`%`)
 
 Collects `key=value` pairs into an associative array. Key without value
@@ -243,7 +289,8 @@ work the same way with pass-through options.
 Calls a function when the option is parsed. Default function name is the
 option name with hyphens converted to underscores; use `getoptlong callback`
 to specify a custom function. Can combine with any type (`+!`, `:!`,
-`?!`, `@!`, `%!`).
+`?!`, `@!`, `*!`, `%!`).  The `*` type gives all the arguments
+in place of the value, in one call.
 
     [action|a!]=        # Calls action() when specified
     [file|f:!]=         # Calls file() with argument
@@ -336,8 +383,9 @@ in comments when using regex validation.
 Validation occurs before the value is stored and normal callbacks are
 invoked; `--before` callbacks are called before validation.
 For array options, each element is validated; for hash options, each
-`key=value` pair is matched as a whole. A validation failure exits
-the script with an error message, regardless of `EXIT_ON_ERROR`.
+`key=value` pair is matched as a whole. A validation failure is a
+parse error, which exits the script unless `EXIT_ON_ERROR` is
+disabled (see ["getoptlong parse"](#getoptlong-parse)).
 
 # HELP MESSAGE
 
@@ -382,20 +430,29 @@ See ["CONFIGURATION"](#configuration) for available parameters.
 ## getoptlong parse
 
 Parse arguments. Always quote `"$@"`. On a parse error, such as an
-undefined option or a missing required argument, the script exits
-with an error message.
+undefined option, a missing required argument or a validation
+failure, the script exits with an error message.
 
     getoptlong parse "$@"
 
-To leave undefined options in the arguments instead, disable
-`EXIT_ON_ERROR` (see ["CONFIGURATION"](#configuration)).  They are kept with the
-non-option arguments, and `parse` returns 0.  A short option without
-its required argument is left as well.  A long option without its
-required argument and a validation failure still exit the script.
-Set `SILENT` to suppress the error messages of **getopts**.
+To handle the error in the script, disable `EXIT_ON_ERROR` (see
+["CONFIGURATION"](#configuration)).  Then `parse` stops at the first error, and
+returns 1 after the error message.  The arguments are left as they
+are; the options before the error have been set.  Set `SILENT` to
+suppress the error messages, and show your own.
 
     getoptlong configure EXIT_ON_ERROR= SILENT=1
-    getoptlong parse "$@"
+    getoptlong parse "$@" || { echo "see --help" >&2; exit 2; }
+    eval "$(getoptlong set)"
+
+In the one-liner form, the status of `parse` is the status of the
+`.` command:
+
+    . getoptlong.sh OPTS "$@" || exit 2
+
+Undefined options are not left in the arguments.  To leave the
+options of a subcommand to it, disable `PERMUTE`: `parse` stops at
+the first non-option argument, the name of the subcommand.
 
 ## getoptlong set
 
@@ -476,13 +533,15 @@ Configuration parameters can be specified either as arguments to
 - **EXIT\_ON\_ERROR**
 
     Exit immediately on parse error. Default: enabled.
-    Set to empty string to disable: undefined options are left in the
-    arguments (see ["getoptlong parse"](#getoptlong-parse)).  Note that `0` is not empty,
-    and does not disable it.
+    Set to empty string to disable: `parse` returns 1 on an error (see
+    ["getoptlong parse"](#getoptlong-parse)).  Note that `0` is not empty, and does not
+    disable it.
 
 - **SILENT**
 
-    Suppress error messages. Default: disabled.
+    Suppress the error messages of **getopts**, for short options.  With
+    `EXIT_ON_ERROR` disabled, suppress all the error messages of parsing.
+    Default: disabled.
     Set to non-empty value to enable.
 
 - **DEBUG**

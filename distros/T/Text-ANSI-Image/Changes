@@ -1,5 +1,14 @@
 Revision history for Perl extension Text-ANSI-Image
 
+0.02 2026-11-26T06:12:56Z
+
+    - The osc option puts a private OSC at the beginning of each row
+      of a kitty image, which tells the id, the size in cells and the
+      file of the image, for a program which draws the image itself,
+      as ansi2pdf
+    - The manual of ansipic tells the terminals that show images, and
+      gives -X to less
+
 0.01 2026-11-25T10:12:34Z
 
     - Text::ANSI::Image draws an image in the terminal as lines of

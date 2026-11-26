@@ -1,5 +1,13 @@
 Revision history for EV::Nats
 
+0.07  2026-11-25
+    - Fix timeouts armed after a blocking callback firing early; sockets
+      are close-on-exec.
+    - JetStream: cancellable fetch, ack/nak/in_progress/term, with_status;
+      fetch, js_publish_h and KV writes fail with "disconnected" when the
+      connection drops (their timeouts now read "request timeout").
+    - flush works while connecting; add hrequest, inbox_prefix, KV get_entry.
+
 0.06  2026-10-16
     - Fix TLS retries, reconnect teardown and callback ordering.
     - Report disconnected KV writes through callbacks and clean failed construction.

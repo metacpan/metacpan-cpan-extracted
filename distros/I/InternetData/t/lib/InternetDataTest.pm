@@ -27,6 +27,9 @@ sub batch_case {
     return $case;
 }
 
+# The flags a paid plan or the trial answers and Unlimited does not.
+our @PAID_FLAGS = qw(is_bot is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent);
+
 # An address's answer on Unlimited, every member the spec requires and nothing
 # more, so a test can vary the one member it is about.
 sub lookup {
@@ -34,10 +37,7 @@ sub lookup {
     return {
         ip => '9.9.9.9',
         is_bogon => false,
-        (map { ($_ => false) } qw(
-            is_tor is_relay is_bot is_anycast is_carrier is_satellite is_ssh is_smtp is_web
-            is_dns_resolver is_bittorrent
-        )),
+        (map { ($_ => false) } qw(is_tor is_relay is_anycast)),
         tor => {},
         relay => {},
         location => {

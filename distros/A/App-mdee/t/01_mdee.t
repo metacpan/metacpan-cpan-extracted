@@ -39,6 +39,10 @@ $ENV{XDG_CONFIG_HOME} = $empty_config;
 # Do not ask the terminal for its background color: the reply of a
 # busy terminal can come after termcolor gave up and shows up as input.
 $ENV{TERM_LUMINANCE} = 100;
+# Images are shown to a pipe, as the output of the tests: not on the
+# terminal the tests run in, unless a test asks for it
+delete @ENV{qw(TERM_PROGRAM TERM_PROGRAM_VERSION)};
+$ENV{TERM} = 'xterm-256color' if ($ENV{TERM} // '') eq 'xterm-kitty';
 
 # Check if mdee exists
 ok(-x $mdee, 'mdee is executable');
@@ -714,12 +718,36 @@ subtest q(runin and runout options) => sub {
     like($later, qr/debug: nup .*--runin=4 --runout=4/, q(--runlen overrides earlier --runout));
 };
 
+subtest q(image option) => sub {
+    my $out = `$mdee -n --image=png,svg $test_md 2>&1`;
+    isnt($? >> 8, 0, q(--image with an unknown type fails));
+    like($out, qr/svg/, q(the error names the type));
+    for my $opt ('--image', '--image=png', '--image=png,jpeg,gif', '--no-image') {
+	$out = `$mdee -n $opt $test_md 2>&1`;
+	is($? >> 8, 0, qq($opt is accepted));
+    }
+    $out = `$mdee --help 2>&1`;
+    like($out, qr/--\[no-\]image\[=/, q(--help shows the types of --image));
+
+    # shown to a pipe, which may go to a pager; not to a file, where
+    # the rows would stay without the image
+    local $ENV{TERM_PROGRAM} = 'ghostty';
+    $out = `$mdee -n --no-pager $test_md 2>&1`;
+    like($out, qr/image_types=png:jpeg:gif/, q(images are shown to a pipe));
+    my $file = "$empty_config/out";
+    system "$mdee -n --no-pager $test_md > $file 2>&1";
+    $out = do { open my $fh, '<', $file or die; local $/; <$fh> };
+    unlike($out, qr/image_types=/, q(images are not shown to a file));
+};
+
 # Test: output width option (-w) and --fold-width
 subtest q(refill option) => sub {
     my $out = `COLUMNS=200 $mdee -n --refill $test_md 2>&1`;
     like($out, qr/^greple .*refill=1/m, q(--refill passes refill=1 to the md module));
     $out = `COLUMNS=200 $mdee -n -r $test_md 2>&1`;
-    like($out, qr/^greple .*refill=1/m, q(-r is --refill));
+    like($out, qr/^greple .*refill=1/m, q(-r turns refill on by default));
+    $out = `COLUMNS=200 $mdee -n -rr $test_md 2>&1`;
+    unlike($out, qr/refill=/, q(-r twice gives the default back));
     $out = `COLUMNS=200 $mdee -n $test_md 2>&1`;
     unlike($out, qr/refill=/, q(refill is off by default));
     $out = `$mdee --help 2>&1`;
@@ -756,11 +784,32 @@ subtest q(refill option) => sub {
     like($out, qr/^greple .*refill=1/m, q(default[refill]=1 turns refill on));
     $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n --no-refill $test_md 2>&1`;
     unlike($out, qr/refill=/, q(--no-refill overrides default[refill]));
+    $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -r $test_md 2>&1`;
+    unlike($out, qr/refill=/, q(-r turns default[refill]=1 off));
+
+    # --refill, --no-refill and -r in any order: the last of --refill
+    # and --no-refill takes effect, and -r, the reverse of the default,
+    # only when neither is given
+    for my $default (0, 1) {
+	my %env = (XDG_CONFIG_HOME => $default ? $tmpdir : tempdir(CLEANUP => 1));
+	for my $seq ('--refill -r', '-r --refill', '--no-refill -r', '-r --no-refill',
+		     '--refill -r --refill', '--no-refill -r -r', '-r -r', '-r -r -r',
+		     '-r --refill -r --no-refill -r', '--refill --no-refill -r') {
+	    my($given) = reverse grep { /^--/ } split ' ', $seq;
+	    my $on = $given ? $given eq '--refill' : (() = $seq =~ /(?<!-)-r\b/g) % 2 ? !$default : $default;
+	    $out = `XDG_CONFIG_HOME=$env{XDG_CONFIG_HOME} COLUMNS=200 $mdee -n $seq $test_md 2>&1`;
+	    my $name = "default $default, $seq: " . ($on ? 'on' : 'off');
+	    $on ? like($out, qr/^greple .*refill=1/m, $name) : unlike($out, qr/refill=/, $name);
+	}
+    }
     open $fh, q(>), "$tmpdir/mdee/config.sh" or die;
-    print $fh "default[refill]=0\n";
+    # a flag of getoptlong: empty is off, as --no-refill makes it
+    print $fh "default[refill]=\n";
     close $fh;
     $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n $test_md 2>&1`;
-    unlike($out, qr/refill=/, q(default[refill]=0 leaves refill off));
+    unlike($out, qr/refill=/, q(default[refill]= leaves refill off));
+    $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -r $test_md 2>&1`;
+    like($out, qr/^greple .*refill=1/m, q(-r turns default[refill]= on));
 
     # fatchap adds lines, which puts the folding of refill off, so it
     # turns off the default but not the option
@@ -770,7 +819,7 @@ subtest q(refill option) => sub {
     $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -t fatchap $test_md 2>&1`;
     unlike($out, qr/refill=/, q(fatchap turns off default[refill]));
     $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -t fatchap -r $test_md 2>&1`;
-    like($out, qr/^greple .*refill=1/m, q(--refill works with fatchap));
+    like($out, qr/^greple .*refill=1/m, q(-r turns refill on with fatchap, which turns the default off));
     $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -t fatchap --no-refill $test_md 2>&1`;
     unlike($out, qr/refill=/, q(--no-refill works with fatchap));
     $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -t warm $test_md 2>&1`;
@@ -919,6 +968,13 @@ subtest 'device and output' => sub {
     like($a4, qr/mode=light/, '-T a4: light mode on paper');
     unlike($a4, qr/less/, '-T a4: no pager');
     like($run->('-T a4 --mode=dark'), qr/mode=dark/, '--mode is kept');
+
+    # images on paper: ansi2pdf draws them, told of their files by the
+    # rows; nothing goes to the terminal, which is not asked either
+    my($lines) = `ansi2pdf -C1 --no-border -L -p a4 --geometry` =~ /^\d+ (\d+)/;
+    like($a4, qr/image_types=png:jpeg:gif,image_osc=1,image_tty=\/dev\/null,image_term=${w}x${lines}:10x24\b/,
+         '-T a4: images for ansi2pdf');
+    unlike($run->('-T a4 --no-image'), qr/image_/, '-T a4 --no-image: no images');
 
     # one pane goes through nup as well
     my $a4p = $run->('-T a4p');

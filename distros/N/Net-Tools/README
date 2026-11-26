@@ -1,0 +1,27 @@
+Net::Tools
+==============
+
+Net::Tools provides socket I/O functions, length-prefixed and serialized
+messages, and non-blocking messages over socket pairs. Split from Data::Tools
+in 1.60 (Data::Tools::Socket* became Net::Tools::Socket*).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Net::Tools requires Data::Tools.
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2013-2026 Vladi Belperchinov-Shabanski
+                        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+                        http://cade.noxrun.com/

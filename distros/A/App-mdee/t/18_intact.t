@@ -14,9 +14,13 @@ $ENV{HOME} = tempdir(CLEANUP => 1);
 
 # intact=table: the lines of a formatted table are joined into one line
 # by UNIT SEPARATOR (0x1F), the last newline kept, for ansicolumn
-# --intact.  The joined table is not folded as text.
+# --intact.  The joined table is not folded as text.  The lines of a
+# row are joined by GROUP SEPARATOR (0x1D) instead, and so are the
+# header, the rule below it and the first row, so that a pane does not
+# end inside them.
 
 my $US = "\x1F";
+my $GS = "\x1D";
 my $md = 't/table_wrap.md';
 my $strip = sub { local $_ = shift; s/\e\[[0-9;]*[mK]//g; s/\e\]8;;[^\e]*\e\\//g; $_ };
 my $cfg = 'colorize=0,table=1,rule=1,table_width=40,fold=1,fold_width=30';
@@ -30,13 +34,73 @@ like($intact, qr/$US/, 'with intact, the rows are joined');
 # the rows of every table are the lines without intact
 my @tables = grep { /$US/ } split /\n/, $intact;
 is(scalar @tables, 1, 'the table is one line');
-my $rows = join "\n", map { split /$US/, $_, -1 } @tables;
+my $rows = join "\n", map { split /[$US$GS]/, $_, -1 } @tables;
 my @missing = grep { index($lines, "$_\n") < 0 } split /\n/, $rows;
 is(scalar @missing, 0, 'every row is a line of the table without intact');
-unlike($intact, qr/$US\n|\n$US|$US$US/, 'US goes only between rows');
+unlike($intact, qr/[$US$GS]\n|\n[$US$GS]|[$US$GS]{2}/, 'US and GS go only between lines');
+
+# the units divided by US: the header with the rule and the first row,
+# whose cell is wrapped, then the other rows, each with its lines
+my @units = split /$US/, $tables[0];
+is(scalar @units, 4, 'a unit for the head and one for each other row');
+my @head = split /$GS/, $units[0];
+like($head[0], qr/^ key/, 'the head: the header');
+like($head[1], qr/^\x{2500}+\x{253C}/, 'the head: the rule');
+like($head[2], qr/k1/, 'the head: the first row');
+ok(@head > 3, 'the head: all the lines of the first row');
+like($units[1], qr/alpha[^$GS]*$GS/, 'a wrapped row is a group');
+like($units[3], qr/^[^$GS]*k2[^$GS]*$/, 'a row of one line is a line');
 
 # the text around the tables is the same
-(my $joined = $intact) =~ s/$US/\n/g;
+(my $joined = $intact) =~ s/[$US$GS]/\n/g;
 is($joined, $lines, 'the rest of the text is not changed');
+
+# 3line: the rule above goes with the head, the one below with the last
+# row, and the rules are as wide as the table
+{
+    my $cfg = "$cfg,table_style=3line";
+    my $intact = $strip->(run("'-Mmd::config($cfg,intact=table)' $md")->stdout);
+    my($table) = grep { /$US/ } split /\n/, $intact;
+    my @units = split /$US/, $table;
+    my @head = split /$GS/, $units[0];
+    like($head[0], qr/^\x{2500}+$/, '3line: the rule above in the head');
+    like($head[1], qr/^ key/, '3line: then the header');
+    like($units[-1], qr/k2[^$GS]*$GS\x{2500}+$/, '3line: the rule below with the last row');
+    is(length $head[0], length $head[1], '3line: the rule is as wide as the header');
+}
+
+# a table of one row is a group with no US, and is not folded as text
+{
+    my $dir = tempdir(CLEANUP => 1);
+    my $one = "$dir/one.md";
+    open my $fh, '>:utf8', $one or die;
+    print $fh "| - key | description |\n|-----|-------------|\n| k1 | the quick brown fox jumps over the lazy dog and keeps on running |\n";
+    close $fh;
+    my $intact = $strip->(run("'-Mmd::config($cfg,intact=table)' $one")->stdout);
+    my @lines = split /\n/, $intact;
+    is(scalar @lines, 1, 'one row: one line');
+    unlike($intact, qr/$US/, 'one row: no US');
+    like($intact, qr/$GS/, 'one row: a group');
+    like($intact, qr/^ - key\s*\x{2502} description/, 'one row: the header is not folded');
+}
+
+# with refill, a parser may take a table for a paragraph (libcmark has
+# no tables): the lines of the table, joined into one, are not regions
+# to fold
+SKIP: {
+    require App::Greple::md::Blocks;
+    my @parsers = App::Greple::md::Blocks::available();
+    skip 'no parser for refill', 2 unless @parsers;
+    my $dir = tempdir(CLEANUP => 1);
+    my $file = "$dir/refill.md";
+    open my $fh, '>:utf8', $file or die;
+    print $fh "# h\n\nparagraph\n\n| a | b |\n| - | - |\n| c | d |\n| e | f |\n| g | h |\n";
+    close $fh;
+    for my $parser ($parsers[0]) {
+        my $r = run("'-Mmd::config($cfg,intact=table,refill=1,refill_parser=$parser)' $file");
+        is($r->status, 0, "refill with $parser: no error");
+        like($strip->($r->stdout), qr/ c\x{2502} d$US e/, "refill with $parser: the table");
+    }
+}
 
 done_testing;

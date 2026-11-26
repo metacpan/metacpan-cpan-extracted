@@ -12,35 +12,61 @@
 
 <>
 	dc:title			"Changes for AtteanX::Endpoint" ;
+	dc:description		"Changes for AtteanX::Endpoint" ;
 	dc:subject			my:project ;
 	dc:creator			my:developer ;
-	dc:description		"Changes for AtteanX::Endpoint" ;
 	.
 
 my:project
 	a 						:Project ;
 	:name					"AtteanX::Endpoint" ;
-	:shortdesc				"An Attean SPARQL 1.1 Endpoint implementation." ;
+	:shortdesc				"An Attean SPARQL 1.2 Endpoint implementation." ;
 	:programming-language	"Perl" ;
 	:created				"2016-03-25"^^xsd:date ;
 	:maintainer				my:developer ;
 	:homepage				<http://search.cpan.org/dist/AtteanX::Endpoint/> ;
 	:bug-database			<https://github.com/kasei/atteanx-endpoint/issues> ;
-	doap:download-page		<http://search.cpan.org/dist/AtteanX-Endpoint/> ;
-	doap:download-mirror	<http://kasei.us/code/files/> ;
+	:download-page			<http://search.cpan.org/dist/AtteanX-Endpoint/> ;
+	:download-mirror		<http://kasei.us/code/files/> ;
+	:release				my:v_0-001 , my:v_0-002 , my:v_0-003 , my:v_0-004 ;
 	.
 
-my:project :release my:v_0-003 .
+my:v_0-004
+	a					:Version ;
+	dc:issued			"2026-11-24"^^xsd:date ;
+	:revision			"0.004" ;
+	dcterms:replaces	my:v_0-003 ;
+	dcs:changeset [
+		dcs:versus my:v_0-003 ;
+		dcs:item
+			[ a dcs:Addition ; rdfs:label "Add example Dockerfile for running a full SPARQL endpoint." ],
+			[ a dcs:Addition ; rdfs:label "Add Test::AtteanX::Endpoint class for shared functionality." ],
+			[ a dcs:Addition ; rdfs:label "Add example config file." ],
+			[ a dcs:Update ; rdfs:label "Replace uses of TryCatch with Try::Tiny; remove unused dependencies." ],
+			[ a dcs:Update ; rdfs:label "Improve SPARQL Graph Store Protocol conformance." ],
+			[ a dcs:Update ; rdfs:label "Improve SPARQL Protocol conformance." ],
+			[ a dcs:Update ; rdfs:label "Improve HTML rendering of SPARQL Protocol HTML results." ],
+			[ a dcs:Update ; rdfs:label "Refactor code and tests, splitting Protocol and GSP handling into separate packages." ],
+			[ a dcs:Update ; rdfs:label "Update dependencies." ],
+			[ a dcs:Update ; rdfs:label "Fix handling of protocol-defined dataset when configuring query planner." ],
+			[ a dcs:Update ; rdfs:label "Fix HTTP response code for PUT to the default graph (201 -> 204)." ],
+			[ a dcs:Update ; rdfs:label "Expand the possible formats for the configuration file." ],
+			[ a dcs:Update ; rdfs:label "Update required version of Attean to 0.041." ],
+			[ a dcs:Update ; rdfs:label "Add support for SPARQL Service Descriptions." ],
+			[ a dcs:Update ; rdfs:label "Fix encoding bug in handling of multipart POST content." ]
+	]
+	.
 
 my:v_0-003
 	a					:Version ;
 	dc:issued			"2026-05-21"^^xsd:date ;
 	:revision			"0.003" ;
+	dcterms:replaces	my:v_0-002 ;
 	dcs:changeset [
 		dcs:versus my:v_0-002 ;
 		dcs:item
-			[ a dcs:Update ; rdfs:label "Add implementation of SPARQL Graph Store Protocol."],
-			[ a dcs:Update ; rdfs:label "Miscellaneous bug-fixes."]
+			[ a dcs:Update ; rdfs:label "Add implementation of SPARQL Graph Store Protocol." ],
+			[ a dcs:Update ; rdfs:label "Miscellaneous bug-fixes." ]
 	]
 	.
 
@@ -48,12 +74,13 @@ my:v_0-002
 	a					:Version ;
 	dc:issued			"2017-10-26"^^xsd:date ;
 	:revision			"0.002" ;
+	dcterms:replaces	my:v_0-001 ;
 	dcs:changeset [
 		dcs:versus my:v_0-001 ;
 		dcs:item
-			[ a dcs:Update ; rdfs:label "Replace use of HTML::HTML5::Parser with XML::LibXML::Parser (#4 from @kjetilk)."],
-			[ a dcs:Update ; rdfs:label "Change hashbang to use env (#2 from KjetilK)."],
-			[ a dcs:Update ; rdfs:label "Updated copyright year and added text about CodeMirror license."]
+			[ a dcs:Update ; rdfs:label "Replace use of HTML::HTML5::Parser with XML::LibXML::Parser (#4 from @kjetilk)." ],
+			[ a dcs:Update ; rdfs:label "Change hashbang to use env (#2 from KjetilK)." ],
+			[ a dcs:Update ; rdfs:label "Updated copyright year and added text about CodeMirror license." ]
 	]
 	.
 
@@ -67,6 +94,7 @@ my:v_0-001
 			[ a dcs:Addition ; rdfs:label "Initial release." ]
 	]
 	.
+
 
 my:developer
 	a               foaf:Person ;

@@ -70,7 +70,9 @@ DESCRIPTION
     addresses for latency-sensitive applications.
 
 METHODS
-  new(%options)
+  new
+        new(%options)
+
     Create an EV::Nats instance. If "host" or "path" is supplied, connection
     is initiated immediately and the "on_connect" callback fires once the
     CONNECT/PONG handshake completes.
@@ -118,7 +120,7 @@ METHODS
 
     nkey_seed => Str
         NATS NKey seed (the "SU..." form). Requires the build to have
-        OpenSSL ("EV::Nats::HAS_NKEY").
+        OpenSSL ("EV::Nats::HAS_NKEY"). Invalid seeds croak.
 
     jwt => Str
         User JWT, paired with "nkey_seed" for decentralized auth. See also
@@ -141,6 +143,11 @@ METHODS
         Ask the server to send a 503 status reply when a request has no
         responders, surfaced as the "no responders" error in "request".
 
+    inbox_prefix => Str (default "_INBOX")
+        Subject prefix for reply inboxes ("request", "new_inbox"), for
+        accounts whose permissions allow replies only under their own
+        prefix. Dot-separated tokens without wildcards, at most 64 bytes.
+
     ping_interval => Int (ms, default 120000; 0 = disabled)
         Client-initiated PING interval for keep-alive.
 
@@ -153,7 +160,8 @@ METHODS
 
     reconnect_delay => Int (ms, default 2000)
         Initial delay between reconnect attempts; subsequent attempts use
-        exponential backoff with jitter, capped by "max_reconnect_delay".
+        exponential backoff with jitter, capped by "max_reconnect_delay",
+        floored at 100ms.
 
     max_reconnect_delay => Int (ms, default 30000)
         Upper bound on the backoff delay.
@@ -169,9 +177,10 @@ METHODS
     fatal: they are reported via "on_error" and never retried.
 
    Callback options
-    All callbacks fire on the EV loop, never inline -- except
-    "on_slow_consumer", which fires synchronously from the call whose write
-    crosses the threshold (see "slow_consumer").
+    Callbacks fire on the EV loop, except in three narrow cases:
+    "on_slow_consumer" fires from the sending call, "on_disconnect" fires
+    from "disconnect", and "on_error" fires inline when "new"/"connect" fail
+    before the loop runs.
 
     on_connect => sub { }
         Called after the CONNECT/PONG handshake completes.
@@ -189,13 +198,17 @@ METHODS
     on_slow_consumer => sub { my ($pending_bytes) = @_ }
         See "slow_consumer".
 
-  connect($host, [$port])
-    Initiate a TCP connection. Port defaults to 4222. Croaks if already
-    connected or in the middle of connecting; otherwise returns
-    immediately, resets the automatic-reconnect attempt budget, and signals
-    completion via "on_connect".
+  connect
+        connect($host, [$port])
 
-  connect_unix($path)
+    Initiate a TCP connection. Port defaults to 4222. Croaks if already
+    connected or in the middle of connecting; otherwise returns immediately,
+    resets the automatic-reconnect attempt budget, and signals completion
+    via "on_connect".
+
+  connect_unix
+        connect_unix($path)
+
     Initiate a Unix-domain-socket connection. Same async semantics as
     "connect".
 
@@ -209,19 +222,25 @@ METHODS
     True if the CONNECT/PONG handshake has completed and no disconnect or
     reconnect is in progress.
 
-  publish($subject, [$payload], [$reply_to])
+  publish
+        publish($subject, [$payload], [$reply_to])
+
     Publish a message. Alias: "pub". Croaks on an undef or empty subject.
 
         $nats->publish('foo', 'hello');
         $nats->publish('foo', 'hello', 'reply.subject');
 
-  hpublish($subject, $headers, [$payload], [$reply_to])
+  hpublish
+        hpublish($subject, $headers, [$payload], [$reply_to])
+
     Publish with headers. Alias: "hpub". Croaks on an undef or empty subject
     or headers, or headers not starting with "NATS/1.0".
 
         $nats->hpublish('foo', "NATS/1.0\r\nX-Key: val\r\n\r\n", 'body');
 
-  subscribe($subject, $cb, [$queue_group])
+  subscribe
+        subscribe($subject, $cb, [$queue_group])
+
     Subscribe to a subject. Returns subscription ID. Alias: "sub". Croaks on
     an undef or empty subject.
 
@@ -238,19 +257,25 @@ METHODS
     $reply - reply-to subject (undef if none)
     $headers - raw headers string (only for HMSG)
 
-  subscribe_max($subject, $cb, $max_msgs, [$queue_group])
+  subscribe_max
+        subscribe_max($subject, $cb, $max_msgs, [$queue_group])
+
     Convenience: "subscribe" followed by an auto-unsubscribe after $max_msgs
     messages have been delivered.
 
-  unsubscribe($sid, [$max_msgs])
+  unsubscribe
+        unsubscribe($sid, [$max_msgs])
+
     Unsubscribe. With $max_msgs, the server is told to deliver that many
     more messages and then drop the subscription. The auto-unsub state is
     restored on reconnect (so the partial count survives a disconnect).
     Alias: "unsub".
 
-  request($subject, $payload, $cb, [$timeout_ms])
-    Request/reply. Uses automatic inbox subscription. Alias: "req". Croaks on
-    an undef or empty subject.
+  request
+        request($subject, $payload, $cb, [$timeout_ms])
+
+    Request/reply. Uses automatic inbox subscription. Alias: "req". Croaks
+    on an undef or empty subject.
 
         $nats->request('service', 'data', sub {
             my ($response, $err) = @_;
@@ -261,11 +286,18 @@ METHODS
     Callback receives "($response, $error)". For replies that include NATS
     message headers (HMSG), a third argument $headers with the raw header
     block is also passed. Error is set on timeout ("request timeout"), no
-    responders ("no responders"), or a dropped connection ("disconnected"). A
-    $timeout_ms of 0 disables the timeout; the callback then waits
+    responders ("no responders"), or a dropped connection ("disconnected").
+    A $timeout_ms of 0 disables the timeout; the callback then waits
     indefinitely.
 
-  drain([$cb])
+  hrequest
+        hrequest($subject, $headers, $payload, $cb, [$timeout_ms])
+
+    Like "request", with a header block as for "hpublish". Alias: "hreq".
+
+  drain
+        drain([$cb])
+
     Graceful shutdown: sends UNSUB for all subscriptions, flushes pending
     writes with a PING fence, fires $cb when the server confirms with PONG,
     then disconnects. No new messages will be received after drain is
@@ -286,14 +318,23 @@ METHODS
   ping
     Send PING to server. Croaks unless connected.
 
-  flush([$cb])
-    Send PING as a write fence; the subsequent PONG guarantees all prior
-    messages were processed by the server. Croaks unless connected. If $cb is
-    given, it is invoked when the PONG arrives. The callback receives a
-    single argument: "undef" on success, or an error string (e.g.
-    "disconnected") if the connection dropped before the PONG arrived.
+  flush
+        flush([$cb])
 
-  creds_file($path)
+    Send PING as a write fence; the subsequent PONG guarantees all prior
+    messages were processed by the server. If $cb is given, it is invoked
+    when the PONG arrives. The callback receives a single argument: "undef"
+    on success, or an error string if the PONG cannot arrive: "disconnected"
+    when the connection (or the attempt the flush waited for) failed, "not
+    connected" when there is no connection and none is being made.
+
+    While connecting or reconnecting, the PING is sent once the handshake
+    completes, behind the writes queued meanwhile. Without $cb, a flush with
+    no connection and none being made croaks.
+
+  creds_file
+        creds_file($path)
+
     Read a NATS ".creds" file and apply the embedded JWT and NKey seed via
     "jwt" and "nkey_seed". Apply this BEFORE "connect" so the credentials
     are available during the CONNECT handshake. Dies if the file is
@@ -301,20 +342,22 @@ METHODS
 
   new_inbox
     Returns a fresh subject suitable for use as a private reply target
-    ("_INBOX.<rand>.<n>"). Each call burns a slot from the same counter that
-    "request" uses, so manual subscribers must treat the returned subject as
-    opaque.
+    ("_INBOX.<rand>.<n>", under "inbox_prefix" if set). Each call burns a
+    slot from the same counter that "request" uses, so manual subscribers
+    must treat the returned subject as opaque.
 
   subscription_count
     Returns the number of currently-registered subscriptions, including the
-    implicit "_INBOX.>" subscription used by "request".
+    implicit inbox subscription used by "request".
 
   server_info
     Returns the raw JSON string of the most recent INFO frame received from
     the server (or "undef" before the first INFO). Useful for inspecting
     "server_id", "version", "cluster", "connect_urls", etc.
 
-  max_payload([$limit])
+  max_payload
+        max_payload([$limit])
+
     Server-advertised maximum payload size in bytes. Returns the current
     value; with an argument, overrides it (publishes above this croak
     locally before reaching the wire).
@@ -329,7 +372,9 @@ METHODS
     Drop all queued writes without sending them. Useful before "disconnect"
     if reconnect is enabled and you don't want stale publishes replayed.
 
-  reconnect($enable, [$delay_ms], [$max_attempts])
+  reconnect
+        reconnect($enable, [$delay_ms], [$max_attempts])
+
     Configure reconnection. $delay_ms and $max_attempts are only written
     when supplied; omitted args leave the existing value unchanged. Passing
     a false $enable also cancels a pending reconnect attempt.
@@ -337,30 +382,44 @@ METHODS
   reconnect_enabled
     Returns true if reconnect is enabled.
 
-  reconnect_buf_size([$bytes])
+  reconnect_buf_size
+        reconnect_buf_size([$bytes])
+
     Get/set the cap on writes queued while disconnected (default 8 MiB; 0
     disables the cap). May also be passed to "new". A publish that would
     exceed the cap croaks with "reconnect buffer full" instead of queueing.
 
-  connect_timeout([$ms])
+  connect_timeout
+        connect_timeout([$ms])
+
     Get/set connect timeout. Read at the start of each connect attempt.
 
-  ping_interval([$ms])
+  ping_interval
+        ping_interval([$ms])
+
     Get/set PING interval. Takes effect immediately on a live connection,
     including disabling (0) a running timer.
 
-  max_pings_outstanding([$num])
+  max_pings_outstanding
+        max_pings_outstanding([$num])
+
     Get/set max outstanding PINGs. 0 disables the staleness check.
 
-  priority([$num])
+  priority
+        priority([$num])
+
     Get/set EV watcher priority (-2 .. +2; anything else croaks). Applies to
     watchers created by the next (re)connect.
 
-  keepalive([$seconds])
+  keepalive
+        keepalive([$seconds])
+
     Get/set TCP keepalive. Applies to sockets created by the next
     (re)connect.
 
-  batch($coderef)
+  batch
+        batch($coderef)
+
     Batch multiple publishes into a single write. Suppresses per-publish
     write scheduling; all buffered data is flushed after the coderef
     returns.
@@ -369,11 +428,14 @@ METHODS
             $nats->publish("foo.$_", "msg-$_") for 1..1000;
         });
 
-  slow_consumer($bytes_threshold, [$cb])
+  slow_consumer
+        slow_consumer($bytes_threshold, [$cb])
+
     Enable slow consumer detection. When the write buffer exceeds
     $bytes_threshold bytes, $cb is called with the current buffer size. A
     threshold of 0 disables detection. Unlike other callbacks, this one
-    fires synchronously from the call whose write crosses the threshold. The
+    fires synchronously from the call whose write crosses the threshold,
+    once per crossing: it re-arms after the buffer drains back below it. The
     threshold and callback may also be passed to "new" as
     "slow_consumer_bytes" and "on_slow_consumer".
 
@@ -382,48 +444,58 @@ METHODS
             warn "slow consumer: ${pending_bytes}B pending\n";
         });
 
-  on_lame_duck([$cb])
+  on_lame_duck
+        on_lame_duck([$cb])
+
     Get/set the lame-duck callback. Fires once when the server signals
     shutdown (leaf node, rolling restart) via INFO "ldm:true". Use this to
     migrate work to another server before the grace period elapses.
 
-  nkey_seed($seed)
+  nkey_seed
+        nkey_seed($seed)
+
     Set the NKey seed (the "SU..." base32-encoded form) for Ed25519
     authentication. Requires the build to have OpenSSL (see
-    "EV::Nats::HAS_NKEY" in EV::Nats). The server nonce from INFO is
-    automatically signed during CONNECT. May also be passed to "new" as
-    "nkey_seed => ...". Set before connecting; a change takes effect on the
-    next (re)connect.
+    "EV::Nats::HAS_NKEY"). The server nonce from INFO is automatically
+    signed during CONNECT. May also be passed to "new" as "nkey_seed =>
+    ...". Set before connecting; a change takes effect on the next
+    (re)connect.
 
-  jwt($token)
+  jwt
+        jwt($token)
+
     Set the user JWT. Combine with "nkey_seed" for NATS decentralized auth.
     May also be passed to "new". See "creds_file" for the common case of
     loading both from a ".creds" file. Set before connecting; a change takes
     effect on the next (re)connect.
 
-  EV::Nats->nkey_generate_user_seed
+  nkey_generate_user_seed
+        EV::Nats->nkey_generate_user_seed
+
     Class method. Returns a fresh, valid NATS User NKey seed (the "SU..."
     form). Useful for tests and provisioning scripts that don't have the
     "nk" CLI available. Requires "HAS_NKEY"; croaks otherwise.
 
-  EV::Nats->nkey_public_from_seed($seed)
+  nkey_public_from_seed
+        EV::Nats->nkey_public_from_seed($seed)
+
     Class method. Derives the matching public key (the "U..." form) from a
     User NKey seed. Croaks on an invalid seed. Pair with
     "nkey_generate_user_seed" to provision the server with the public key
     while the client keeps the seed.
 
-  tls($enable, [$ca_file], [$skip_verify])
-    Configure TLS. Requires OpenSSL at build time (see
-    "EV::Nats::HAS_TLS" in EV::Nats).
+  tls
+        tls($enable, [$ca_file], [$skip_verify])
+
+    Configure TLS. Requires OpenSSL at build time (see "EV::Nats::HAS_TLS").
 
         $nats->tls(1);                           # system CA
         $nats->tls(1, '/path/to/ca.pem');        # custom CA
         $nats->tls(1, undef, 1);                 # skip verification
 
     When verification is enabled (the default), the server certificate's SAN
-    must match either the resolved IP literal or the DNS hostname passed to
-    "connect". May also be passed to "new" as "tls => 1, tls_ca_file =>
-    $path". Takes effect on the next (re)connect.
+    must match the host passed to "connect". May also be passed to "new" as
+    "tls => 1, tls_ca_file => $path". Takes effect on the next (re)connect.
 
   stats
     Returns a hash of connection counters:
@@ -431,21 +503,30 @@ METHODS
         my %s = $nats->stats;
         # ( msgs_in, msgs_out, bytes_in, bytes_out )
 
+    Outbound counters record accepted writes; messages still queued when the
+    connection drops are counted but never sent.
+
   reset_stats
     Zero all counters returned by "stats".
 
-  on_error([$cb])
-  on_connect([$cb])
-  on_disconnect([$cb])
+  on_error
+        on_error([$cb])
+
+  on_connect
+        on_connect([$cb])
+
+  on_disconnect
+        on_disconnect([$cb])
+
     Get/set the corresponding callback at runtime. With no argument, returns
     the current value (or "undef"). With an argument, replaces it; pass
     "undef" to clear.
 
 BUILD-TIME FEATURES
-    EV::Nats::HAS_TLS
+    "EV::Nats::HAS_TLS"
         True if compiled with OpenSSL (TLS supported).
 
-    EV::Nats::HAS_NKEY
+    "EV::Nats::HAS_NKEY"
         True if NKey/JWT signing is available (also requires OpenSSL).
 
 BENCHMARKS
@@ -518,3 +599,4 @@ AUTHOR
 LICENSE
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
+

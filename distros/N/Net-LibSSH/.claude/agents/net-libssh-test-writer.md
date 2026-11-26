@@ -2,13 +2,12 @@
 name: net-libssh-test-writer
 description: "Write Net::LibSSH tests — unit tests and integration tests driving a real sshd spawned by t/lib/TestSSHD.pm. Knows the skip_all trap that lets an untested suite report success, that the harness adds an sftp subsystem and therefore cannot prove the SFTP-free claim on its own, and that mocking an XS object is impossible anyway. Use for test additions, regression scaffolding, and reproducing connection, channel or lifetime failures."
 model: sonnet
-allowed-tools: Read, Edit, Write, Bash, Glob, Grep
-briefing:
-  skills:
-    - net-libssh-core
-    - perl-xs
-    - getty-perl-core
-    - kanban-issues-karr-cli
+skills:
+  - net-libssh-core
+  - net-libssh-hazards
+  - perl-xs
+  - getty-perl-core
+  - kanban-issues-karr-ticket
 ---
 
 You are the `net-libssh-test-writer` for **Net::LibSSH**.

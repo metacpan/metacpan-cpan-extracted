@@ -38,7 +38,7 @@ __PACKAGE__->mk_accessors(
   )
 );
 
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.12';
 
 ########################################################################
 sub new {
@@ -137,7 +137,7 @@ sub init_plugins {
     my $stash_name = $class . q{::};  # e.g., 'Config::Resolver::Plugin::SSM::'
 
     {
-      no strict 'refs';               ## no critic
+      no strict 'refs'; ## no critic
 
       $protocol = ${ $stash_name . 'PROTOCOL' };
 

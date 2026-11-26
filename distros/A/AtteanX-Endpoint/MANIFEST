@@ -12,6 +12,10 @@ inc/Module/Install/Share.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/AtteanX/Endpoint.pm
+lib/AtteanX/Endpoint/GraphStoreProtocol.pm
+lib/AtteanX/Endpoint/Error.pm
+lib/AtteanX/Endpoint/Protocol.pm
+lib/Test/AtteanX/Endpoint.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -20,7 +24,7 @@ meta/changes.ttl
 README.md
 scripts/endpoint.psgi
 share/endpoint/index.html
-share/endpoint/results.html
+share/endpoint/templates/results.html
 share/endpoint/www/css/docs.css
 share/endpoint/www/css/sparqlcolors.css
 share/endpoint/www/favicon.ico

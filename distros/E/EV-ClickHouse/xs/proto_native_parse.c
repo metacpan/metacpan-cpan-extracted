@@ -72,7 +72,6 @@ static int parse_and_discard_block(ev_clickhouse_t *self,
         return -1;
     }
 
-#ifdef HAVE_LZ4
     if (self->compress) {
         int need_more = 0;
         const char *lz4_err = NULL;
@@ -91,9 +90,7 @@ static int parse_and_discard_block(ev_clickhouse_t *self,
     if (decompressed) {
         bbuf = decompressed;
         bpos = 0;
-    } else
-#endif
-    {
+    } else {
         bbuf = buf;
         blen = len;
         bpos = pos;
@@ -182,7 +179,6 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
     if (rc == 0) return 0;
     if (rc < 0) { *errmsg = safe_strdup("malformed log block"); return -1; }
 
-#ifdef HAVE_LZ4
     if (self->compress) {
         int need_more = 0;
         const char *lz4_err = NULL;
@@ -195,9 +191,7 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
         }
     }
     if (decompressed) { bbuf = decompressed; bpos = 0; }
-    else
-#endif
-    { bbuf = buf; blen = len; bpos = pos; }
+    else { bbuf = buf; blen = len; bpos = pos; }
 
 #define _BAIL_LOG(rc_val) do { \
     if (decompressed) Safefree(decompressed); \
@@ -445,7 +439,6 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         if (rc == 0) return 0;
         if (rc < 0) { *errmsg = safe_strdup("malformed table name"); return -1; }
 
-#ifdef HAVE_LZ4
         if (self->compress) {
             /* Decompress the block body — may span multiple LZ4 sub-blocks. */
             int need_more = 0;
@@ -459,9 +452,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
             }
             dbuf = decompressed;
             dpos = 0;
-        } else
-#endif
-        {
+        } else {
             dbuf = buf;
             dlen = len;
             dpos = pos;
@@ -696,7 +687,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                     /* Send empty Data block to complete the INSERT protocol */
                     native_buf_t fallback;
                     nbuf_init(&fallback);
-                    nbuf_empty_data_block(&fallback, self->compress);
+                    nbuf_empty_data_block(&fallback, self);
                     data_pkt = fallback.data;
                     data_pkt_len = fallback.len;
                     if (encode_failed) {
@@ -741,7 +732,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 recv_consume(self, pos);
 
                 nbuf_init(&fallback);
-                nbuf_empty_data_block(&fallback, self->compress);
+                nbuf_empty_data_block(&fallback, self);
                 self->native_state = NATIVE_WAIT_RESULT;
                 if (self->cancel_after_meta) {
                     self->cancel_after_meta = 0;

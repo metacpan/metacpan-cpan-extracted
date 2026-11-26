@@ -9,7 +9,7 @@ use Ekorn::Pipeline::Errors qw(croakf);
 use namespace::clean;
 
 # Croak at the line that called Ekorn::Pipeline.
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.2';
 
 our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 
@@ -63,6 +63,13 @@ sub all ($self) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
         while (my($value) = $next->()) { push @all, $value }
     }
     return wantarray ? @all : \@all;
+}
+
+# Return the values still to be handed out, reading the run to its end,
+# as an array reference, whatever the context: all's, asked for one
+# value (roadmap 2026-0055).
+sub all_arrayref ($self) {
+    return scalar $self->all;
 }
 
 # Return the next value, or undef if there's none, and end the run, so
@@ -129,6 +136,7 @@ Ekorn::Pipeline::Iterator - one run, handing out its values as they're pulled
     while (my($value) = $next->()) { ... }    # one value per call
 
     my @rest  = $next->all;       # every value still to come
+    my $rest  = $next->all_arrayref;    # the same, as an array reference
     my $first = $next->first;     # the next value; then the run ends
     my $one   = $next->single;    # the same, warning if there's another
 
@@ -207,7 +215,17 @@ Returns every value still to come, reading the run to its end. In
 scalar context, it returns them as an array reference. Where values
 are already waiting at the end of the stages, such as a sink of many's
 result, or a step's many values, where there are no stages, it takes
-them all at once, rather than one call at a time.
+them all at once, rather than one call at a time. For an array
+reference in any context, use L</all_arrayref>.
+
+=head2 all_arrayref
+
+    my %report = (rows => $next->all_arrayref);
+
+Returns every value still to come, as L</all> does, but always as an
+array reference, whatever the context it's called in: in a hash or a
+list, as an argument, or returned from a sub. An empty one, if there
+are none.
 
 =head2 first
 

@@ -8,7 +8,7 @@
 
 use Devel::Hide qw( Algorithm::AhoCorasick::XS );
 
-use Test2::V0;
+use Test2::V0 -no_srand;
 
 use Net::DNS::Resolver::Mock;
 

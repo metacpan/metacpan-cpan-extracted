@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::ClaudeMd 0.008;
+package Dist::Conformance::Check::ClaudeMd 0.011;
 
 # ABSTRACT: CLAUDE.md exists and names the skills that it must
 
@@ -21,7 +21,6 @@ sub config_schema ($) {
     };
 }
 
-
 sub check ( $self, $snapshot ) {
     my ( $file, $mentions ) = @{ $self->config }{qw{file mentions}};
     my $text   = $snapshot->content($file) // return ( 'fail', "$file is missing" );
@@ -29,7 +28,6 @@ sub check ( $self, $snapshot ) {
     return ( 'fail', "$file does not name " . join ', ', @absent ) if @absent;
     return ( 'pass', @$mentions ? 'names ' . join ', ',  @$mentions : "$file exists" );
 }
-
 
 sub update ( $self, $update ) {
     my ( $status, $detail ) = $self->check( $update->snapshot );
@@ -51,7 +49,7 @@ Dist::Conformance::Check::ClaudeMd - CLAUDE.md exists and names the skills that 
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -62,14 +60,6 @@ missing, or when a string is not in it.
 Its update writes nothing.  What the file says about a repository is prose that
 a person writes, so the update names the file, the template to start from, and
 what the file lacks.
-
-=head1 METHODS
-
-=head2 check
-
-=head2 update
-
-Records what the file needs, for a person.
 
 =head1 IN A FLAVOR
 

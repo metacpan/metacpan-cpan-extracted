@@ -2,11 +2,11 @@
 name: net-libssh-doc-writer
 description: "Write and maintain Net::LibSSH POD in the [@Author::GETTY] house format. Knows that Channel.pm and SFTP.pm are POD-only files documenting packages that live in XS, so every claim must be verified against LibSSH.xs rather than against the neighbouring prose. One module at a time; specify the path. Does not edit code."
 model: sonnet
-allowed-tools: Read, Edit, Grep, Glob
-briefing:
-  skills:
-    - getty-perl-release-author-getty
-    - net-libssh-core
+disallowedTools: Write, NotebookEdit, Bash
+skills:
+  - net-libssh-core
+  - net-libssh-hazards
+  - getty-perl-pod
 ---
 
 You are the `net-libssh-doc-writer` for **Net::LibSSH**.

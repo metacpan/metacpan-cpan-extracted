@@ -13,6 +13,7 @@ use strict;
 use lib 'lib', '../lib';
 use Test::More;
 use File::Temp qw( tempdir );
+use Encode;
 use Data::Tools;
 
 ok( defined $Data::Tools::VERSION, 'Data::Tools loaded' );
@@ -53,6 +54,12 @@ ok( file_bin_save( "$TMP/b.bin", "\x00\xff\x10" ), 'file_bin_save()' );
 is( file_bin_load( "$TMP/b.bin" ), "\x00\xff\x10", 'file_bin_load()' );
 
 ok( file_text_save( "$TMP/c.txt", "x\ny\n" ),         'file_text_save()' );
+is( file_bin_save( "$TMP/no/such/dir/b.bin", 'x' ), undef, 'file_bin_save() returns undef when it cannot open' );
+is( file_text_save( "$TMP/no/such/dir/c.txt", 'x' ), undef, 'file_text_save() returns undef when it cannot open' );
+SKIP: { skip 'no /dev/full', 2 unless -w '/dev/full';
+  is( file_bin_save( '/dev/full', 'x' x 10000 ), undef, 'file_bin_save() returns undef when the write fails' );
+  is( file_text_save( '/dev/full', 'x' x 10000 ), undef, 'file_text_save() returns undef when the write fails' );
+}
 is( file_text_load( "$TMP/c.txt" ), "x\ny\n",         'file_text_load()' );
 is( file_text_load_first_line( "$TMP/c.txt" ), "x\n", 'file_text_load_first_line()' );
 ok( file_text_append( "$TMP/c.txt", "z\n" ),          'file_text_append()' );
@@ -169,8 +176,17 @@ is( str_escape( "a=b\nc:d\\e\tf\r" ), 'a\=b\nc\:d\\\\e\tf\r', 'str_escape()' );
 is( str_unescape( str_escape( "a=b\nc:d\\e\tf\r" ) ), "a=b\nc:d\\e\tf\r", 'str_unescape() round trip' );
 
 is( str_url_escape( 'ab c/d' ), 'ab%20c%2Fd', 'str_url_escape()' );
-is( str_url_escape( "\x{00E4}b" ), '%C3%A4b',  'str_url_escape() encodes to UTF-8 bytes' );
+my $url_chars = "\x{00E4}b"; # below 256, perl keeps it without the utf8 flag
+utf8::upgrade( $url_chars );
+is( str_url_escape( $url_chars ), '%C3%A4b',  'str_url_escape() encodes characters (utf8 string) to UTF-8 bytes' );
+is( str_url_escape( "\x{00E4}b" ), '%E4b',    'str_url_escape() leaves a non-utf8 string as bytes' );
+is( str_url_escape( encode( 'UTF-8', "\x{0418}" ) ), '%D0%98', 'str_url_escape() does not encode UTF-8 bytes twice' );
 is( str_url_unescape( 'ab%20c%2Fd' ), 'ab c/d', 'str_url_unescape()' );
+is( str_url_unescape( '%D0%98%D0%B2' ), "\x{0418}\x{0432}", 'str_url_unescape() decodes UTF-8 to characters' );
+is( str_url_unescape( "x\x{0418}%D0%B2y" ), "x\x{0418}\x{0432}y", 'str_url_unescape() keeps characters above 255 in the input' );
+is( str_url_unescape( $url_chars ), "\x{00E4}b", 'str_url_unescape() keeps characters (utf8 string) below 256 in the input' );
+is( str_url_unescape( 'a%E9b' ), "a\x{FFFD}b", 'str_url_unescape() turns an invalid UTF-8 byte into U+FFFD' );
+is( str_url_unescape( str_url_escape( "\x{0418}\x{0432}\x{0430}\x{043D} \x{00FC} x/y" ) ), "\x{0418}\x{0432}\x{0430}\x{043D} \x{00FC} x/y", 'str_url_escape()/str_url_unescape() round trip' );
 
 is( str_html_escape( q{<a href="x">&`=\\} ), '&#60;a href&#61;&#34;x&#34;&#62;&#38;&#96;&#61;&#92;', 'str_html_escape()' );
 is( str_html_escape_text( q{<a href="x">&} ), '&#60;a href="x"&#62;&#38;', 'str_html_escape_text() leaves quotes' );
@@ -185,6 +201,41 @@ is( str_html_unescape( str_html_escape_text( '<&>' ) ), '<&>', 'str_html_unescap
 is( str_hex( 'AB' ),     '4142', 'str_hex()' );
 is( str_unhex( '4142' ), 'AB',   'str_unhex()' );
 is( str_unhex( str_hex( "\x00\xff" ) ), "\x00\xff", 'str_hex()/str_unhex() round trip' );
+is( str_hex( '' ),       '',     'str_hex() of empty string' );
+
+# eval_err_strip() keeps the first line of $@ without location and @INC list
+is( eval_err_strip( undef ), undef, 'eval_err_strip() of undef' );
+is( eval_err_strip( '' ),    undef, 'eval_err_strip() of empty string' );
+is( eval_err_strip( "plain\n" ), 'plain', 'eval_err_strip() drops the newline' );
+eval { die "boom" };
+is( eval_err_strip( $@ ), 'boom', 'eval_err_strip() drops " at FILE line N."' );
+eval { die "first line\nsecond line\n" };
+is( eval_err_strip( $@ ), 'first line', 'eval_err_strip() keeps the first line only' );
+eval { require Data::Tools::No::Such::Module };
+is( eval_err_strip( $@ ), "Can't locate Data/Tools/No/Such/Module.pm in \@INC (you may need to install the Data::Tools::No::Such::Module module)", 'eval_err_strip() drops the @INC list' );
+eval { require Carp; Carp::confess( 'deep' ) };
+is( eval_err_strip( $@ ), 'deep', 'eval_err_strip() drops the confess() stack trace' );
+
+my $upgraded = "\x{e9}";
+utf8::upgrade( $upgraded );
+
+is( str_hex_utf8( 'AB' ),               '4142',     'str_hex_utf8() ASCII' );
+is( str_hex_utf8( "\x{e9}" ),           'c3a9',     'str_hex_utf8() latin1 char' );
+is( str_hex_utf8( $upgraded ),          'c3a9',     'str_hex_utf8() ignores internal utf8 flag' );
+is( str_hex_utf8( "\x{430}\x{430}" ),   'd0b0d0b0', 'str_hex_utf8() wide chars' );
+isnt( str_hex_utf8( "\x{430}\x{430}" ), str_hex_utf8( '00' ), 'str_hex_utf8() no wide char collisions' );
+is( str_hex_utf8( '' ),                 '',         'str_hex_utf8() empty string' );
+
+is( str_unhex_utf8( '4142' ),           'AB',             'str_unhex_utf8() ASCII' );
+is( str_unhex_utf8( 'c3a9' ),           "\x{e9}",         'str_unhex_utf8() latin1 char' );
+is( str_unhex_utf8( 'd0b0d0b0' ),       "\x{430}\x{430}", 'str_unhex_utf8() wide chars' );
+is( str_unhex_utf8( 'ff41' ),           "\x{fffd}A",      'str_unhex_utf8() invalid UTF-8 becomes U+FFFD' );
+is( str_unhex_utf8( '' ),               '',               'str_unhex_utf8() empty string' );
+
+for my $text ( 'AB', "\x{e9}", "\x{430}\x{430}", "a\x{e9}\x{430}\x{1f600}" )
+  {
+  is( str_unhex_utf8( str_hex_utf8( $text ) ), $text, sprintf( 'str_hex_utf8()/str_unhex_utf8() round trip [%vX]', $text ) );
+  }
 
 ##############################################################################
 # string formatting helpers

@@ -1,7 +1,7 @@
 # ABSTRACT: Op tree analysis for perl 5.44 and later
 # PODNAME: Pod::Coverage::More::Analyzer::Perl5_44
 
-package Pod::Coverage::More::Analyzer::Perl5_44 0.003;
+package Pod::Coverage::More::Analyzer::Perl5_44 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -93,7 +93,7 @@ Pod::Coverage::More::Analyzer::Perl5_44 - Op tree analysis for perl 5.44 and lat
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 DESCRIPTION
 

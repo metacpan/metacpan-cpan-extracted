@@ -37,38 +37,15 @@ static void nbuf_block_info(native_buf_t *b) {
 }
 
 /* Build an empty Data block (signals end of client data after Query) */
-static void nbuf_empty_data_block(native_buf_t *b, int do_compress) {
+static void nbuf_empty_data_block(native_buf_t *b, const ev_clickhouse_t *self) {
+    native_buf_t body;
     nbuf_varuint(b, CLIENT_DATA);
     nbuf_cstring(b, "");   /* table name — outside compression */
-
-    /* block body: block info + num_cols + num_rows */
-#ifdef HAVE_LZ4
-    if (do_compress) {
-        native_buf_t body;
-        char *compressed;
-        size_t comp_len;
-
-        nbuf_init(&body);
-        nbuf_block_info(&body);
-        nbuf_varuint(&body, 0);    /* num_columns = 0 */
-        nbuf_varuint(&body, 0);    /* num_rows = 0 */
-
-        compressed = ch_lz4_compress(body.data, body.len, &comp_len);
-        Safefree(body.data);
-        if (compressed) {
-            nbuf_append(b, compressed, comp_len);
-            Safefree(compressed);
-            return;
-        }
-        /* LZ4 failed (should never happen) — fall through to uncompressed */
-    }
-#else
-    (void)do_compress;
-#endif
-
-    nbuf_block_info(b);
-    nbuf_varuint(b, 0);    /* num_columns = 0 */
-    nbuf_varuint(b, 0);    /* num_rows = 0 */
+    nbuf_init(&body);
+    nbuf_block_info(&body);
+    nbuf_varuint(&body, 0);    /* num_columns = 0 */
+    nbuf_varuint(&body, 0);    /* num_rows = 0 */
+    nbuf_put_block(b, &body, self);
 }
 
 static char* build_native_query(ev_clickhouse_t *self, const char *sql,
@@ -141,7 +118,6 @@ static char* build_native_query(ev_clickhouse_t *self, const char *sql,
      * Format: repeated (String name, UInt8 is_important, String value),
      * terminated by empty name. */
     write_native_settings(&b, defaults, overrides);
-#ifdef HAVE_LZ4
     /* We decode LZ4 only: pin the method so a server whose default is
      * ZSTD (or anything else) still answers in a form we can read.
      * An explicit user setting always wins. */
@@ -154,7 +130,6 @@ static char* build_native_query(ev_clickhouse_t *self, const char *sql,
         nbuf_varuint(&b, 3);
         nbuf_append(&b, "LZ4", 3);
     }
-#endif
     nbuf_cstring(&b, "");  /* empty name = end of settings */
 
     /* interserver_secret: empty string (revision >= 54441) */
@@ -162,11 +137,7 @@ static char* build_native_query(ev_clickhouse_t *self, const char *sql,
 
     /* state (stage), compression, query */
     nbuf_varuint(&b, STAGE_COMPLETE);
-#ifdef HAVE_LZ4
     nbuf_varuint(&b, self->compress ? 1 : 0);
-#else
-    nbuf_varuint(&b, 0);
-#endif
     nbuf_string(&b, sql, sql_len);
 
     /* Parameters block: param_* keys, terminated by empty name.
@@ -187,7 +158,7 @@ static char* build_native_query(ev_clickhouse_t *self, const char *sql,
      * tables, sent before the terminating empty block. */
     if (ext_data && ext_len) nbuf_append(&b, ext_data, ext_len);
 
-    nbuf_empty_data_block(&b, self->compress);
+    nbuf_empty_data_block(&b, self);
 
     *out_len = b.len;
     return b.data;

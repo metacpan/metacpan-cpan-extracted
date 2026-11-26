@@ -1,4 +1,4 @@
-package Dist::Conformance::Source::Git 0.008;
+package Dist::Conformance::Source::Git 0.011;
 
 # ABSTRACT: Standards fetched from a git repository into a cache directory
 
@@ -29,7 +29,10 @@ sub new ( $class, @args ) {
     return $self;
 }
 
-
+# The directory of the clone of this URL and ref, which may not exist yet.
+# @returns InstanceOf["Mojo::File"]  the directory
+# @throws  when neither C<$XDG_CACHE_HOME> nor C<$HOME> is set and no L</cache> is given
+# @example my $clone = $source->clone_dir;
 sub clone_dir ($self) {
     return Mojo::File->new( $self->cache )->child( Digest::SHA::sha1_hex( $self->url . "\n" . $self->ref ) );
 }
@@ -48,7 +51,11 @@ sub root ($self) {
     };
 }
 
-
+# Clones the repository if there is no clone yet, fetches L</ref>, and checks out
+# what it fetched, discarding any change in the checkout.
+# @returns InstanceOf["Mojo::File"]  the directory of the clone
+# @throws  with what git said when a step fails
+# @example $source->fetch;
 sub fetch ($self) {
     my $dir = $self->clone_dir;
     if ( !-d $dir->child('.git') ) {
@@ -90,7 +97,7 @@ Dist::Conformance::Source::Git - Standards fetched from a git repository into a 
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -139,36 +146,80 @@ it.  Dies when there is no clone yet.
 
 =head1 METHODS
 
-=head2 new
+=head2 new(@args)
+
+A new source.  It fetches nothing until the first read.
+
+=over 4
+
+=item args - Hash - the attributes, such as L</url> and L</ref>, as named arguments
+
+=back
+
+Returns a Dist::Conformance::Source::Git object.
 
 Dies unless L</url> is given, and on a URL or a ref that git would take for an
 option.
 
-=head2 clone_dir
-
-The directory of the clone of this URL and ref, as a L<Mojo::File>.
+    my $source = Dist::Conformance::Source::Git->new( url => 'https://forge.test.test/standards.git' );
 
 =head2 root
 
 The checkout, after a L</fetch> unless L</offline>.  Memoized on the object.
 
-=head2 fetch
+Returns a Mojo::File object.
 
-Clones the repository if there is no clone yet, fetches L</ref>, and checks out
-what it fetched, discarding any change in the checkout.  Dies with what git
-said when a step fails.
+Dies when it is L</offline> and there is no clone yet, and when the fetch
+fails.
+
+    my $top = $source->root;
 
 =head2 describe
 
-The URL and the ref.
+The URL and the ref, and the path inside the repository.
+
+Returns Str.
+
+    say 'Flavor from ', $source->describe;
+
+=head2 clone_dir
+
+The directory of the clone of this URL and ref, which may not exist yet.
+
+Returns a Mojo::File object, the directory.
+
+Dies when neither C<$XDG_CACHE_HOME> nor C<$HOME> is set and no L</cache> is given.
+
+    my $clone = $source->clone_dir;
+
+=head2 fetch
+
+Clones the repository if there is no clone yet, fetches L</ref>, and checks out what it fetched, discarding any change in the checkout.
+
+Returns a Mojo::File object, the directory of the clone.
+
+Dies with what git said when a step fails.
+
+    $source->fetch;
 
 =head1 FUNCTIONS
 
-=head2 git
+=head2 git(@arguments)
 
-C<(@arguments)>.  Runs C<git> with C<@arguments>, and dies with its standard
-error when it fails.  Every call to git goes through this function, so a test
-can replace it.
+Runs C<git> with C<@arguments>.  Every call to git goes through this function,
+so a test can replace it.
+
+=over 4
+
+=item arguments - Array - the arguments of git
+
+=back
+
+Returns Str, the standard output of git.
+
+Dies with its standard error when git fails.
+
+    my $head = Dist::Conformance::Source::Git::git( qw{-C /bogus/checkout rev-parse HEAD} );
 
 =head1 SEE ALSO
 

@@ -21,7 +21,7 @@ use InternetData::Error;
 use InternetData::Oauth;
 use InternetData::Result;
 
-our $VERSION = '1.20.0';
+our $VERSION = '1.21.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.internetdata.io';
@@ -46,6 +46,10 @@ my %OPTIONS = map { $_ => 1 } qw(
 # or null, and every one present has the spec's type at every depth. A detail
 # requires no member, so `{}`, its answer under a false flag, is one. A `format: date`
 # member, a seen day among them, is `date`: RFC 3339's full-date on a day that exists.
+# A field's third element is 1 for a member that is required, and NOT_NULL for one an
+# answer may lack (a plan without it) but never serves as null.
+use constant NOT_NULL => 2;
+
 my $CLASS_DETAIL = [fields => [
     (map { [$_ => ['string']] } qw(provider provider_name confidence)), [last_seen => ['date']],
 ]];
@@ -107,8 +111,8 @@ my $LOCATION = [fields => [
     (map { [$_ => ['string']] } qw(geoname_id dma_code last_changed)),
 ]];
 my $ASN = [fields => [
-    [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name domain type prefix)),
-    (map { [$_ => ['string']] } qw(country rpki_status)),
+    [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name domain prefix)),
+    [type => ['string'], NOT_NULL], (map { [$_ => ['string']] } qw(country rpki_status)),
 ]];
 my $COMPANY = [fields => [
     (map { [$_ => ['string'], 1] } qw(name domain)), (map { [$_ => ['string']] } qw(type country)),
@@ -126,8 +130,9 @@ our $LOOKUP = [fields => [
     [ip => ['string'], 1], [is_bogon => ['boolean'], 1], [is_vpn => ['boolean']],
     (map { [$_ => ['boolean'], 1] } qw(is_tor is_relay)),
     (map { [$_ => ['boolean']] } qw(is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn)),
-    (map { [$_ => ['boolean'], 1] } qw(
-        is_bot is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent
+    [is_anycast => ['boolean'], 1],
+    (map { [$_ => ['boolean'], NOT_NULL] } qw(
+        is_bot is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent
     )),
     [vpn => $CLASS_DETAIL], (map { [$_ => $CLASS_DETAIL, 1] } qw(tor relay)),
     (map { [$_ => $PROXY_DETAIL] } qw(resproxy dcproxy mobproxy)), [pubproxy => $PUBPROXY_DETAIL],
@@ -857,7 +862,8 @@ sub _nonconforming {
     for my $field (@$inner) {
         my ($name, $member_shape, $required) = @$field;
         if (!defined $value->{$name}) {
-            return 'the API answered with no ' . join('.', @$at, $name) if $required;
+            return 'the API answered with no ' . join('.', @$at, $name)
+                if $required && ($required != NOT_NULL || exists $value->{$name});
             next;
         }
         my $w = _nonconforming($member_shape, $value->{$name}, [@$at, $name]);

@@ -1,0 +1,27 @@
+Data::Tools::Process
+==============
+
+Data::Tools::Process provides process control functions: daemonizing, pid
+files, forked process control and pools of forked processes with messaging.
+Split from Data::Tools in 1.60, module names did not change.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Data::Tools::Process requires Data::Tools, Net::Tools and Exception::Sink.
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2013-2026 Vladi Belperchinov-Shabanski
+                        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+                        http://cade.noxrun.com/

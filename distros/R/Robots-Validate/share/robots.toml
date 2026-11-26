@@ -9,6 +9,11 @@
 agents="2ip bot"
 domain=".2ip.io"
 
+[academicbotrtu]
+## About: https://academicbot.rtu.lv/
+agents="AcademicBotRTU"
+network="213.175.88.0/21"
+
 [ahrefs]
 ## Date: 2026-11-14
 ## About: https://ahrefs.com/robot
@@ -2455,6 +2460,14 @@ network=[
 agents="bnf.fr_bot"
 domain=".bnf.fr"
 
+[boehmbot]
+## Date: 2026-11-25
+## About: https://boehm.systems/bot
+
+agents="BoehmBot"
+domain=".boehm.systems"
+network="5.196.92.3"
+
 [brightbot]
 ## Date: 2026-08-14
 ## About: https://brightdata.com/brightbot
@@ -4043,6 +4056,16 @@ network=[
   "98.70.219.37/32",
 ]
 
+[elamurbot]
+## Date: 2026-11-23
+## About: https://bot.elamur.ai/free/en/
+
+agents="ElamurBot"
+network=[
+  "144.76.221.20",
+  "2a01:4f8:200:9429::2",
+]
+
 [emailsherlock]
 ## About: https://www.hostsherlock.com/bot
 
@@ -4156,6 +4179,11 @@ network=[
   "2406:da18:800::/38",
   "2605:9f80:8000::/35",
 ]
+
+[geedo]
+agents="GeedoShopProductFinder"
+domain=".geedo.com"
+network="83.99.206.0/24"
 
 [generalretrievalbot]
 ## Date: 2026-11-17
@@ -6829,6 +6857,31 @@ network=[
   "35.202.5.108/32",
 ]
 
+[liberaitebot]
+## Date: 2026-11-19
+## About: https://liberaite.com/bot.html
+
+agents="LiberaiteBot"
+network=[
+  "35.176.35.148",
+  "3.9.148.207",
+  "3.10.195.91",
+  "16.60.55.201",
+  "16.60.188.84",
+  "16.61.122.180",
+  "18.132.32.75",
+  "18.134.231.80",
+  "35.179.224.108",
+  "52.56.241.219",
+]
+
+[librarianbot]
+## Date: 2026-11-23
+## About: https://apps.geniofab.com/librarian/bot
+## Network: https://apps.geniofab.com/librarian/bot/addresses.txt
+agents="LibrarianBot"
+network="57.129.192.162"
+
 [linkedin]
 agents="LinkedInBot"
 domain=".linkedin.com"
@@ -8855,6 +8908,12 @@ network=[
   "52.47.146.163",
   "52.77.36.31",
 ]
+
+[valdius]
+## About: https://crawler.validus.ai/
+
+agents="domains-distillery"
+domain=".validus.ai"
 
 [vexel]
 ## Date: 2026-10-20

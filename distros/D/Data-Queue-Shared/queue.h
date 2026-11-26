@@ -35,14 +35,20 @@
  * ================================================================ */
 
 #define QUEUE_MAGIC       0x51554531U  /* "QUE1" */
-#define QUEUE_VERSION     1
+#define QUEUE_VERSION     2
 #define QUEUE_MODE_INT    0
 #define QUEUE_MODE_STR    1
 #define QUEUE_MODE_INT32  2
 #define QUEUE_MODE_INT16  3
 #define QUEUE_ERR_BUFLEN  (PATH_MAX + 256)
 #define QUEUE_SPIN_LIMIT  32
-#define QUEUE_LOCK_TIMEOUT_SEC 2
+/* Period of the safety retries in the wait loops, and the longest wait before a lock holder is checked. */
+#define QUEUE_RECHECK_SEC 2
+#define QUEUE_RECHECK_NS  (QUEUE_RECHECK_SEC * 1000000000L)
+/* A lock waiter first checks the holder is alive after this, doubling up to QUEUE_RECHECK_NS. */
+#define QUEUE_LOCK_CHECK_NS 1000000L
+/* Arena bytes populated per step, under the mutex: small, as every producer waits for it. */
+#define QUEUE_POPULATE_CHUNK (16u << 10)
 
 /* ================================================================
  * Header (256 bytes = 4 cache lines, lives at start of mmap)
@@ -58,7 +64,9 @@ typedef struct {
     uint64_t slots_off;      /* 24: offset to slot array */
     uint64_t arena_off;      /* 32: str mode: offset to arena; int: 0 */
     uint64_t arena_cap;      /* 40: str mode: arena byte capacity; int: 0 */
-    uint8_t  _pad0[16];      /* 48-63 */
+    uint64_t pidns;          /* 48: creator's PID namespace inode, 0 if unknown */
+    uint32_t pidns_mixed;    /* 56: set once a process of another PID namespace attaches */
+    uint8_t  _pad0[4];       /* 60-63 */
 
     /* ---- Cache line 1 (64-127): head / consumer hot ---- */
     uint64_t head;           /* 64: consumer position */
@@ -70,7 +78,12 @@ typedef struct {
     uint64_t tail;           /* 128: producer position */
     uint32_t push_waiters;   /* 136: count of blocked producers */
     uint32_t push_futex;     /* 140: futex word for producer wakeup */
-    uint8_t  _pad2[48];      /* 144-191 */
+    uint64_t stat_lock_waits;      /* 144: Str lock acquisitions that slept */
+    uint64_t stat_lock_wait_ns;    /* 152 */
+    uint64_t stat_lock_wait_max_ns;/* 160 */
+    uint64_t stat_lock_timeouts;   /* 168 */
+    uint64_t stat_last_recovery;   /* 176: CLOCK_REALTIME seconds */
+    uint8_t  _pad2[8];             /* 184-191 */
 
     /* ---- Cache line 3 (192-255): mutex + arena state + stats ---- */
     uint32_t mutex;          /* 192: futex-based mutex (0 or PID|0x80000000) */
@@ -88,7 +101,7 @@ typedef struct {
     uint64_t stat_pop_empty; /* 232 */
     uint64_t stat_recoveries;/* 240 */
     uint32_t str_arena_wait; /* 248: a producer has run out of arena bytes */
-    uint8_t  _pad3[4];       /* 252-255 */
+    uint32_t arena_populated;/* 252: arena bytes below this are allocated */
 } QueueHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -146,7 +159,13 @@ typedef struct {
     int          notify_fd;  /* eventfd for event-loop integration, -1 if disabled */
     int          backing_fd; /* memfd fd, -1 for file-backed/anonymous */
     int          notify_fd_owned; /* 1 if we created notify_fd and must close it */
+    double       lock_timeout; /* Str: seconds to wait for the mutex, < 0 for no limit */
+    int          fail_errno;
+    int          same_pidns;   /* this process sees the creator's PIDs */
 } QueueHandle;
+
+/* An operation that did nothing for a reason in h->fail_errno. */
+#define QUEUE_FAILED (-3)
 
 /* ================================================================
  * Utility
@@ -189,6 +208,32 @@ static inline void queue_set_arena(QueueHeader *hdr, uint32_t wpos, uint32_t use
     __atomic_store_n(&hdr->arena_state, state.word, __ATOMIC_RELEASE);
 }
 
+/* Compute remaining timespec from absolute deadline. Returns 0 if deadline passed. */
+static inline int queue_remaining_time(const struct timespec *deadline,
+                                        struct timespec *remaining) {
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    remaining->tv_sec = deadline->tv_sec - now.tv_sec;
+    remaining->tv_nsec = deadline->tv_nsec - now.tv_nsec;
+    if (remaining->tv_nsec < 0) {
+        remaining->tv_sec--;
+        remaining->tv_nsec += 1000000000L;
+    }
+    return remaining->tv_sec >= 0;
+}
+
+/* Convert timeout in seconds (double) to absolute deadline */
+static inline void queue_make_deadline(double timeout, struct timespec *deadline) {
+    clock_gettime(CLOCK_MONOTONIC, deadline);
+    if (!(timeout < 1e9)) timeout = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
+    deadline->tv_sec += (time_t)timeout;
+    deadline->tv_nsec += (long)((timeout - (double)(time_t)timeout) * 1e9);
+    if (deadline->tv_nsec >= 1000000000L) {
+        deadline->tv_sec++;
+        deadline->tv_nsec -= 1000000000L;
+    }
+}
+
 /* ================================================================
  * Futex helpers
  * ================================================================ */
@@ -225,47 +270,119 @@ static inline int queue_pid_alive(uint32_t pid) {
     return 1;
 }
 
-static const struct timespec queue_lock_timeout = { QUEUE_LOCK_TIMEOUT_SEC, 0 };
+static const struct timespec queue_recheck = { QUEUE_RECHECK_SEC, 0 };
 
-static inline void queue_recover_stale_mutex(QueueHeader *hdr, uint32_t observed) {
-    if (!__atomic_compare_exchange_n(&hdr->mutex, &observed, 0,
-            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-        return;
-    __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
-    if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
+#ifndef MADV_WIPEONFORK
+#define MADV_WIPEONFORK 18
+#endif
+
+/* getpid() costs a syscall per lock. The cache sits in a page MADV_WIPEONFORK zeroes in a forked
+ * child, so a child never takes the lock under its parent's PID. */
+static uint32_t queue_self_pid(void) {
+    static uint32_t *cache;
+    static int uncached;
+    uint32_t *c = __atomic_load_n(&cache, __ATOMIC_ACQUIRE);
+    if (c && *c) return *c;
+    uint32_t pid = (uint32_t)getpid();
+    if (!c && !uncached) {
+        size_t page = (size_t)sysconf(_SC_PAGESIZE);
+        void *p = mmap(NULL, page, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        if (p == MAP_FAILED) { uncached = 1; return pid; }
+        if (madvise(p, page, MADV_WIPEONFORK) < 0) { munmap(p, page); uncached = 1; return pid; }
+        uint32_t *expected = NULL;
+        if (__atomic_compare_exchange_n(&cache, &expected, (uint32_t *)p, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE))
+            c = (uint32_t *)p;
+        else { munmap(p, page); c = expected; }
+    }
+    if (c) *c = pid;
+    return pid;
 }
 
-static inline void queue_mutex_lock(QueueHeader *hdr) {
-    uint32_t mypid = QUEUE_MUTEX_VAL((uint32_t)getpid());
+static uint64_t queue_pidns(void) {
+    struct stat st;
+    return stat("/proc/self/ns/pid", &st) == 0 ? (uint64_t)st.st_ino : 0;
+}
+
+static inline int queue_recover_stale_mutex(QueueHeader *hdr, uint32_t observed) {
+    if (!__atomic_compare_exchange_n(&hdr->mutex, &observed, 0,
+            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+        return 0;
+    __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+    __atomic_store_n(&hdr->stat_last_recovery, (uint64_t)time(NULL), __ATOMIC_RELAXED);
+    if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
+    return 1;
+}
+
+static inline int queue_recover_dead_holder(QueueHeader *hdr, uint32_t val) {
+    return val >= QUEUE_MUTEX_WRITER_BIT
+        && !queue_pid_alive(val & QUEUE_MUTEX_PID_MASK)
+        && queue_recover_stale_mutex(hdr, val);
+}
+
+/* Under the mutex, after a wait that started at *since. */
+static void queue_lock_wait_stat(QueueHeader *hdr, const struct timespec *since) {
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    uint64_t ns = (uint64_t)(now.tv_sec - since->tv_sec) * 1000000000u + now.tv_nsec - since->tv_nsec;
+    __atomic_store_n(&hdr->stat_lock_waits, hdr->stat_lock_waits + 1, __ATOMIC_RELAXED);
+    __atomic_store_n(&hdr->stat_lock_wait_ns, hdr->stat_lock_wait_ns + ns, __ATOMIC_RELAXED);
+    if (ns > hdr->stat_lock_wait_max_ns)
+        __atomic_store_n(&hdr->stat_lock_wait_max_ns, ns, __ATOMIC_RELAXED);
+}
+
+/* Takes the Str mutex, or returns 0 once h->lock_timeout runs out. PIDs of another namespace look
+ * dead, so a queue shared across PID namespaces checks a holder only after QUEUE_RECHECK_NS. */
+static int queue_str_lock(QueueHandle *h) {
+    QueueHeader *hdr = h->hdr;
+    uint32_t mypid = QUEUE_MUTEX_VAL(queue_self_pid());
+    uint32_t watched = 0;
+    long check_ns = 0;
+    struct timespec deadline, slept_at;
+    int has_deadline = 0, slept = 0;
     for (int spin = 0; ; spin++) {
         uint32_t expected = 0;
         if (__atomic_compare_exchange_n(&hdr->mutex, &expected, mypid,
-                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-            return;
+                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+            if (slept) queue_lock_wait_stat(hdr, &slept_at);
+            return 1;
+        }
         if (__builtin_expect(spin < QUEUE_SPIN_LIMIT, 1)) {
             queue_spin_pause();
             continue;
         }
+        spin = 0;
+        int fast = h->same_pidns && !__atomic_load_n(&hdr->pidns_mixed, __ATOMIC_SEQ_CST);
         __atomic_add_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
         uint32_t cur = __atomic_load_n(&hdr->mutex, __ATOMIC_RELAXED);
-        if (cur != 0) {
-            long rc = syscall(SYS_futex, &hdr->mutex, FUTEX_WAIT, cur,
-                              &queue_lock_timeout, NULL, 0);
-            if (rc == -1 && errno == ETIMEDOUT) {
-                __atomic_sub_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
-                uint32_t val = __atomic_load_n(&hdr->mutex, __ATOMIC_RELAXED);
-                if (val >= QUEUE_MUTEX_WRITER_BIT) {
-                    uint32_t pid = val & QUEUE_MUTEX_PID_MASK;
-                    if (!queue_pid_alive(pid))
-                        queue_recover_stale_mutex(hdr, val);
-                }
-                spin = 0;
-                continue;
-            }
+        if (cur == 0) {
+            __atomic_sub_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
+            continue;
         }
+        if (cur != watched) { watched = cur; check_ns = fast ? QUEUE_LOCK_CHECK_NS : QUEUE_RECHECK_NS; }
+        struct timespec ts = { check_ns / 1000000000L, check_ns % 1000000000L };
+        int full_wait = 1;
+        if (h->lock_timeout >= 0) {
+            struct timespec rem;
+            if (!has_deadline) { queue_make_deadline(h->lock_timeout, &deadline); has_deadline = 1; }
+            if (!queue_remaining_time(&deadline, &rem)) {
+                __atomic_sub_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
+                if (fast && queue_recover_dead_holder(hdr, cur)) continue;
+                __atomic_add_fetch(&hdr->stat_lock_timeouts, 1, __ATOMIC_RELAXED);
+                h->fail_errno = EAGAIN;
+                return 0;
+            }
+            if (rem.tv_sec < ts.tv_sec || (rem.tv_sec == ts.tv_sec && rem.tv_nsec < ts.tv_nsec))
+                ts = rem, full_wait = 0;
+        }
+        if (!slept) { clock_gettime(CLOCK_MONOTONIC, &slept_at); slept = 1; }
+        long rc = syscall(SYS_futex, &hdr->mutex, FUTEX_WAIT, cur, &ts, NULL, 0);
+        int timed_out = rc == -1 && errno == ETIMEDOUT;
         __atomic_sub_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
-        spin = 0;
+        if (!timed_out || __atomic_load_n(&hdr->mutex, __ATOMIC_RELAXED) != cur)
+            watched = 0;   /* the lock moved on: check the next hold afresh */
+        else if (full_wait && !queue_recover_dead_holder(hdr, cur))
+            check_ns = check_ns < QUEUE_RECHECK_NS / 2 ? check_ns * 2 : QUEUE_RECHECK_NS;
     }
 }
 
@@ -309,57 +426,58 @@ static inline void queue_wake_producers(QueueHeader *hdr) {
     queue_wake_producers_n(hdr, 1);
 }
 
-/* Compute remaining timespec from absolute deadline. Returns 0 if deadline passed. */
-static inline int queue_remaining_time(const struct timespec *deadline,
-                                        struct timespec *remaining) {
-    struct timespec now;
-    clock_gettime(CLOCK_MONOTONIC, &now);
-    remaining->tv_sec = deadline->tv_sec - now.tv_sec;
-    remaining->tv_nsec = deadline->tv_nsec - now.tv_nsec;
-    if (remaining->tv_nsec < 0) {
-        remaining->tv_sec--;
-        remaining->tv_nsec += 1000000000L;
-    }
-    return remaining->tv_sec >= 0;
-}
-
-/* Convert timeout in seconds (double) to absolute deadline */
-static inline void queue_make_deadline(double timeout, struct timespec *deadline) {
-    clock_gettime(CLOCK_MONOTONIC, deadline);
-    if (!(timeout < 1e9)) timeout = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
-    deadline->tv_sec += (time_t)timeout;
-    deadline->tv_nsec += (long)((timeout - (double)(time_t)timeout) * 1e9);
-    if (deadline->tv_nsec >= 1000000000L) {
-        deadline->tv_sec++;
-        deadline->tv_nsec -= 1000000000L;
-    }
-}
-
 /* ================================================================
  * Create / Open / Close
  * ================================================================ */
 
 #define QUEUE_ERR(fmt, ...) do { if (errbuf) snprintf(errbuf, QUEUE_ERR_BUFLEN, fmt, ##__VA_ARGS__); } while(0)
 
-static inline void queue_init_new_header(void *base, uint32_t cap, uint64_t arena_cap,
-                                          uint32_t slots_off, uint32_t arena_off,
-                                          uint32_t mode, uint64_t total_size) {
+#define QUEUE_FORMAT_ERR "queue file format v%u, this module uses v%u; recreate the queue"
+
+typedef struct { uint32_t cap; uint64_t arena_off, arena_cap, total_size; } QueueGeometry;
+
+static uint64_t queue_slot_size(uint32_t mode) {
+    return mode == QUEUE_MODE_INT   ? sizeof(QueueIntSlot)
+         : mode == QUEUE_MODE_INT32 ? sizeof(QueueInt32Slot)
+         : mode == QUEUE_MODE_INT16 ? sizeof(QueueInt16Slot)
+         :                            sizeof(QueueStrSlot);
+}
+
+static int queue_geometry(uint32_t capacity, uint32_t mode, uint64_t arena_cap_hint,
+                          QueueGeometry *g, char *errbuf) {
+    g->cap = queue_next_pow2(capacity);
+    if (g->cap == 0) { QUEUE_ERR("invalid capacity"); return 0; }
+    if (mode > QUEUE_MODE_INT16) { QUEUE_ERR("unknown mode %u", mode); return 0; }
+    uint64_t slots_end = sizeof(QueueHeader) + (uint64_t)g->cap * queue_slot_size(mode);
+    g->arena_off = g->arena_cap = 0;
+    g->total_size = slots_end;
+    if (mode == QUEUE_MODE_STR) {
+        g->arena_off = (slots_end + 7) & ~(uint64_t)7;
+        g->arena_cap = arena_cap_hint < 4096 ? 4096 : arena_cap_hint > UINT32_MAX ? UINT32_MAX : arena_cap_hint;
+        g->total_size = g->arena_off + g->arena_cap;
+    }
+    return 1;
+}
+
+static void queue_init_new_header(void *base, const QueueGeometry *g, uint32_t mode, uint64_t reserved) {
     QueueHeader *hdr = (QueueHeader *)base;
     memset(hdr, 0, sizeof(QueueHeader));
     hdr->version    = QUEUE_VERSION;
     hdr->mode       = mode;
-    hdr->capacity   = cap;
-    hdr->total_size = total_size;
-    hdr->slots_off  = slots_off;
-    hdr->arena_off  = arena_off;
-    hdr->arena_cap  = arena_cap;
-    #define INIT_SEQ(STYPE, C) do { \
-        STYPE *s = (STYPE *)((char *)base + slots_off); \
-        for (uint32_t _i = 0; _i < (C); _i++) s[_i].sequence = _i; \
+    hdr->capacity   = g->cap;
+    hdr->total_size = g->total_size;
+    hdr->slots_off  = sizeof(QueueHeader);
+    hdr->arena_off  = g->arena_off;
+    hdr->arena_cap  = g->arena_cap;
+    hdr->pidns      = queue_pidns();
+    hdr->arena_populated = reserved >= g->total_size ? (uint32_t)g->arena_cap : 0;
+    #define INIT_SEQ(STYPE) do { \
+        STYPE *s = (STYPE *)((char *)base + sizeof(QueueHeader)); \
+        for (uint32_t _i = 0; _i < g->cap; _i++) s[_i].sequence = _i; \
     } while(0)
-    if      (mode == QUEUE_MODE_INT)   INIT_SEQ(QueueIntSlot,   cap);
-    else if (mode == QUEUE_MODE_INT32) INIT_SEQ(QueueInt32Slot, cap);
-    else if (mode == QUEUE_MODE_INT16) INIT_SEQ(QueueInt16Slot, cap);
+    if      (mode == QUEUE_MODE_INT)   INIT_SEQ(QueueIntSlot);
+    else if (mode == QUEUE_MODE_INT32) INIT_SEQ(QueueInt32Slot);
+    else if (mode == QUEUE_MODE_INT16) INIT_SEQ(QueueInt16Slot);
     #undef INIT_SEQ
     /* Publish magic LAST, as a release store: it is the commit point, so a
        creator killed before it leaves magic==0 and never a file mistaken for
@@ -367,6 +485,40 @@ static inline void queue_init_new_header(void *base, uint32_t cap, uint64_t aren
        hand. */
     __atomic_store_n(&hdr->magic, QUEUE_MAGIC, __ATOMIC_RELEASE);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
+}
+
+static int queue_header_valid(const QueueHeader *hdr, uint32_t mode, uint64_t size) {
+    uint64_t slot_size = queue_slot_size(mode);
+    if (!(hdr->magic == QUEUE_MAGIC && hdr->version == QUEUE_VERSION && hdr->mode == mode
+          && hdr->capacity >= 2 && (hdr->capacity & (hdr->capacity - 1)) == 0
+          && hdr->total_size == size && hdr->slots_off == sizeof(QueueHeader)
+          && hdr->capacity <= (hdr->total_size - hdr->slots_off) / slot_size))
+        return 0;
+    if (mode != QUEUE_MODE_STR) return 1;
+    uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
+    return hdr->arena_cap >= 4096 && (hdr->arena_off & 7) == 0 && hdr->arena_off >= slots_end
+        && hdr->arena_off <= hdr->total_size && hdr->arena_cap <= hdr->total_size - hdr->arena_off;
+}
+
+static QueueHandle *queue_handle_new(void *base, size_t map_size, const char *path, int backing_fd) {
+    QueueHeader *hdr = (QueueHeader *)base;
+    QueueHandle *h = (QueueHandle *)calloc(1, sizeof(QueueHandle));
+    if (!h) return NULL;
+    h->hdr          = hdr;
+    h->slots        = (char *)base + hdr->slots_off;
+    h->arena        = hdr->mode == QUEUE_MODE_STR ? (char *)base + hdr->arena_off : NULL;
+    h->mmap_size    = map_size;
+    h->capacity     = hdr->capacity;
+    h->cap_mask     = hdr->capacity - 1;
+    h->arena_cap    = hdr->arena_cap;
+    h->path         = path ? strdup(path) : NULL;
+    h->notify_fd    = -1;
+    h->backing_fd   = backing_fd;
+    h->lock_timeout = -1;
+    uint64_t ns = queue_pidns();
+    h->same_pidns = ns && ns == hdr->pidns;
+    if (!h->same_pidns) __atomic_store_n(&hdr->pidns_mixed, 1, __ATOMIC_SEQ_CST);
+    return h;
 }
 
 /* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at
@@ -403,11 +555,15 @@ static int queue_file_is_zero(int fd, uint64_t size) {
     return 1;
 }
 
-/* A sparse segment would SIGBUS at the first write the filesystem cannot back.  opt_in (Str) reserves
-   only on DATA_QUEUE_SHARED_SPARSE=0: it would commit memory the arena otherwise fills lazily. */
-static int queue_reserve(int fd, uint64_t size, int opt_in) {
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static uint64_t queue_reserve_len(uint32_t mode, uint64_t total_size, uint64_t arena_off) {
     const char *sp = getenv("DATA_QUEUE_SHARED_SPARSE");
-    if (opt_in ? !sp || strcmp(sp, "0") : sp && *sp && strcmp(sp, "0")) return 0;
+    if (sp && *sp) return strcmp(sp, "0") ? 0 : total_size;
+    return mode == QUEUE_MODE_STR ? arena_off : total_size;
+}
+
+static int queue_reserve(int fd, uint64_t size) {
+    if (!size) return 0;
     /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
      * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
     sigset_t all, old;
@@ -425,29 +581,9 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
                                   uint32_t mode, uint64_t arena_cap_hint,
                                   mode_t file_mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
-
-    uint32_t cap = queue_next_pow2(capacity);
-    if (cap == 0) { QUEUE_ERR("invalid capacity"); return NULL; }
-    if (mode > QUEUE_MODE_INT16) { QUEUE_ERR("unknown mode %u", mode); return NULL; }
-
-    uint64_t slots_off = sizeof(QueueHeader);
-    uint64_t slot_size = (mode == QUEUE_MODE_INT)   ? sizeof(QueueIntSlot)
-                       : (mode == QUEUE_MODE_INT32) ? sizeof(QueueInt32Slot)
-                       : (mode == QUEUE_MODE_INT16) ? sizeof(QueueInt16Slot)
-                       :                              sizeof(QueueStrSlot);
-    uint64_t arena_off = 0, arena_cap = 0;
-    uint64_t total_size;
-
-    if (mode == QUEUE_MODE_STR) {
-        uint64_t slots_end = slots_off + (uint64_t)cap * slot_size;
-        arena_off = (slots_end + 7) & ~(uint64_t)7;
-        arena_cap = arena_cap_hint;
-        if (arena_cap < 4096) arena_cap = 4096;
-        if (arena_cap > UINT32_MAX) arena_cap = UINT32_MAX;
-        total_size = arena_off + arena_cap;
-    } else {
-        total_size = slots_off + (uint64_t)cap * slot_size;
-    }
+    QueueGeometry g;
+    if (!queue_geometry(capacity, mode, arena_cap_hint, &g, errbuf)) return NULL;
+    uint64_t total_size = g.total_size;
 
     int anonymous = (path == NULL);
     size_t map_size;
@@ -462,9 +598,10 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
             QUEUE_ERR("mmap(anonymous): %s", strerror(errno));
             return NULL;
         }
-        queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
+        queue_init_new_header(base, &g, mode, 0);
     } else {
         /* File-backed shared mmap */
+        uint64_t reserved = queue_reserve_len(mode, total_size, g.arena_off);
         int fd = queue_secure_open(path, file_mode, errbuf);
         if (fd < 0) return NULL;
 
@@ -500,8 +637,8 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
                 QUEUE_ERR("ftruncate(%s): %s", path, strerror(errno));
                 flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            if (queue_reserve(fd, total_size, mode == QUEUE_MODE_STR) < 0) {
-                QUEUE_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total_size, strerror(errno));
+            if (queue_reserve(fd, reserved) < 0) {
+                QUEUE_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)reserved, strerror(errno));
                 if (ftruncate(fd, 0) < 0) { /* best effort */ }
                 flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -518,24 +655,7 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
         QueueHeader *hdr = (QueueHeader *)base;
 
         if (!is_new) {
-            /* Validate existing file */
-            int valid = (hdr->magic == QUEUE_MAGIC &&
-                         hdr->version == QUEUE_VERSION &&
-                         hdr->mode == mode &&
-                         hdr->capacity >= 2 &&
-                         (hdr->capacity & (hdr->capacity - 1)) == 0 &&
-                         hdr->total_size == (uint64_t)st.st_size &&
-                         hdr->slots_off == sizeof(QueueHeader) &&
-                         hdr->capacity <= (hdr->total_size - hdr->slots_off) / slot_size);
-            if (mode == QUEUE_MODE_STR && valid) {
-                uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
-                valid = (hdr->arena_cap >= 4096 &&
-                         (hdr->arena_off & 7) == 0 &&
-                         hdr->arena_off >= slots_end &&
-                         hdr->arena_off <= hdr->total_size &&
-                         hdr->arena_cap <= hdr->total_size - hdr->arena_off);
-            }
-            if (!valid) {
+            if (!queue_header_valid(hdr, mode, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
                  * between the ftruncate and the header init leaves a
                  * full-size, all-zero (magic==0) file that would brick every
@@ -548,52 +668,37 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
                         QUEUE_ERR("%s: fchmod: %s", path, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
-                    if (queue_reserve(fd, total_size, mode == QUEUE_MODE_STR) < 0) {
-                        QUEUE_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total_size, strerror(errno));
+                    if (queue_reserve(fd, reserved) < 0) {
+                        QUEUE_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)reserved, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
-                    queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
+                    queue_init_new_header(base, &g, mode, reserved);
                     flock(fd, LOCK_UN); close(fd);
                     goto setup_handle;
                 }
                 if (hdr->magic == 0 && (uint64_t)st.st_size == total_size
                     && st.st_uid == geteuid())
                     QUEUE_ERR("%s: incomplete queue file left by an interrupted create; remove it and retry", path);
+                else if (hdr->magic == QUEUE_MAGIC && hdr->version != QUEUE_VERSION)
+                    QUEUE_ERR("%s: " QUEUE_FORMAT_ERR, path, hdr->version, QUEUE_VERSION);
                 else
                     QUEUE_ERR("%s: invalid or incompatible queue file", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
-            cap = hdr->capacity;
-            arena_cap = hdr->arena_cap;
             flock(fd, LOCK_UN);
             close(fd);
             goto setup_handle;
         }
 
-        queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
+        queue_init_new_header(base, &g, mode, reserved);
         flock(fd, LOCK_UN);
         close(fd);
     }
 
 setup_handle:;
-    {
-    QueueHeader *hdr = (QueueHeader *)base;
-    QueueHandle *h = (QueueHandle *)calloc(1, sizeof(QueueHandle));
-    if (!h) { munmap(base, map_size); return NULL; }
-
-    h->hdr       = hdr;
-    h->slots     = (char *)base + hdr->slots_off;
-    h->arena     = (mode == QUEUE_MODE_STR) ? (char *)base + hdr->arena_off : NULL;
-    h->mmap_size = map_size;
-    h->capacity  = cap;
-    h->cap_mask  = cap - 1;
-    h->arena_cap = arena_cap;
-    h->path      = path ? strdup(path) : NULL;
-    h->notify_fd = -1;
-    h->backing_fd = -1;
-
+    QueueHandle *h = queue_handle_new(base, map_size, path, -1);
+    if (!h) munmap(base, map_size);
     return h;
-    }
 }
 
 /* Create queue backed by memfd -- shareable via fd passing (SCM_RIGHTS) */
@@ -601,28 +706,9 @@ static QueueHandle *queue_create_memfd(const char *name, uint32_t capacity,
                                         uint32_t mode, uint64_t arena_cap_hint,
                                         char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
-
-    uint32_t cap = queue_next_pow2(capacity);
-    if (cap == 0) { QUEUE_ERR("invalid capacity"); return NULL; }
-    if (mode > QUEUE_MODE_INT16) { QUEUE_ERR("unknown mode %u", mode); return NULL; }
-
-    uint64_t slots_off = sizeof(QueueHeader);
-    uint64_t slot_size = (mode == QUEUE_MODE_INT)   ? sizeof(QueueIntSlot)
-                       : (mode == QUEUE_MODE_INT32) ? sizeof(QueueInt32Slot)
-                       : (mode == QUEUE_MODE_INT16) ? sizeof(QueueInt16Slot)
-                       :                              sizeof(QueueStrSlot);
-    uint64_t arena_off = 0, arena_cap = 0, total_size;
-
-    if (mode == QUEUE_MODE_STR) {
-        uint64_t slots_end = slots_off + (uint64_t)cap * slot_size;
-        arena_off = (slots_end + 7) & ~(uint64_t)7;
-        arena_cap = arena_cap_hint;
-        if (arena_cap < 4096) arena_cap = 4096;
-        if (arena_cap > UINT32_MAX) arena_cap = UINT32_MAX;
-        total_size = arena_off + arena_cap;
-    } else {
-        total_size = slots_off + (uint64_t)cap * slot_size;
-    }
+    QueueGeometry g;
+    if (!queue_geometry(capacity, mode, arena_cap_hint, &g, errbuf)) return NULL;
+    uint64_t total_size = g.total_size;
 
     int fd = memfd_create(name ? name : "queue", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { QUEUE_ERR("memfd_create: %s", strerror(errno)); return NULL; }
@@ -631,8 +717,9 @@ static QueueHandle *queue_create_memfd(const char *name, uint32_t capacity,
         QUEUE_ERR("ftruncate(memfd): %s", strerror(errno));
         close(fd); return NULL;
     }
-    if (queue_reserve(fd, total_size, mode == QUEUE_MODE_STR) < 0) {
-        QUEUE_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total_size, strerror(errno));
+    uint64_t reserved = queue_reserve_len(mode, total_size, g.arena_off);
+    if (queue_reserve(fd, reserved) < 0) {
+        QUEUE_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)reserved, strerror(errno));
         close(fd); return NULL;
     }
 
@@ -645,22 +732,9 @@ static QueueHandle *queue_create_memfd(const char *name, uint32_t capacity,
         close(fd); return NULL;
     }
 
-    queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
-
-    QueueHandle *h = (QueueHandle *)calloc(1, sizeof(QueueHandle));
-    if (!h) { munmap(base, (size_t)total_size); close(fd); return NULL; }
-
-    h->hdr        = (QueueHeader *)base;
-    h->slots      = (char *)base + slots_off;
-    h->arena      = (mode == QUEUE_MODE_STR) ? (char *)base + arena_off : NULL;
-    h->mmap_size  = (size_t)total_size;
-    h->capacity   = cap;
-    h->cap_mask   = cap - 1;
-    h->arena_cap  = arena_cap;
-    h->path       = NULL;
-    h->notify_fd  = -1;
-    h->backing_fd = fd;
-
+    queue_init_new_header(base, &g, mode, reserved);
+    QueueHandle *h = queue_handle_new(base, (size_t)total_size, NULL, fd);
+    if (!h) { munmap(base, (size_t)total_size); close(fd); }
     return h;
 }
 
@@ -699,28 +773,11 @@ static QueueHandle *queue_open_fd(int fd, uint32_t mode, char *errbuf) {
     }
 
     QueueHeader *hdr = (QueueHeader *)base;
-    uint64_t slot_size = (mode == QUEUE_MODE_INT)   ? sizeof(QueueIntSlot)
-                       : (mode == QUEUE_MODE_INT32) ? sizeof(QueueInt32Slot)
-                       : (mode == QUEUE_MODE_INT16) ? sizeof(QueueInt16Slot)
-                       :                              sizeof(QueueStrSlot);
-    int valid = (hdr->magic == QUEUE_MAGIC &&
-                 hdr->version == QUEUE_VERSION &&
-                 hdr->mode == mode &&
-                 hdr->capacity >= 2 &&
-                 (hdr->capacity & (hdr->capacity - 1)) == 0 &&
-                 hdr->total_size == (uint64_t)st.st_size &&
-                 hdr->slots_off == sizeof(QueueHeader) &&
-                 hdr->capacity <= (hdr->total_size - hdr->slots_off) / slot_size);
-    if (mode == QUEUE_MODE_STR && valid) {
-        uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
-        valid = (hdr->arena_cap >= 4096 &&
-                 (hdr->arena_off & 7) == 0 &&
-                 hdr->arena_off >= slots_end &&
-                 hdr->arena_off <= hdr->total_size &&
-                 hdr->arena_cap <= hdr->total_size - hdr->arena_off);
-    }
-    if (!valid) {
-        QUEUE_ERR("fd %d: invalid or incompatible queue", fd);
+    if (!queue_header_valid(hdr, mode, (uint64_t)st.st_size)) {
+        if (hdr->version != QUEUE_VERSION)
+            QUEUE_ERR("fd %d: " QUEUE_FORMAT_ERR, fd, hdr->version, QUEUE_VERSION);
+        else
+            QUEUE_ERR("fd %d: invalid or incompatible queue", fd);
         munmap(base, map_size);
         return NULL;
     }
@@ -733,20 +790,8 @@ static QueueHandle *queue_open_fd(int fd, uint32_t mode, char *errbuf) {
         return NULL;
     }
 
-    QueueHandle *h = (QueueHandle *)calloc(1, sizeof(QueueHandle));
-    if (!h) { munmap(base, map_size); close(myfd); return NULL; }
-
-    h->hdr        = hdr;
-    h->slots      = (char *)base + hdr->slots_off;
-    h->arena      = (mode == QUEUE_MODE_STR) ? (char *)base + hdr->arena_off : NULL;
-    h->mmap_size  = map_size;
-    h->capacity   = hdr->capacity;
-    h->cap_mask   = hdr->capacity - 1;
-    h->arena_cap  = hdr->arena_cap;
-    h->path       = NULL;
-    h->notify_fd  = -1;
-    h->backing_fd = myfd;
-
+    QueueHandle *h = queue_handle_new(base, map_size, NULL, myfd);
+    if (!h) { munmap(base, map_size); close(myfd); }
     return h;
 }
 
@@ -883,13 +928,13 @@ static int queue_##PFX##_push_wait(QueueHandle *h, VTYPE value,               \
             queue_##PFX##_handoff(h, true);                                   \
             return 1;                                                         \
         }                                                                     \
-        const struct timespec *pts = &queue_lock_timeout;                                          \
+        const struct timespec *pts = &queue_recheck;                          \
         if (has_deadline) {                                                    \
             if (!queue_remaining_time(&deadline, &remaining)) {               \
                 __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE); \
                 return 0;                                                     \
             }                                                                 \
-            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;                                                 \
+            if (remaining.tv_sec < QUEUE_RECHECK_SEC) pts = &remaining;       \
         }                                                                     \
         long rc = syscall(SYS_futex, &hdr->push_futex, FUTEX_WAIT,           \
                           fseq, pts, NULL, 0);                                \
@@ -921,13 +966,13 @@ static int queue_##PFX##_pop_wait(QueueHandle *h, VTYPE *value,               \
             queue_##PFX##_handoff(h, false);                                  \
             return 1;                                                         \
         }                                                                     \
-        const struct timespec *pts = &queue_lock_timeout;                                          \
+        const struct timespec *pts = &queue_recheck;                          \
         if (has_deadline) {                                                    \
             if (!queue_remaining_time(&deadline, &remaining)) {               \
                 __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);  \
                 return 0;                                                     \
             }                                                                 \
-            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;                                                 \
+            if (remaining.tv_sec < QUEUE_RECHECK_SEC) pts = &remaining;       \
         }                                                                     \
         long rc = syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAIT,            \
                           fseq, pts, NULL, 0);                                \
@@ -995,7 +1040,46 @@ static inline uint32_t queue_str_producer_wake_count(QueueHeader *hdr, uint32_t 
     return INT_MAX;
 }
 
-/* Push one item while mutex is already held. Returns 1=ok, 0=full, -2=too long. */
+#ifndef MADV_POPULATE_WRITE
+#define MADV_POPULATE_WRITE 23
+#endif
+
+/* Allocates the pages under [p, p+len) as a write would, but fails instead of raising SIGBUS;
+ * does nothing on kernels without MADV_POPULATE_WRITE (before 5.14). */
+static int queue_populate(char *p, uint64_t len) {
+    static uintptr_t page;
+    static int unsupported;
+    if (unsupported) return 0;
+    if (!page) page = (uintptr_t)sysconf(_SC_PAGESIZE);
+    uintptr_t a = (uintptr_t)p & ~(page - 1);
+    uintptr_t e = ((uintptr_t)p + len + page - 1) & ~(page - 1);
+    int r, tries = 0;
+    do r = madvise((void *)a, e - a, MADV_POPULATE_WRITE);
+    while (r < 0 && (errno == EINTR || errno == EAGAIN) && ++tries < 8);
+    if (r < 0 && errno == EINVAL) unsupported = 1, r = 0;
+    return r;
+}
+
+/* Under the mutex, before writing arena bytes [pos, end); only push_front's wrap to the top writes above the mark. */
+static int queue_arena_populate(QueueHandle *h, uint32_t pos, uint32_t end) {
+    QueueHeader *hdr = h->hdr;
+    uint32_t mark = hdr->arena_populated;
+    if (end <= mark) return 1;
+    uint64_t from = pos > mark ? pos : mark, to = end;
+    if (from == mark) {
+        uint64_t step = (uint64_t)mark + QUEUE_POPULATE_CHUNK;
+        if (step > h->arena_cap) step = h->arena_cap;
+        if (step > to) to = step;
+    }
+    if (queue_populate(h->arena + from, to - from) < 0) {
+        h->fail_errno = errno == EFAULT ? ENOSPC : errno;
+        return 0;
+    }
+    if (from == mark) __atomic_store_n(&hdr->arena_populated, (uint32_t)to, __ATOMIC_RELAXED);
+    return 1;
+}
+
+/* Push one item while mutex is already held. Returns 1=ok, 0=full, -2=too long, QUEUE_FAILED. */
 static inline int queue_str_push_locked(QueueHandle *h, const char *str,
                                          uint32_t len, bool utf8) {
     QueueHeader *hdr = h->hdr;
@@ -1031,6 +1115,7 @@ static inline int queue_str_push_locked(QueueHandle *h, const char *str,
         }
     }
 
+    if (!queue_arena_populate(h, pos, pos + alloc)) return QUEUE_FAILED;
     memcpy(h->arena + pos, str, len);
 
     uint32_t idx = (uint32_t)(hdr->tail & h->cap_mask);
@@ -1050,7 +1135,7 @@ static inline int queue_str_push_locked(QueueHandle *h, const char *str,
 
 static inline int queue_str_try_push(QueueHandle *h, const char *str,
                                       uint32_t len, bool utf8) {
-    queue_mutex_lock(h->hdr);
+    if (!queue_str_lock(h)) return QUEUE_FAILED;
     int r = queue_str_push_locked(h, str, len, utf8);
     queue_mutex_unlock(h->hdr);
     if (r == 1) queue_wake_consumers(h->hdr);
@@ -1104,96 +1189,21 @@ static inline int queue_str_pop_locked(QueueHandle *h, const char **out_str,
     return 1;
 }
 
+/* Under the mutex; 0 when empty. */
+static inline uint32_t queue_str_front_len(QueueHandle *h) {
+    QueueHeader *hdr = h->hdr;
+    if (hdr->tail == hdr->head) return 0;
+    return ((QueueStrSlot *)h->slots)[hdr->head & h->cap_mask].packed_len & QUEUE_STR_LEN_MASK;
+}
+
 static inline int queue_str_try_pop(QueueHandle *h, const char **out_str,
                                      uint32_t *out_len, bool *out_utf8) {
-    queue_mutex_lock(h->hdr);
+    if (!queue_str_lock(h)) return QUEUE_FAILED;
     int r = queue_str_pop_locked(h, out_str, out_len, out_utf8);
     uint32_t wake = r == 1 ? queue_str_producer_wake_count(h->hdr, 1) : 0;
     queue_mutex_unlock(h->hdr);
     if (wake) queue_wake_producers_n(h->hdr, wake);
     return r;
-}
-
-static int queue_str_push_wait(QueueHandle *h, const char *str,
-                                uint32_t len, bool utf8, double timeout) {
-    int r = queue_str_try_push(h, str, len, utf8);
-    if (r != 0) return r;  /* 1 = success, -2 = too long */
-    if (timeout == 0) return 0;
-
-    QueueHeader *hdr = h->hdr;
-    struct timespec deadline, remaining;
-    int has_deadline = (timeout > 0);
-    if (has_deadline) queue_make_deadline(timeout, &deadline);
-
-    for (;;) {
-        /* Announce BEFORE sampling seq and re-trying; otherwise a popper
-         * that drains between try_push and waiters++ reads waiters==0,
-         * skips the push_futex bump, and our FUTEX_WAIT then sleeps on
-         * an unchanged seq with no future waker. */
-        __atomic_add_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
-        uint32_t seq = __atomic_load_n(&hdr->push_futex, __ATOMIC_ACQUIRE);
-        r = queue_str_try_push(h, str, len, utf8);
-        if (r != 0) {
-            __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
-            return r;
-        }
-
-        /* Periodic retries also recover a peer killed before its wakeup. */
-        const struct timespec *pts = &queue_lock_timeout;
-        if (has_deadline) {
-            if (!queue_remaining_time(&deadline, &remaining)) {
-                __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
-                return 0;
-            }
-            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;
-        }
-        long rc = syscall(SYS_futex, &hdr->push_futex, FUTEX_WAIT, seq, pts, NULL, 0);
-        __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
-
-        r = queue_str_try_push(h, str, len, utf8);
-        if (r != 0) return r;
-        if (has_deadline && rc == -1 && errno == ETIMEDOUT
-            && !queue_remaining_time(&deadline, &remaining)) return 0;
-    }
-}
-
-static int queue_str_pop_wait(QueueHandle *h, const char **out_str,
-                               uint32_t *out_len, bool *out_utf8, double timeout) {
-    int r = queue_str_try_pop(h, out_str, out_len, out_utf8);
-    if (r != 0) return r;
-    if (timeout == 0) return 0;
-
-    QueueHeader *hdr = h->hdr;
-    struct timespec deadline, remaining;
-    int has_deadline = (timeout > 0);
-    if (has_deadline) queue_make_deadline(timeout, &deadline);
-
-    for (;;) {
-        /* Announce BEFORE sampling seq / re-trying; see push_wait. */
-        __atomic_add_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
-        uint32_t seq = __atomic_load_n(&hdr->pop_futex, __ATOMIC_ACQUIRE);
-        r = queue_str_try_pop(h, out_str, out_len, out_utf8);
-        if (r != 0) {
-            __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
-            return r;
-        }
-
-        const struct timespec *pts = &queue_lock_timeout;
-        if (has_deadline) {
-            if (!queue_remaining_time(&deadline, &remaining)) {
-                __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
-                return 0;
-            }
-            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;
-        }
-        long rc = syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAIT, seq, pts, NULL, 0);
-        __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
-
-        r = queue_str_try_pop(h, out_str, out_len, out_utf8);
-        if (r != 0) return r;
-        if (has_deadline && rc == -1 && errno == ETIMEDOUT
-            && !queue_remaining_time(&deadline, &remaining)) return 0;
-    }
 }
 
 static inline uint64_t queue_str_size(QueueHandle *h) {
@@ -1205,9 +1215,9 @@ static inline uint64_t queue_str_size(QueueHandle *h) {
     return diff > h->capacity ? h->capacity : diff;
 }
 
-static void queue_str_clear(QueueHandle *h) {
+static int queue_str_clear(QueueHandle *h) {
     QueueHeader *hdr = h->hdr;
-    queue_mutex_lock(hdr);
+    if (!queue_str_lock(h)) return QUEUE_FAILED;
     /* One store empties it: zeroing head and tail apart would leave tail-head garbage. */
     __atomic_store_n(&hdr->head, hdr->tail, __ATOMIC_RELAXED);
     queue_set_arena(hdr, 0, 0);
@@ -1222,13 +1232,14 @@ static void queue_str_clear(QueueHandle *h) {
         __atomic_add_fetch(&hdr->pop_futex, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
     }
+    return 1;
 }
 
 /* Peek: read front element without consuming (exact, under mutex). */
 static inline int queue_str_peek(QueueHandle *h, const char **out_str,
                                   uint32_t *out_len, bool *out_utf8) {
     QueueHeader *hdr = h->hdr;
-    queue_mutex_lock(hdr);
+    if (!queue_str_lock(h)) return QUEUE_FAILED;
     if (hdr->tail == hdr->head) {
         queue_mutex_unlock(hdr);
         return 0;
@@ -1256,7 +1267,7 @@ static inline int queue_str_peek(QueueHandle *h, const char **out_str,
 static inline int queue_str_push_front(QueueHandle *h, const char *str,
                                         uint32_t len, bool utf8) {
     QueueHeader *hdr = h->hdr;
-    queue_mutex_lock(hdr);
+    if (!queue_str_lock(h)) return QUEUE_FAILED;
 
     if (len > QUEUE_STR_LEN_MASK) {
         queue_mutex_unlock(hdr);
@@ -1283,20 +1294,17 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
      * contiguous ring region), which the free accounting relies on. The
      * invariant arena_wpos == (read_frontier + arena_used) mod arena_cap is
      * preserved by every op, so pop_back can just retreat arena_wpos by the
-     * slot's skip. (The old code allocated at the WRITE frontier but inserted
-     * at the head; a following pop_front then freed the newest arena bytes,
-     * leaving a hole the single-counter model cannot represent, so later
-     * wrapping pushes overwrote live elements.) */
+     * slot's skip. */
     uint32_t cap = (uint32_t)h->arena_cap;
     if (cap == 0) { queue_mutex_unlock(hdr); return 0; }
     uint32_t pos, skip;
+    int empty = hdr->tail == hdr->head;
 
-    if (hdr->tail == hdr->head) {
+    if (empty) {
         /* Empty: the element is both front and back. Place it at the arena
          * start, resetting the ring (also defragments a drained arena). */
         pos  = 0;
         skip = alloc;
-        queue_set_arena(hdr, alloc, alloc);
     } else {
         uint32_t rpos = (uint32_t)(((uint64_t)hdr->arena_wpos
                           + cap - (hdr->arena_used % cap)) % cap);
@@ -1313,6 +1321,14 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
             queue_mutex_unlock(hdr);
             return 0;
         }
+    }
+    if (!queue_arena_populate(h, pos, pos + alloc)) {
+        queue_mutex_unlock(hdr);
+        return QUEUE_FAILED;
+    }
+    if (empty) {
+        queue_set_arena(hdr, alloc, alloc);
+    } else {
         hdr->arena_used += skip;   /* arena_wpos unchanged: rpos moved down */
     }
 
@@ -1332,50 +1348,11 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
     return 1;
 }
 
-static int queue_str_push_front_wait(QueueHandle *h, const char *str,
-                                      uint32_t len, bool utf8, double timeout) {
-    int r = queue_str_push_front(h, str, len, utf8);
-    if (r != 0) return r;
-    if (timeout == 0) return 0;
-
-    QueueHeader *hdr = h->hdr;
-    struct timespec deadline, remaining;
-    int has_deadline = (timeout > 0);
-    if (has_deadline) queue_make_deadline(timeout, &deadline);
-
-    for (;;) {
-        /* Announce BEFORE sampling seq / re-trying; see push_wait. */
-        __atomic_add_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
-        uint32_t seq = __atomic_load_n(&hdr->push_futex, __ATOMIC_ACQUIRE);
-        r = queue_str_push_front(h, str, len, utf8);
-        if (r != 0) {
-            __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
-            return r;
-        }
-
-        const struct timespec *pts = &queue_lock_timeout;
-        if (has_deadline) {
-            if (!queue_remaining_time(&deadline, &remaining)) {
-                __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
-                return 0;
-            }
-            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;
-        }
-        long rc = syscall(SYS_futex, &hdr->push_futex, FUTEX_WAIT, seq, pts, NULL, 0);
-        __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
-
-        r = queue_str_push_front(h, str, len, utf8);
-        if (r != 0) return r;
-        if (has_deadline && rc == -1 && errno == ETIMEDOUT
-            && !queue_remaining_time(&deadline, &remaining)) return 0;
-    }
-}
-
 /* Pop from back (tail). Str only -- undoes the most recent push. */
 static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
                                       uint32_t *out_len, bool *out_utf8) {
     QueueHeader *hdr = h->hdr;
-    queue_mutex_lock(hdr);
+    if (!queue_str_lock(h)) return QUEUE_FAILED;
 
     if (hdr->tail == hdr->head) {
         __atomic_add_fetch(&hdr->stat_pop_empty, 1, __ATOMIC_RELAXED);
@@ -1427,43 +1404,81 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
     return 1;
 }
 
-static int queue_str_pop_back_wait(QueueHandle *h, const char **out_str,
-                                    uint32_t *out_len, bool *out_utf8, double timeout) {
-    int r = queue_str_pop_back(h, out_str, out_len, out_utf8);
-    if (r != 0) return r;
-    if (timeout == 0) return 0;
+/* In for a push, out for a pop. */
+typedef struct { const char *str; uint32_t len; bool utf8; } QueueStrVal;
+typedef int (*queue_str_op)(QueueHandle *, QueueStrVal *);
 
+static int queue_str_op_push(QueueHandle *h, QueueStrVal *v) { return queue_str_try_push(h, v->str, v->len, v->utf8); }
+static int queue_str_op_push_front(QueueHandle *h, QueueStrVal *v) { return queue_str_push_front(h, v->str, v->len, v->utf8); }
+static int queue_str_op_pop(QueueHandle *h, QueueStrVal *v) { return queue_str_try_pop(h, &v->str, &v->len, &v->utf8); }
+static int queue_str_op_pop_back(QueueHandle *h, QueueStrVal *v) { return queue_str_pop_back(h, &v->str, &v->len, &v->utf8); }
+
+/* Retries op until it is done or fails, or timeout (seconds, < 0 for none) runs out. */
+static int queue_str_wait(QueueHandle *h, queue_str_op op, QueueStrVal *v, int producer, double timeout) {
+    int r = op(h, v);
+    if (r != 0 || timeout == 0) return r;
     QueueHeader *hdr = h->hdr;
+    uint32_t *waiters = producer ? &hdr->push_waiters : &hdr->pop_waiters;
+    uint32_t *futex = producer ? &hdr->push_futex : &hdr->pop_futex;
     struct timespec deadline, remaining;
-    int has_deadline = (timeout > 0);
+    int has_deadline = timeout > 0;
     if (has_deadline) queue_make_deadline(timeout, &deadline);
-
     for (;;) {
-        /* Announce BEFORE sampling seq / re-trying; see pop_wait. */
-        __atomic_add_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
-        uint32_t seq = __atomic_load_n(&hdr->pop_futex, __ATOMIC_ACQUIRE);
-        r = queue_str_pop_back(h, out_str, out_len, out_utf8);
+        /* Announce before sampling seq, so a peer that changes the queue in between wakes us. */
+        __atomic_add_fetch(waiters, 1, __ATOMIC_RELEASE);
+        uint32_t seq = __atomic_load_n(futex, __ATOMIC_ACQUIRE);
+        r = op(h, v);
         if (r != 0) {
-            __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
-            return r;
+            __atomic_sub_fetch(waiters, 1, __ATOMIC_RELEASE);
+            break;
         }
-
-        const struct timespec *pts = &queue_lock_timeout;
+        /* Periodic retries also recover a peer killed before its wakeup. */
+        const struct timespec *pts = &queue_recheck;
         if (has_deadline) {
             if (!queue_remaining_time(&deadline, &remaining)) {
-                __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
+                __atomic_sub_fetch(waiters, 1, __ATOMIC_RELEASE);
                 return 0;
             }
-            if (remaining.tv_sec < QUEUE_LOCK_TIMEOUT_SEC) pts = &remaining;
+            if (remaining.tv_sec < QUEUE_RECHECK_SEC) pts = &remaining;
         }
-        long rc = syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAIT, seq, pts, NULL, 0);
-        __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
-
-        r = queue_str_pop_back(h, out_str, out_len, out_utf8);
-        if (r != 0) return r;
+        long rc = syscall(SYS_futex, futex, FUTEX_WAIT, seq, pts, NULL, 0);
+        __atomic_sub_fetch(waiters, 1, __ATOMIC_RELEASE);
+        r = op(h, v);
+        if (r != 0) break;
         if (has_deadline && rc == -1 && errno == ETIMEDOUT
             && !queue_remaining_time(&deadline, &remaining)) return 0;
     }
+    if (r == QUEUE_FAILED) {   /* pass on a wake we may have taken */
+        if (producer) queue_wake_producers(hdr);
+        else queue_wake_consumers(hdr);
+    }
+    return r;
+}
+
+static int queue_str_push_wait(QueueHandle *h, const char *str, uint32_t len, bool utf8, double timeout) {
+    QueueStrVal v = { str, len, utf8 };
+    return queue_str_wait(h, queue_str_op_push, &v, 1, timeout);
+}
+
+static int queue_str_push_front_wait(QueueHandle *h, const char *str, uint32_t len, bool utf8, double timeout) {
+    QueueStrVal v = { str, len, utf8 };
+    return queue_str_wait(h, queue_str_op_push_front, &v, 1, timeout);
+}
+
+static int queue_str_pop_wait_with(QueueHandle *h, queue_str_op op, const char **out_str,
+                                   uint32_t *out_len, bool *out_utf8, double timeout) {
+    QueueStrVal v;
+    int r = queue_str_wait(h, op, &v, 0, timeout);
+    if (r == 1) { *out_str = v.str; *out_len = v.len; *out_utf8 = v.utf8; }
+    return r;
+}
+
+static int queue_str_pop_wait(QueueHandle *h, const char **out_str, uint32_t *out_len, bool *out_utf8, double timeout) {
+    return queue_str_pop_wait_with(h, queue_str_op_pop, out_str, out_len, out_utf8, timeout);
+}
+
+static int queue_str_pop_back_wait(QueueHandle *h, const char **out_str, uint32_t *out_len, bool *out_utf8, double timeout) {
+    return queue_str_pop_wait_with(h, queue_str_op_pop_back, out_str, out_len, out_utf8, timeout);
 }
 
 /* msync -- flush mapped pages to disk */

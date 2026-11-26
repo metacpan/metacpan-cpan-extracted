@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::GitHooks 0.008;
+package Dist::Conformance::Check::GitHooks 0.011;
 
 # ABSTRACT: The git hooks are tracked, match their templates, and are installed
 
@@ -24,9 +24,11 @@ sub config_schema ($) {
     };
 }
 
-
+# The path of the hook C<$name> in the repository: below C<directory>.
+# @param   name  Str  the name of the hook, such as C<pre-commit>
+# @returns Str  the path, relative to the top of the repository
+# @example my $path = $check->hook_path('pre-commit');
 sub hook_path ( $self, $name ) { return $self->config->{directory} . "/$name" }
-
 
 sub check ( $self, $snapshot ) {
     my $hooks   = $self->config->{hooks};
@@ -37,7 +39,6 @@ sub check ( $self, $snapshot ) {
     return ( $self->config->{differ}, 'customized or outdated: ' . join ', ', map { local ($_) = $_; $self->hook_path($_) } @differ ) if @differ;
     return ( 'pass', 'match the templates' );
 }
-
 
 sub update ( $self, $update ) {
     my ( $hooks, $replace, $install ) = @{ $self->config }{qw{hooks replace install}};
@@ -66,7 +67,7 @@ Dist::Conformance::Check::GitHooks - The git hooks are tracked, match their temp
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -92,16 +93,19 @@ the check and still gets them from the update.
 
 =head1 METHODS
 
-=head2 hook_path
+=head2 hook_path(name)
 
-C<($name)>.  The path of the hook C<$name> in the repository.
+The path of the hook C<$name> in the repository: below C<directory>.
 
-=head2 check
+=over 4
 
-=head2 update
+=item name - Str - the name of the hook, such as C<pre-commit>
 
-Writes the missing hooks, replaces those that differ if C<replace>, and
-installs them if C<install>.
+=back
+
+Returns Str, the path, relative to the top of the repository.
+
+    my $path = $check->hook_path('pre-commit');
 
 =head1 IN A FLAVOR
 

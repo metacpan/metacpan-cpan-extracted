@@ -180,6 +180,10 @@ PERL
             return $output;
         };
         my $source = File::Spec->catfile($dist, 'conf', 'acme-test-syspath.cfg');
+        # Release distributions ship this fixture read-only.
+        my @source_stat = stat($source) or die "cannot stat '$source': $!";
+        chmod(($source_stat[2] & 07777) | 0200, $source)
+            or die "cannot chmod '$source': $!";
         my $config = File::Spec->catfile($system, 'sysconfdir', 'acme-test-syspath.cfg');
         my $explicit_source = File::Spec->catfile($dist, 'share', 'share');
         my $explicit_config = File::Spec->catfile($system, 'datadir', 'share');

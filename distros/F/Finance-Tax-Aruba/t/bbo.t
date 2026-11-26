@@ -29,23 +29,27 @@ subtest 'import -- taxed at the border, same rate' => sub {
     is($calc->import_tax(1000), 70, 'importing 1000 worth of goods owes 70 in BBO at the border');
 };
 
-subtest 'the 7% is BAZV 3% plus BBO 4%' => sub {
-    for my $year (2020 .. 2023) {
+subtest 'the 7% is BAZV 3% plus BBO 2.5% plus BAVP 1.5%' => sub {
+    for my $year (2020 .. 2022) {
         my $calc = Finance::Tax::Aruba::BBO->tax_year($year);
-        is($calc->bbo_rate, 0.03, "$year: BBO is 3%");
+        is($calc->bbo_rate, 0.015, "$year: BBO is 1.5%");
+        is($calc->bavp_rate, 0.015, "$year: BAVP is 1.5%");
         is($calc->bazv_rate, 0.03, "$year: BAZV is 3%");
         is($calc->rate, 0.06, "$year: total rate is 6%");
     }
-    for my $year (2024, 2025) {
+    for my $year (2023 .. 2025) {
         my $calc = Finance::Tax::Aruba::BBO->tax_year($year);
-        is($calc->bbo_rate, 0.04, "$year: BBO is 4%");
+        is($calc->bbo_rate, 0.025, "$year: BBO is 2.5%");
+        is($calc->bavp_rate, 0.015, "$year: BAVP is 1.5%");
         is($calc->bazv_rate, 0.03, "$year: BAZV is 3%");
         is($calc->rate, 0.07, "$year: total rate is 7%");
     }
     my $calc = Finance::Tax::Aruba::BBO->tax_year(2025);
     is($calc->domestic_tax_bazv(100), 3, 'BAZV is 3 of 100');
-    is($calc->domestic_tax_bbo(100), 4, 'BBO is 4 of 100');
-    is($calc->domestic_tax_bazv(333.33) + $calc->domestic_tax_bbo(333.33),
+    is($calc->domestic_tax_bbo(1000), 25, 'BBO is 25 of 1000');
+    is($calc->domestic_tax_bavp(1000), 15, 'BAVP is 15 of 1000');
+    is($calc->domestic_tax_bazv(333.33) + $calc->domestic_tax_bbo(333.33)
+        + $calc->domestic_tax_bavp(333.33),
         $calc->domestic_tax(333.33), 'the parts add up to the total after rounding');
 };
 

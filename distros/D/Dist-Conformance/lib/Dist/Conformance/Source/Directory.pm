@@ -1,4 +1,4 @@
-package Dist::Conformance::Source::Directory 0.008;
+package Dist::Conformance::Source::Directory 0.011;
 
 # ABSTRACT: Standards read from a directory on this machine
 
@@ -43,7 +43,7 @@ Dist::Conformance::Source::Directory - Standards read from a directory on this m
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -67,17 +67,39 @@ Required.  The top of the tree.
 
 =head1 METHODS
 
-=head2 new
+=head2 new(@args)
+
+A new source.
+
+=over 4
+
+=item args - Hash - the attributes, such as L</directory> and C<path>, as named arguments
+
+=back
+
+Returns a Dist::Conformance::Source::Directory object.
 
 Dies unless L</directory> is given.
 
+    my $source = Dist::Conformance::Source::Directory->new( directory => '/bogus/standards' );
+
 =head2 root
 
-L</directory>, as a L<Mojo::File>.  Dies when it is not a directory.
+L</directory>, as a L<Mojo::File>.
+
+Returns a Mojo::File object.
+
+Dies when it is not a directory.
+
+    my $top = $source->root;
 
 =head2 describe
 
 The directory, and the path inside it.
+
+Returns Str.
+
+    say 'Flavor from ', $source->describe;
 
 =head1 SEE ALSO
 

@@ -1,0 +1,50 @@
+
+Revision history for Perl extension Net::Tools
+
+1.60 (pending)
+
+   - first Net-Tools release: socket modules split from Data::Tools 1.52 and
+     renamed, Data::Tools::Socket* is now Net::Tools::Socket*:
+              Net::Tools::Socket
+              Net::Tools::Socket::Protocols
+              Net::Tools::Socket::Pair
+              Net::Tools::Socket::Err
+     only the package names changed; earlier history is in Data::Tools
+     Changes. the changes since Data::Tools 1.52 follow
+   - added Net::Tools::Socket::Err, common error state for all socket
+     modules: $SOCK_ERR (negative SOCK_E_* code or positive errno) and
+     $SOCK_ERRSTR, sock_err(), sock_err_sys(), sock_err_name(),
+     sock_err_clear()
+   - added Net::Tools::Socket::Pair, SOCK_SEQPACKET socketpair messages,
+     socketpair_create(), socketpair_send(), socketpair_recv();
+     socketpair_create( 'dgram' ) creates SOCK_DGRAM pairs (no EOF on recv,
+     a write end may be shared by many writers), see POD SOCKET TYPES;
+     where MSG_NOSIGNAL is not available (macOS) socketpair_send() ignores
+     SIGPIPE only during send(), the caller's handler is restored
+   - INCOMPATIBLE: Net::Tools::Socket socket_read_message() returns the data
+     only (no more list of data, length and error), undef on error, details
+     are in $SOCK_ERR/$SOCK_ERRSTR (SOCK_E_EOF, SOCK_E_TIMEOUT,
+     SOCK_E_TOOBIG, errno)
+   - Net::Tools::Socket all functions set $SOCK_ERR on error, socket_write()
+     and socket_write_message() refuse wide characters (SOCK_E_INVAL),
+     EPIPE/ECONNRESET are reported as SOCK_E_EOF, EINTR is retried
+   - Net::Tools::Socket socket_write_message() sends messages up to
+     $WRITE_MESSAGE_JOIN_MAX (64 KiB) with one write, longer ones with two
+     writes (length, then data, not copied), see POD about TCP_NODELAY
+   - Net::Tools::Socket $timeout 0 does not wait at all (it waited forever
+     before), undef waits forever
+   - INCOMPATIBLE: Net::Tools::Socket::Protocols socket_protocol_read_message()
+     returns ( $data, $ptype ) in list context and $data in scalar context,
+     undef on error (no more error string), details in $SOCK_ERR/$SOCK_ERRSTR
+     (SOCK_E_EMPTY, SOCK_E_PROTO, any socket error)
+   - INCOMPATIBLE: Net::Tools::Socket::Protocols does not confess on unknown
+     or forbidden protocol types and bad data anymore, read and write return
+     undef with SOCK_E_PROTO or SOCK_E_INVAL, the stream stays in sync
+   - INCOMPATIBLE: Net::Tools::Socket::Protocols 'p' (Storable) is unsafe on
+     untrusted input, so it is forbidden by default and not allowed by '*',
+     it must be allowed explicitly, e.g. socket_protocols_allow( '*p' )
+   - Net::Tools::Socket::Protocols socket_protocols_allow() returns 1, types
+     after '*' are added (they were ignored), unknown type confesses and
+     keeps the allowed set; socket_protocol_read_message() takes $maxlen
+   - tests for Socket::Err (t3) and Socket::Pair (t4), more socket and
+     protocols tests

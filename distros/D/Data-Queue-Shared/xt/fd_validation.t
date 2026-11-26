@@ -20,7 +20,7 @@ SKIP: {
     # Actual struct offsets need checking — simpler: write a plausible 128-byte header
     my $hdr = pack('V V V V Q< Q< Q< Q<',
         0x51554531,   # magic QUE1
-        1,             # version
+        2,             # version
         0,             # mode INT
         0x40000000,    # capacity = 2^30 (way more than fits in 1024-byte file)
         1024,          # total_size

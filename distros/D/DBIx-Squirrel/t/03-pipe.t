@@ -4,6 +4,8 @@ use Test2::Plugin::NoWarnings;
 
 use DBIx::Squirrel;
 use DBIx::Squirrel::Stop;
+use Ekorn::Pipeline;
+use Ekorn::Pipeline::Sinks qw(keep_all keep_first);
 
 my $dbh = DBIx::Squirrel->connect(
     'dbi:SQLite:dbname=:memory:', '', '',
@@ -14,7 +16,7 @@ subtest 'the first stage is called with the database handle' => sub {
     my $arg = sub ($x) { $x };
     ref_is [$dbh->pipe($arg)]->[0],       $dbh, 'as its argument';
     ref_is [$dbh->pipe(sub { $_ })]->[0], $dbh, 'and in $_';
-    is $dbh->pipe(sub { $_->selectrow_array('SELECT 6 * 7') }), 42,
+    is [$dbh->pipe(sub { $_->selectrow_array('SELECT 6 * 7') })], [42],
         'which it can use';
 };
 
@@ -22,6 +24,7 @@ subtest 'with no stages, pipe returns the database handle' => sub {
     my @results = $dbh->pipe;
     is scalar(@results), 1, 'one value';
     ref_is $results[0], $dbh, 'the database handle';
+    is scalar($dbh->pipe), 1, 'or, in scalar context, 1';
 };
 
 subtest 'each value goes through the rest of the stages on its own' => sub {
@@ -33,12 +36,16 @@ subtest 'each value goes through the rest of the stages on its own' => sub {
     is \@results, [6, 10];
 };
 
-subtest 'in scalar context, pipe returns the first value' => sub {
-    my $first = $dbh->pipe(sub { (3, 4, 5) });
-    is $first, 3, 'of several';
-
-    my $none = $dbh->pipe(sub { () });
-    is $none, undef, 'or undef, if there are none';
+subtest 'in scalar context, pipe gives what a pipeline gives' => sub {
+    my @stages = (sub { (7, 8, 9) });
+    is scalar($dbh->pipe(@stages)),             3, 'how many results';
+    is scalar($dbh->pipe(sub { () })),          0, 'or 0, if there are none';
+    is scalar($dbh->pipe(@stages, keep_first)), 7, "or a sink's result";
+    is scalar($dbh->pipe(@stages, keep_all)), [7, 8, 9],
+        "a list sink's as an array reference";
+    is scalar($dbh->pipe(@stages)),
+        scalar(Ekorn::Pipeline->new(@stages)->($dbh)),
+        'as a pipeline does';
 };
 
 subtest 'Stop ends the pipeline' => sub {

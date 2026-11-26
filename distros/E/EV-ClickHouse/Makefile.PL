@@ -48,8 +48,27 @@ if ($ssl_libs) {
 # zlib
 push @libs, '-lz';
 
-# LZ4 is bundled: xs/lz4.c, built by lz4_unit.c with hidden symbols.
-$extra_inc .= ' -DHAVE_LZ4';
+# libzstd (optional): ZSTD frames for native inserts, used only when a
+# program including <zstd.h> links. --without-zstd skips it.
+my $no_zstd = grep { $_ eq '--without-zstd' } @ARGV;
+@ARGV = grep { $_ ne '--without-zstd' } @ARGV;
+unless ($no_zstd) {
+    my $zstd_cflags = `pkg-config --cflags libzstd 2>/dev/null` // '';
+    my $zstd_libs   = `pkg-config --libs libzstd 2>/dev/null` // '';
+    chomp($zstd_cflags, $zstd_libs);
+    $zstd_libs ||= '-lzstd';
+    require File::Temp;
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    open my $fh, '>', "$dir/z.c" or die "$dir/z.c: $!";
+    print $fh "#include <zstd.h>\nint main(void) { return ZSTD_versionNumber() > 0 ? 0 : 1; }\n";
+    close $fh;
+    if (system("$Config{cc} $Config{ccflags} $zstd_cflags -o $dir/z $dir/z.c $Config{ldflags} $zstd_libs >/dev/null 2>&1") == 0) {
+        $extra_inc .= " $zstd_cflags -DHAVE_ZSTD";
+        push @libs, $zstd_libs;
+    } else {
+        warn "libzstd not found, building without compress_method => 'zstd'\n";
+    }
+}
 
 WriteMakefile(
     NAME          => 'EV::ClickHouse',

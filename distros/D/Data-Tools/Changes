@@ -1,6 +1,37 @@
 
 Revision history for Perl extension Data::Tools
 
+1.60 (pending)
+
+   - INCOMPATIBLE: socket modules moved to the new Net-Tools package and
+     renamed Data::Tools::Socket* to Net::Tools::Socket* (Socket,
+     Socket::Protocols, Socket::Pair, Socket::Err), see Net-Tools Changes
+   - INCOMPATIBLE: Data::Tools::Process, Data::Tools::Process::Forks and
+     Data::Tools::Process::ForkPool moved to the new Data-Tools-Process
+     package (module names did not change), see Data-Tools-Process Changes
+   - Exception::Sink is no longer required (it was used by ForkPool only)
+   - added str_hex_utf8() and str_unhex_utf8() for hex encoding of text
+     (wide chars) via UTF-8 bytes, invalid UTF-8 input decodes to U+FFFD
+   - POD notes on str_hex()/str_unhex() byte semantics and that hex input
+     is not checked for odd length or invalid characters
+   - str_url_unescape() now decodes UTF-8 and returns characters, an invalid
+     UTF-8 byte becomes U+FFFD (it returned bytes before), so it is the exact
+     reverse of str_url_escape(), url2hash() and str2hash_url() return
+     characters too
+   - str_url_unescape() input with characters (perl utf8 string) is encoded to
+     UTF-8 bytes first, so raw characters mixed with %xx escapes are kept
+   - str_url_escape() encodes to UTF-8 only characters (perl utf8 string), a
+     non-utf8 string is taken as bytes and escaped as it is (it was always
+     encoded before, which double encoded UTF-8 bytes)
+   - file_save() returns undef when print or close fails (a full disk), it
+     returned 1 before and left a truncated file, and undef when the file
+     cannot be opened (it returned 0)
+   - hash_save() and hash_load() use file_text_save() and file_text_load()
+   - file_bin_save() and file_text_save() return undef when the file cannot
+     be opened (they returned 0) or when print or close fails (a full disk,
+     they returned 1), as file_save()
+   - Data::Tools::Serialization loads XML::Bare and JSON on demand only
+
 1.52 2026-09-22
 
    - added optional formatting row with align and widths to format_ascii_table()

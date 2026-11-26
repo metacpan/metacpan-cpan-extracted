@@ -3,11 +3,7 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use File::Temp qw(tempfile);
@@ -18,7 +14,7 @@ use YAML::Tiny qw(Dump);
 {
 
   package MockCLI;
-  our @ISA = qw(CLI::Config::Resolver);
+  our @ISA = qw(Config::Resolver::CLI);
 
   # Override init to do nothing
   # We just need an object to call the method on.

@@ -112,6 +112,80 @@ DEFINE_Q_KW(str, "Str", size, 1, build_kw_1arg)
     sv_bless(ref, gv_stashpv(class, GV_ADD)); \
     RETVAL = ref
 
+#define OPT_ARG(n) (items > (n) && (SvGETMAGIC(ST(n)), SvOK(ST(n))))
+#define STR_TOO_BIG "Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)"
+#define STR_OOM "Data::Queue::Shared::Str: out of memory"
+
+/* $! after a Str operation that did nothing: its reason, or 0 for a plain full or empty queue. */
+static void str_errno(QueueHandle *h, int r) {
+    errno = r == QUEUE_FAILED ? h->fail_errno : 0;
+}
+
+static bool str_ok(pTHX_ QueueHandle *h, int r) {
+    if (r == -2) croak(STR_TOO_BIG);
+    if (r != 1) str_errno(h, r);
+    return r == 1;
+}
+
+static SV *str_sv(pTHX_ QueueHandle *h, int r, const char *str, uint32_t len, bool utf8) {
+    if (r == -1) croak(STR_OOM);
+    if (r != 1) { str_errno(h, r); return &PL_sv_undef; }
+    SV *sv = newSVpvn(str, len);
+    if (utf8) SvUTF8_on(sv);
+    return sv;
+}
+
+typedef struct { char *buf; uint32_t len; bool utf8; } StrItem;
+
+/* Pops up to count values under one hold of the lock, ending before one that would take the
+ * batch past max_bytes; unless a value was taken before, the first one always comes. Copies
+ * them out so that no Perl allocation, which can croak, happens under the lock. */
+static StrItem *str_pop_batch(pTHX_ QueueHandle *h, UV count, uint64_t max_bytes,
+                              uint64_t bytes, int taken, UV *n_out) {
+    *n_out = 0;
+    if (count > h->capacity) count = h->capacity;
+    if (!count) return NULL;
+    StrItem *it = (StrItem *)malloc((size_t)count * sizeof *it);
+    if (!it) croak(STR_OOM);
+    if (!queue_str_lock(h)) { free(it); str_errno(h, QUEUE_FAILED); return NULL; }
+    UV n = 0;
+    int r = 1;
+    while (n < count && !((n || taken) && bytes + queue_str_front_len(h) > max_bytes)) {
+        const char *str; uint32_t len; bool utf8;
+        r = queue_str_pop_locked(h, &str, &len, &utf8);
+        if (r != 1) break;
+        char *c = (char *)malloc(len ? len : 1);
+        if (!c) { r = -1; break; }
+        memcpy(c, str, len);
+        it[n].buf = c; it[n].len = len; it[n].utf8 = utf8;
+        n++;
+        bytes += len;
+    }
+    uint32_t wake = n ? queue_str_producer_wake_count(h->hdr, (uint32_t)n) : 0;
+    queue_mutex_unlock(h->hdr);
+    if (wake) queue_wake_producers_n(h->hdr, wake);
+    if (r == -1) {
+        while (n) free(it[--n].buf);
+        free(it);
+        croak(STR_OOM);
+    }
+    if (!n) errno = 0;
+    *n_out = n;
+    return it;
+}
+
+static SV **str_push_items(pTHX_ SV **sp, StrItem *it, UV n) {
+    EXTEND(sp, (SSize_t)n);
+    for (UV i = 0; i < n; i++) {
+        SV *sv = newSVpvn(it[i].buf, it[i].len);
+        if (it[i].utf8) SvUTF8_on(sv);
+        PUSHs(sv_2mortal(sv));
+        free(it[i].buf);
+    }
+    free(it);
+    return sp;
+}
+
 MODULE = Data::Queue::Shared  PACKAGE = Data::Queue::Shared::Int
 
 PROTOTYPES: DISABLE
@@ -150,7 +224,7 @@ new(class, path, capacity, ...)
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     /* Optional 4th arg: file mode for a new file-backed segment (default 0600,
      * owner-only); pass e.g. 0660 to opt into cross-user sharing. */
-    mode_t fmode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    mode_t fmode = OPT_ARG(3) ? (mode_t)SvUV_nomg(ST(3)) : 0600;
     QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_INT, 0, fmode, errbuf);
     if (!h) croak("Data::Queue::Shared::Int->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
@@ -237,7 +311,7 @@ push_wait(self, value, ...)
     EXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     double timeout = -1;
   CODE:
-    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    if (OPT_ARG(2)) timeout = SvNV_nomg(ST(2));
     REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     RETVAL = queue_int_push_wait(h, (int64_t)value, timeout);
   OUTPUT:
@@ -251,7 +325,7 @@ pop_wait(self, ...)
     double timeout = -1;
     int64_t value;
   CODE:
-    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    if (OPT_ARG(1)) timeout = SvNV_nomg(ST(1));
     REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     if (queue_int_pop_wait(h, &value, timeout))
         RETVAL = newSViv((IV)value);
@@ -412,7 +486,7 @@ drain(self, ...)
     int64_t value;
     uint32_t max_count;
   PPCODE:
-    max_count = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
+    max_count = OPT_ARG(1) ? (uint32_t)SvUV_nomg(ST(1)) : UINT32_MAX;
     REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     while (max_count-- > 0 && queue_int_try_pop(h, &value))
         mXPUSHi((IV)value);
@@ -426,7 +500,7 @@ pop_wait_multi(self, count, ...)
     double timeout = -1;
     int64_t value;
   PPCODE:
-    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    if (OPT_ARG(2)) timeout = SvNV_nomg(ST(2));
     REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     if (count > h->capacity) count = h->capacity;
     if (count == 0) XSRETURN(0);
@@ -540,7 +614,7 @@ new(class, path, capacity, ...)
         arena_cap = (uint64_t)capacity * 256;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     /* Optional 5th arg: file mode (default 0600); arena_cap is the optional 4th. */
-    mode_t fmode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    mode_t fmode = OPT_ARG(4) ? (mode_t)SvUV_nomg(ST(4)) : 0600;
     QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_STR, arena_cap, fmode, errbuf);
     if (!h) croak("Data::Queue::Shared::Str->new: %s", errbuf[0] ? errbuf : "out of memory");
     MAKE_OBJ(class, h);
@@ -611,8 +685,7 @@ push(self, value)
     bool utf8 = SvUTF8(value) ? true : false;
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     int r = queue_str_try_push(h, str, LEN32(len), utf8);
-    if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
-    RETVAL = (r == 1);
+    RETVAL = str_ok(aTHX_ h, r);
   OUTPUT:
     RETVAL
 
@@ -621,19 +694,12 @@ pop(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-    const char *str;
-    uint32_t len;
-    bool utf8;
+    const char *str = NULL;
+    uint32_t len = 0;
+    bool utf8 = false;
   CODE:
     int r = queue_str_try_pop(h, &str, &len, &utf8);
-    if (r == 1) {
-        RETVAL = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(RETVAL);
-    } else if (r == -1) {
-        croak("Data::Queue::Shared::Str: out of memory");
-    } else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = str_sv(aTHX_ h, r, str, len, utf8);
   OUTPUT:
     RETVAL
 
@@ -646,13 +712,12 @@ push_wait(self, value, ...)
     double timeout = -1;
     STRLEN len;
   CODE:
-    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    if (OPT_ARG(2)) timeout = SvNV_nomg(ST(2));
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     int r = queue_str_push_wait(h, str, LEN32(len), utf8, timeout);
-    if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
-    RETVAL = (r == 1);
+    RETVAL = str_ok(aTHX_ h, r);
   OUTPUT:
     RETVAL
 
@@ -662,21 +727,14 @@ pop_wait(self, ...)
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     double timeout = -1;
-    const char *str;
-    uint32_t len;
-    bool utf8;
+    const char *str = NULL;
+    uint32_t len = 0;
+    bool utf8 = false;
   CODE:
-    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    if (OPT_ARG(1)) timeout = SvNV_nomg(ST(1));
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     int r = queue_str_pop_wait(h, &str, &len, &utf8, timeout);
-    if (r == 1) {
-        RETVAL = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(RETVAL);
-    } else if (r == -1) {
-        croak("Data::Queue::Shared::Str: out of memory");
-    } else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = str_sv(aTHX_ h, r, str, len, utf8);
   OUTPUT:
     RETVAL
 
@@ -713,71 +771,40 @@ push_multi(self, ...)
         }
     }
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-    queue_mutex_lock(h->hdr);
+    if (!queue_str_lock(h)) {
+        str_errno(h, QUEUE_FAILED);
+        XSRETURN_UV(0);
+    }
+    int r = 1;
     for (uint32_t i = 0; i < count; i++) {
-        int r = queue_str_push_locked(h, args[i].str, LEN32(args[i].len), args[i].utf8);
+        r = queue_str_push_locked(h, args[i].str, LEN32(args[i].len), args[i].utf8);
         if (r == -2) {
             if (pushed) queue_wake_consumers_n(h->hdr, pushed);
             queue_mutex_unlock(h->hdr);
-            croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
+            croak(STR_TOO_BIG);
         }
         if (r != 1) break;
         pushed++;
     }
     queue_mutex_unlock(h->hdr);
     if (pushed) queue_wake_consumers_n(h->hdr, pushed);
+    if (r != 1) str_errno(h, r);
     RETVAL = pushed;
   OUTPUT:
     RETVAL
 
 void
-pop_multi(self, count)
+pop_multi(self, count, ...)
     SV *self
     UV count
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-    const char *str;
-    uint32_t len;
-    bool utf8;
+    UV n;
   PPCODE:
-    /* Hoist Perl SV construction out of the process-shared mutex:
-     * newSVpvn can longjmp on OOM and deadlock peers on the futex. */
-    struct { char *buf; uint32_t len; bool utf8; } *items_buf = NULL;
-    UV n = 0;
-    int last_r = 0;
-    int oom = 0;
-    /* Cap count at capacity: the queue can't hold more than capacity items,
-     * so a single pop_multi can't return more than that. This also prevents
-     * size_t overflow in the items_buf allocation for adversarial inputs. */
-    if (count > h->capacity) count = h->capacity;
-    if (count > 0) {
-        items_buf = (void *)malloc((size_t)count * sizeof(*items_buf));
-        if (!items_buf) croak("Data::Queue::Shared::Str: out of memory");
-    }
-    queue_mutex_lock(h->hdr);
-    for (UV i = 0; i < count; i++) {
-        last_r = queue_str_pop_locked(h, &str, &len, &utf8);
-        if (last_r <= 0) break;
-        char *c = (char *)malloc(len ? len : 1);
-        if (!c) { oom = 1; break; }
-        if (len) memcpy(c, str, len);
-        items_buf[n].buf = c;
-        items_buf[n].len = len;
-        items_buf[n].utf8 = utf8;
-        n++;
-    }
-    uint32_t wake = n ? queue_str_producer_wake_count(h->hdr, (uint32_t)n) : 0;
-    queue_mutex_unlock(h->hdr);
-    if (wake) queue_wake_producers_n(h->hdr, wake);
-    EXTEND(SP, (SSize_t)n);
-    for (UV j = 0; j < n; j++) {
-        SV *sv = newSVpvn(items_buf[j].buf, items_buf[j].len);
-        if (items_buf[j].utf8) SvUTF8_on(sv);
-        PUSHs(sv_2mortal(sv));
-        free(items_buf[j].buf);
-    }
-    free(items_buf);
-    if (last_r == -1 || oom) croak("Data::Queue::Shared::Str: out of memory");
+    uint64_t max_bytes = OPT_ARG(2) ? SvUV_nomg(ST(2)) : UINT64_MAX;
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
+    StrItem *it = str_pop_batch(aTHX_ h, count, max_bytes, 0, 0, &n);
+    SP = str_push_items(aTHX_ SP, it, n);
 
 UV
 size(self)
@@ -819,13 +846,30 @@ is_full(self)
   OUTPUT:
     RETVAL
 
-void
+bool
 clear(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
   CODE:
-    queue_str_clear(h);
+    RETVAL = str_ok(aTHX_ h, queue_str_clear(h));
+  OUTPUT:
+    RETVAL
+
+SV *
+lock_timeout(self, ...)
+    SV *self
+  PREINIT:
+    EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
+  CODE:
+    if (items > 1) {
+        double v = OPT_ARG(1) ? SvNV_nomg(ST(1)) : -1;
+        REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
+        h->lock_timeout = v >= 0 ? v : -1;
+    }
+    RETVAL = h->lock_timeout < 0 ? &PL_sv_undef : newSVnv(h->lock_timeout);
+  OUTPUT:
+    RETVAL
 
 void
 unlink(self_or_class, ...)
@@ -874,6 +918,11 @@ stats(self)
     hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "push_waiters", 12, newSVuv((UV)__atomic_load_n(&hdr->push_waiters, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "pop_waiters", 11, newSVuv((UV)__atomic_load_n(&hdr->pop_waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "lock_waits", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_lock_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "lock_wait_time", 14, newSVnv(__atomic_load_n(&hdr->stat_lock_wait_ns, __ATOMIC_RELAXED) / 1e9), 0);
+    hv_store(hv, "lock_wait_max", 13, newSVnv(__atomic_load_n(&hdr->stat_lock_wait_max_ns, __ATOMIC_RELAXED) / 1e9), 0);
+    hv_store(hv, "lock_timeouts", 13, newSVuv((UV)__atomic_load_n(&hdr->stat_lock_timeouts, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "last_recovery", 13, newSVuv((UV)__atomic_load_n(&hdr->stat_last_recovery, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -883,19 +932,12 @@ peek(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-    const char *str;
-    uint32_t len;
-    bool utf8;
+    const char *str = NULL;
+    uint32_t len = 0;
+    bool utf8 = false;
   CODE:
     int r = queue_str_peek(h, &str, &len, &utf8);
-    if (r == 1) {
-        RETVAL = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(RETVAL);
-    } else if (r == -1) {
-        croak("Data::Queue::Shared::Str: out of memory");
-    } else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = str_sv(aTHX_ h, r, str, len, utf8);
   OUTPUT:
     RETVAL
 
@@ -911,8 +953,7 @@ push_front(self, value)
     bool utf8 = SvUTF8(value) ? true : false;
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     int r = queue_str_push_front(h, str, LEN32(len), utf8);
-    if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
-    RETVAL = (r == 1);
+    RETVAL = str_ok(aTHX_ h, r);
   OUTPUT:
     RETVAL
 
@@ -925,13 +966,12 @@ push_front_wait(self, value, ...)
     double timeout = -1;
     STRLEN len;
   CODE:
-    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    if (OPT_ARG(2)) timeout = SvNV_nomg(ST(2));
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     int r = queue_str_push_front_wait(h, str, LEN32(len), utf8, timeout);
-    if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
-    RETVAL = (r == 1);
+    RETVAL = str_ok(aTHX_ h, r);
   OUTPUT:
     RETVAL
 
@@ -940,44 +980,12 @@ drain(self, ...)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-    const char *str;
-    uint32_t len;
-    bool utf8;
-    uint32_t max_count;
+    UV n;
   PPCODE:
-    max_count = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
-    /* Hoist SV construction out of the mutex (see pop_multi). */
-    struct drain_item { char *buf; uint32_t len; bool utf8; struct drain_item *next; } *drained_head = NULL, *drained_tail = NULL;
-    UV drained_n = 0;
-    int last_r = 0;
-    int oom = 0;
+    UV max_count = OPT_ARG(1) ? SvUV_nomg(ST(1)) : UINT32_MAX;
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-    queue_mutex_lock(h->hdr);
-    while (max_count-- > 0) {
-        last_r = queue_str_pop_locked(h, &str, &len, &utf8);
-        if (last_r <= 0) break;
-        struct drain_item *it = (struct drain_item *)malloc(sizeof(*it));
-        char *c = (char *)malloc(len ? len : 1);
-        if (!it || !c) { free(it); free(c); oom = 1; break; }
-        if (len) memcpy(c, str, len);
-        it->buf = c; it->len = len; it->utf8 = utf8; it->next = NULL;
-        if (drained_tail) drained_tail->next = it; else drained_head = it;
-        drained_tail = it;
-        drained_n++;
-    }
-    uint32_t wake = drained_n ? queue_str_producer_wake_count(h->hdr, (uint32_t)drained_n) : 0;
-    queue_mutex_unlock(h->hdr);
-    if (wake) queue_wake_producers_n(h->hdr, wake);
-    EXTEND(SP, (SSize_t)drained_n);
-    while (drained_head) {
-        struct drain_item *it = drained_head; drained_head = it->next;
-        SV *sv = newSVpvn(it->buf, it->len);
-        if (it->utf8) SvUTF8_on(sv);
-        PUSHs(sv_2mortal(sv));
-        free(it->buf);
-        free(it);
-    }
-    if (last_r == -1 || oom) croak("Data::Queue::Shared::Str: out of memory");
+    StrItem *it = str_pop_batch(aTHX_ h, max_count, UINT64_MAX, 0, 0, &n);
+    SP = str_push_items(aTHX_ SP, it, n);
 
 void
 pop_wait_multi(self, count, ...)
@@ -986,31 +994,21 @@ pop_wait_multi(self, count, ...)
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     double timeout = -1;
-    const char *str;
-    uint32_t len;
-    bool utf8;
+    const char *str = NULL;
+    uint32_t len = 0;
+    bool utf8 = false;
+    UV n;
   PPCODE:
-    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    if (OPT_ARG(2)) timeout = SvNV_nomg(ST(2));
+    uint64_t max_bytes = OPT_ARG(3) ? SvUV_nomg(ST(3)) : UINT64_MAX;
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-    if (count > h->capacity) count = h->capacity;
     if (count == 0) XSRETURN(0);
-    /* Block until at least 1 */
-    {
-        int r = queue_str_pop_wait(h, &str, &len, &utf8, timeout);
-        if (r == -1) croak("Data::Queue::Shared::Str: out of memory");
-        if (r != 1) XSRETURN(0);
-        SV *sv = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(sv);
-        mXPUSHs(sv);
-    }
-    /* Grab up to count-1 more non-blocking */
-    for (UV i = 1; i < count; i++) {
-        int r = queue_str_try_pop(h, &str, &len, &utf8);
-        if (r <= 0) break;
-        SV *sv = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(sv);
-        mXPUSHs(sv);
-    }
+    int r = queue_str_pop_wait(h, &str, &len, &utf8, timeout);
+    SV *first = str_sv(aTHX_ h, r, str, len, utf8);
+    if (r != 1) XSRETURN(0);
+    XPUSHs(sv_2mortal(first));
+    StrItem *it = str_pop_batch(aTHX_ h, count - 1, max_bytes, len, 1, &n);
+    SP = str_push_items(aTHX_ SP, it, n);
 
 UV
 push_wait_multi(self, timeout, ...)
@@ -1035,9 +1033,7 @@ push_wait_multi(self, timeout, ...)
         const char *str = SvPV(sv, len);
         bool utf8 = SvUTF8(sv) ? true : false;
         REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-        int r = queue_str_push_wait(h, str, LEN32(len), utf8, t);
-        if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
-        if (r != 1) break;
+        if (!str_ok(aTHX_ h, queue_str_push_wait(h, str, LEN32(len), utf8, t))) break;
         RETVAL++;
     }
   OUTPUT:
@@ -1048,19 +1044,12 @@ pop_back(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-    const char *str;
-    uint32_t len;
-    bool utf8;
+    const char *str = NULL;
+    uint32_t len = 0;
+    bool utf8 = false;
   CODE:
     int r = queue_str_pop_back(h, &str, &len, &utf8);
-    if (r == 1) {
-        RETVAL = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(RETVAL);
-    } else if (r == -1) {
-        croak("Data::Queue::Shared::Str: out of memory");
-    } else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = str_sv(aTHX_ h, r, str, len, utf8);
   OUTPUT:
     RETVAL
 
@@ -1070,21 +1059,14 @@ pop_back_wait(self, ...)
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     double timeout = -1;
-    const char *str;
-    uint32_t len;
-    bool utf8;
+    const char *str = NULL;
+    uint32_t len = 0;
+    bool utf8 = false;
   CODE:
-    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    if (OPT_ARG(1)) timeout = SvNV_nomg(ST(1));
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     int r = queue_str_pop_back_wait(h, &str, &len, &utf8, timeout);
-    if (r == 1) {
-        RETVAL = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(RETVAL);
-    } else if (r == -1) {
-        croak("Data::Queue::Shared::Str: out of memory");
-    } else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = str_sv(aTHX_ h, r, str, len, utf8);
   OUTPUT:
     RETVAL
 

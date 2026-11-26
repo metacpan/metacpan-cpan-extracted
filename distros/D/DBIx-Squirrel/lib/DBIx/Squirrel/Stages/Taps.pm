@@ -6,10 +6,12 @@ use Exporter qw(import);
 
 use Ekorn::Pipeline::Stages::Taps qw(peek count_into dump_to tee);
 
-# A facade over Ekorn::Pipeline::Stages::Taps, exporting DBIx::Squirrel's
-# own list of its functions, imported from it by name, so a name
-# Ekorn::Pipeline drops fails here, as the module loads, and one it
-# adds isn't exported until it's listed here.
+our $VERSION = 'v4.1.1';
+
+# A plain re-export of Ekorn::Pipeline::Stages::Taps's functions, from
+# DBIx::Squirrel's own list of them, imported from it by name, so a name
+# Ekorn::Pipeline drops fails here, as the module loads, and one it adds
+# isn't exported until it's listed here.
 our @EXPORT      = qw(peek count_into);          ## no critic (Modules::ProhibitAutomaticExportation)
 our @EXPORT_OK   = (@EXPORT, qw(dump_to tee));
 our %EXPORT_TAGS = (all => \@EXPORT_OK);

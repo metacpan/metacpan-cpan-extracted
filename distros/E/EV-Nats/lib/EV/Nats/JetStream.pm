@@ -1,7 +1,7 @@
 package EV::Nats::JetStream;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use EV;
 use JSON::PP ();
 
@@ -10,11 +10,13 @@ sub new {
     my $nats    = delete $opts{nats}    || die "nats connection required";
     my $prefix  = delete $opts{prefix}  || '$JS.API';
     my $timeout = delete $opts{timeout} || 5000;
+    my $with_status = delete $opts{with_status} ? 1 : 0;
     warn "EV::Nats::JetStream::new: unknown option '$_'" for keys %opts;
     bless {
-        nats    => $nats,
-        prefix  => $prefix,
-        timeout => $timeout,
+        nats        => $nats,
+        prefix      => $prefix,
+        timeout     => $timeout,
+        with_status => $with_status,
     }, $class;
 }
 
@@ -54,16 +56,30 @@ sub msg_is_tombstone {
 sub _json_api {
     my ($self, $subj, $data, $cb) = @_;
     my $payload = defined $data ? JSON::PP::encode_json($data) : '';
-    $self->_api($subj, $payload, sub {
+    $self->_api($subj, $payload, $self->_decoded($cb));
+}
+
+## Public to sibling modules. A request callback that decodes the JSON
+## reply for $cb and turns an API error object into an error string.
+sub _decoded {
+    my ($self, $cb) = @_;
+    return sub {
         my ($resp, $err) = @_;
         return $cb->(undef, $err) if $err;
         my ($decoded, $derr) = decode_json_or_error($resp);
         return $cb->(undef, $derr) if $derr;
-        if ($decoded->{error}) {
-            return $cb->(undef, "$decoded->{error}{description} (code $decoded->{error}{code})");
-        }
+        my $e = $decoded->{error};
+        return $cb->(undef, "$e->{description} (code $e->{code})", $self->{with_status} ? $e : ())
+            if $e;
         $cb->($decoded, undef);
-    });
+    };
+}
+
+sub _defer {
+    my ($nats, $code) = @_;
+    my $t;
+    $t = $nats->_timer(0, 0, sub { undef $t; $code->() });
+    return;
 }
 
 # Stream management
@@ -140,101 +156,72 @@ sub consumer_list {
 
 sub js_publish {
     my ($self, $subject, $payload, $cb) = @_;
-    $self->{nats}->request($subject, $payload, sub {
-        my ($resp, $err) = @_;
-        return $cb->(undef, $err) if $err;
-        my ($ack, $derr) = decode_json_or_error($resp);
-        return $cb->(undef, $derr) if $derr;
-        return $cb->(undef, "$ack->{error}{description} (code $ack->{error}{code})")
-            if $ack->{error};
-        $cb->($ack, undef);
-    }, $self->{timeout});
+    $self->{nats}->request($subject, $payload, $self->_decoded($cb), $self->{timeout});
 }
 
-# Like js_publish but carries NATS headers (e.g. Nats-Rollup) and still
-# waits for the PubAck. Same inbox pattern as EV::Nats::KV::create.
 sub js_publish_h {
     my ($self, $subject, $headers, $payload, $cb) = @_;
-    my $nats  = $self->{nats};
-    my $inbox = $nats->new_inbox;
-    my ($sid, $timer);
-    $sid = $nats->subscribe_max($inbox, sub {
-        my ($s, $resp) = @_;
-        if ($timer) { $timer->stop; undef $timer; }
-        my ($ack, $derr) = decode_json_or_error($resp);
-        return $cb->(undef, $derr) if $derr;
-        return $cb->(undef, "$ack->{error}{description} (code $ack->{error}{code})")
-            if $ack->{error};
-        $cb->($ack, undef);
-    }, 1);
-    $timer = $nats->_timer($self->{timeout} / 1000.0, 0, sub {
-        eval { $nats->unsubscribe($sid) };
-        $cb->(undef, "publish timeout");
-    });
-    if (!eval { $nats->hpublish($subject, $headers, $payload, $inbox); 1 }) {
-        my $err = $@;
-        $timer->stop;
-        eval { $nats->unsubscribe($sid) };
-        die $err;
-    }
+    $self->{nats}->hrequest($subject, $headers, $payload, $self->_decoded($cb), $self->{timeout});
 }
 
-# Fetch messages (pull consumer).
-#
-# A pull-consumer NEXT request returns up to N messages on a reply inbox,
-# not a single JSON API response. We subscribe to a fresh inbox, publish
-# the fetch request, and collect messages until $batch is reached, the
-# server emits a status message (404/408/503), or the local safety timer
-# fires.
-
+# The server serves a pull until it expires even after a cancel or a
+# reconnect, so the inbox stays open until then and late messages are -NAKed.
 sub fetch {
     my ($self, $stream, $consumer, $opts, $cb) = @_;
     $opts //= {};
-    my $batch       = $opts->{batch}   || 1;
-    my $expires_ns  = $opts->{expires} || 5_000_000_000; # 5s default
-    my $no_wait     = $opts->{no_wait} ? 1 : 0;
-    my $expires_sec = $expires_ns / 1_000_000_000;
+    my $batch      = $opts->{batch}   || 1;
+    my $expires_ns = $opts->{expires} || 5_000_000_000;
+    my $no_wait    = $opts->{no_wait} ? 1 : 0;
+    my $wait = $no_wait ? $self->{timeout} / 1000 : $expires_ns / 1e9 + 1;
 
     my $nats  = $self->{nats};
     my $inbox = $nats->new_inbox;
 
-    my @messages;
-    my ($sid, $timer);
-    my $finished = 0;
+    my (@messages, $sid, $timer, $watch, $answered, $cancelled);
+    my $seen = 0;
 
-    my $finish = sub {
-        my $err = shift;
-        return if $finished;
-        $finished = 1;
-        if ($timer) { $timer->stop; undef $timer; }
-        eval { $nats->unsubscribe($sid) } if defined $sid;
-        $err ? $cb->(undef, $err) : $cb->(\@messages, undef);
+    my $nak = sub { $self->nak($_) for grep { defined $_->{reply} } @_ };
+    my $close = sub {
+        return unless $timer;
+        $timer->stop;
+        undef $timer;
+        $nats->_unwatch_disconnect($watch) if defined $watch;
+        undef $watch;
+        eval { $nats->unsubscribe($sid) };
+    };
+    my $answer = sub {
+        return if $answered++;
+        $cb->(@_);
     };
 
     $sid = $nats->subscribe($inbox, sub {
         my ($subject, $payload, $reply, $headers) = @_;
         # Status lines are exactly "NATS/1.0 <3 digits>"; a loose \s+ would
         # swallow a headered DATA message's first header as a status frame.
-        if ($headers && $headers =~ m{\ANATS/1\.0 (\d{3})(?:[ \r\n]|\z)}) {
-            my $code = $1;
-            # A NATS/1.0 status frame is a control message, never data, so it
-            # must not be pushed as a result. 100 = idle heartbeat / flow
-            # control: ignore and keep waiting. 404/408 (no messages, wait
-            # elapsed) end the batch cleanly. Anything else (409 consumer
-            # deleted, 503 no responders, 400 bad request, ...) is a real
-            # failure the caller must see, not an empty batch.
+        if ($headers && $headers =~ m{\A(NATS/1\.0 (\d{3})(?: ([^\r\n]*))?)(?:[\r\n]|\z)}) {
+            my ($line, $code, $desc) = ($1, $2, $3 // '');
+            # 100 is a heartbeat; 404/408 end the batch; anything else
+            # (409, 503, 400) is a failure the caller must see.
             return if $code == 100;
-            return $finish->() if $code == 404 || $code == 408;
-            my ($status) = split /\r\n/, $headers;
-            return $finish->("fetch failed: $status");
+            $close->();
+            return if $answered;
+            my @status = $self->{with_status}
+                ? ({ code => 0 + $code, description => $desc }) : ();
+            return $answer->([splice @messages], undef, @status)
+                if $code == 404 || $code == 408;
+            $nak->(splice @messages);
+            return $answer->(undef, "fetch failed: $line", @status);
         }
-        push @messages, {
+        my $msg = {
             subject => $subject,
             payload => $payload,
             reply   => $reply,
             headers => $headers,
         };
-        $finish->() if @messages >= $batch;
+        if ($answered) { $nak->($msg) } else { push @messages, $msg }
+        return if ++$seen < $batch;
+        $close->();
+        $answer->([splice @messages]);
     });
 
     my %req = (batch => $batch);
@@ -250,11 +237,52 @@ sub fetch {
         die $err;
     }
 
-    $timer = $nats->_timer($expires_sec + 1, 0, sub {
-        $finish->();
+    $timer = $nats->_timer($wait, 0, sub {
+        $close->();
+        $answer->([splice @messages]);
     });
-    return;
+    $watch = $nats->_watch_disconnect(sub {
+        undef $watch;
+        return if $answered++;
+        my @undelivered = splice @messages;
+        _defer($nats, sub {
+            $nak->(@undelivered);
+            $cb->(undef, 'disconnected') unless $cancelled;
+        });
+    });
+
+    return bless sub {
+        $cancelled = 1;
+        return if $answered++;
+        $nak->(splice @messages);
+    }, 'EV::Nats::JetStream::Fetch';
 }
+
+sub ack         { $_[0]->_ack_reply($_[1], '+ACK') }
+sub in_progress { $_[0]->_ack_reply($_[1], '+WPI') }
+
+sub nak {
+    my ($self, $msg, $delay) = @_;
+    return $self->_ack_reply($msg, '-NAK') unless defined $delay;
+    die "invalid nak delay '$delay'" unless $delay =~ /\A[0-9]+\z/;
+    $self->_ack_reply($msg, qq{-NAK {"delay":$delay}});
+}
+
+sub term {
+    my ($self, $msg, $reason) = @_;
+    $self->_ack_reply($msg, defined $reason && length $reason ? "+TERM $reason" : '+TERM');
+}
+
+sub _ack_reply {
+    my ($self, $msg, $body) = @_;
+    my $reply = ref $msg ? $msg->{reply} : $msg;
+    die "message has no reply subject" unless defined $reply && length $reply;
+    return eval { $self->{nats}->publish($reply, $body); 1 } ? 1 : 0;
+}
+
+package EV::Nats::JetStream::Fetch;
+
+sub cancel { $_[0]->(); return }
 
 1;
 
@@ -302,10 +330,16 @@ All methods are async. Callbacks fire on the L<EV> loop.
     new(%opts)
 
     my $js = EV::Nats::JetStream->new(
-        nats    => $nats,
-        prefix  => '$JS.API',   # default API subject prefix
-        timeout => 5000,        # ms; default 5000
+        nats        => $nats,
+        prefix      => '$JS.API',   # default API subject prefix
+        timeout     => 5000,        # ms; default 5000
+        with_status => 0,           # see below
     );
+
+With C<with_status>, callbacks receive a third argument when the server
+reported a status: a JetStream API error's object,
+C<< { code => 404, err_code => 10014, description => 'consumer not found' } >>,
+or the status that ended a L</fetch>.
 
 =head2 Stream management
 
@@ -404,7 +438,7 @@ rollup publishes where the acknowledged sequence still matters
 
 =head3 fetch
 
-    fetch($stream, $consumer, \%opts, $cb)
+    my $fetch = fetch($stream, $consumer, \%opts, $cb)
 
 Pull messages from a pull-mode consumer. Options:
 
@@ -421,7 +455,8 @@ Ignored with C<no_wait>.
 
 =item C<no_wait>
 
-If true, return immediately if no messages are currently available.
+If true, the server answers at once with what is available; a fetch
+nobody answers ends after C<timeout>.
 
 =back
 
@@ -430,19 +465,47 @@ Callback: C<(\@messages, $err)>. Each message is a hashref:
     {
         subject => 'orders.new',
         payload => '...',
-        reply   => '$JS.ACK....',  # for explicit ack/nak/wpi
+        reply   => '$JS.ACK....',  # for ack/nak/in_progress/term
         headers => "...",          # raw NATS/1.0 header block, or undef
     }
 
-To acknowledge a message:
+A 404 (no messages) or 408 (expired) status ends the batch; any other
+status fails the fetch (C<"fetch failed: NATS/1.0 409 Server Shutdown">)
+and C<-NAK>s the messages received so far. A dropped connection fails it
+with C<"disconnected">. With C<with_status> the ending status is passed
+as C<< { code => 409, description => 'Server Shutdown' } >>. An unknown
+stream or consumer may get no answer at all: the fetch then ends with an
+empty batch.
 
-    $nats->publish($msg->{reply}, '+ACK');   # success
-    $nats->publish($msg->{reply}, '-NAK');   # negative --redeliver after ack_wait
-    $nats->publish($msg->{reply}, '+WPI');   # work-in-progress --extend ack_wait
+Returns a handle: C<< $fetch->cancel >> ends the fetch without calling
+C<$cb>; messages that still arrive for the pull are C<-NAK>ed.
 
-An abnormal server status (e.g. 409, the consumer was deleted
-mid-fetch) arrives as C<$err>. An unknown stream or consumer yields
-an empty batch after C<expires>: the server answers nothing at all.
+=head3 ack
+
+    ack($msg)
+
+=head3 nak
+
+    nak($msg, [$delay_ns])
+
+Redeliver, after C<$delay_ns> nanoseconds if given.
+
+=head3 in_progress
+
+    in_progress($msg)
+
+Extend the message's C<ack_wait>.
+
+=head3 term
+
+    term($msg, [$reason])
+
+Never redeliver the message.
+
+These take a fetched message hashref or its reply subject, and return
+true once the acknowledgement is sent or queued, or false when it
+cannot be (C<$@> holds why). They die on a message without a reply
+subject.
 
 =head1 INTERNAL
 

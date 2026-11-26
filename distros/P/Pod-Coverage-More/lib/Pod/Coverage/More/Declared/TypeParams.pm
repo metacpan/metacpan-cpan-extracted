@@ -1,7 +1,7 @@
 # ABSTRACT: Declarations of the signatures of Type::Params
 # PODNAME: Pod::Coverage::More::Declared::TypeParams
 
-package Pod::Coverage::More::Declared::TypeParams 0.003;
+package Pod::Coverage::More::Declared::TypeParams 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -81,7 +81,7 @@ Pod::Coverage::More::Declared::TypeParams - Declarations of the signatures of Ty
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 DESCRIPTION
 

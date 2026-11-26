@@ -28,7 +28,8 @@ map. Each module's own POD says the same things more briefly. Where
 the two differ, the POD is the authority. Every example runs, against
 the database below, and its comments say what it prints.
 
-This is version 3. L<Upgrading from 2.x|/"Upgrading from 2.x"> and
+This is version 4. L<Upgrading from 3.x|/"Upgrading from 3.x">,
+L<Upgrading from 2.x|/"Upgrading from 2.x"> and
 L<Upgrading from 1.x|/"Upgrading from 1.x"> list what changes for code
 written for earlier versions.
 
@@ -119,6 +120,10 @@ L<Making each kind of part|/"Making each kind of part">
 =item *
 
 L<Differences from plain DBI|/"Differences from plain DBI">
+
+=item *
+
+L<Upgrading from 3.x|/"Upgrading from 3.x">
 
 =item *
 
@@ -1090,8 +1095,8 @@ the iterator is let go.
 Rows are fetched with the DBI's C<fetchall_arrayref>, 2 at first, the
 least that tells whether there's a second, then twice as many each
 time a fetch fills its batch, up to 64. Past 64, each fetch's cost is
-spread so thin that a bigger batch reads hardly any faster, and holds
-more of a wide row's data. So reading one row fetches no more than
+spread so thin that a batch of 1,024 read narrow rows at most 7%
+faster, and would hold more of a wide row's data. So reading one row fetches no more than
 two, and DBIx::Squirrel holds no more than 64 rows of a result.
 
 The driver may hold more. DBD::SQLite reads rows as they're fetched,
@@ -1129,6 +1134,18 @@ finishes the statement, so the rest of its rows aren't fetched:
     say $dbh->iterate('SELECT name FROM artist ORDER BY id', pluck)->first;                # Abba
     say $dbh->iterate('SELECT name FROM artist WHERE id > 9', pluck)->first // 'none';    # none
     say $dbh->iterate('SELECT COUNT(*) FROM track', pluck)->single;                        # 6
+
+C<all> gives an array reference only where one value is asked for. In
+a hash constructor, an argument list or a sub's return, it gives a
+list, flattened into what's around it, unless you write C<scalar>.
+C<all_arrayref> gives one reference, whatever the context, reading the
+run to its end as C<all> does:
+
+    my %artists = (
+        names => $dbh->iterate('SELECT name FROM artist ORDER BY id', pluck)->all_arrayref,
+        table => 'artist',
+    );
+    say "@{$artists{names}}";    # Abba Blur Cream
 
 C<single> is for a statement meant to give one result: if there's
 another, it warns, and returns the first, which finds a statement that
@@ -2119,9 +2136,12 @@ tap|Ekorn::Pipeline::Manual::Reference/"pipe and tap: Ekorn::Pipeline::Pipes">,
 in Ekorn's reference, says how to give a class of your own the same.
 
 C<pipe> is for work that starts from the handle and ends in values: it
-returns what comes out of the last stage, all of it in list context,
-or the first in scalar context. A stage that dies makes it croak,
-naming the stage (see L<When a stage dies|/"When a stage dies">).
+returns what a pipeline of the same stages gives: in list context, what
+comes out of the last stage; in scalar context, how many results came
+out, or a sink's result. For one value, read it in list context, or
+end with C<keep_first>. Until v4.0.0, in scalar context, C<pipe> gave the
+first result instead, unlike a pipeline. A stage that dies makes it
+croak, naming the stage (see L<When a stage dies|/"When a stage dies">).
 
     my @names = $dbh->pipe(
         sub ($dbh) { @{ $dbh->selectcol_arrayref('SELECT name FROM artist ORDER BY id') } },
@@ -2130,7 +2150,8 @@ naming the stage (see L<When a stage dies|/"When a stage dies">).
     say "@names";    # ABBA BLUR CREAM
 
     my $sth = $dbh->prepare('SELECT name FROM artist WHERE id = ?');
-    say scalar $sth->pipe(sub ($sth) { $sth->execute(2); $sth->fetchrow_arrayref->[0] });    # Blur
+    my ($name) = $sth->pipe(sub ($sth) { $sth->execute(2); $sth->fetchrow_arrayref->[0] });
+    say $name;    # Blur
 
 C<tap> is for a side job in the middle of a chain of method calls: it
 drops what comes out, and returns the handle, however the stages end,
@@ -3368,6 +3389,24 @@ B<DBIx::Squirrel:> C<iterate>, C<results>, sinks, C<|> and C<@{}>, C<pipe>, C<ta
 
 =back
 
+=head1 Upgrading from 3.x
+
+Version 4 takes Ekorn::Pipeline v0.4.0, where C<pipe> gives what a
+pipeline of the same stages gives. One change meets code written for
+3.x:
+
+=over 4
+
+=item C<< my $name = $dbh->pipe(...) >>, or C<< $sth->pipe(...) >>, in scalar context, for the first result
+
+B<What happens now:> how many results came out, or a sink's result if a sink is last
+
+B<How to move:> read it in list context, C<< my($name) = $dbh->pipe(...) >>, or give C<keep_first> last
+
+=back
+
+Everything else works as it did.
+
 =head1 Upgrading from 2.x
 
 Version 3 builds on Ekorn::Pipeline v0.3.0, and makes one rule of what
@@ -3839,12 +3878,17 @@ See L<iterate|/"iterate">.
 =head3 pipe
 
     @results = $dbh->pipe(@stages);
-    $result  = $dbh->pipe(@stages);
+    $count   = $dbh->pipe(@stages);
+    ($first) = $dbh->pipe(@stages);
+    $first   = $dbh->pipe(@stages, keep_first);
 
 Runs the handle through the stages, and returns what comes out of the
-last one: all of it in list context; in scalar context, the first
-value, or C<undef> if none came out. With no stages, it returns the
-handle. A stage that dies makes C<pipe> croak, naming the stage (see
+last one, as a pipeline of the same stages does: all of it in list
+context; in scalar context, how many results came out, or, if a sink
+is last, the sink's result, a list sink's as an array reference. For
+one value, read it in list context, or end with C<keep_first>. Until
+v4.0.0, in scalar context, it gave the first result. With no stages, it
+returns the handle, or, in scalar context, 1. A stage that dies makes C<pipe> croak, naming the stage (see
 L<When a stage dies|/"When a stage dies">).
 
 See L<pipe and tap|/"pipe and tap">.
@@ -4054,6 +4098,19 @@ Returns the results still to come, reading the run to its end: as a
 list, or, asked for one value, an array reference of them, never a
 count. Either way, the statement is then finished, and C<next> returns
 nothing after, until L<reset|/"reset">.
+
+See L<The iterator's methods|/"The iterator's methods">.
+
+=head3 all_arrayref
+
+    $results = $it->all_arrayref;
+
+Returns the results still to come as an array reference, whatever the
+context it's called in, so a hash constructor, an argument list or a
+sub's return can't flatten them; an empty one if there are none.
+Otherwise it's L<all|/"all">: it reads the run to its end, the statement
+is then finished, and C<next> returns nothing after, until
+L<reset|/"reset">.
 
 See L<The iterator's methods|/"The iterator's methods">.
 
@@ -4320,12 +4377,17 @@ See L<iterate|/"iterate">.
 =head3 pipe
 
     @results = $sth->pipe(@stages);
-    $result  = $sth->pipe(@stages);
+    $count   = $sth->pipe(@stages);
+    ($first) = $sth->pipe(@stages);
+    $first   = $sth->pipe(@stages, keep_first);
 
 Runs the handle through the stages, and returns what comes out of the
-last one: all of it in list context; in scalar context, the first
-value, or C<undef> if none came out. With no stages, it returns the
-handle. A stage that dies makes C<pipe> croak, naming the stage (see
+last one, as a pipeline of the same stages does: all of it in list
+context; in scalar context, how many results came out, or, if a sink
+is last, the sink's result, a list sink's as an array reference. For
+one value, read it in list context, or end with C<keep_first>. Until
+v4.0.0, in scalar context, it gave the first result. With no stages, it
+returns the handle, or, in scalar context, 1. A stage that dies makes C<pipe> croak, naming the stage (see
 L<When a stage dies|/"When a stage dies">).
 
 See L<pipe and tap|/"pipe and tap">.
@@ -4675,11 +4737,308 @@ runs|/"Defining them as the program runs">.
 =head2 DBIx::Squirrel::Tooling
 
 Exports what callers use to do work, from one place, by tags. Nothing
-by default: ask for the names in the modules above, or the tags that
-hold them, C<:all>, C<:batch>, C<:context>, C<:core>, C<:csv>, C<:flow>,
-C<:json>, C<:rows>, C<:sinks>, C<:sources>, C<:stages>, C<:taps> and
-C<:words> (see
-L<Importing|/"Importing: DBIx::Squirrel::Tooling">).
+by default: ask for the names, or the tags that hold them, C<:all>,
+C<:batch>, C<:context>, C<:core>, C<:csv>, C<:flow>, C<:json>, C<:rows>,
+C<:sinks>, C<:sources>, C<:stages>, C<:taps> and C<:words> (see
+L<Importing|/"Importing: DBIx::Squirrel::Tooling">). The names below are
+those it exports from Ekorn::Pipeline's modules; DBIx::Squirrel's own,
+such as C<take> and C<pluck>, are under their modules above. Ekorn's
+reference has each in full.
+
+=head3 count_items
+
+    count_items
+
+A sink giving how many results there were. From
+Ekorn::Pipeline::Sinks. Exported upon request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 counter
+
+    counter()
+    counter($start)
+    counter($start, $step)
+
+A source of C<$start>, then on by C<$step>, without end, 1 and 1 by
+default: give it a stage that stops, such as C<take>. From
+Ekorn::Pipeline::Sources. Exported upon request.
+
+See L<Sources: Ekorn::Pipeline::Sources|Ekorn::Pipeline::Manual::Reference/"Sources: Ekorn::Pipeline::Sources">.
+
+=head3 from_array
+
+    from_array(@values)
+
+A source of the values given, in order. From Ekorn::Pipeline::Sources.
+Exported upon request.
+
+See L<Sources: Ekorn::Pipeline::Sources|Ekorn::Pipeline::Manual::Reference/"Sources: Ekorn::Pipeline::Sources">.
+
+=head3 from_csv
+
+    my $source = from_csv(file => $path);
+    my $source = from_csv(file => $path, header => 1, munge => 'db');
+    my $source = from_csv(fh => $fh, header => 'skip', csv => {sep_char => "\t"});
+    my $stage  = from_csv();
+
+Given a C<file> or an C<fh>, a source of its rows, as array references,
+or, with C<header> true, hash references keyed by the header's names;
+given neither, a stage parsing each value into its rows. From
+Ekorn::Pipeline::CSV; it loads Text::CSV when first called. Exported
+upon request.
+
+See L<CSV: Ekorn::Pipeline::CSV|Ekorn::Pipeline::Manual::Reference/"CSV: Ekorn::Pipeline::CSV">.
+
+=head3 from_fh
+
+    from_fh($fh)
+
+A source of a filehandle's lines, each without its line end, as
+C<chomp> removes it. It leaves C<$fh> open. From
+Ekorn::Pipeline::Sources. Exported upon request.
+
+See L<Sources: Ekorn::Pipeline::Sources|Ekorn::Pipeline::Manual::Reference/"Sources: Ekorn::Pipeline::Sources">.
+
+=head3 from_file
+
+    from_file($path)
+    from_file($path, $layers)
+
+A source of a file's lines, each without its line end, read through
+the I/O layers given, such as C<':encoding(UTF-8)'>. It opens the file
+as the run starts, and closes it however the run ends. From
+Ekorn::Pipeline::Sources. Exported upon request.
+
+See L<Sources: Ekorn::Pipeline::Sources|Ekorn::Pipeline::Manual::Reference/"Sources: Ekorn::Pipeline::Sources">.
+
+=head3 from_json
+
+    my $source = from_json(file => $path);
+    my $source = from_json(fh => $fh, json => \%settings);
+    my $stage  = from_json();
+    my $stage  = from_json(json => $encoder);
+
+Given a C<file> or an C<fh>, a source of one JSON document, read whole:
+an array's elements, or the document itself; given neither, a stage
+decoding each value the same way. From Ekorn::Pipeline::JSON.
+Exported upon request.
+
+See L<JSON: Ekorn::Pipeline::JSON|Ekorn::Pipeline::Manual::Reference/"JSON: Ekorn::Pipeline::JSON">.
+
+=head3 from_jsonl
+
+    my $source = from_jsonl(file => $path);
+    my $source = from_jsonl(fh => $fh, json => \%settings);
+    my $stage  = from_jsonl();
+    my $stage  = from_jsonl(json => $encoder);
+
+Given a C<file> or an C<fh>, a source of JSON Lines, each line's
+document a value; given neither, a stage decoding each value, a text
+of one or more lines, into each line's document. From
+Ekorn::Pipeline::JSON. Exported upon request.
+
+See L<JSON: Ekorn::Pipeline::JSON|Ekorn::Pipeline::Manual::Reference/"JSON: Ekorn::Pipeline::JSON">.
+
+=head3 generator
+
+    my $source = generator { ...; yield @values; ... };
+
+A source of every value its block passes to C<yield>, in order. Each
+run calls the block once, to its end. From Ekorn::Pipeline::Factories.
+Exported upon request.
+
+See L<generator and yield|Ekorn::Pipeline::Manual::Reference/"generator and yield">.
+
+=head3 keep
+
+    keep($n)
+
+A sink giving the first C<$n> results, as a list, or an array reference
+where one value is asked for, and stopping the run once it has them.
+From Ekorn::Pipeline::Sinks. Exported upon request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 keep_all
+
+    keep_all
+
+A sink giving every result, as a list, or an array reference where one
+value is asked for. From Ekorn::Pipeline::Sinks. Exported upon
+request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 keep_first
+
+    keep_first
+
+A sink giving the first result, or C<undef> if there's none, and
+stopping the run once it has it. From Ekorn::Pipeline::Sinks.
+Exported upon request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 keep_last
+
+    keep_last
+
+A sink giving the last result, reading every one to find it, or
+C<undef> if there's none. From Ekorn::Pipeline::Sinks. Exported upon
+request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 keep_single
+
+    keep_single
+
+A sink giving the one result, or C<undef> if there's none; at a second,
+it warns, "Expected only one item, but there were more", stops the
+run, and gives the first. From Ekorn::Pipeline::Sinks. Exported upon
+request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 pipeline
+
+    my $p = pipeline(@stages);
+    my $p = pipeline($name);
+    my $p = pipeline($name, @stages);
+
+Returns a new pipeline of C<@stages>, each a stage or the name of a
+pipeline; given one name alone, the pipeline it names. From
+Ekorn::Pipeline::Factories. Exported upon request.
+
+See L<10. Pipelines|/"10. Pipelines">.
+
+=head3 sink_many
+
+    my $sink = sink_many { ...; return ($step, $flush, $end) };
+    my $sink = sink_many { ...; return ($step, $flush) };
+    my $sink = sink_many { ...; return {step => $step, flush => $flush} };
+
+A sink of many, made for each run by its block, which returns a step,
+called with each value, a flush, giving the result, a list, and,
+optionally, an end. From Ekorn::Pipeline::Factories. Exported upon
+request.
+
+See L<sink_one and sink_many|Ekorn::Pipeline::Manual::Reference/"sink_one and sink_many">.
+
+=head3 sink_one
+
+    my $sink = sink_one { ...; return ($step, $flush, $end) };
+    my $sink = sink_one { ...; return ($step, $flush) };
+    my $sink = sink_one { ...; return {step => $step, flush => $flush} };
+
+A sink of one, made for each run by its block, which returns a step,
+called with each value, a flush, giving the result, one value, and,
+optionally, an end. From Ekorn::Pipeline::Factories. Exported upon
+request.
+
+See L<A sink into a table, with the word
+C<sink_one>|/"A sink into a table, with the word sink_one">.
+
+=head3 source
+
+    my $source = source { ...; return ($step, $end, $context) };
+    my $source = source { ...; return ($step, $end) };
+    my $source = source { ...; return $step };
+    my $source = source { ...; return {step => $step, context => $context} };
+    my $source = source { ...; return {step => $step, original => $original} };
+
+A source, made for each run by its block, which returns a step, giving
+the next value or values, or nothing when there are no more, and,
+optionally, an end, a context and an original. From
+Ekorn::Pipeline::Factories. Exported upon request.
+
+See L<source|Ekorn::Pipeline::Manual::Reference/"source">.
+
+=head3 stage
+
+    my $stage = stage { ... };
+    my $stage = stage sub ($value) { ... };
+    my $stage = stage(\&code);
+
+A stage of the block, called with each value, in C<$_> and as its
+argument, as any stage is, but one of Ekorn::Pipeline's types from the
+start. From Ekorn::Pipeline::Factories. Exported upon request.
+
+See L<stage|Ekorn::Pipeline::Manual::Reference/"stage">.
+
+=head3 to_csv
+
+    my $sink  = to_csv(file => $path);
+    my $sink  = to_csv(file => $path, header => [qw(title plays)]);
+    my $sink  = to_csv(fh => $fh, header => 1, csv => {eol => "\r\n"});
+    my $stage = to_csv();
+
+Given a C<file> or an C<fh>, a sink writing each row, an array or a hash
+reference, as a line, after the header's, and giving how many rows it
+wrote; given neither, a stage passing on each row's line. From
+Ekorn::Pipeline::CSV; it loads Text::CSV when first called. Exported
+upon request.
+
+See L<CSV: Ekorn::Pipeline::CSV|Ekorn::Pipeline::Manual::Reference/"CSV: Ekorn::Pipeline::CSV">.
+
+=head3 to_fh
+
+    to_fh($fh)
+
+A sink printing each result to C<$fh>, a line each, and giving how many
+it printed. It leaves C<$fh> open. From Ekorn::Pipeline::Sinks.
+Exported upon request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 to_file
+
+    to_file($path)
+    to_file($path, $layers)
+
+A sink writing each result to the file at C<$path>, a line each, and
+giving how many it wrote. It opens the file, emptied, as the run
+starts, and closes it however the run ends. From
+Ekorn::Pipeline::Sinks. Exported upon request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 to_json
+
+    my $sink  = to_json(file => $path);
+    my $sink  = to_json(fh => $fh, json => \%settings);
+    my $stage = to_json();
+    my $stage = to_json(json => $encoder);
+
+Given a C<file> or an C<fh>, a sink writing every result into one JSON
+array, and giving how many it wrote; given neither, a stage passing on
+the array's text once every value has come. From
+Ekorn::Pipeline::JSON. Exported upon request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 to_jsonl
+
+    my $sink  = to_jsonl(file => $path);
+    my $sink  = to_jsonl(fh => $fh, json => \%settings);
+    my $stage = to_jsonl();
+    my $stage = to_jsonl(json => $encoder);
+
+Given a C<file> or an C<fh>, a sink writing each result as a line of
+JSON, and giving how many it wrote; given neither, a stage passing on
+each value's line. From Ekorn::Pipeline::JSON. Exported upon request.
+
+See L<8. Sinks|/"8. Sinks">.
+
+=head3 yield
+
+    yield @values;
+
+In a generator's block, gives C<@values>, in order, as the generator's
+next values. From Ekorn::Pipeline::Factories. Exported upon request.
+
+See L<generator and yield|Ekorn::Pipeline::Manual::Reference/"generator and yield">.
 
 =head2 DBIx::Squirrel::Util
 

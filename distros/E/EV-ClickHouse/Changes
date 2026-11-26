@@ -1,3 +1,9 @@
+0.10  2026-11-25
+    - Inserts send each LowCardinality value once per column and block: smaller inserts.
+    - Native inserts are compressed in 1 MiB frames; new compress_block_size.
+    - New compress_method => 'zstd' (with libzstd at build time) and compress_level.
+    - on_connect and on_error no longer fire inside new() (instant connect or resolver failure).
+
 0.09  2026-11-18
     - Faster DateTime text and float decimals; LZ4 bundled; features() reports build options.
     - empty_as_default fails only rows that need it, accepts CAST defaults; new table_defaults.

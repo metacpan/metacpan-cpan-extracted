@@ -47,9 +47,9 @@ sub mech_for_nquads {
 
 
 my $mech	= mech_for_nquads(<<"END");
-_:b <num> "123" <http://example.org/graph> .
-_:b <num> "787" <http://example.org/graph> .
-<doc> <name> "My Document" <http://example.org/graph2> .
+_:b <http://example.org/num> "123" <http://example.org/graph> .
+_:b <http://example.org/num> "787" <http://example.org/graph> .
+<http://example.org/doc> <http://example.org/name> "My Document" <http://example.org/graph2> .
 END
 
 subtest 'POST query for default graph' => sub {
@@ -66,6 +66,13 @@ subtest 'POST query for named graph' => sub {
 	is( $mech->ct, 'application/sparql-results+xml', 'Is application/sparql-results+xml' );
 	$mech->content_like(qr#My Document#);
 	$mech->content_unlike(qr#num#);
+};
+
+subtest 'invalid query leads to 4xx' => sub {
+	$mech->post('/sparql', Accept => 'application/sparql-results+xml', Content => ['query' => 'SELECT * WHERE {']);
+	cmp_ok( $mech->status, '>=', 400 );
+	cmp_ok( $mech->status, '<', 500 );
+	$mech->content_like(qr'parse error'i);
 };
 
 done_testing();

@@ -1,5 +1,12 @@
 Revision history for Perl extension App-nup
 
+1.25 2026-11-26T09:37:40Z
+
+    - On paper (-T), the start of each pane is marked for ansi2pdf by
+      ansicolumn --pane-osc, so that the text of a PDF is selected and
+      copied pane by pane rather than line by line across the panes;
+      ansi2pdf 0.3.0 reads the marks
+
 1.24 2026-11-24T07:00:14Z
 
     - Require Getopt::Long::Bash 2.0.0, which has the fix of the

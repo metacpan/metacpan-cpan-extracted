@@ -1,5 +1,5 @@
-AtteanX-Store-DBI
-=================
+AtteanX-Endpoint
+================
 
 An Attean SPARQL 1.1 Endpoint implementation.
 
@@ -12,5 +12,4 @@ questions.
 
 You can also:
 
-* Email our [mailing list](http://lists.perlrdf.org/listinfo/dev)
-* Create a new [GitHub Issue](https://github.com/kasei/attean/issues) or submit a pull request
+* Create a new [GitHub Issue](https://github.com/kasei/atteanx-endpoint/issues) or submit a pull request

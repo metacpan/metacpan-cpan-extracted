@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::BBO::2024;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 use Moose;
 use namespace::autoclean;
 
@@ -36,13 +36,13 @@ Finance::Tax::Aruba::BBO::2024 - BBO calculator for the year 2024
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 DESCRIPTION
 
 BBO calculator for the year 2024.
 
-The rate is 7%: BBO 4% plus BAZV 3%.
+The rate is 7%: BBO 2.5%, BAVP 1.5% and BAZV 3%.
 
 =head1 METHODS
 

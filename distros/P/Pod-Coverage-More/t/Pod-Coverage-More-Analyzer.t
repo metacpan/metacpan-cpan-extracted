@@ -100,14 +100,16 @@ subtest constants => sub {
 };
 
 subtest positional_parameters => sub {
-    is( params_of( $subs->{shifted} ),         [ '$self#0:shift', '$name#1:shift' ],                                                          "each shift takes the next index" );
-    is( params_of( $subs->{listed} ),          [ '$self#0:list', '$first#1:list', '@rest#2:list' ],                                           "a list assignment from \@_ ends with its slurpy array" );         ## no critic (RequireQwForLiteralLists) qw warns about the # in each
-    is( params_of( $subs->{elements} ),        [ '?#0:element', '?#1:element' ],                                                              "\$_[N] used directly gives unnamed parameters" );
-    is( params_of( $subs->{defaulted_empty} ), [q{$x#0:element}],                                                                             "a ternary on \@_ with an empty list is no default" );
-    is( params_of( $subs->{defaulted} ),       [ q{$x#0:element}, q{$y#1:element optional default =}, q{$z#2:element optional default //=} ], "\$_[N] with a default is an optional parameter" );
-    is( params_of( $subs->{shift_method} ),    ['?#0:shift'],                                                                                 "shift->method gives an unnamed parameter" );
-    is( params_of( $subs->{anon_inside} ),     ['$x#0:shift'],                                                                                "the shift inside a nested anonymous sub belongs to that sub" );
-    is( params_of( $subs->{generated} ),       ['$q#0:list'],                                                                                 "a closure assigned to a glob has its parameters read" );
+    is( params_of( $subs->{shifted} ),                 [ '$self#0:shift', '$name#1:shift' ],                                                          "each shift takes the next index" );
+    is( params_of( $subs->{listed} ),                  [ '$self#0:list', '$first#1:list', '@rest#2:list' ],                                           "a list assignment from \@_ ends with its slurpy array" );                          ## no critic (RequireQwForLiteralLists) qw warns about the # in each
+    is( params_of( $subs->{listed_undef_last} )->[-1], q{?#2:list},                                                                                   "an undef in a list assignment from \@_ is an unnamed parameter, at its index" );
+    is( params_of( $subs->{listed_undef_first} ),      [ q{?#0:list}, q{$value#1:list} ],                                                             "and takes its index from the parameters after it" );
+    is( params_of( $subs->{elements} ),                [ '?#0:element', '?#1:element' ],                                                              "\$_[N] used directly gives unnamed parameters" );
+    is( params_of( $subs->{defaulted_empty} ),         [q{$x#0:element}],                                                                             "a ternary on \@_ with an empty list is no default" );
+    is( params_of( $subs->{defaulted} ),               [ q{$x#0:element}, q{$y#1:element optional default =}, q{$z#2:element optional default //=} ], "\$_[N] with a default is an optional parameter" );
+    is( params_of( $subs->{shift_method} ),            ['?#0:shift'],                                                                                 "shift->method gives an unnamed parameter" );
+    is( params_of( $subs->{anon_inside} ),             ['$x#0:shift'],                                                                                "the shift inside a nested anonymous sub belongs to that sub" );
+    is( params_of( $subs->{generated} ),               ['$q#0:list'],                                                                                 "a closure assigned to a glob has its parameters read" );
     ok( $subs->{generated}{generated}, "a closure assigned to a glob is marked generated" );
     ok( !$subs->{shifted}{generated},  "a named sub is not marked generated" );
     is( params_of( $subs->{evaled} ), [ '$self#0:list', '$value#1:list' ], "a sub built by string eval has its parameters read" );
@@ -177,6 +179,15 @@ subtest dies => sub {
     is( $subs->{logs_only}{dies}, [], "a log method of another level is no termination" );
 };
 
+subtest never_returns => sub {
+    ok( $subs->{refuses_too}{never_returns},          "a sub whose every path dies never returns" );
+    ok( $subs->{abstract_via_lexical}{never_returns}, "nor does one whose every path calls a lexical sub that never returns" );
+    ok( $subs->{abstract_via_package}{never_returns}, "or a sub of its package that never returns" );
+    is( $subs->{abstract_via_lexical}{returns}, [], "and the value of that call is no return value" );
+    ok( !$subs->{sometimes_refuses}{never_returns}, "but a sub that returns on another path does return" );
+    is( $subs->{abstract_via_lexical}{dies}, [], "a call that never returns is no termination of the caller's own" );
+};
+
 subtest signatures => sub {
     my $signed = $analyzer->analyze_package('Signed');
     is( params_of( $signed->{plain} ),                  [ '$x#0:signature', '$y#1:signature' ],                       "two mandatory parameters" );
@@ -185,8 +196,11 @@ subtest signatures => sub {
     is( params_of( $signed->{slurpy_array} ),           [ '$x#0:signature', '@rest#1:signature optional' ],           "a slurpy array" );
     is( params_of( $signed->{slurpy_hash} ),            [ '$x#0:signature', '%opts#1:signature optional keys size' ], "a slurpy hash and the keys read from it" );
     ok( $signed->{slurpy_hash}{params}[1]{slurpy}, "a slurpy hash is marked slurpy" );
-    is( params_of( $signed->{placeholder} ), [ '?#0:signature', '$y#1:signature' ], "a placeholder parameter has no name" );
-    is( params_of( $signed->{empty} ),       [],                                    "an empty signature has no parameters" );
+    is( params_of( $signed->{placeholder} ),      [ '?#0:signature',  '$y#1:signature' ],         "a placeholder parameter has no name" );
+    is( params_of( $signed->{anonymous_slurpy} ), [ '$x#0:signature', '?#1:signature optional' ], "a slurpy parameter with no name has none" );
+    ok( $signed->{anonymous_slurpy}{params}[1]{slurpy}, "and is marked slurpy" );
+    is( [ map { [ @{$_}{qw{name index optional}} ] } @{ $signed->{defaulted_placeholder}{params} } ], [ [ '$x', 0, 0 ], [ undef, 1, 1 ] ], "a placeholder with a default has no name either, and is optional" );
+    is( params_of( $signed->{empty} ),                                                                [],                                  "an empty signature has no parameters" );
 };
 
 subtest signature_defaults_5_38 => sub {

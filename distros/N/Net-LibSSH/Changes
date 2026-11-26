@@ -1,5 +1,26 @@
 Revision history for Net-LibSSH
 
+0.005     2026-11-26 04:01:17Z
+  - Fix segfault when a thread is created while a session, channel or SFTP
+    object is alive: the objects are no longer cloned into the new thread
+    and are not usable there, so the parent's connection is freed only once
+  - Add auth_none() for servers that admit a session without credentials
+  - Add Channel request_pty() and request_shell() for an interactive
+    shell, and read_timeout() to read from it with a timeout or without
+    waiting: it returns data, '' on a timeout and undef at end of file,
+    and croaks on a failed connection
+  - option() accepts kex, hostkeys, ciphers_c_s, ciphers_s_c, hmac_c_s and
+    hmac_s_c, so legacy algorithms can be enabled explicitly for old
+    devices; unset, the proposal is libssh's default, as before. The "+",
+    "-" and "^" prefixes on those values are libssh's and need libssh 0.11.0
+    or later
+  - Requires Alien::libssh 0.003: a libssh built from source is 0.12.2 with
+    the upstream security fixes, and a system libssh counts from 0.9.0 on
+  - exit_status() calls ssh_channel_get_exit_state() on libssh 0.11.0 and
+    later, where ssh_channel_get_exit_status() is deprecated; older libssh
+    keeps the old call. Answers are unchanged: -1 for a process that is
+    still running or was killed by a signal
+
 0.004     2026-09-20 18:38:02Z
   - SECURITY: connect() now verifies the server host key against known_hosts
     (CWE-322, reported privately via CPANSec). Previously

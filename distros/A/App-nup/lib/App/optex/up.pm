@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.24";
+our $VERSION = "1.25";
 
 =encoding utf-8
 
@@ -169,7 +169,9 @@ C<ansi2pdf>.
 The size of a sheet of paper in columns and lines, which
 C<ansi2pdf --geometry> tells, is used in place of the terminal size,
 and C<ansi2pdf> is used in place of the pager.  Each screen is
-printed on a sheet as it is.
+printed on a sheet as it is.  The start of each pane is marked for
+C<ansi2pdf> (C<ansicolumn --pane-osc>), which puts the text in the
+PDF pane by pane, so that a pane is selected and copied as a whole.
 
 =item B<--output>=I<FILE>, B<-o> I<FILE>
 
@@ -645,6 +647,9 @@ sub finalize {
                             : ("-w$term_width", "-C$cols"));
     push @ac_opts, "--height=$height" if defined $height;
     push @ac_opts, "--no-page"        if $no_page;
+    # on paper, ansi2pdf puts the text in the order of the panes, told
+    # where they start, so that a pane is selected as a whole in a PDF
+    push @ac_opts, "--pane-osc"       if $ansi2pdf;
     push @ac_opts, @passthru;
 
     ##

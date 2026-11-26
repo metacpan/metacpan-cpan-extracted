@@ -16,6 +16,7 @@ eg/producer_consumer.pl
 eg/request_response.pl
 eg/retry_queue.pl
 eg/rolling_buffer.pl
+eg/sharded.pl
 eg/worker_pool.pl
 lib/Data/Queue/Shared.pm
 lib/Data/Queue/Shared/Int.pm
@@ -64,6 +65,7 @@ xt/ev_integration.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/fork_bomb.t
+xt/fork_pid.t
 xt/futex_fairness.t
 xt/fuzz_ops.t
 xt/invalid_args.t
@@ -75,6 +77,7 @@ xt/memfd_seal.t
 xt/mmap_leak.t
 xt/partial_publish.t
 xt/path_edge.t
+xt/pidns.t
 xt/sigstop_holder.t
 xt/spurious_wake.t
 xt/stats_sanity.t
@@ -86,6 +89,7 @@ xt/tsan.t
 xt/valgrind.t
 xt/wait0_eq_try.t
 xt/wait_timeout_precision.t
+xt/wake_handoff.t
 xt/write_visibility.t
 xt/zero_consumers.t
 t/15-recover.t
@@ -93,5 +97,9 @@ t/16-foreign-invocant.t
 t/17-adversarial-hardening.t
 t/18-str-wakeups.t
 t/19-int-missed-wake.t
+t/20-lock-holder.t
+t/21-format-version.t
+t/22-lock-timeout.t
+t/23-pop-byte-budget.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

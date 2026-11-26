@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::ToolConfiguration 0.008;
+package Dist::Conformance::Check::ToolConfiguration 0.011;
 
 # ABSTRACT: The configuration files of the tools exist
 
@@ -18,13 +18,11 @@ sub config_schema ($) {
     };
 }
 
-
 sub check ( $self, $snapshot ) {
     my @missing = $self->missing( $snapshot, sort keys %{ $self->config->{files} } );
     return ( 'fail', 'missing: ' . join ', ', @missing ) if @missing;
     return ( 'pass', 'all present' );
 }
-
 
 sub update ( $self, $update ) {
     my $files = $self->config->{files};
@@ -51,7 +49,7 @@ Dist::Conformance::Check::ToolConfiguration - The configuration files of the too
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -63,14 +61,6 @@ template.
 
 The update writes each missing file from its template, and leaves a file that
 exists alone.
-
-=head1 METHODS
-
-=head2 check
-
-=head2 update
-
-Writes each missing file from its template.
 
 =head1 IN A FLAVOR
 

@@ -55,10 +55,23 @@ static void capture_tls_syscall_error(ev_clickhouse_t *self, int ret) {
 }
 #endif
 
+/* Report a connect that failed before any I/O (resolver, BSD loopback
+ * refusal) from the loop, so on_error never fires inside new(). */
+static void defer_connect_failure(ev_clickhouse_t *self, const char *msg) {
+    CLEAR_STR(self->connect_err);
+    self->connect_err = savepv(msg);
+    if (self->timing) ev_timer_stop(self->loop, &self->timer);
+    ev_timer_set(&self->timer, 0.0, 0.0);
+    ev_timer_start(self->loop, &self->timer);
+    self->timing = 1;
+}
+
 static void start_connect(ev_clickhouse_t *self) {
     struct addrinfo hints, *res = NULL, *ai;
     int fd = -1, ret;
     char port_str[16];
+
+    CLEAR_STR(self->connect_err);
 
     self->connect_gen++;
 
@@ -84,7 +97,7 @@ static void start_connect(ev_clickhouse_t *self) {
     if (ret != 0) {
         char errbuf[256];
         snprintf(errbuf, sizeof(errbuf), "getaddrinfo: %s", gai_strerror(ret));
-        fail_connection(self, errbuf);
+        defer_connect_failure(self, errbuf);
         return;
     }
 
@@ -117,7 +130,7 @@ static void start_connect(ev_clickhouse_t *self) {
             char errbuf[256];
             snprintf(errbuf, sizeof(errbuf), "connect: %s",
                      strerror(saved_errno ? saved_errno : ECONNREFUSED));
-            fail_connection(self, errbuf);
+            defer_connect_failure(self, errbuf);
             return;
         }
     }
@@ -141,17 +154,8 @@ static void start_connect(ev_clickhouse_t *self) {
         self->timing = 1;
     }
 
-    if (ret == 0) {
-        /* connected immediately — connected=1 is deferred for native
-         * (until ServerHello) and TLS (until handshake completes) */
-        self->connecting = 0;
-        if (self->protocol != PROTO_NATIVE && !self->tls_enabled)
-            self->connected = 1;
-        on_connect_done(self);
-        return;
-    }
-
-    /* in progress — wait for writability */
+    /* In progress, or connected at once (BSD loopback): either way wait
+     * for writability, so on_connect never fires inside new() */
     start_writing(self);
 }
 
@@ -531,8 +535,11 @@ static void timer_cb(EV_P_ ev_timer *w, int revents) {
     /* Treat any pre-`connected=1` timeout as a connect timeout — covers
      * TCP connect, TLS handshake, and native ServerHello stages. */
     if (!self->connected) {
+        char *err = self->connect_err;
+        self->connect_err = NULL;
         stop_writing(self);
-        fail_connection(self, "connect timeout");
+        fail_connection(self, err ? err : "connect timeout");
+        Safefree(err);
     } else {
         /* query timeout */
         CLEAR_SV(self->native_rows);

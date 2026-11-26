@@ -32,6 +32,7 @@ my %internal = map { $_ => 1 } qw(
     sub
     unsub
     req
+    hreq
 );
 
 plan tests => 2 * scalar @pms;

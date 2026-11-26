@@ -74,7 +74,9 @@ DBIx::Squirrel does them for you.
 
     A statement and its stages can become a function with a name of its
     own. The SQL is written in one place, and the code that uses it reads
-    as plainly as `titles_by 2`.
+    as plainly as `titles_by 2`. Callers can add stages of their own, or a
+    sink, so one statement gives the first row, a count, a file or every
+    result, without growing an option for each.
 
 - **Nothing to unlearn, and nothing to undo.**
 
@@ -159,7 +161,8 @@ They're in four modules: `take` and `drop` in
 `take_while` and more on request, `pluck` and `as_hash` in
 [DBIx::Squirrel::Stages::Rows](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ARows), `batch` and `collect` in
 [DBIx::Squirrel::Stages::Batch](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ABatch), and `peek` and `count_into` in
-[DBIx::Squirrel::Stages::Taps](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ATaps).
+[DBIx::Squirrel::Stages::Taps](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ATaps), with `dump_to` and `tee` on
+request.
 
 A sink, given last, says what the call gives in place of an iterator:
 `keep_all` every result, `count_items` how many, `keep_first` the
@@ -182,6 +185,9 @@ my @next_ten = $dbh->iterate(
 `take(10)` comes after a test in Perl, so a `LIMIT` in the SQL
 couldn't do its job. While debugging, `peek { warn ... }` anywhere in
 the stages shows the rows going by, without a change to the query.
+`dump_to` writes each one out in full with Data::Dumper, and where
+Text::Redact::Secrets is installed, it hides the long, random secrets
+it finds, such as the password in a DSN.
 
 Where [Ekorn::Pipeline::Operators](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AOperators) is in scope, `|` chains them too,
 as in `$it | count_items`. The reference says how to write your own
@@ -249,11 +255,17 @@ It needs Perl 5.36 or later.
 
 ## Upgrading
 
-This is version 3. It builds on Ekorn::Pipeline, and makes one rule of
-what a call with stages gives: an iterator, unless a sink given last
-says otherwise. Most code written for 2.x runs as it did, and
-[Upgrading from 2.x](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AManual%3A%3AReference#Upgrading-from-2.x),
-in the reference, lists what changes.
+This is version 4. Code written for 3.x runs as it did, but for one
+change: `pipe`, in scalar context, gives what a pipeline gives, not
+the first result, as
+[Upgrading from 3.x](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AManual%3A%3AReference#Upgrading-from-3.x),
+in the reference, says.
+
+Version 3 built on Ekorn::Pipeline, and made one rule of what a call
+with stages gives: an iterator, unless a sink given last says
+otherwise. Most code written for 2.x runs as it did, and
+[Upgrading from 2.x](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AManual%3A%3AReference#Upgrading-from-2.x)
+lists what changes.
 
 Version 2 was a rewrite. Code written for 1.x needs changes to run,
 and

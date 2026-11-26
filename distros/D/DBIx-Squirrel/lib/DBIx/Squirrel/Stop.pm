@@ -6,6 +6,8 @@ use Exporter qw(import);
 
 use Ekorn::Pipeline::Stop qw(Stop);
 
+our $VERSION = 'v4.1.1';
+
 # A plain re-export of Ekorn::Pipeline::Stop's function, from
 # DBIx::Squirrel's own list of them, imported from it by name, so a name
 # Ekorn::Pipeline drops fails here, as the module loads, and one it adds

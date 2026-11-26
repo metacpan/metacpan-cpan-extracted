@@ -10,22 +10,22 @@ use ExtUtils::MakeMaker;
 use Alien::libssh;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Perl binding for libssh \x{2014} SSH without SFTP dependency",
+  "ABSTRACT" => "Perl binding for libssh - SSH without SFTP dependency",
   "AUTHOR" => "Torsten Raudssus <getty\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "Alien::libssh" => "0.002",
+    "Alien::libssh" => "0.003",
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Net-LibSSH",
   "LICENSE" => "perl",
   "NAME" => "Net::LibSSH",
   "PREREQ_PM" => {
-    "Alien::libssh" => "0.002"
+    "Alien::libssh" => "0.003"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
-  "Alien::libssh" => "0.002",
+  "Alien::libssh" => "0.003",
   "Test::More" => "0.98"
 );
 

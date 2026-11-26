@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.20.0';
+our $VERSION = '1.21.0';
 
 our @FLAGS = qw(
     is_vpn is_tor is_relay is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn
@@ -154,13 +154,18 @@ the flag above it is false. A populated one always carries every one of its keys
 Always present. C<is_bogon> is set for reserved space, which the client answers
 itself without a request.
 
-=head2 is_tor, is_relay, is_bot, is_anycast, is_carrier, is_satellite, is_ssh, is_smtp, is_web, is_dns_resolver, is_bittorrent
+=head2 is_tor, is_relay, is_anycast
 
 On every answer, with a key or without one: C<1> or C<0>.
 
 =head2 is_vpn, is_resproxy, is_dcproxy, is_mobproxy, is_pubproxy, is_hosting, is_cdn
 
 The paid flags: C<1>, C<0>, or C<undef> when your plan omits the field.
+
+=head2 is_bot, is_carrier, is_satellite, is_ssh, is_smtp, is_web, is_dns_resolver, is_bittorrent
+
+On a paid plan or the trial: C<1>, C<0>, or C<undef> on Unlimited's answer, which
+does not carry them.
 
 =head2 vpn, tor, relay, resproxy, dcproxy, mobproxy, pubproxy, hosting, cdn, bot, carrier, satellite, ssh, smtp, web, dns_resolver, bittorrent
 

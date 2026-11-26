@@ -1,7 +1,7 @@
 # PRAXO-CORE Perl Registry Introduction
 
-**Status:** published 0.7.0 on CPAN; 0.7.1 publication pending. Source version `0.7.1`, source
-tag `perl/v0.7.1`. Published registry version: `0.7.0`. Registry
+**Status:** published on CPAN; README.pod indexed. Source version `0.8.0`, source
+tag `perl/v0.8.0`. Published registry version: `0.7.1`. Registry
 pages are release snapshots; verify the published version before relying on a
 feature.
 
@@ -15,11 +15,11 @@ PRAXO-CORE is an embeddable, MIT-licensed AI agent framework. This distribution 
 | --- | --- |
 | Package | `Praxo::Core` |
 | Registry | [CPAN (MetaCPAN index)](https://metacpan.org/dist/Praxo-Core) |
-| Source version | `0.7.1` |
-| Published registry version | `0.7.0` |
+| Source version | `0.8.0` |
+| Published registry version | `0.7.1` |
 | Install (published) | `cpanm Praxo::Core` |
 | Install (source/release prepared) | `cpanm Praxo::Core` |
-| Source tag | `perl/v0.7.1` |
+| Source tag | `perl/v0.8.0` |
 | Tier | Core |
 | Contract | `SPEC_VERSION` `0.2.0` |
 | Documentation | https://axisvela.github.io/praxo-core/languages/perl/ |
@@ -40,6 +40,7 @@ PRAXO-CORE is an embeddable, MIT-licensed AI agent framework. This distribution 
 ## Coding-agent entry
 
 - [Examples](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples): runnable language-specific examples.
+- [Scenario tutorials](https://github.com/axisvela/praxo-core/tree/main/language/perl/Tutorial): scenario-oriented tutorials.
 - [llms.txt](llms.txt): compact machine-readable entry for this language.
 - [llms.md](llms.md): Markdown version of the same entry.
 - [Coding-agent contract](../../docs/getting-started/coding-agents.md): explicit
@@ -49,6 +50,14 @@ PRAXO-CORE is an embeddable, MIT-licensed AI agent framework. This distribution 
 
 - X: <https://x.com/axisvela>
 - Weibo: <https://weibo.com/u/1936025761>
+- LinkedIn: <https://www.linkedin.com/company/axisvela/>
+- Facebook: <https://www.facebook.com/profile.php?id=61596905732406>
+- YouTube: <https://www.youtube.com/@axisvela>
+- Discord: <https://discord.com/channels/1575163993767809064/1575164343148875977>
+- GitHub Discussions: <https://github.com/axisvela/praxo-core/discussions>
+- GitHub Issues: <https://github.com/axisvela/praxo-core/issues>
+- Documentation: <https://axisvela.github.io/praxo-core/>
+- Architect: <https://axisvela.architect.pub>
 
 ## Boundaries
 

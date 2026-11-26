@@ -32,7 +32,12 @@ $distribution->child('www', 'www~')->spew("editor backup matching MANIFEST.SKIP\
 $distribution->child('www', '.unwanted')->spew("unlisted dot file\n");
 $distribution->child('log', 'acme-log', 'app.log')->spew("runtime log\n");
 $distribution->child('log', 'acme-unlisted', '.exists')->touchpath;
-$distribution->child('MANIFEST')->append("www/Xhidden/visible\nwww/.listed\n");
+my $manifest = $distribution->child('MANIFEST');
+# Release distributions ship the manifest read-only.
+my @manifest_stat = stat($manifest) or die "cannot stat '$manifest': $!";
+chmod(($manifest_stat[2] & 07777) | 0200, $manifest)
+    or die "cannot chmod '$manifest': $!";
+$manifest->append("www/Xhidden/visible\nwww/.listed\n");
 my $build_pl = $distribution->child('Build.PL');
 $build_pl->edit(sub { s/(conffiles\s*=>)/webdir_files => { 'www\/.listed' => 1 },\n    $1/ });
 

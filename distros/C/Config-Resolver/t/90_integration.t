@@ -2,11 +2,8 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
+use FindBin;
 
 use Test::More;
 use File::Temp qw(tempdir);
@@ -18,8 +15,12 @@ use Config::Resolver::Utils qw(slurp_file);
 # --- Find our script and lib paths ---
 # We need to find the script to run, and the -I path for the subprocess
 my $Bin     = $FindBin::Bin;
-my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver.pl' );
+my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver' );
 my $LibPath = File::Spec->catfile( $Bin, '..', 'lib' );
+
+# The shell wrapper launches its own Perl interpreter.
+local $ENV{PERL5LIB} = join q{:}, grep { !ref $_ && defined $_ && -d $_ }
+  $LibPath, @INC, split /:/xsm, $ENV{PERL5LIB} // q{};
 
 # --- Test 1: Full end-to-end manifest run ---
 subtest 'Test Case: End-to-end manifest run' => sub {
@@ -60,7 +61,7 @@ subtest 'Test Case: End-to-end manifest run' => sub {
   # We use qx() (backticks) to run this as a real shell command.
   # The -I flag is critical so the 'perl' subprocess can find
   # your Config::Resolver module.
-  my $command = "perl -I$LibPath $Script resolve -m $manifest_path";
+  my $command = "bash $Script resolve -m $manifest_path";
 
   # We run the command and capture any STDOUT/STDERR
   my $script_output = qx($command);

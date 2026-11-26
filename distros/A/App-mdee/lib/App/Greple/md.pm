@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.27";
+our $VERSION = "1.29";
 
 =encoding utf-8
 
@@ -278,10 +278,25 @@ Available parameters:
     table_boundary  fold boundary in wrapped cells (default: word)
     table_linebreak line break mode in wrapped cells: none, runin,
                     runout or all (default: all)
-    intact          parts sent to ansicolumn --intact to be kept as
-                    they are, colon separated; only "table" for now:
-                    the lines of a formatted table are joined into
-                    one (default: none)
+    intact          parts to be kept intact by ansicolumn --intact,
+                    separated by colons (default: none): "table"
+                    joins the lines of a formatted table by US;
+                    "image" joins an image line and the rows of its
+                    image by GS, to keep them in one pane
+    image_types     types of images to show, separated by colons:
+                    png, jpeg and gif; the rows of an image are put
+                    below a line which is an image, and its data is
+                    sent to the terminal (default: none, no images);
+                    see Text::ANSI::Image
+    image_rows      maximum rows of an image (default: 0, the
+                    terminal height minus four lines)
+    image_term      size of the terminal as COLSxROWS:WxH, the
+                    columns and rows and the width and height of a
+                    cell in pixels (default: read from /dev/tty)
+    image_tty       file to send the image data to (default: /dev/tty)
+    image_osc       1: each row of an image tells its file by a private
+                    OSC, for ansi2pdf, which draws the image itself
+                    (default: 0)
     table_style     lattice: column separators (default; pipe is
                     another name); 3line: columns separated by spaces,
                     a rule above and below the table and per column
@@ -535,6 +550,12 @@ columns.
 Finds the paragraphs for C<refill=1> with L<CommonMark>,
 L<Markdown::Perl> or L<pandoc|https://pandoc.org>.
 
+=item L<Text::ANSI::Image>
+
+Shows the images for C<image_types>, with the Unicode placeholders
+of the kitty graphics protocol.  L<App::Greple::md::Image> finds
+their files.
+
 =item L<CommonMark Spec 0.31.2, Emphasis and strong emphasis|https://spec.commonmark.org/0.31.2/#emphasis-and-strong-emphasis>
 
 The rules that C<*> and C<**> follow by default.
@@ -561,6 +582,7 @@ it under the same terms as Perl itself.
 =cut
 
 use URI::Escape;
+use List::Util qw(min);
 use Text::ANSI::Fold qw($csi_re $osc_re);
 use Text::ANSI::Fold::Util qw(ansi_width);
 use Getopt::EX::Config;
@@ -569,6 +591,8 @@ use Getopt::EX::Func qw(parse_func);
 use App::Greple::Common qw(FILELABEL);
 use App::Greple::Regions qw(match_regions);
 use App::Greple::md::Blocks qw(blocks);
+use App::Greple::md::Image qw(local_path);
+use Text::ANSI::Image;
 
 my @color_labels = qw(
     code_mark code_tick code_info code_block code_inline
@@ -603,7 +627,12 @@ my $config = Getopt::EX::Config->new(
     table_runout    => 2,        # run-out width in wrapped cells
     table_boundary  => 'word',   # fold boundary in wrapped cells
     table_linebreak => 'all',    # line break (kinsoku) mode in wrapped cells
-    intact          => '',       # parts kept intact by ansicolumn --intact (table)
+    intact          => '',       # parts kept intact by ansicolumn --intact (table, image)
+    image_types     => '',       # types of images shown, colon separated (png:jpeg:gif)
+    image_rows      => 0,        # rows that an image may take (0: those of the terminal but four)
+    image_term      => '',       # size of the terminal, COLSxROWS:WxH (default: of /dev/tty)
+    image_tty       => '',       # where the data of the images goes (default: /dev/tty)
+    image_osc       => 0,        # tell the file of each image in its rows, for ansi2pdf
     rule            => 1,        # box-drawing characters for tables
     table_style     => 'lattice', # lattice (or pipe): column separators; 3line, simple: spaces and rules only
     table_gap       => 1,        # columns from a cell to the mark place of the next column
@@ -704,7 +733,7 @@ sub finalize {
                        "colorize!", "nofork!", "fold!", "refill!", "refill_parser=s", "front_matter!", "fold_width=i", "fold_runin=i", "fold_runout=i",
                        "table!", "table_trim!",
                        "table_width=i", "table_cell=s", "table_wrap_mark=s", "table_cell_mark=s", "rule!", "table_style=s", "table_gap=i",
-                       "table_runin=i", "table_runout=i", "table_boundary=s", "table_linebreak=s", "intact=s",
+                       "table_runin=i", "table_runout=i", "table_boundary=s", "table_linebreak=s", "intact=s", "image_types=s", "image_rows=i", "image_term=s", "image_tty=s", "image_osc=i",
                        "heading_markup|hm:s", "cjk_friendly!", "tick_open=s", "tick_close=s",
                        "hashed=s%",
                        "colormap|cm=s" => \@opt_cm,
@@ -942,6 +971,9 @@ sub Step {
 # Pipeline steps: Step(sub{}) = always active, Step(label => sub{}) = controllable
 #
 
+# the file being shown, for the paths of its images (begin)
+our $current_file;
+
 my %colorize = (
 
     front_matter => Step(sub {
@@ -1006,6 +1038,69 @@ my %colorize = (
                 . osc8($+{url}, mark_color('link', "[") . md_color('image_link', $+{text}) . mark_color('link', "]"))
             )
         }ge;
+    }),
+
+    # A line which is an image and nothing else is followed by the rows
+    # of the image (Text::ANSI::Image, the kitty method).  The rows are
+    # protected, so that no other step takes them, and are joined with
+    # the line by GS when they are to be kept in one pane (intact=image),
+    # as the rows of a table are joined by US.
+    image_blocks => Step(sub {
+        my @types = split /:/, $config->{image_types} // '';
+        @types or return;
+        my $img = Text::ANSI::Image->new(
+            method => 'kitty',
+            types  => \@types,
+            term   => $config->{image_term},
+            tty    => $config->{image_tty} || '/dev/tty',
+            osc    => $config->{image_osc},
+        );
+        my @added;
+        my $dir = defined $current_file && $current_file =~ m{^(.*)/} ? $1 : ".";
+        my $width = $config->{fold} ? $config->{fold_width} : 0;
+        # A Markdown image, alone or as a link, or an HTML <img> with
+        # only <p>, <div>, <a> or <center> around it (README files made
+        # from POD have one for the logo).
+        s{^(?<line>\h*+
+            (?: \[?!\[(?:$LT)?\]\(<?(?<url>[^>)\s\n]+)>?\)(?:\]\([^)\n]*\))?
+              | (?:<(?:p|div|a|center)\b[^>\n]*>\h*)*
+                <img\b(?<attr>[^>\n]*)>
+                (?:\h*</(?:p|div|a|center)>)*
+            )\h*+)\n
+        }{
+            # the line number, before any other match is made
+            my $at = 1 + (substr($_, 0, $-[0]) =~ tr/\n//);
+            my($line, $url, $attr) = @+{qw(line url attr)};
+            if (defined $attr) {
+                ($url) = $attr =~ m{\bsrc\h*=\h*(?|"([^"]*)"|'([^']*)'|([^\s"'>]+))}i;
+            }
+            my $file = defined $url ? local_path($url, $dir) : undef;
+            my @rows = $file ? $img->rows($file,
+                width => $width,
+                rows  => $config->{image_rows},
+            ) : ();
+            if (@rows) {
+                # the line of a shown image is markup only, the Markdown
+                # or the HTML tags: it is put as it is in code_info, as the
+                # info string of a code fence is
+                my($indent, $tags) = $line =~ /^(\h*)(.*?)\h*$/;
+                $line = $indent . protect(md_color('code_info', $tags));
+                my $keep = intact("image");
+                # kept in one pane, the line of the image goes with its rows
+                push @added, [ $at, $keep ? 0 : scalar @rows ];
+                my $sep = $keep ? "\x1D" : "\n";
+                $line . $sep . protect(join $sep, @rows) . "\n";
+            } else {
+                "$line\n";
+            }
+        }mgex;
+        $img->flush;
+        # the lines joined by refill() below an image go down
+        for my $r (@App::Greple::md::refill_lines) {
+            my $shift = 0;
+            $_->[0] < $r->[0] and $shift += $_->[1] for @added;
+            $_ += $shift for @$r;
+        }
     }),
 
     images => Step(sub {
@@ -1096,7 +1191,7 @@ my %colorize = (
 #
 
 # Always before headings (protection + links)
-my @protect_steps = qw(front_matter code_blocks comments image_links images links);
+my @protect_steps = qw(front_matter code_blocks comments image_blocks image_links images links);
 
 # Inline steps controlled by heading_markup
 my @inline_steps  = qw(inline_code horizontal_rules bold_italic bold italic strike);
@@ -1148,6 +1243,9 @@ sub colorize {
 # What joins the lines of a part kept intact (config intact) into one
 # line, as ansicolumn --intact takes it
 my $INTACT_SEP = "\x1F";
+# What joins lines kept in one pane, the rows of an image or the lines
+# of a row of a table
+my $GROUP_SEP = "\x1D";
 
 # Whether the part ("table") is kept intact
 sub intact {
@@ -1175,9 +1273,11 @@ sub table_regions {
           [^\n]* [ $bar $cross ] [^\n]* \n         # ... with a separator somewhere
     }xxm;
     my $sep = qr{ (?= [^\n]* [ $cross | ] ) [ $rule $cross | - ]+ \n }xx;
-    # a table kept intact is a line with UNIT SEPARATORs, which come
-    # from nowhere else: remove_controls() takes them out of the text
-    return match_regions(pattern => qr/^[^\n]*$INTACT_SEP[^\n]*\n/m) if intact('table');
+    # a table kept intact is a line with UNIT SEPARATORs, or GROUP
+    # SEPARATORs alone when it has one row, which come from nowhere else
+    # but the rows of an image: remove_controls() takes them out of the
+    # text
+    return match_regions(pattern => qr/^[^\n]*[$INTACT_SEP$GROUP_SEP][^\n]*\n/m) if intact('table');
     match_regions(pattern => qr/ (?= (?:$row)*? $sep ) (?:$row){3,} /x);
 }
 
@@ -1245,7 +1345,8 @@ sub refill_block {
 }
 
 # The line ranges that refill() joined, as [first, last] in the text
-# after joining, and the formatted tables, as [first line, lines added],
+# after joining, and the formatted tables, as [first line, lines added,
+# lines before formatting],
 # both for the current file.  refill_regions() turns them into the
 # regions that --fold-by folds.
 our @refill_lines;
@@ -1331,13 +1432,20 @@ sub refill_regions {
     my $end = length $_;
     my @regions;
     for my $range (@refill_lines) {
-        for my $line ($range->[0] .. $range->[1]) {
+        LINE: for my $line ($range->[0] .. $range->[1]) {
             my $shift = 0;
             for my $t (@table_shift) {
+                # A line of a table is not folded.  A parser without
+                # tables (libcmark) reports a table as a paragraph, and
+                # its lines after the first are not lines any more when
+                # the table is joined into one (intact=table).
+                next LINE if $t->[0] <= $line and $line < $t->[0] + $t->[2];
                 $shift += $t->[1] if $t->[0] < $line;
             }
             my $n = $line + $shift;
             last if $n > @start;
+            # a line which holds the rows of an image is not folded
+            next if substr($_, $start[$n-1], ($start[$n] // $end) - $start[$n-1]) =~ /[\x1D\x{10EEEE}]/;
             push @regions, [ $start[$n-1], $start[$n] // $end ];
         }
     }
@@ -1410,6 +1518,7 @@ sub begin_functions {
 
 sub begin {
     remove_controls();
+    $current_file = { @_ }->{&FILELABEL};
     @refill_lines = @table_shift = ();
     for my $func (begin_functions()) {
         $func->call(@_);
@@ -1502,13 +1611,15 @@ sub format_table {
         # How cells are wrapped is given explicitly, so that it does not
         # change with the user's ~/.ansicolumnrc
         my @wrap = map { "--$_=" . $config->{"table_$_"} } qw(runin runout boundary linebreak);
+        # kept intact, the lines of a row come joined by GS (see below)
+        push @wrap, '--table-group' if intact('table');
         my $formatted = call_ansicolumn($block, @sep_opt, '-o', $sep, '-t', '--cu=1', @align, @fit, @wrap);
         my $table = fix_separator($formatted, $sep);
         if ($open) {
             # blank the column separators and add the rules
             $table =~ tr/\x{2502}\x{253C}\x{251C}\x{2524}/    /;
             if ($style eq '3line') {
-                my($first) = $table =~ /^(.*)$/m;
+                my($first) = $table =~ /^([^\n$GROUP_SEP]*)/;
                 my $rule = "\x{2500}" x ansi_width($first);
                 $table = "$rule\n$table$rule\n";
             } else {
@@ -1521,8 +1632,29 @@ sub format_table {
         # SEPARATOR, the last newline kept, for ansicolumn --intact,
         # which lays them out without folding them.  Nothing after this
         # takes a table by its lines but table_regions().
-        $table =~ s/\n(?=.)/$INTACT_SEP/gs if intact('table');
-        push @table_shift, [ $line, ($table =~ tr/\n//) - $lines ];
+        #
+        # The lines of a row come from ansicolumn joined by GROUP
+        # SEPARATOR (--table-group), which --intact keeps in one pane.
+        # The header, the rule below it and the first row are joined
+        # so too, and so is a rule below the table (3line, simple) with
+        # the last row: a pane does not end between them.
+        if (intact('table')) {
+            my @rows = split /\n/, $table;
+            # the rule below the header: the first rule after a line
+            # which is not one (3line has one above the header)
+            my $head;
+            for my $i (1 .. $#rows) {
+                $rows[$i] =~ /^[\x{2500}\x{253C}\x{251C}\x{2524}|\- ]+$/ or next;
+                $head = $i;
+                last;
+            }
+            my %glue = map { $_ => 1 } 1 .. min(($head // 0) + 1, $#rows);
+            $glue{$#rows} = 1 if $open and @rows > 1;
+            $table = $rows[0] . join('', map {
+                ($glue{$_} ? $GROUP_SEP : $INTACT_SEP) . $rows[$_]
+            } 1 .. $#rows) . "\n";
+        }
+        push @table_shift, [ $line, ($table =~ tr/\n//) - $lines, $lines ];
         $table;
     }mgep;
     # the separators of mark_line_breaks() left out of the tables

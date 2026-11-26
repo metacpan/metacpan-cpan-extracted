@@ -2,11 +2,8 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
+use FindBin;
 
 use Test::More;
 use File::Temp qw(tempfile);
@@ -16,9 +13,12 @@ use Symbol;
 use File::Spec;
 
 my $Bin     = $FindBin::Bin;
-my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver.pl' );
+my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver' );
 my $LibPath = File::Spec->catfile( $Bin, '..', 'lib' );
-my $Perl    = $^X;  # Get the path to the current perl executable
+
+# The shell wrapper launches its own Perl interpreter.
+local $ENV{PERL5LIB} = join q{:}, grep { !ref $_ && defined $_ && -d $_ }
+  $LibPath, @INC, split /:/xsm, $ENV{PERL5LIB} // q{};
 
 # --- Test 1: Pipe parameters using '-p -' ---
 subtest 'Test Case: Pipe parameters with -p -' => sub {
@@ -31,7 +31,7 @@ subtest 'Test Case: Pipe parameters with -p -' => sub {
   my $json_params = to_json( { name => 'Piped Params' } );
 
   # THE REAL COMMAND: Use '-p -'
-  my @command = ( $Perl, "-I$LibPath", $Script, "resolve", "-t", $tpl_path, "-p", "-" );
+  my @command = ( "bash", $Script, "resolve", "-t", $tpl_path, "-p", "-" );
 
   # 2. --- Execute ---
   my ( $stdin, $stdout, $stderr );
@@ -68,7 +68,7 @@ subtest 'Test Case: Pipe template with -t -' => sub {
   my $template_string = 'Piped ${name}!';
 
   # THE REAL COMMAND: Use '-t -'
-  my @command = ( $Perl, "-I$LibPath", $Script, "resolve", "-p", $p_path, "-t", "-" );
+  my @command = ( "bash", $Script, "resolve", "-p", $p_path, "-t", "-" );
 
   # 2. --- Execute ---
   my ( $stdin, $stdout, $stderr );
@@ -105,7 +105,7 @@ subtest 'Test Case: Pipe template with -t -' => sub {
   my $template_string = 'Piped ${name}!';
 
   # THE REAL COMMAND: Use '-t -'
-  my @command = ( $Perl, "-I$LibPath", $Script, "resolve", "-p", $p_path );
+  my @command = ( "bash", $Script, "resolve", "-p", $p_path );
 
   # 2. --- Execute ---
   my ( $stdin, $stdout, $stderr );

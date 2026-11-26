@@ -10,7 +10,7 @@
   "note": "Integrity and exact membership only, not a publisher signature. SOURCE_LOCK.json is research provenance, not a dependency lock.",
   "files": {
     "README.md": "5cd6ef65d9c173e50c254a22643f89a4b34def52b2d93abd7aee03a054358542",
-    "SKILL.md": "e6a060adca7e219c2f6e8fdff5f1699162230170ac495212e65ebd7afc9c523f",
+    "SKILL.md": "8ff0a66bc4141385662adfd7e6324a756e9aa79b4ad6e821ff763794edca664a",
     "SOURCE_LOCK.json": "17f3e77e7c9ad5baaacc6285fc6c761497786078b595f21456c6942a8e28d021",
     "VALIDATION.md": "5059c0305547261a3b01e06f6d6c13a3bbcba58ef824df24b0780bb5a7c6a095",
     "audit/original-skill.md": "b724af0012b4a206aeb980f436e824185cc0ac3e269b9aca2efa1e8e24794e16",

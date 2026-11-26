@@ -1,4 +1,4 @@
-package Dist::Conformance::Check 0.008;
+package Dist::Conformance::Check 0.011;
 
 # ABSTRACT: The interface of a check, and what the checks share
 
@@ -22,10 +22,17 @@ my $MODULE_NAME_RX = $Module::Runtime::module_name_rx;
 my $MODULE_RX      = qr/\A$MODULE_NAME_RX\z/;
 our $MODULE = { type => 'string', pattern => "$MODULE_RX" };
 
-
+# The schema of the keys that this check takes.  Every key in it is documented
+# in the POD of the check.  The base class takes none of its own; L</schema>
+# adds L</THE KEYS THAT EVERY CHECK TAKES>.
+# @returns HashRef  with C<properties>, and C<required> if any key is required
+# @example my $schema = Dist::Conformance::Check::ClaudeMd->config_schema;
 sub config_schema ($) { return { properties => {} } }
 
-
+# The whole schema of the configuration: L</config_schema>, the keys that every
+# check takes, and no others.
+# @returns HashRef  an object schema that allows no other keys
+# @example my $schema = Dist::Conformance::Check::ClaudeMd->schema;
 sub schema ($class) {
     my $own = $class->config_schema;
     return {
@@ -40,27 +47,68 @@ sub schema ($class) {
     };
 }
 
-
+# A new check, whose C<config> is validated against L</schema> first.  The other
+# arguments, such as C<source> and C<variables>, are the attributes of the new
+# check.
+# @param   name    Str      the name of the check in the flavor
+# @param   config  HashRef  optional: the configuration, default empty
+# @param   where   Str      optional: names the configuration in an error, such as
+# C<the check ClaudeMd of the flavor troglodyne>; default C<the check NAME>
+# @returns InstanceOf["Dist::Conformance::Check"]  the check, of the class that it is called on
+# @throws  when the schema refuses the configuration, with the message of
+# L<Dist::Conformance::Schema/"validate($data, $schema, $where)">
+# @example my $check = Dist::Conformance::Check::ClaudeMd->from_config(
+#     name   => 'ClaudeMd',
+#     config => { file => 'CLAUDE.md', mentions => [] },
+#     source => $source,
+# );
 sub from_config ( $class, %arguments ) {
     my $where  = delete $arguments{where} // "the check $arguments{name}";
     my $config = Dist::Conformance::Schema::validate( $arguments{config} // {}, $class->schema, $where );
     return $class->new( %arguments, config => $config );
 }
 
-
+# Checks the L<Dist::Conformance::Snapshot> that it is given.  A subclass must
+# implement it.
+# @returns C<($status, $detail)>, as a list: the status is C<pass>, C<fail> or
+# C<info>, and the detail is one line for a person
+# @throws  when the subclass does not implement it
+# @example my ( $status, $detail ) = $check->check($snapshot);
 sub check ( $self, $ ) { die( ref($self) . " does not implement check\n" ) }
 
-
+# Changes the checkout of C<< $update->snapshot >> through the
+# L<Dist::Conformance::Update>.
+#
+# The default is for a check that cannot change anything: when L</check> fails,
+# it records the detail and that there is no automatic fix.
+# @param   update  InstanceOf["Dist::Conformance::Update"]  what records and writes the changes
+# @returns what the subclass chooses, which no caller reads: L<Dist::Conformance/"update(dry_run)">
+# ignores it.  The default returns nothing.
+# @example $check->update($update);
 sub update ( $self, $update ) {
     my ( $status, $detail ) = $self->check( $update->snapshot );
     $update->by_hand( "$detail: " . $self->name . ' has no automatic fix' ) if $status eq 'fail';
     return;
 }
 
-
+# The configuration that would make this check accept the repository in the
+# L<Dist::Conformance::Snapshot> that it is given as it is now, as the keys of
+# this check for F<.conformance.yml>.
+# C<conformance adopt> prints it, so that a person can record the choices of a
+# repository before an update replaces them.  The default is nothing: a check
+# whose configuration has no room for the choices of a repository has nothing to
+# adopt.
+# @returns HashRef  the keys, or nothing
+# @example my $keys = $check->adopt($snapshot);
 sub adopt ( $, $ ) { return }
 
-
+# The template at C<$path> in the source with the variables filled in, and then
+# the sorted names of the placeholders that no variable fills.
+# @param   path  Str  the path of the template in the source
+# @returns the text, and then the names of the placeholders that are left, as a list
+# @throws  when the source has no such file, with the message of
+# L<Dist::Conformance::Source/"file(relative)">
+# @example my ( $text, @unfilled ) = $check->template('templates/CLAUDE.md');
 sub template ( $self, $path ) {
     my $text      = $self->source->file($path);
     my $variables = $self->variables;
@@ -69,7 +117,16 @@ sub template ( $self, $path ) {
     return ( $text, @unfilled );
 }
 
-
+# Writes the template C<$template> to C<$path>, with C<$mode>, through
+# C<$update>.  When a placeholder is left, writes nothing and records what is
+# needed.
+# @param   update    InstanceOf["Dist::Conformance::Update"]  what writes the file
+# @param   path      Str  the path to write in the checkout
+# @param   template  Str  the path of the template in the source
+# @param   mode      Int  optional: the permissions, default 0644
+# @returns Bool  whether it wrote
+# @throws  when the source has no such template, with the message of L<template|/"template(path)">
+# @example $check->write_template( $update, '.perltidyrc', 'templates/perltidyrc' );
 sub write_template ( $self, $update, $path, $template, $mode = oct 644 ) {
     my ( $text, @unfilled ) = $self->template($template);
     if (@unfilled) {
@@ -97,7 +154,7 @@ Dist::Conformance::Check - The interface of a check, and what the checks share
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -128,7 +185,7 @@ L</check> reads the snapshot, and returns a status and a detail.
 
 =item how to update
 
-L</update> changes a checkout so that the check passes, through a
+L<update|/"update(update)"> changes a checkout so that the check passes, through a
 L<Dist::Conformance::Update>, which records what it changed and writes nothing
 on a dry run.  What it cannot do safely, it says so, as a sentence for a
 person, rather than guessing.
@@ -162,63 +219,133 @@ The values of the placeholders of the templates.
 
 =head1 METHODS
 
-=head2 config_schema
+=head2 missing($snapshot, @paths)
 
-The schema of the keys that this check takes, as a hash reference with
-C<properties>, and C<required> if any are.  Every key in it is documented in
-the POD of the check.  The base class takes none of its own; L</schema> adds
-L</THE KEYS THAT EVERY CHECK TAKES>.
+The paths of C<@paths> that the snapshot does not have, in their order.
 
-=head2 schema
+=over 4
 
-The whole schema of the configuration: L</config_schema>, the keys that every
-check takes, and no others.
+=item snapshot - InstanceOf["Dist::Conformance::Snapshot"] - the repository
 
-=head2 from_config
+=item paths - Str - the paths to look for
 
-C<(%arguments)>.  A new check, whose C<config> is validated against
-L</schema> first.  C<where> names the configuration in an error, such as
-C<the check ClaudeMd of the flavor troglodyne>.
+=back
 
-=head2 check
+Returns the missing paths, as a list.
 
-C<($snapshot)>.  Returns C<($status, $detail)>: the status is C<pass>, C<fail>
-or C<info>, and the detail is one line for a person.  A subclass must
-implement it.
-
-=head2 update
-
-C<($update)>.  Changes the checkout of C<< $update->snapshot >> through the
-L<Dist::Conformance::Update>.  Returns nothing that the caller reads.
-
-The default is for a check that cannot change anything: when L</check> fails,
-it records the detail and that there is no automatic fix.
+    my @missing = $check->missing( $snapshot, 'dist.ini', 'Changes' );
 
 =head2 adopt
 
-C<($snapshot)>.  The configuration that would make this check accept the
-repository in C<$snapshot> as it is now, as a hash reference of the keys of
-this check for F<.conformance.yml>, or nothing.  C<conformance adopt> prints
-it, so that a person can record the choices of a repository before an update
-replaces them.  The default is nothing: a check whose configuration has no
-room for the choices of a repository has nothing to adopt.
+The configuration that would make this check accept the repository in the L<Dist::Conformance::Snapshot> that it is given as it is now, as the keys of this check for F<.conformance.yml>. C<conformance adopt> prints it, so that a person can record the choices of a repository before an update replaces them.  The default is nothing: a check whose configuration has no room for the choices of a repository has nothing to adopt.
 
-=head2 template
+Returns HashRef, the keys, or nothing.
 
-C<($path)>.  Returns the template at C<$path> in the source with the variables
-filled in, and then the sorted names of the placeholders that no variable
-fills.  Dies when the source has no such file.
+    my $keys = $check->adopt($snapshot);
 
-=head2 write_template
+=head2 check
 
-C<($update, $path, $template, $mode)>.  Writes the template C<$template> to
-C<$path>, with C<$mode>, through C<$update>.  When a placeholder is left,
-writes nothing and records what is needed.  Returns whether it wrote.
+Checks the L<Dist::Conformance::Snapshot> that it is given.  A subclass must implement it.
 
-=head2 missing
+Returns C<($status, $detail)>, as a list: the status is C<pass>, C<fail> or C<info>, and the detail is one line for a person.
 
-C<($snapshot, @paths)>.  The paths of C<@paths> that the snapshot does not
-have, in their order.
+Dies when the subclass does not implement it.
+
+    my ( $status, $detail ) = $check->check($snapshot);
+
+=head2 config_schema
+
+The schema of the keys that this check takes.  Every key in it is documented in the POD of the check.  The base class takes none of its own; L</schema> adds L</THE KEYS THAT EVERY CHECK TAKES>.
+
+Returns HashRef, with C<properties>, and C<required> if any key is required.
+
+    my $schema = Dist::Conformance::Check::ClaudeMd->config_schema;
+
+=head2 from_config(where, name, config)
+
+A new check, whose C<config> is validated against L</schema> first.  The other arguments, such as C<source> and C<variables>, are the attributes of the new check.
+
+=over 4
+
+=item where - Str - optional: names the configuration in an error, such as C<the check ClaudeMd of the flavor troglodyne>; default C<the check NAME>
+
+=item name - Str - the name of the check in the flavor
+
+=item config - HashRef - optional: the configuration, default empty
+
+=back
+
+Returns a Dist::Conformance::Check object, the check, of the class that it is called on.
+
+Dies when the schema refuses the configuration, with the message of L<Dist::Conformance::Schema/"validate($data, $schema, $where)">.
+
+    my $check = Dist::Conformance::Check::ClaudeMd->from_config(
+        name   => 'ClaudeMd',
+        config => { file => 'CLAUDE.md', mentions => [] },
+        source => $source,
+    );
+
+=head2 schema
+
+The whole schema of the configuration: L</config_schema>, the keys that every check takes, and no others.
+
+Returns HashRef, an object schema that allows no other keys.
+
+    my $schema = Dist::Conformance::Check::ClaudeMd->schema;
+
+=head2 template(path)
+
+The template at C<$path> in the source with the variables filled in, and then the sorted names of the placeholders that no variable fills.
+
+=over 4
+
+=item path - Str - the path of the template in the source
+
+=back
+
+Returns the text, and then the names of the placeholders that are left, as a list.
+
+Dies when the source has no such file, with the message of L<Dist::Conformance::Source/"file(relative)">.
+
+    my ( $text, @unfilled ) = $check->template('templates/CLAUDE.md');
+
+=head2 update(update)
+
+Changes the checkout of C<< $update->snapshot >> through the L<Dist::Conformance::Update>.
+
+The default is for a check that cannot change anything: when L</check> fails, it records the detail and that there is no automatic fix.
+
+=over 4
+
+=item update - InstanceOf["Dist::Conformance::Update"] - what records and writes the changes
+
+=back
+
+Returns what the subclass chooses, which no caller reads: L<Dist::Conformance/"update(dry_run)"> ignores it.  The default returns nothing.
+
+    $check->update($update);
+
+=head2 write_template(update, path, template, mode)
+
+Writes the template C<$template> to C<$path>, with C<$mode>, through C<$update>.  When a placeholder is left, writes nothing and records what is needed.
+
+=over 4
+
+=item update - InstanceOf["Dist::Conformance::Update"] - what writes the file
+
+=item path - Str - the path to write in the checkout
+
+=item template - Str - the path of the template in the source
+
+=item mode - Int - optional: the permissions, default 0644
+
+=back
+
+Returns Bool, whether it wrote.
+
+Dies when the source has no such template, with the message of L<template|/"template(path)">.
+
+    $check->write_template( $update, '.perltidyrc', 'templates/perltidyrc' );
 
 =head1 STATUSES
 
@@ -304,6 +431,21 @@ A JSON, YAML or INI file, such as F<.perl-slop.json>, matches a schema.
 
 An INI file, such as F<dist.ini>, sets no key that the flavor refuses, and the
 update removes each one.
+
+=item L<Dist::Conformance::Check::AuthorDeps>
+
+F<dist.ini> asks for each authordep of its template, at the version of the
+template or later, and the update raises or adds each one.
+
+=item L<Dist::Conformance::Check::IniTemplate>
+
+An INI file, such as F<weaver.ini>, is its template with the overrides of the
+repository, and the update writes it.
+
+=item L<Dist::Conformance::Check::DistIni>
+
+F<dist.ini> is its template with the overrides of the repository, its
+authordeps included.
 
 =item L<Dist::Conformance::Check::ClaudeSettings>
 

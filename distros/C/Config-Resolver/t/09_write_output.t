@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
 
 use Test::More;
 use File::Temp qw(tempfile);
@@ -19,7 +15,7 @@ use Config::Resolver::Utils qw(slurp_file);
 {
 
   package MockCLI;
-  our @ISA = qw(CLI::Config::Resolver);
+  our @ISA = qw(Config::Resolver::CLI);
   sub init { }
 
   # Stubs for all the accessors write_output uses
@@ -29,9 +25,7 @@ use Config::Resolver::Utils qw(slurp_file);
   sub get_pretty  { $_[0]->{_mock_pretty} }
 }
 
-my @option_specs = qw(
-  outfile|o=s umask=s format=s pretty|P
-);
+my @option_specs = qw(debug|g);
 
 # --- Helper sub to capture STDOUT ---
 sub capture_stdout {

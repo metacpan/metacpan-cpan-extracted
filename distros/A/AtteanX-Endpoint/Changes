@@ -6,10 +6,39 @@ Home page:    <http://search.cpan.org/dist/AtteanX::Endpoint/>
 Bug tracker:  <https://github.com/kasei/atteanx-endpoint/issues>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.004  2026-11-24
+
+ - (Addition) Add Test::AtteanX::Endpoint class for shared functionality.
+ - (Addition) Add example Dockerfile for running a full SPARQL endpoint.
+ - (Addition) Add example config file.
+ - (Update) Add support for SPARQL Service Descriptions.
+ - (Update) Expand the possible formats for the configuration file.
+ - (Update) Fix HTTP response code for PUT to the default graph (201 ->
+   204).
+ - (Update) Fix encoding bug in handling of multipart POST content.
+ - (Update) Fix handling of protocol-defined dataset when configuring query
+   planner.
+ - (Update) Improve HTML rendering of SPARQL Protocol HTML results.
+ - (Update) Improve SPARQL Graph Store Protocol conformance.
+ - (Update) Improve SPARQL Protocol conformance.
+ - (Update) Refactor code and tests, splitting Protocol and GSP handling
+   into separate packages.
+ - (Update) Replace uses of TryCatch with Try::Tiny; remove unused
+   dependencies.
+ - (Update) Update dependencies.
+ - (Update) Update required version of Attean to 0.041.
+
 0.003  2026-05-21
 
  - (Update) Add implementation of SPARQL Graph Store Protocol.
  - (Update) Miscellaneous bug-fixes.
+
+0.002  2017-10-26
+
+ - (Update) Change hashbang to use env (#2 from KjetilK).
+ - (Update) Replace use of HTML::HTML5::Parser with XML::LibXML::Parser (#4
+   from @kjetilk).
+ - (Update) Updated copyright year and added text about CodeMirror license.
 
 0.001  2016-03-25
 

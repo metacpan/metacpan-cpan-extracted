@@ -1,7 +1,7 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
 
@@ -54,7 +54,9 @@ B<Linux-only>. Requires 64-bit Perl. Capacity must be E<lt>= 2^31.
 Used only as a FIFO (C<push_back> + C<pop_front>), it's effectively a
 fixed-slot string queue: 1.3x-4.7x faster than
 L<Data::Queue::Shared::Str> under multi-producer contention, at the cost
-of per-slot fixed memory (C<capacity x max_len>).
+of per-slot fixed memory (C<capacity x max_len>). For values of widely
+varying size, see L<Data::Queue::Shared::Str>, which stores each in only the
+bytes it needs.
 
 =head2 Concurrency
 
@@ -106,8 +108,8 @@ or a filesystem path for a file-backed mapping shared across processes.
 C<$capacity> is the number of slots (must be E<gt> 0 and E<lt>= 2^31); it is
 rounded up to the next power of two, and C<capacity>/C<stats> report that
 rounded value. For the Str variant, C<$max_len> is the maximum stored byte
-length per entry (must be E<gt> 0 and E<lt> 2 GiB); longer values are truncated
-at a character boundary for UTF-8 strings, or a byte boundary for byte strings.
+length per entry (must be E<gt> 0 and E<lt> 2 GiB); pushing a longer value
+croaks.
 C<$mode> is an optional octal file permission mode applied only when a
 backing file is created (default C<0600>); see L</SECURITY>.
 

@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Git-ChangelogFromTrailers
 
+0.002 2026-11-25 TEODESIAN
+    - Document what each method takes, returns and how it fails, with an example of each call
+    - Read the Changelog trailers that a squash merge on GitHub leaves above the last paragraph of a commit message
+
 0.001 2026-11-20 TEODESIAN
     - Initial release.  [Git::ChangelogFromTrailers] builds the Changes
       entry for a release from the Changelog trailers of the commits since

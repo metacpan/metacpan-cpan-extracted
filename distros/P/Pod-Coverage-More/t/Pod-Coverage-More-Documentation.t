@@ -44,6 +44,58 @@ subtest headings => sub {
     is( [ $doc->identifiers ],                             [qw{fun1 fun2 formatted qualified method_call spaced spaced2 spaced3 woven}],                             "the identifiers are every sub that a heading names" );
 };
 
+subtest call_headings => sub {
+    my $doc = read_pod(
+        undef,
+        '=head2 Provisioner::Recipe::acmeca->issuing_authority()',
+        '=head2 $paths = Some::Class->named_paths()',
+        '=head2 \%plan = Trog::HV::Libvirt->guest_network_plan(%args)',
+        '=head2 ($advice, $port) = $hv->vnc_access($name)',
+        '=head2 @names = $hv->preflight_checks(), $hv->preflight_notes(@extra)',
+    );
+    is( [ map { $_->{functions} } $doc->sections ], [ ['issuing_authority'], ['named_paths'], ['guest_network_plan'], ['vnc_access'], [qw{preflight_checks preflight_notes}] ], "a method called on a class, and a call assigned to a variable, name their subs" );
+    my $tails = read_pod( undef, '=head2 config($key) = HASHREF', '=head2 drag_and_drop - NOT WORKING' );
+    is( [ map { $_->{functions} } $tails->sections ],    [ ['config'], ['drag_and_drop'] ], "what a call returns after an =, and a description after a dash, name no sub" );
+    is( $doc->section_for('guest_network_plan')->{args}, { guest_network_plan => ['%args'] },                         "and keep their argument lists" );
+    is( $doc->section_for('preflight_checks')->{args},   { preflight_checks   => [], preflight_notes => ['@extra'] }, "each call of a heading that names two keeps its own argument list" );
+};
+
+subtest assigning_headings => sub {
+    my $doc = read_pod( undef, '=head2 $paths = Some::Class->named_paths()', '=head2 Some::Class->plain_call($x)', '=head2 config($key) = HASHREF' );
+    is( { map { $_->{functions}[0] => $_->{assigns} } $doc->sections }, { named_paths => 1, plain_call => 0, config => 0 }, "a heading that assigns its call says so, and a call alone, or what it returns after an =, does not" );
+};
+
+subtest prose_headings => sub {
+    my $doc = read_pod(
+        [qw{token helper args cache}],
+        '=head1 DESCRIPTION',
+        '=head2 The token cache',
+        'Returns nothing, being prose.',
+        '=head2 Why there is a bridge helper at all',
+        '=head2 Configuration',
+        '=head3 args',
+        'The options.',
+        '=head1 METHODS',
+        '=head2 token',
+        'Returns Str.',
+        '=head2 $recipe->args()',
+        'Returns HashRef.',
+        '=head2 cache, helper',
+        'Returns Int.',
+    );
+    is( $doc->section_for('token')->{heading},  'token',           "a heading of prose names no sub by one of its words" );
+    is( $doc->section_for('helper')->{heading}, 'cache, helper',   "nor by its last word" );
+    is( $doc->section_for('args')->{heading},   '$recipe->args()', "a call names its sub before a heading that is only the bare name" );
+    my $levels = read_pod( [qw{args}], '=head2 Configuration', '=head3 args', 'The options.', '=head2 args', 'Returns HashRef.' );
+    is( $levels->section_for('args')->{line}, 7, "and of two bare names, the shallower heading names the sub" );
+};
+
+subtest named_argument_headings => sub {
+    my $doc = read_pod( undef, '=head2 account_for($domain, \%conf, above => $bool)', '=head2 put($file, ref => $ref, overwrite => 1)' );
+    is( $doc->section_for('account_for')->{args}{account_for}, [ '$domain', '\%conf', 'above' ], "a key => value pair in a heading names the argument by its key" );
+    is( $doc->section_for('put')->{args}{put}, [ q{$file}, qw{ref overwrite} ], "whatever its value" );
+};
+
 subtest sections => sub {
     my $doc = read_pod( [qw{first second}], '=head2 first', '=head3 Caveats', 'Returns Int.', '=head2 Return values', 'Returns Str.', '=head2 second', 'Returns Num.' );
     is( returns_of( $doc->section_for('first') ),                      ['Int'],            "a deeper heading that names no sub stays part of the section" );

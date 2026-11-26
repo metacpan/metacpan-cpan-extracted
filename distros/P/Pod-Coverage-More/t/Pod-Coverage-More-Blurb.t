@@ -48,6 +48,36 @@ subtest tags => sub {
     is( $blurb->{line},                                          14,                                                                "the line of the sub" );
 };
 
+subtest example_indentation => sub {
+    my $blurbs = blurbs_of(
+        '# @example my $widget = make(',
+        '# @example     size   => 3,',
+        '# @example     colour => q{red},',
+        '# @example );',
+        'sub make {',
+        '}',
+        '# @example   if ($ready) {',
+        '# @example       go();',
+        '# @example   }',
+        'sub go {',
+        '}',
+        '# @example my $widget = make(',
+        '#     size => 3,',
+        '# );',
+        'sub continued {',
+        '}',
+    );
+    is( $blurbs->{make}{examples},      [ [ 'my $widget = make(', '    size   => 3,', '    colour => q{red},', ');' ] ], "consecutive \@example lines keep their indentation relative to the first" );
+    is( $blurbs->{go}{examples},        [ [ 'if ($ready) {',      '    go();',      '}' ] ],  "under the indentation of the first" );
+    is( $blurbs->{continued}{examples}, [ [ 'my $widget = make(', '    size => 3,', ');' ] ], "and lines without the tag keep theirs" );
+};
+
+subtest returns_text => sub {
+    my $blurbs = blurbs_of( '# @returns 443 when nothing else is set', 'sub port {', '}', '# @returns 0 on success', 'sub status {', '}' );
+    is( [ map { name_of( $blurbs->{$_}{returns}{type} ) } qw{port status} ], [qw{- -}],                      "a number at the start of a \@returns names no type" );
+    is( $blurbs->{port}{returns}{description},                               '443 when nothing else is set', "and starts its text" );
+};
+
 subtest where_a_blurb_is => sub {
     my $blurbs = blurbs_of(
         '# Not a blurb: a blank line follows.',

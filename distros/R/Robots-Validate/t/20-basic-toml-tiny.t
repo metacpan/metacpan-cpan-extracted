@@ -2,7 +2,7 @@
 
 use Devel::Hide qw( TOML::XS );
 
-use Test2::V0;
+use Test2::V0 -no_srand;
 use Test2::Tools::Exception qw( dies );
 
 use Test::File::ShareDir -share => {

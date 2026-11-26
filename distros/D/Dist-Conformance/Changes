@@ -1,5 +1,16 @@
 Revision history for Dist-Conformance
 
+0.011 2026-11-26 TEODESIAN
+    - A position of ~ puts a section of the overrides before every section, and conformance adopt keeps a section of its own that comes first there
+
+0.010 2026-11-25 TEODESIAN
+    - Add IniTemplate, which holds an INI file to its template with the overrides of the repository, and DistIni, which does so for dist.ini, authordeps included
+
+0.009 2026-11-25 TEODESIAN
+    - metamerge.yml declares aspell, which the spelling policy of the critic profile runs
+    - The POD of each sub now gives the type of each argument, what it returns, how it fails, and an example call
+    - Add the check AuthorDeps, which raises or adds each authordep of dist.ini that asks for less than its template
+
 0.008 2026-11-24 TEODESIAN
     - A flavor can give SystemPackages a template metamerge.yml.  The check then fails unless the repository declares each dependency of the template, and the update adds the missing ones.
     - The update edits the text of an existing metamerge.yml, so its comments and the order of its keys stay as they were.

@@ -17,9 +17,14 @@ declare -A OPTS=(
     [ help    | h   ]=
     [ message | m % ]=
 )
-getoptlong init OPTS EXIT_ON_ERROR= SILENT=1 DEBUG=${DEBUGME:-}
+# Without EXIT_ON_ERROR, parse returns 1 on an error, and leaves the
+# arguments as they are; SILENT drops the error messages, and the
+# script gives its own.  PERMUTE= stops at the subcommand, so that its
+# options are left to the subcommand.
+getoptlong init OPTS EXIT_ON_ERROR= SILENT=1 PERMUTE= DEBUG=${DEBUGME:-}
 getoptlong callback help help_main
-getoptlong parse "$@" && eval "$(getoptlong set)"
+getoptlong parse "$@" || { echo "invalid option: see --help" >&2 ; exit 2 ; }
+eval "$(getoptlong set)"
 
 echo "ARGV=[$@]" >&2
 
@@ -37,7 +42,6 @@ case $subcmd in
     *)    echo "$subcmd: unknown subcommand" >&2 ; exit 1 ;;
 esac
 
-unset GOL_ARGV
 getoptlong init SUB_OPTS DEBUG=${DEBUGME:-}
 getoptlong parse "$@" && eval "$(getoptlong set)"
 

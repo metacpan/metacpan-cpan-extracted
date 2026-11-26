@@ -20,3 +20,4 @@ t/047-ldap.t
 test.log
 MYMETA*
 ^Mail-DWIM-.*\.tar\.gz$
+(^|/)\.DS_Store$

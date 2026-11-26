@@ -1,4 +1,4 @@
-package Dist::Conformance::Snapshot 0.008;
+package Dist::Conformance::Snapshot 0.011;
 
 # ABSTRACT: What a check can read of a repository: its paths, their blob SHAs and their contents
 
@@ -10,25 +10,45 @@ use Mojo::Base -base, -signatures;
 use Digest::SHA();
 
 
+# Every path of the snapshot, with its git blob SHA.  A subclass must implement
+# it.
+# @returns HashRef  from each path to its git blob SHA, in lowercase hex
+# @throws  when the subclass does not implement it
+# @example my $paths = $snapshot->paths;
 sub paths ($self) { die( ref($self) . " does not implement paths\n" ) }
 
-
+# The bytes of the file at the path that it is given.  A subclass must
+# implement it.
+# @returns Str|Undef  the bytes, or C<undef> if the snapshot has no such path
+# @throws  when the subclass does not implement it
+# @example my $text = $snapshot->content('CLAUDE.md');
 sub content ( $self, $ ) { die( ref($self) . " does not implement content\n" ) }
 
-
+# Whether the snapshot has a file at C<$path>.
+# @param   path  Str  the path
+# @returns Bool
+# @example say 'has a profile' if $snapshot->contains('.perlcriticrc');
 sub contains ( $self, $path ) { return exists $self->paths->{$path} }
 
-
+# The git blob SHA of C<$path>.
+# @param   path  Str  the path
+# @returns Str|Undef  the SHA, or C<undef> when the snapshot has no such path
+# @example my $sha = $snapshot->sha('git-hooks/pre-commit');
 sub sha ( $self, $path ) { return $self->paths->{$path} }
 
-
+# The paths inside C<$directory>, at any depth, relative to it and sorted.
+# @param   directory  Str  the directory, without a trailing C</>
+# @returns the paths, as a list
+# @example my @workflows = $snapshot->under('.github/workflows');
 sub under ( $self, $directory ) {
     my $prefix = "$directory/";
     my @inside = sort map { substr $_, length $prefix } grep { index( $_, $prefix ) == 0 } keys %{ $self->paths };
     return @inside;
 }
 
-
+# Whether a check can change this snapshot.  False here.
+# @returns Bool
+# @example die "read-only\n" if !$snapshot->writable;
 sub writable ($) { return 0 }
 
 
@@ -48,7 +68,7 @@ Dist::Conformance::Snapshot - What a check can read of a repository: its paths, 
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -77,48 +97,101 @@ Paths are relative to the root of the repository, with C</> between the
 components, as git writes them.  A snapshot lists files and symbolic links, not
 directories.
 
+=head1 FUNCTIONS
+
+=head2 blob_sha($bytes)
+
+The SHA that git gives a blob with this content, the same as C<git
+hash-object> prints.  So a check can compare a template with a file in a
+snapshot that it never downloaded.
+
+=over 4
+
+=item bytes - Str - the content of the blob
+
+=back
+
+Returns Str, the SHA, in lowercase hex.
+
+    my $sha = Dist::Conformance::Snapshot::blob_sha("Load perl-slop:reading-perl first.\n");
+
 =head1 METHODS
 
-=head2 paths
+=head2 contains(path)
 
-Returns a hash reference from each path to its git blob SHA, in lowercase hex.
-A subclass must implement it.
+Whether the snapshot has a file at C<$path>.
+
+=over 4
+
+=item path - Str - the path
+
+=back
+
+Returns Bool.
+
+    say 'has a profile' if $snapshot->contains('.perlcriticrc');
 
 =head2 content
 
-C<($path)>.  Returns the bytes of the file at C<$path>, or C<undef> if the
-snapshot has no such path.  A subclass must implement it.
+The bytes of the file at the path that it is given.  A subclass must implement it.
 
-=head2 contains
+Returns Str or Undef, the bytes, or C<undef> if the snapshot has no such path.
 
-C<($path)>.  Whether the snapshot has a file at C<$path>.
+Dies when the subclass does not implement it.
 
-=head2 sha
+    my $text = $snapshot->content('CLAUDE.md');
 
-C<($path)>.  The git blob SHA of C<$path>, or C<undef>.
+=head2 paths
 
-=head2 under
+Every path of the snapshot, with its git blob SHA.  A subclass must implement it.
 
-C<($directory)>.  The paths inside C<$directory>, at any depth, relative to it
-and sorted.
+Returns HashRef, from each path to its git blob SHA, in lowercase hex.
+
+Dies when the subclass does not implement it.
+
+    my $paths = $snapshot->paths;
+
+=head2 sha(path)
+
+The git blob SHA of C<$path>.
+
+=over 4
+
+=item path - Str - the path
+
+=back
+
+Returns Str or Undef, the SHA, or C<undef> when the snapshot has no such path.
+
+    my $sha = $snapshot->sha('git-hooks/pre-commit');
+
+=head2 under(directory)
+
+The paths inside C<$directory>, at any depth, relative to it and sorted.
+
+=over 4
+
+=item directory - Str - the directory, without a trailing C</>
+
+=back
+
+Returns the paths, as a list.
+
+    my @workflows = $snapshot->under('.github/workflows');
 
 =head2 writable
 
 Whether a check can change this snapshot.  False here.
 
-=head1 FUNCTIONS
+Returns Bool.
 
-=head2 blob_sha
-
-C<($bytes)>.  The SHA that git gives a blob with this content, the same as
-C<git hash-object> prints.  So a check can compare a template with a file in a
-snapshot that it never downloaded.
+    die "read-only\n" if !$snapshot->writable;
 
 =head1 WRITING A SNAPSHOT
 
 Subclass this module, and implement L</paths> and L</content>.  Both can be
 lazy, and both can memoize, because a snapshot describes one moment of one
-repository.  L</contains> and L</sha> call L</paths>.  If listing every path costs
+repository.  L<contains|/"contains(path)"> and L<sha|/"sha(path)"> call L</paths>.  If listing every path costs
 much more than looking at one, override them as well.
 
 =head1 SEE ALSO

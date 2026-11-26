@@ -12,9 +12,8 @@ package Data::Tools::Serialization;
 use strict;
 use Exporter;
 use Carp;
-use JSON;
 
-our $VERSION = '1.52';
+our $VERSION = '1.60';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -38,11 +37,8 @@ our %EXPORT_TAGS = (
 
 BEGIN
 {
-  eval
-    {
-    require XML::Bare;
-    require JSON;
-    };
+  eval { require XML::Bare; };
+  eval { require JSON;      };
 }
 
 sub xml2perl

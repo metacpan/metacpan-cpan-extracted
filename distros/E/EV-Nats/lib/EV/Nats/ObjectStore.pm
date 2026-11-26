@@ -1,7 +1,7 @@
 package EV::Nats::ObjectStore;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use Digest::SHA qw(sha256 sha256_hex);
 use EV::Nats::JetStream;
 
@@ -47,12 +47,12 @@ sub create_bucket {
         discard      => 'new',
         allow_rollup_hdrs => JSON::PP::true(),
     };
-    $self->{js}->stream_create($config, $cb);
+    $self->{js}->stream_create($config, sub { $cb->(@_[0, 1]) });
 }
 
 sub delete_bucket {
     my ($self, $cb) = @_;
-    $self->{js}->stream_delete($self->{stream}, $cb);
+    $self->{js}->stream_delete($self->{stream}, sub { $cb->(@_[0, 1]) });
 }
 
 # Best-effort purge that survives a dead connection: a sync croak

@@ -4,6 +4,7 @@ use utf8;
 use Test::More 0.98;
 use File::Temp qw(tempdir);
 use MIME::Base64 qw(encode_base64);
+use File::Spec;
 
 use lib 't/lib';
 use Images;
@@ -46,6 +47,22 @@ my $a = png("$dir/a.png", 64, 68);	# 4 cells wide, 2 rows high
 
     my @again = $img->rows($a);
     isnt(($again[0] =~ /^(\e\[[0-9;]*m)/)[0], $color, 'another image has another id');
+}
+
+# osc: each row tells the id, the size and the file by a private OSC,
+# for a program that draws the image itself, as ansi2pdf
+{
+    my @rows = kitty()->rows($a);
+    unlike($rows[0], qr/\e\]/, 'no OSC by default');
+    @rows = kitty(osc => 1)->rows($a);
+    my($r, $g, $b) = $rows[0] =~ /\e\[38;2;(\d+);(\d+);(\d+)m/;
+    my $id = ($r << 16) | ($g << 8) | $b;
+    my $osc = "\e]7771;i=$id,c=4,r=2;" . File::Spec->rel2abs($a) . "\e\\";
+    is(substr($rows[$_], 0, length $osc), $osc, "osc: row $_ begins with it") for 0, 1;
+    png("$dir/a\eb.png", 64, 68);
+    @rows = kitty(osc => 1)->rows("$dir/a\eb.png");
+    is(scalar @rows, 2, 'a file name with a control character: rows');
+    unlike($rows[0], qr/\e\]/, 'a file name with a control character: no OSC');
 }
 
 # the data is sent in chunks of 4096 bytes

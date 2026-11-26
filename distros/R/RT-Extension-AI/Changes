@@ -1,5 +1,10 @@
 Revision history for RT-Extension-AI
 
+0.09 2026-11-25
+ - Fix Dissatisfied sentiment saved as Satisfied (thanks to Simon Wilcox)
+ - Ask for only the label in the sentiment prompt. Existing
+   configurations keep their assess_sentiment prompt.
+
 0.08 2026-11-24
  - Display line breaks in AI responses (thanks to Emmanuel Lacour)
  - Show markup in AI responses as text in the editor modals and when

@@ -1,7 +1,7 @@
 # ABSTRACT: Optional SFTP session for Net::LibSSH
 
 package Net::LibSSH::SFTP;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ Net::LibSSH::SFTP - Optional SFTP session for Net::LibSSH
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ L<Net::LibSSH>, L<Net::LibSSH::Channel>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-net-libssh/issues>.
 
 =head1 CONTRIBUTING

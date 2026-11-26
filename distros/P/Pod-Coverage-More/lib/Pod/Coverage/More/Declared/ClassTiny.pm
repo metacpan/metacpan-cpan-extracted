@@ -1,7 +1,7 @@
 # ABSTRACT: Declarations of the attributes of Class::Tiny classes
 # PODNAME: Pod::Coverage::More::Declared::ClassTiny
 
-package Pod::Coverage::More::Declared::ClassTiny 0.003;
+package Pod::Coverage::More::Declared::ClassTiny 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -72,7 +72,7 @@ Pod::Coverage::More::Declared::ClassTiny - Declarations of the attributes of Cla
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 DESCRIPTION
 

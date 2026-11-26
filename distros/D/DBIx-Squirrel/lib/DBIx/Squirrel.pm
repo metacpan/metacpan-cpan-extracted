@@ -15,7 +15,7 @@ use DBIx::Squirrel::st   qw();
 use namespace::clean;
 
 our @ISA     = 'DBI';
-our $VERSION = 'v3.6.1';
+our $VERSION = 'v4.1.1';
 
 # Export what the DBI exports, such as :sql_types, to the package using
 # DBIx::Squirrel. The names are the DBI's, so the DBI's import exports
@@ -59,7 +59,6 @@ sub connect_cached ($class, $source, @args) {
     unshift @args, undef, undef if !ref $source && is_hashref($args[0]);
     return $class->SUPER::connect_cached($source, @args);
 }
-
 
 # Return the handle of a new connection using the same parameters as
 # another connection.
@@ -136,7 +135,6 @@ sub _dialect ($dbh) {
 }
 
 1;
-
 __END__
 
 =encoding utf8
@@ -208,10 +206,11 @@ It's a subclass of the DBI, so everything the DBI does still works.
 Where the two do the same thing, they give the same result. This page
 notes where they differ.
 
-This is version 3, built on L<Ekorn::Pipeline>. Version 2 was a
-rewrite of DBIx::Squirrel 1.x for Perl 5.36 or later. Code written for
-either needs changes to run, and the reference's "Upgrading from 2.x"
-and "Upgrading from 1.x" list them. To stay on 1.x, install its last
+This is version 4, built on L<Ekorn::Pipeline>. Version 3 first built
+on it, and version 2 was a rewrite of DBIx::Squirrel 1.x for Perl 5.36
+or later. Code written for any of them may need changes to run, and
+the reference's "Upgrading from 3.x", "Upgrading from 2.x" and
+"Upgrading from 1.x" list them. To stay on 1.x, install its last
 version, C<cpanm DBIx::Squirrel@1.6.5>.
 
 The database handle's own methods are in L<DBIx::Squirrel::db>, and
@@ -343,10 +342,13 @@ instead.
 =head2 pipe
 
     @results = $dbh->pipe(@stages);
-    $result  = $dbh->pipe(@stages);
+    $count   = $dbh->pipe(@stages);
+    ($first) = $dbh->pipe(@stages);
+    $first   = $dbh->pipe(@stages, keep_first);
 
 Runs the database handle through a pipeline of stages, and returns
-what comes out of the last one.
+what the pipeline gives, as
+C<< Ekorn::Pipeline->new(@stages)->($dbh) >> would.
 
 A stage is a code reference, or a pipeline, which stands for its
 stages, as L<Ekorn::Pipeline> shows. A code reference is called with
@@ -368,13 +370,18 @@ of several goes through the rest of the stages on its own:
     );    # (6, 10)
 
 To end the pipeline early, call L</Stop>. With no stages, C<pipe>
-returns the database handle.
+returns the database handle, or, in scalar context, 1.
 
 Called in list context, C<pipe> returns all the values. In scalar
-context, it returns the first, or C<undef> if there are none. To count
-the values, assign them to an empty list in scalar context:
+context, it returns how many there are, or, if a sink is last, the
+sink's result, a list sink's as an array reference. For one value,
+read it in list context, or end with C<keep_first>:
 
-    my $count = () = $dbh->pipe(@stages);
+    my ($first) = $dbh->pipe(@stages);
+    my $first   = $dbh->pipe(@stages, keep_first);
+
+Until v4.0.0, in scalar context, C<pipe> gave the first value, or
+C<undef> if there were none, unlike a pipeline.
 
 If a stage dies, C<pipe> croaks at the line that called it, naming the
 stage by its position, from C<#1>:

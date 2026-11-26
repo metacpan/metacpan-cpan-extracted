@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.06';
+    our $VERSION = '0.07';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -14,6 +14,7 @@ BEGIN {
 *sub   = \&subscribe;
 *unsub = \&unsubscribe;
 *req   = \&request;
+*hreq  = \&hrequest;
 
 # Threads would clone the raw C pointer into the child, aliasing one
 # connection from two interpreters; leave the child with undef instead.
@@ -244,6 +245,12 @@ Receive messages this client itself publishes.
 Ask the server to send a 503 status reply when a request has no
 responders, surfaced as the C<"no responders"> error in C<request>.
 
+=item inbox_prefix => Str (default C<_INBOX>)
+
+Subject prefix for reply inboxes (L</request>, L</new_inbox>), for
+accounts whose permissions allow replies only under their own prefix.
+Dot-separated tokens without wildcards, at most 64 bytes.
+
 =item ping_interval => Int (ms, default 120000; 0 = disabled)
 
 Client-initiated PING interval for keep-alive.
@@ -428,6 +435,13 @@ raw header block is also passed. Error is set on timeout
 connection ("disconnected"). A C<$timeout_ms> of 0 disables the
 timeout; the callback then waits indefinitely.
 
+=head2 hrequest
+
+    hrequest($subject, $headers, $payload, $cb, [$timeout_ms])
+
+Like L</request>, with a header block as for L</hpublish>. Alias:
+C<hreq>.
+
 =head2 drain
 
     drain([$cb])
@@ -458,11 +472,16 @@ Send PING to server. Croaks unless connected.
     flush([$cb])
 
 Send PING as a write fence; the subsequent PONG guarantees all prior
-messages were processed by the server. Croaks unless connected. If
-C<$cb> is given, it is invoked when the PONG arrives. The callback
-receives a single argument: C<undef> on success, or an error string
-(e.g. C<"disconnected">) if the connection dropped before the PONG
-arrived.
+messages were processed by the server. If C<$cb> is given, it is
+invoked when the PONG arrives. The callback receives a single
+argument: C<undef> on success, or an error string if the PONG cannot
+arrive: C<"disconnected"> when the connection (or the attempt the
+flush waited for) failed, C<"not connected"> when there is no
+connection and none is being made.
+
+While connecting or reconnecting, the PING is sent once the handshake
+completes, behind the writes queued meanwhile. Without C<$cb>, a flush
+with no connection and none being made croaks.
 
 =head2 creds_file
 
@@ -477,14 +496,14 @@ C<USER NKEY SEED> block.
 =head2 new_inbox
 
 Returns a fresh subject suitable for use as a private reply target
-(C<_INBOX.E<lt>randE<gt>.E<lt>nE<gt>>). Each call burns a slot from
-the same counter that L</request> uses, so manual subscribers must
-treat the returned subject as opaque.
+(C<_INBOX.E<lt>randE<gt>.E<lt>nE<gt>>, under C<inbox_prefix> if set).
+Each call burns a slot from the same counter that L</request> uses, so
+manual subscribers must treat the returned subject as opaque.
 
 =head2 subscription_count
 
 Returns the number of currently-registered subscriptions, including
-the implicit C<_INBOX.E<gt>> subscription used by L</request>.
+the implicit inbox subscription used by L</request>.
 
 =head2 server_info
 

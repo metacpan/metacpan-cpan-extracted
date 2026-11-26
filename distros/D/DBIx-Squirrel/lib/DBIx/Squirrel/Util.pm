@@ -13,6 +13,8 @@ use DBIx::Squirrel::Errors qw(croakf);
 
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v4.1.1';
+
 our @EXPORT_OK = qw(
     canonical
     install_sub
@@ -87,11 +89,11 @@ sub split_stages ($args) {
 # Return the bind values given, or those in an array reference given
 # alone, unless it's a value itself. An object is a value, whatever it's
 # made of. Given to a statement taking one value, an array reference is
-# that value if the statement takes a list, as a list
-# placeholder does, or if the driver is DBD::Pg, which binds an array
-# reference as a PostgreSQL array, as it would with the DBI. The driver's
-# name is given, code returning how many values the statement takes, and
-# the statement's map of its list placeholders, if it has any.
+# that value if the statement takes a list, as a list placeholder does,
+# or if the driver is DBD::Pg, which binds an array reference as a
+# PostgreSQL array, as it would with the DBI. The driver's name is given,
+# code returning how many values the statement takes, and the
+# statement's map of its list placeholders, if it has any.
 sub unwrap_values ($driver, $taken, $lists, @args) {
     return @args
         unless @args == 1 && is_plain_arrayref($args[0]);

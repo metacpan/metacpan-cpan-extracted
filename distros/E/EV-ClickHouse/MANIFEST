@@ -143,6 +143,8 @@ t/75_lz4_features.t
 t/76_defaults_per_value.t
 t/77_tzif_numbers.t
 t/78_param_escapes.t
+t/79_lc_dict_frames.t
+t/80_callbacks_after_new.t
 typemap
 xs/codecs.c
 xs/io.c

@@ -1,13 +1,14 @@
 # ABSTRACT: The Type::Tiny constraints that the evidence of an analysis amounts to
 # PODNAME: Pod::Coverage::More::Types
 
-package Pod::Coverage::More::Types 0.003;
+package Pod::Coverage::More::Types 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
 use re q{/xsaa};
 
-use Exporter qw{import};
+use Exporter     qw{import};
+use Scalar::Util qw{blessed};
 use Type::Registry;
 use Type::Tiny::Intersection;
 use Type::Tiny::Union;
@@ -102,9 +103,11 @@ sub type_named {
     # No type expression has a %, and the error of a failed lookup takes NAME as a printf format, which warns.
     return if index( $name, q{%} ) >= 0;
 
-    my $registry = Type::Registry->for_class(__PACKAGE__);
-    $registry->add_types('Types::Standard') if !$registry->simple_lookup('Str');
+    state $registry = Type::Registry->new->add_types('Types::Standard');
     my $type = eval { $registry->lookup($name) };
+
+    # The parser of Type::Registry reads a number as a value, and gives it back as it is.
+    return if !blessed($type) || !$type->isa('Type::Tiny');
     return $type;
 }
 
@@ -122,7 +125,7 @@ Pod::Coverage::More::Types - The Type::Tiny constraints that the evidence of an 
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -181,7 +184,7 @@ Returns a Type::Tiny object, or undef when the uses say nothing of the type.
 =head2 type_named(NAME)
 
 Returns the constraint that NAME names.  NAME is either a type word of the POD that L<Pod::Coverage::More> reads,
-in any case, such as C<HASHREF> or C<integer>, or a type expression of L<Types::Standard>, such as C<ArrayRef[Int]>.
+in any case, such as C<HASHREF> or C<integer>, or a type expression of any type of L<Types::Standard>, such as C<ArrayRef[Int]> or C<Enum["a","b"]>.
 A word for a container, C<ARRAY> or C<HASH>, names a reference to one.
 
 =over 4

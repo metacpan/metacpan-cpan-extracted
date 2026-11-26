@@ -87,6 +87,52 @@ sub read_until {
     return $buf =~ $re ? $buf : undef;
 }
 
+# A reader over one buffer that persists across calls, so frames that
+# arrive in the same read as an earlier match are not lost. Each call
+# reads until $re matches the whole buffer and returns it (undef on
+# timeout or EOF).
+sub reader {
+    my ($class, $conn) = @_;
+    my $buf = '';
+    return sub {
+        my ($re, $timeout) = @_;
+        my $deadline = time + ($timeout // 5);
+        while ($buf !~ $re && time < $deadline) {
+            my $rin = '';
+            vec($rin, fileno($conn), 1) = 1;
+            next unless select(my $rout = $rin, undef, undef, 0.1);
+            my $n = sysread($conn, my $chunk, 65536);
+            last unless $n;
+            $buf .= $chunk;
+        }
+        return $buf =~ $re ? $buf : undef;
+    };
+}
+
+# subject => sid for every SUB line in $buf.
+sub subs_in {
+    my ($class, $buf) = @_;
+    my %sid;
+    $sid{$1} = $2 while $buf =~ /^SUB (\S+) (?:\S+ )?(\d+)\r$/mg;
+    return \%sid;
+}
+
+sub msg_frame {
+    my ($class, $subject, $sid, $reply, $payload) = @_;
+    $payload //= '';
+    my $r = defined $reply ? "$reply " : '';
+    return "MSG $subject $sid $r" . length($payload) . "\r\n$payload\r\n";
+}
+
+sub hmsg_frame {
+    my ($class, $subject, $sid, $reply, $headers, $payload) = @_;
+    $payload //= '';
+    my $r = defined $reply ? "$reply " : '';
+    my $hl = length $headers;
+    return "HMSG $subject $sid $r$hl " . ($hl + length $payload)
+        . "\r\n$headers$payload\r\n";
+}
+
 # INFO -> read CONNECT+PING -> PONG. Returns the handshake buffer.
 sub handshake {
     my ($class, $conn, $info) = @_;
@@ -135,18 +181,18 @@ sub start {
 sub report {
     my ($self, $timeout) = @_;
     my $rd = $self->{rd} or return '';
-    my $line = '';
+    my $buf = \($self->{report_buf} //= '');
     my $deadline = time + ($timeout // 10);
-    while (time < $deadline && $line !~ /\n/) {
+    while (time < $deadline && $$buf !~ /\n/) {
         my $rin = '';
         vec($rin, fileno($rd), 1) = 1;
         my $ready = select(my $rout = $rin, undef, undef, 0.2);
         next unless $ready;
         my $n = sysread($rd, my $chunk, 4096);
         last unless $n;
-        $line .= $chunk;
+        $$buf .= $chunk;
     }
-    chomp $line;
+    my $line = $$buf =~ s/\A([^\n]*)\n// ? $1 : substr($$buf, 0, length $$buf, '');
     return $line;
 }
 

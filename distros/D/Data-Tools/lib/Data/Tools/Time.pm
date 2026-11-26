@@ -16,7 +16,7 @@ use Data::Tools;
 use Date::Calc qw(:all);
 use Time::JulianDay;
 
-our $VERSION = '1.52';
+our $VERSION = '1.60';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

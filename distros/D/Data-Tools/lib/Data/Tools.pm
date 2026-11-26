@@ -24,7 +24,7 @@ use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 use Fcntl qw( :flock );
 
-our $VERSION = '1.52';
+our $VERSION = '1.60';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -78,6 +78,7 @@ our @EXPORT = qw(
 
               hash2json
               hash2json_pp
+              hash2json_cc
               json2hash
 
               hash_uc
@@ -94,6 +95,7 @@ our @EXPORT = qw(
               hash_save_json_pp
               hash_load_json
 
+              hash_fingerprint
               hash_validate
 
               hash_lock_recursive
@@ -118,6 +120,9 @@ our @EXPORT = qw(
 
               str_hex
               str_unhex
+
+              str_hex_utf8
+              str_unhex_utf8
 
               str_num_comma
               str_pad
@@ -175,6 +180,8 @@ our @EXPORT = qw(
               bcd2str
 
               format_ascii_table
+
+              eval_err_strip
             );
 
 our %EXPORT_TAGS = (
@@ -228,6 +235,7 @@ sub file_load
   my $mopt;
   $mopt = ":encoding($encoding)" if $encoding;
   open( $i, "<" . $mopt, $fn ) or return undef;
+  flock( $i, LOCK_SH ) if $opt->{ 'FLOCK' };
   binmode( $i ) if $opt->{ ':RAW' };
   local $/ = undef;
   my $s = <$i>;
@@ -256,12 +264,14 @@ sub file_load_ar
   my $mopt;
   $mopt = ":encoding($encoding)" if $encoding;
   open( $i, "<" . $mopt, $fn ) or return undef;
+  flock( $i, LOCK_SH ) if $opt->{ 'FLOCK' };
   binmode( $i ) if $opt->{ ':RAW' };
   my @all = <$i>;
   close $i;
   return \@all;
 }
 
+# FIXME: TODO: add umask
 sub file_save
 {
   my $fn = shift; # file name
@@ -279,10 +289,17 @@ sub file_save
   $mopt = ":encoding($encoding)" if $encoding;
 
   my $o;
-  open( $o, ">" . $mopt, $fn ) or return 0;
+  # FIXME: with FLOCK, ">" empties the file before flock() below, so a reader can
+  #        get an empty file in that window; open with ">>", then flock(), then
+  #        truncate() to close it
+  open( $o, ">" . $mopt, $fn ) or return undef;
+  if( $opt->{ 'FLOCK' } )
+    {
+    flock( $o, LOCK_EX );
+    truncate( $o, 0 ); # need to clear file if race but after lock
+    }
   binmode( $o ) if $opt->{ ':RAW' };
-  print $o @_;
-  close $o;
+  return undef unless print( $o @_ ) and close( $o );
   return 1;
 }
 
@@ -307,10 +324,12 @@ sub file_bin_save
   my $fn = shift; # file name
 
   my $o;
-  open( $o, ">", $fn ) or return 0;
+#-  open( $o, ">", $fn ) or return 0; # cc20261026-14
+  open( $o, ">", $fn ) or return undef; # cc20261026-14
   binmode( $o );
-  print $o @_;
-  close $o;
+#-  print $o @_; # cc20261026-14
+#-  close $o; # cc20261026-14
+  return undef unless print( $o @_ ) and close( $o ); # a full disk fails here, as file_save() # cc20261026-14
   return 1;
 }
 
@@ -355,11 +374,14 @@ sub file_text_save
   my $fn = shift; # file name
 
   my $o;
-  my $enc = ":encoding($TEXT_IO_ENCODING)" if $TEXT_IO_ENCODING;
-  open( $o, ">$enc", $fn ) or return 0;
+#-  my $enc = ":encoding($TEXT_IO_ENCODING)" if $TEXT_IO_ENCODING; # cc20261026-14
+#-  open( $o, ">$enc", $fn ) or return 0; # cc20261026-14
+  my $enc = $TEXT_IO_ENCODING ? ":encoding($TEXT_IO_ENCODING)" : ''; # cc20261026-14 no "my ... if"
+  open( $o, ">$enc", $fn ) or return undef; # cc20261026-14
   binmode( $o ) unless $TEXT_IO_ENCODING;
-  print $o @_;
-  close $o;
+#-  print $o @_; # cc20261026-14
+#-  close $o; # cc20261026-14
+  return undef unless print( $o @_ ) and close( $o ); # a full disk fails here, as file_save() # cc20261026-14
   return 1;
 }
 
@@ -375,8 +397,6 @@ sub file_text_append
   close $o;
   return 1;
 }
-
-
 
 ##############################################################################
 
@@ -404,7 +424,6 @@ sub cmd_write_to
   close $o;
   return 1;
 }
-
 
 ##############################################################################
 
@@ -578,9 +597,17 @@ sub __url_escapes_init
   $URL_ESCAPES_DONE = 1;
 }
 
+# url (RFC 3986) is ascii only, anything else is UTF-8 bytes as %xx escapes:
+# str_url_escape() takes characters (or UTF-8 bytes) and returns ascii url,
+# str_url_unescape() takes url (ascii or UTF-8 bytes) and returns characters,
+# so str_url_unescape( str_url_escape( $s ) ) eq $s
+
 sub str_url_escape
 {
-  my $bytes = encode( 'UTF-8', shift ); # assume UTF-8 input
+  my $bytes = shift;
+
+  # characters (perl utf8 string) become UTF-8 bytes, bytes stay as they are
+  $bytes = encode( 'UTF-8', $bytes ) if utf8::is_utf8( $bytes );
 
   $bytes =~ s/([^A-Za-z_0-9])/$URL_ESCAPES{$1}/gs; # strict
 
@@ -591,7 +618,14 @@ sub str_url_unescape
 {
   my $text = shift;
 
+  # guard: url is bytes, characters (perl utf8 string, possibly above 255)
+  # become UTF-8 bytes first, %xx escapes and ascii stay as they are
+  $text = encode( 'UTF-8', $text ) if utf8::is_utf8( $text );
+
   $text =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+
+  $text = decode( 'UTF-8', $text ); # UTF-8 bytes to characters, an invalid byte becomes U+FFFD
+
   return $text;
 }
 
@@ -726,12 +760,22 @@ sub str_html_unescape
 
 sub str_hex
 {
-  return unpack( "H*",  shift() );
+  return unpack( "H*", $_[0] );
 }
 
 sub str_unhex
 {
-  return pack( "H*", shift() );
+  return pack( "H*", $_[0] );
+}
+
+sub str_hex_utf8
+{
+  return unpack( "H*", encode( 'UTF-8', $_[0] ) );
+}
+
+sub str_unhex_utf8
+{
+  return decode( 'UTF-8', pack( "H*", $_[0] ) );
 }
 
 ##############################################################################
@@ -950,19 +994,30 @@ sub url2hash
   return \%hash;
 }
 
+# FIXME: hash2json(), json2hash(), hash_load_json() and hash_save_json() now
+#        return undef on failure where they used to die, and hash_save_json_pp()
+#        now writes canonical UTF-8; exported by default, needs a Changes entry
 sub hash2json
 {
-  return encode_json( shift );
+  return scalar eval { encode_json( $_[0] ) };
 }
 
+my $__JSON_PP = JSON->new()->utf8()->canonical(1)->pretty( 1 );
 sub hash2json_pp
 {
-  return JSON->new()->pretty( 1 )->encode( shift );
+  return scalar eval { $__JSON_PP->encode( $_[0] ) };
+}
+
+# CanoniCal :)
+my $__JSON_CC = JSON->new()->utf8()->canonical(1);
+sub hash2json_cc
+{
+  return scalar eval { $__JSON_CC->encode( $_[0] ) };
 }
 
 sub json2hash
 {
-  return decode_json( shift );
+  return scalar eval { decode_json( $_[0] ); };
 }
 
 ##############################################################################
@@ -1013,14 +1068,14 @@ sub hash_save
   # @_ array of hash references
   my $data;
   $data .= hash2str( $_ ) for @_;
-  return file_save( $fn, $data );
+  return file_text_save( $fn, $data );
 }
 
 sub hash_load
 {
   my $fn = shift;
 
-  return str2hash( file_load( $fn ) );
+  return str2hash( file_text_load( $fn ) );
 }
 
 sub hash_save_keys
@@ -1054,7 +1109,7 @@ sub hash_save_json
   my $fn = shift;
   my $hr = shift;
 
-  return file_save( $fn, encode_json( $hr ) );
+  return file_save( $fn, hash2json( $hr ) // return undef );
 }
 
 sub hash_save_json_pp
@@ -1062,17 +1117,23 @@ sub hash_save_json_pp
   my $fn = shift;
   my $hr = shift;
 
-  return file_save( $fn, JSON->new()->pretty( 1 )->encode( $hr ) );
+  return file_save( $fn, hash2json_pp( $hr ) // return undef );
 }
 
 sub hash_load_json
 {
   my $fn = shift;
 
-  return decode_json( file_load( $fn ));
+  return json2hash( file_load( $fn ) );
 }
 
 ##############################################################################
+
+sub hash_fingerprint
+{
+  return undef if ! defined $_[0] or ref( $_[0] ) ne 'HASH';
+  return sha1_hex( hash2json_cc( $_[0] ) // return undef );
+}
 
 sub hash_validate
 {
@@ -1740,6 +1801,17 @@ sub format_ascii_convert_aoh_to_aoa
 
 ##############################################################################
 
+sub eval_err_strip
+{
+  my $err = shift || return undef;
+  $err =~ s/\n.*//s;
+  $err =~ s/ \(\@INC[^)]*\)//;
+  $err =~ s/ at \S+ line \d+.*//;
+  return $err;
+}
+
+##############################################################################
+
 BEGIN { __url_escapes_init(); }
 INIT  { __url_escapes_init(); }
 
@@ -1877,11 +1949,43 @@ INIT  { __url_escapes_init(); }
   my $escaped   = str_url_escape( $plain_str ); # URL-style %XX escaping
   my $plain_str = str_url_unescape( $escaped );
 
+  # NOTE: url (RFC 3986) is ascii only, anything else is UTF-8 bytes as %xx.
+  #       str_url_escape() encodes characters (perl utf8 string) to UTF-8
+  #       bytes first, a non-utf8 string is taken as bytes and escaped as it
+  #       is, so UTF-8 bytes are not encoded twice. characters below 0x100 may
+  #       be kept without the utf8 flag (literal "\x{e9}"), then they are bytes:
+  #       str_url_escape( "\x{e9}" ) is "%E9", use utf8::upgrade() or decode()
+  #       for text, then it is "%C3%A9".
+  #       str_url_unescape() takes url (ascii or UTF-8 bytes) and returns
+  #       characters: %xx escapes become bytes, decoded from UTF-8, invalid
+  #       bytes become U+FFFD: str_url_unescape( "%D0%98" ) is "\x{418}".
+  #       characters (perl utf8 string) in its input are encoded to UTF-8 bytes
+  #       first, so raw text mixed with %xx escapes is kept.
+  #       str_url_unescape( str_url_escape( $text ) ) returns $text.
+  #       url2hash() and str2hash_url() use str_url_unescape() and return
+  #       characters too.
+
   my $escaped   = str_html_escape( $plain_str ); # HTML-style &name; escaping
   my $plain_str = str_html_unescape( $escaped );
 
   my $hex_str   = str_hex( $plain_str ); # HEX-style XX string escaping
   my $plain_str = str_unhex( $hex_str );
+
+  my $hex_str   = str_hex_utf8( $text ); # the same for text (wide chars)
+  my $text      = str_unhex_utf8( $hex_str );
+
+  # NOTE: str_hex() and str_unhex() work on bytes, i.e. unpack/pack( "H*" ):
+  #       characters above 0xFF are wrapped to their low byte, so different
+  #       text may give the same result: str_hex( "\x{430}\x{430}" ) and
+  #       str_hex( "00" ) both return "3030". use them for binary data only.
+  #       str_hex_utf8() encodes text to UTF-8 bytes first, so the result is
+  #       unique per text: str_hex_utf8( "\x{430}\x{430}" ) returns "d0b0d0b0".
+  #       str_unhex_utf8() decodes the bytes back to text, invalid UTF-8 bytes
+  #       become U+FFFD. results differ from str_hex() for any non-ASCII text,
+  #       str_hex( "\x{e9}" ) is "e9" while str_hex_utf8( "\x{e9}" ) is "c3a9".
+  #       str_unhex() and str_unhex_utf8() do not check their input: odd length
+  #       is padded with "0" ( "414" gives "A@" ) and non-hex characters are
+  #       not rejected but silently converted to garbage bytes.
 
   # --------------------------------------------------------------------------
 
@@ -1946,8 +2050,18 @@ keys (possibly key paths like 'KEY1/KEY2/KEY3'):
 
 Data::Tools package includes several sub-modules:
 
-  * Data::Tools::Socket (socket I/O processing, TODO: docs)
-  * Data::Tools::Time   (time processing)
+  * Data::Tools::Time                (time processing)
+  * Data::Tools::Math                (mathematics)
+  * Data::Tools::CSV                 (compact, pure-perl CSV parsing)
+  * Data::Tools::Serialization       (high-level serialization)
+
+Since 1.60 process and socket modules are separate packages:
+
+  * Data-Tools-Process  Data::Tools::Process, Data::Tools::Process::Forks,
+                        Data::Tools::Process::ForkPool
+  * Net-Tools           Net::Tools::Socket, Net::Tools::Socket::Protocols,
+                        Net::Tools::Socket::Pair, Net::Tools::Socket::Err
+                        (were Data::Tools::Socket*)
 
 =head1 REQUIRED MODULES
 

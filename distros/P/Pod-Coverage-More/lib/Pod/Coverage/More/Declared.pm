@@ -1,7 +1,7 @@
 # ABSTRACT: What class builders and signature modules declare about the subs of a package
 # PODNAME: Pod::Coverage::More::Declared
 
-package Pod::Coverage::More::Declared 0.003;
+package Pod::Coverage::More::Declared 0.005;
 
 use 5.036;
 use warnings FATAL => q{all};
@@ -60,7 +60,7 @@ Pod::Coverage::More::Declared - What class builders and signature modules declar
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 

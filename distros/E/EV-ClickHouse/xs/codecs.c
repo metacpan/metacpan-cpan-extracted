@@ -90,8 +90,6 @@ static char* gzip_decompress(const char *data, size_t data_len, size_t *out_len)
     return out;
 }
 
-#ifdef HAVE_LZ4
-
 /*
  * Decompress a ClickHouse LZ4 compressed block.
  * Input: compressed block starting at checksum (16 + 9 + payload bytes).
@@ -170,46 +168,67 @@ static char* ch_lz4_decompress(const char *data, size_t data_len,
     return out;
 }
 
-/*
- * Compress data into a ClickHouse LZ4 compressed block.
- * Returns malloc'd buffer (checksum + header + LZ4 payload), sets *out_len.
- */
-static char* ch_lz4_compress(const char *data, size_t data_len, size_t *out_len) {
-    int max_compressed;
-    if (data_len > (size_t)INT_MAX) return NULL;
-    max_compressed = LZ4_compressBound((int)data_len);
-    char *out;
-    int compressed_size;
-    uint32_t compressed_with_header;
+/* Input per frame: the server refuses a compressed frame over 1 GiB, and
+ * incompressible input grows by up to 1/255 */
+#define CH_MAX_FRAME 0x3F800000
+
+/* One ClickHouse compressed frame (checksum, method, sizes, payload) of
+ * data[0..len), len <= CH_MAX_FRAME, appended to out. LZ4 into its bound
+ * cannot fail. */
+static void ch_compress_frame(native_buf_t *out, const char *data, size_t len,
+                              int zstd, int level) {
+    size_t bound, comp = 0, start = out->len;
+    uint32_t cwh, ulen = (uint32_t)len;
     ch_uint128_t checksum;
+    char *hdr;
 
-    Newx(out, CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE + max_compressed, char);
-
-    compressed_size = LZ4_compress_default(
-        data, out + CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE,
-        (int)data_len, max_compressed);
-
-    if (compressed_size <= 0) {
-        Safefree(out);
-        return NULL;
+#ifdef HAVE_ZSTD
+    if (zstd) {
+        bound = ZSTD_compressBound(len);
+        nbuf_grow(out, CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE + bound);
+        hdr = out->data + start + CH_CHECKSUM_SIZE;
+        comp = ZSTD_compress(hdr + CH_COMPRESS_HEADER_SIZE, bound, data, len, level);
+        /* only an allocation fails: send the frame in LZ4, which needs none */
+        if (ZSTD_isError(comp)) zstd = 0;
     }
-
-    compressed_with_header = (uint32_t)compressed_size + CH_COMPRESS_HEADER_SIZE;
-
-    /* Write header */
-    out[CH_CHECKSUM_SIZE] = (char)CH_LZ4_METHOD;
-    memcpy(out + CH_CHECKSUM_SIZE + 1, &compressed_with_header, 4);
-    {   uint32_t uncomp = (uint32_t)data_len;
-        memcpy(out + CH_CHECKSUM_SIZE + 5, &uncomp, 4);
+#else
+    zstd = 0;
+    (void)level;
+#endif
+    if (!zstd) {
+        bound = (size_t)LZ4_compressBound((int)len);
+        nbuf_grow(out, CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE + bound);
+        hdr = out->data + start + CH_CHECKSUM_SIZE;
+        comp = (size_t)LZ4_compress_default(data, hdr + CH_COMPRESS_HEADER_SIZE,
+                                            (int)len, (int)bound);
     }
+    cwh = (uint32_t)(comp + CH_COMPRESS_HEADER_SIZE);
+    hdr[0] = (char)(zstd ? CH_ZSTD_METHOD : CH_LZ4_METHOD);
+    memcpy(hdr + 1, &cwh, 4);
+    memcpy(hdr + 5, &ulen, 4);
+    checksum = ch_city_hash128(hdr, cwh);
+    memcpy(out->data + start, &checksum.lo, 8);
+    memcpy(out->data + start + 8, &checksum.hi, 8);
+    out->len = start + CH_CHECKSUM_SIZE + cwh;
+}
 
-    /* Compute checksum over header + compressed data */
-    checksum = ch_city_hash128(out + CH_CHECKSUM_SIZE, compressed_with_header);
-    memcpy(out, &checksum.lo, 8);
-    memcpy(out + 8, &checksum.hi, 8);
-
-    *out_len = CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE + compressed_size;
-    return out;
+/* A Data block's body appended to out, compressed as self compresses: in
+ * frames of compress_block_size (0: the largest the server takes), so the
+ * server decompresses a frame at a time. Frees body. */
+static void nbuf_put_block(native_buf_t *out, native_buf_t *body,
+                           const ev_clickhouse_t *self) {
+    size_t step = self->compress_block_size, pos = 0;
+    if (!step || step > CH_MAX_FRAME) step = CH_MAX_FRAME;
+    if (!self->compress)
+        nbuf_append(out, body->data, body->len);
+    else do {
+        size_t n = body->len - pos < step ? body->len - pos : step;
+        ch_compress_frame(out, body->data + pos, n, self->compress_zstd,
+                          self->compress_level);
+        pos += n;
+    } while (pos < body->len);
+    Safefree(body->data);
+    body->data = NULL;
 }
 
 /* Decompress one or more consecutive LZ4 sub-blocks starting at buf[*pos].
@@ -267,8 +286,6 @@ static char* ch_lz4_decompress_chain(const char *buf, size_t len, size_t *pos,
     }
     return out;
 }
-
-#endif /* HAVE_LZ4 */
 
 /* --- Days-since-epoch calculation for Date encoding --- */
 

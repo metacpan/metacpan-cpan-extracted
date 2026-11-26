@@ -1,6 +1,6 @@
 #!perl
 
-use Test2::V0;
+use Test2::V0 -no_srand;
 
 use Test::File::ShareDir -share => {
     -dist => {

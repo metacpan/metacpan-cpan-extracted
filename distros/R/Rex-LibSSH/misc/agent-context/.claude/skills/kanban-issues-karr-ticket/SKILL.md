@@ -47,11 +47,21 @@ karr handoff 12 --note "Done: <what changed, how verified>" -t   # to review
   the card on. The pin already says the rest.
 - **Finished?** `handoff` with a note that says what changed and how it was
   verified. The card is in `review` — that is where your part ends.
+- **Your notes and your handoff push the board.** That is intended, also when your
+  brief says not to push (that means commits and tags). Do not add `--local-only`.
+  If a write reports a failed push, say so at the top of your report. A
+  "write access … was denied" or "this clone is read-only for the board" means
+  nothing was changed (unless the message names a card that "could not be taken
+  back" and is still only in this clone): fix the access if you may, otherwise
+  report it and stop.
+  A "changes still not on the remote" warning is the cue to run `karr sync` once
+  the remote answers. Never run `karr readonly on`: the clone's maintainer decides that.
 
 ## What you do not do
 
-- `pick`, `move` to another column, `create`, `delete`, `archive`, `sync`, or
-  anything on another card or another board.
+- `pick`, `move` to another column, `create`, `delete`, `archive`, the `karr sync`
+  command, or anything on another card or another board. (The automatic sync
+  inside `edit` and `handoff` is yours and stays on.)
 - Move the card to `done`: `done` means the work is committed and accepted,
   and that is not yours to declare.
 - Take over a claim: if a command says the card is claimed by someone else or

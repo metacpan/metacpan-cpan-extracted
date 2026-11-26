@@ -1,0 +1,21 @@
+This is the Security Policy for the Perl Net-WoRMS distribution.
+
+Report security issues via email to <alex.weidauer@huckfinn.de>.
+
+The author will respond, and release fixes as soon as possible. However,
+this project is maintained by a single volunteer in their spare time,
+and they cannot guarantee a rapid response.
+
+If the issue is urgent, then you can also notify the CPAN Security Group
+(CPANSec) <cpan-security@security.metacpan.org>. This is important if a
+vulnerability is being actively exploited.
+
+Please do not report security problems on public forums or in repository
+issues.
+
+Only the latest release of Net-WoRMS will be supported.
+
+This policy was updated on 2026-11-25.
+
+If this policy or the release is more than two years old, then you
+should check for a more recent version of Net-WoRMS on CPAN.

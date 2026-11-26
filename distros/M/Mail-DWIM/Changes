@@ -1,6 +1,12 @@
 ######################################################################
 Revision history for Perl extension Mail::DWIM
 
+0.12  (2026/11/25)
+    (ms) quoted-printable fixes hanging SMTP sessions with fastmail's SMTP
+         server when umlauts were present in the text.
+    (ms) Added regression tests for quoted-printable HTML alternatives and
+         attachment message bodies, including lossless decoding.
+
 0.11  (2026/08/18)
     (ms) Added a dryrun option that prints a message summary without sending.
     (ms) Pass MIME type strings instead of MIME::Type objects to MIME::Lite.

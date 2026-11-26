@@ -37,7 +37,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.985003';
+$VERSION = '3.985004';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -75,10 +75,11 @@ sub os {
 
 sub os_ver {
     my $sonicosver = shift;
-        my $osver = $sonicosver->sw_firmware();
-        if ( $osver =~ /\S+\s\S+\s(\S+)/) {
-            return $1
-        }
+    my $osver = $sonicosver->sw_firmware();
+
+    if ( defined $osver && $osver =~ /(\d+(?:\.\d+)+(?:-[A-Za-z0-9]+)*)/ ) {
+        return $1;
+    }
 }
 
 sub serial {

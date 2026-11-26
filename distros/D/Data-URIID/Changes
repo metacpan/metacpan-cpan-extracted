@@ -1,3 +1,11 @@
+v0.27  2026-11-25Z
+    - Added support for natural_language key
+    - Added more tests
+    - Added most basic support for museum-digital tag identifiers
+    - Added experimental roles based on identifiers
+    - Fixed displayname problems with services
+    - Ensured attributes read consistently
+
 v0.26  2026-10-21Z
     - Added support for Data::URIID::Request
     - Added parsing for abstract wikipedia

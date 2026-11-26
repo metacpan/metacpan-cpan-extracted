@@ -19,6 +19,8 @@ use DBIx::Squirrel::Util    qw(unwrap_values);
 
 use namespace::clean;
 
+our $VERSION = 'v4.1.1';
+
 our @ISA = ('DBI::st', 'Ekorn::Pipeline::Pipes');
 
 # Croak at the line that called DBIx::Squirrel.
@@ -107,7 +109,6 @@ sub execute ($self, @args) {
     return at_caller { $self->SUPER::execute(@args) };
 }
 
-
 # Execute the statement once for each row of values the fetch gives, as
 # the DBI's execute_for_fetch does, and return what it returns. A
 # statement whose placeholders are mapped takes each row as the values for
@@ -129,7 +130,6 @@ sub execute_for_fetch ($self, $fetch, @status) {
     local $state->{InOrder} = 1;
     return at_caller { $self->SUPER::execute_for_fetch($in_order, @status) };
 }
-
 
 # Execute the statement once for each row of values, as the DBI's
 # execute_array does, and return what it returns: the rows come from the
@@ -191,7 +191,6 @@ sub execute_array ($self, $attrs, @arrays) {
     }
     return $self->execute_for_fetch($fetch, $status ? $status : ());
 }
-
 
 # Bind an array of values, one for each row execute_array executes, to a
 # placeholder, as the DBI's bind_param_array does, and return what it
@@ -305,7 +304,6 @@ sub _in_order ($state, $args) {
     return @in_order;
 }
 
-
 # Return the numbers or names a row of values gives a statement values
 # for, in the order it gives them: each number to the highest, as execute
 # takes them, or the names in the order each first appears (roadmap
@@ -319,7 +317,6 @@ sub _row_keys ($state) {
         ? [1 .. values_taken($binds)]
         : [sort { $binds->{$a}[0] <=> $binds->{$b}[0] } keys %$binds];
 }
-
 
 # Return a row's values for a statement's placeholders in the order of
 # their positions, a value for each use, as _in_order does, given what the
@@ -340,7 +337,6 @@ sub _row_in_order ($state, $keys, $row) {
     @values{@$keys} = @$row;
     return @values{@{ $state->{Order} }};
 }
-
 
 # Return a fetch of rows, for execute_array, from what ArrayTupleFetch
 # holds: a code reference, as it is, or an active statement handle, read
@@ -369,7 +365,6 @@ sub _fetch_from ($self, $source, $needed) {
     return sub { $source->fetchrow_arrayref };
 }
 
-
 # Croak if a statement has list placeholders: its handle is prepared for
 # lists of the lengths it was given, so rows of values can't share it
 # (roadmap 2026-0037, D4).
@@ -380,7 +375,6 @@ sub _no_lists_for_rows ($state) {
         if $lists;
     return;
 }
-
 
 # Set the DBI's error on a statement handle, with one of the DBI's own
 # messages, as its execute_array and bind_param_array set them, so it's

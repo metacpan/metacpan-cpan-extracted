@@ -162,6 +162,37 @@ the file name `-`, which nup passes on unchanged.  It is not done with
 `--cat-v`, which would show the UNIT SEPARATORs, nor without folding
 or table formatting.
 
+#### Images
+
+Images are shown with the Unicode placeholders of the
+[kitty graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/#unicode-placeholders),
+by [Text::ANSI::Image](https://github.com/tecolicom/Text-ANSI-Image)
+(the `kitty` method); [App::Greple::md::Image](lib/App/Greple/md/Image.pm)
+finds the files, and takes a GitHub URL of the repository as the file
+in its work tree.  mdee
+decides whether the terminal and the pagers can show them (the
+terminal from `TERM_PROGRAM` and `TERM`, `less` 632 or later) and
+gives the types of images to show to the md module (`image_types=png:jpeg:gif`, from `--image`), which does not decide it
+itself.
+
+The `image_blocks` step, which comes right after `comments` in the
+protect steps, finds the lines which are an image and nothing else, and
+puts the rows of the image below the line.  A row is a line of
+U+10EEEE, one for a cell, with the row and the column as combining
+characters and the id of the image as the foreground color; the rows
+are protected, so no later step colors them, and the refill and the
+folding leave them alone.  The data of the images is sent to
+`/dev/tty` as APC sequences at the end of the step, before anything
+is printed.
+
+Since the rows are text, nup and ansicolumn lay them out and less
+pages them as text; less needs `LESSUTFCHARDEF=10EEEE:p` to take the
+character as printable.  With nup, `intact=image` joins the line of
+an image and its rows by GROUP SEPARATOR (0x1D), and ansicolumn
+`--intact` keeps them in one pane.  The terminal keeps the images on
+the screen they were sent to, so mdee always gives `-X` to less,
+which then stays on the normal screen.
+
 The device (`-T`) and the output file (`-o`) are passed to nup as
 well.  When either is given, mdee first runs nup with `--geometry`,
 which prints the columns and the lines of the device and its kind,

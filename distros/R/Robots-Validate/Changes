@@ -1,5 +1,19 @@
 Revision history for Robots-Validate:
 
+v0.4.17   2026-11-25 19:28:33+00:00 Europe/London
+  [Enhancements]
+  - Added or updated the robot rules for the following:
+    - AcademicBotRTU
+    - BoehmBot
+    - domains-distillery
+    - GeedoShopProductFinder
+    - ElamurBot
+    - LiberaiteBot
+    - LibrarianBot
+
+  [Tests]
+  - Disabled srand initialisation.
+
 v0.4.16   2026-11-17 16:35:53+00:00 Europe/London
   [Enhancements]
   - Added or updated the robot rules for the following:

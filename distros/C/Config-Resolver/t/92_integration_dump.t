@@ -2,11 +2,8 @@
 use strict;
 use warnings;
 
-BEGIN {
-  use FindBin;
-  my $ScriptPath = "$FindBin::Bin/../bin/config-resolver.pl";
-  require $ScriptPath;
-}
+use Config::Resolver::CLI;
+use FindBin;
 
 use Test::More;
 use File::Temp qw(tempfile);
@@ -17,9 +14,12 @@ use JSON qw(to_json from_json);
 
 # --- Find our script and lib paths ---
 my $Bin     = $FindBin::Bin;
-my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver.pl' );
+my $Script  = File::Spec->catfile( $Bin, '..', 'bin', 'config-resolver' );
 my $LibPath = File::Spec->catfile( $Bin, '..', 'lib' );
-my $Perl    = $^X;  # Get the path to the current perl executable
+
+# The shell wrapper launches its own Perl interpreter.
+local $ENV{PERL5LIB} = join q{:}, grep { !ref $_ && defined $_ && -d $_ }
+  $LibPath, @INC, split /:/xsm, $ENV{PERL5LIB} // q{};
 
 # --- Setup: Create a single, real params file for all tests ---
 my $test_data = {
@@ -35,7 +35,7 @@ subtest 'Test Case: End-to-end dump (full object)' => sub {
 
   # 1. --- Execute the real script ---
   # We test the default JSON output
-  my $command       = "$Perl -I$LibPath $Script dump $p_path";
+  my $command       = "bash $Script dump $p_path";
   my $script_output = qx($command);
 
   # 2. --- Verify the results ---
@@ -52,7 +52,7 @@ subtest 'Test Case: End-to-end dump (single key)' => sub {
 
   # 1. --- Execute the real script ---
   # We ask for a simple key
-  my $command       = "$Perl -I$LibPath $Script dump -k foo $p_path";
+  my $command       = "bash $Script dump -k foo $p_path";
   my $script_output = qx($command);
 
   # 2. --- Verify the results ---
@@ -65,7 +65,7 @@ subtest 'Test Case: End-to-end dump (complex key)' => sub {
 
   # 1. --- Execute the real script ---
   # We ask for a key whose *value* is a hash
-  my $command       = "$Perl -I$LibPath $Script dump -k baz $p_path";
+  my $command       = "bash $Script dump -k baz $p_path";
   my $script_output = qx($command);
 
   # 2. --- Verify the results ---

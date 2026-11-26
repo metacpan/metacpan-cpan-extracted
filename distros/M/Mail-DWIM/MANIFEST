@@ -9,5 +9,6 @@ README
 t/001Basic.t
 t/002Send.t
 t/003SSL.t
+t/004QuotedPrintable.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
