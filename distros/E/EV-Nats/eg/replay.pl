@@ -16,7 +16,7 @@ use MIME::Base64 qw(decode_base64);
 
 my $stream = shift @ARGV // die "usage: replay.pl <stream> [<subject>] [<start_seq>]\n";
 my $filter = shift @ARGV;            # optional subject filter (e.g. "orders.*")
-my $start  = shift @ARGV // 1;       # default: from sequence 1
+my $start  = 0 + (shift @ARGV // 1); # default: from sequence 1; JSON needs a number
 
 my $nats = EV::Nats->new(
     host     => $ENV{NATS_HOST} // '127.0.0.1',

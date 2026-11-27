@@ -1,0 +1,19 @@
+# golden: amd/ubuntu-24.04--inbox--mi300x--modules-extra
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: cat /proc/cmdline 2>/dev/null
+run: grep -rsHE --include='*.conf' '^[[:space:]]*(blacklist[[:space:]]+amdgpu|install[[:space:]]+amdgpu[[:space:]]+(/usr)?/bin/(false|true))([[:space:]]|$)' /etc/modprobe.d /run/modprobe.d /usr/lib/modprobe.d /lib/modprobe.d 2>/dev/null
+run: uname -r
+run: modinfo -n amdgpu 2>/dev/null
+run: dpkg -l linux-firmware-amd-graphics 2>/dev/null | grep -q '^[hi]i'
+run: dpkg -l linux-firmware 2>/dev/null | grep -q '^[hi]i'
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: LC_ALL=C apt-cache policy linux-modules-extra-6.8.0-85-generic 2>/dev/null
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y linux-modules-extra-6.8.0-85-generic
+run: dpkg -l linux-modules-extra-6.8.0-85-generic 2>/dev/null | grep -q '^[hi]i'
+run: modinfo -n amdgpu 2>/dev/null
+run: modprobe amdgpu
+run: <AMD state script>

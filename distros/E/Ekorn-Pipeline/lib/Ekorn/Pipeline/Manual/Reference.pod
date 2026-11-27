@@ -1435,6 +1435,9 @@ say how it ended. A setlist, read up to its encore:
 C<ended> says C<stopped>, as C<take_while> cut the reading short, with
 C<Tender> still to come.
 
+C<next> does what a call does, so a loop can be written either way:
+C<< while (my($song) = $next->next) { ... } >>.
+
 C<all> gives an array reference only in scalar context: in a hash, a
 list or an argument, its values are flattened into it. C<all_arrayref>
 gives the reference whatever the context:
@@ -4696,6 +4699,15 @@ See L<Iterators: Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterato
 
 Returns the next value, or C<undef> if there's none, and ends the run,
 as C<finish> does, so nothing more is read.
+
+See L<Iterators: Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterator">.
+
+=head3 next
+
+    while (my($value) = $next->next) { ... }
+
+Returns the next value, as C<< $next->() >> does, in any context: one
+value, or an empty list once the values run out.
 
 See L<Iterators: Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterator">.
 

@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3430';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3431';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -910,9 +910,12 @@ sub _aoa_width { # widest row of an AoA (ragged-safe)
 sub _aoa_int_cols { # validate integer positions in range
 	my ($fn, $df, @cols) = @_;
 	my $w = _aoa_width($df);
+	# [0-9] and \z, not \d and $: /^\d+$/ took "1\n" and the Arabic-Indic
+	# digit "\x{661}", which then matched no key in drop_cols()'s %drop, so the
+	# call validated and dropped nothing.
 	for my $c (@cols) {
 		_usage_error($fn, "AoA column '$c' is not a non-negative integer")
-			unless $c =~ /^\d+$/;
+			unless $c =~ /\A[0-9]+\z/;
 		_usage_error($fn, "AoA column index $c out of range (max index " . ($w - 1) . ")")
 			if $c >= $w;
 	}
@@ -2204,6 +2207,15 @@ sub concat {
 		@cols = sort keys %seen;
 		my %out = map { $_ => [] } @cols;
 		for my $f (@frames) {
+			# A defined value that is not an array ref is not a column: up to
+			# 0.3430 concat({ a => 1, b => 2 }, { a => 3 }) took it for an absent
+			# one and returned { a => [], b => [] }, losing the data, where
+			# pandas refuses an all-scalar dict. An undef holds nothing and is
+			# still an absent column.
+			for my $c (sort keys %$f) {
+				die "concat: HoA column '$c' is not an ARRAY ref\n"
+					if defined $f->{$c} && ref $f->{$c} ne 'ARRAY';
+			}
 			my $n = 0;
 			for my $c (keys %$f) {
 				$n = @{ $f->{$c} } if ref $f->{$c} eq 'ARRAY' && @{ $f->{$c} } > $n;
@@ -2220,15 +2232,24 @@ sub concat {
 		}
 		return \%out;
 	}
-	# HoH
-	my (%out, $collided);
+	# HoH. A suffixed label must not be any frame's own row name: with every
+	# label claimed as it came, concat({ a => .. }, { a => .., 'a.1' => .. })
+	# gave the second frame's 'a' the name 'a.1' and pushed its real 'a.1'
+	# out to 'a.1.1'. Every frame's names are reserved first, so a real name
+	# keeps its row in the first frame that has it, and a suffix skips past
+	# them all.
+	my (%out, $collided, %real);
+	for my $f (@frames) { $real{$_} = 1 for keys %$f }
 	for my $f (@frames) {
 		for my $rk (sort keys %$f) {
 			die "concat: HoH row '$rk' is not a HASH ref\n"
 				unless ref $f->{$rk} eq 'HASH';
 			my $label = $rk;
 			my $j = 0;
-			while (exists $out{$label}) { $collided = 1; $label = $rk . '.' . (++$j) }
+			while (exists $out{$label} || ($label ne $rk && $real{$label})) {
+				$collided = 1;
+				$label = $rk . '.' . (++$j);
+			}
 			$out{$label} = $f->{$rk};       # reuse the row ref
 		}
 	}
@@ -2338,6 +2359,9 @@ sub dropna {
 		}
 		my @cols = @$sel;
 		return { map { $_ => _dropna_col_copy($_, $df->{$_}, undef, $n) } keys %$df } unless @cols;
+		# empty frame -> empty result, as for an AoH above; up to 0.3430 {} died
+		# here with "column 'A' not found" although the README promises empty
+		return {} unless %$df;
 		for my $c (@cols) {
 			die "dropna: column '$c' not found\n" unless exists $df->{$c};
 		}
@@ -2448,6 +2472,51 @@ sub drop_duplicates {
 }
 # Count rows across Stats::LikeR frame forms: AoH, AoA, HoA, HoH.
 
+# The form of a non-empty hash frame: 'HoH' when every value is a HASH ref,
+# 'HoA' when every value is an ARRAY ref, and a die naming a key otherwise.
+# Up to 0.3430 nrow() and ncol() took the form from the first defined value in
+# hash order, so a hash holding both kinds, or a row beside an undef, was
+# counted on some PERL_HASH_SEEDs and refused on the others: nrow({ a => { x =>
+# 1 }, b => [1, 2, 3] }) returned 2 on 20 of 40 seeds. A valid frame costs one
+# pass over its values; only the way to a die sorts the keys, so a message
+# names the same keys on every run. Sorting on every call made nrow() of a
+# million-row HoH 17 times slower (0.12 s to 2.0 s, perl 5.44.0).
+sub _hash_frame_form {
+	my ($fn, $data) = @_;
+	my ($nh, $na) = (0, 0); # values that are HASH refs, and ARRAY refs
+	for (values %$data) {
+		my $t = reftype $_;
+		next unless defined $t;
+		if    ($t eq 'HASH')  { $nh++ }
+		elsif ($t eq 'ARRAY') { $na++ }
+	}
+	my $n = keys %$data;
+	return 'HoH' if $nh == $n;
+	return 'HoA' if $na == $n;
+	my %first; # the sorted-first key holding each kind: HASH, ARRAY, other
+	for my $k (sort keys %$data) {
+		my $t = reftype $data->{$k};
+		$t = 'other' unless defined $t && ($t eq 'HASH' || $t eq 'ARRAY');
+		$first{$t} = $k unless defined $first{$t};
+	}
+	die "$fn: hash mixes HASH values (key '$first{HASH}') and ARRAY values (key '$first{ARRAY}'), so it is neither a HoH nor a HoA\n"
+		if $nh && $na;
+	die "$fn: HoH row '$first{other}' is not a hash ref\n"      if $nh;
+	die "$fn: HoA column '$first{other}' is not an array ref\n" if $na;
+	die "$fn: HASH values are neither ARRAY refs (HoA) nor HASH refs (HoH)\n";
+}
+
+# Run $check over the keys of %$h in hash order and, only if it reports a fault,
+# again over the sorted keys, dying with the second message, so that the keys a
+# message names are the same on every PERL_HASH_SEED without sorting a valid
+# frame (see _hash_frame_form()). $check takes an array ref of keys and returns
+# a message ending in "\n", or undef.
+sub _check_keys_stable {
+	my ($h, $check) = @_;
+	return unless defined $check->([ keys %$h ]);
+	die $check->([ sort keys %$h ]);
+}
+
 # Count columns across Stats::LikeR frame forms: AoH, AoA, HoA, HoH
 # (plain vector => 1 column). Uses die, not croak. reftype => blessed frames ok.
 sub ncol {
@@ -2461,18 +2530,21 @@ sub ncol {
 		return 0 unless @$data;                     # empty frame
 		my $r0 = reftype $data->[0];                # element 0 decides the form
 
-		# AoH: columns = keys per row; every row a hash ref of equal key count
+		# AoH: columns = the union of the rows' keys, the set colnames() lists,
+		# so a row without a key has a missing cell there, as everywhere else
+		# in the module. Up to 0.3430 it was row 0's key count, with every row
+		# required to have as many keys: [{a,b},{c,d}] was two columns and the
+		# sparse [{a},{a,b}] died. Not _aoh_key_union(), which colnames() uses:
+		# it skips a blessed row, and ncol() takes blessed rows (reftype).
 		if (defined $r0 && $r0 eq 'HASH') {
-			my $ncol = scalar keys %{ $data->[0] };
-			for my $i (1 .. $#$data) {
+			my %seen;
+			for my $i (0 .. $#$data) {
 				my $row = $data->[$i];
 				die "ncol: AoH row $i is not a hash ref\n"
 					unless defined(reftype $row) && reftype($row) eq 'HASH';
-				my $k = scalar keys %$row;
-				die "ncol: ragged AoH — row $i has $k columns, but row 0 has $ncol\n"
-					if $k != $ncol;
+				@seen{ keys %$row } = ();
 			}
-			return $ncol;
+			return scalar keys %seen;
 		}
 
 		# AoA: columns = row length; every row an array ref of equal length
@@ -2494,44 +2566,15 @@ sub ncol {
 		die "ncol: array element 0 is a $r0 ref; expected HASH (AoH), ARRAY (AoA), or plain scalars (vector)\n";
 	}
 
-	# HASH: HoA (keys are columns) or HoH (keys are rows)
+	# HASH: HoA (keys are the columns) or HoH (keys are rows)
 	return 0 unless %$data;
+	return scalar keys %$data if _hash_frame_form('ncol', $data) eq 'HoA';
 
-	my $probe;                                      # first defined value decides the form
-	foreach my $k (keys %$data) {
-		next unless defined $data->{$k};
-		$probe = $data->{$k};
-		last;
-	}
-	my $vtype = reftype $probe;
-
-	# HoA: keys ARE the columns. Validate values are array refs so a malformed
-	# frame dies deterministically rather than depending on which key `probe` hit.
-	if (defined $vtype && $vtype eq 'ARRAY') {
-		foreach my $col (keys %$data) {
-			die "ncol: HoA column '$col' is not an array ref\n"
-				unless defined(reftype $data->{$col}) && reftype($data->{$col}) eq 'ARRAY';
-		}
-		return scalar keys %$data;
-	}
-
-	# HoH: keys are rows; columns = keys of a row hash, consistent across rows
-	if (defined $vtype && $vtype eq 'HASH') {
-		my ($ncol, $ref_row);
-		foreach my $row_key (keys %$data) {
-			my $row = $data->{$row_key};
-			die "ncol: HoH row '$row_key' is not a hash ref\n"
-				unless defined(reftype $row) && reftype($row) eq 'HASH';
-			my $k = scalar keys %$row;
-			if (not defined $ncol) { $ncol = $k; $ref_row = $row_key }
-			elsif ($k != $ncol) {
-				die "ncol: ragged HoH — row '$row_key' has $k columns, but '$ref_row' has $ncol\n";
-			}
-		}
-		return $ncol;
-	}
-
-	die "ncol: HASH values are neither ARRAY refs (HoA) nor HASH refs (HoH)\n";
+	# HoH: columns = the union of the rows' keys, as for an AoH above. Every
+	# value is a hash ref, which _hash_frame_form() has checked.
+	my %seen;
+	@seen{ keys %$_ } = () for values %$data;
+	return scalar keys %seen;
 }
 
 sub nrow {
@@ -2544,35 +2587,25 @@ sub nrow {
 	# AoH / AoA (and a plain vector): one top-level element per row.
 	return scalar @$data if $type eq 'ARRAY';
 
-	# HASH: HoA (keys are columns) or HoH (keys are rows).
+	# HASH: HoA (keys are columns) or HoH (keys are rows, one per key).
 	return 0 unless %$data;                     # empty frame, either form
+	return scalar keys %$data if _hash_frame_form('nrow', $data) eq 'HoH';
 
-	my $probe;                                  # first defined value decides the form
-	foreach my $k (keys %$data) {
-		next unless defined $data->{$k};
-		$probe = $data->{$k};
-		last;
-	}
-	my $vtype = reftype $probe;
-
-	return scalar keys %$data                   # HoH: one key per row
-		if defined $vtype && $vtype eq 'HASH';
-
-	if (defined $vtype && $vtype eq 'ARRAY') {  # HoA: rows = common column length
-		my ($n, $ref_col);
-		foreach my $col (keys %$data) {         # verify columns agree, so a ragged
-			my $vec = $data->{$col};            # frame can't return a silently-wrong
-			die "nrow: HoA column '$col' is not an array ref"  # (and, given hash
-				unless defined(reftype $vec) && reftype($vec) eq 'ARRAY'; # ordering,
-			my $len = scalar @$vec;             # nondeterministic) count
-			if (not defined $n) { $n = $len; $ref_col = $col }
-			elsif ($len != $n) {
-				die "nrow: ragged HoA — column '$col' has $len rows, but '$ref_col' has $n";
-			}
+	# HoA: rows = common column length. The first column checked is the
+	# reference a message names, so a fault is reported from the sorted columns
+	# (see _check_keys_stable()).
+	my $n;
+	_check_keys_stable($data, sub {
+		my $ref_col;
+		for my $col (@{ $_[0] }) {
+			my $len = scalar @{ $data->{$col} };
+			if (not defined $ref_col) { ($ref_col, $n) = ($col, $len); next }
+			return "nrow: ragged HoA — column '$col' has $len rows, but '$ref_col' has $n\n"
+				if $len != $n;
 		}
-		return $n;
-	}
-	die 'nrow: HASH values are neither ARRAY refs (HoA) nor HASH refs (HoH)';
+		return;
+	});
+	return $n;
 }
 sub qcut {
 	my ($data, $q, %opt) = @_;
@@ -2583,6 +2616,17 @@ sub qcut {
 	# probability vector: q+1 evenly spaced points, or an explicit list
 	my $probs;
 	if (ref $q eq 'ARRAY') {
+		# Each probability must be a number. Up to 0.3430 a word was read as 0,
+		# and a NaN sorted to wherever <=> left it and reached an (IV) cast of
+		# NaN in the XS, which C leaves undefined. Out-of-range numbers are
+		# still clamped into [0, 1], as documented.
+		for my $i (0 .. $#$q) {
+			my $p = $q->[$i];
+			_usage_error('qcut', "probability at index $i is not a number")
+				unless defined $p && !ref $p && looks_like_number($p);
+			_usage_error('qcut', "probability at index $i is NaN")
+				if $p != $p;
+		}
 		$probs = [ sort { $a <=> $b } @$q ];
 	} else {
 		_usage_error('qcut', 'number of quantiles must be a positive integer')
@@ -2651,11 +2695,20 @@ sub qcut {
 			unless @$labels == $nbin;
 		$out = [ map { $labels->[$_] } @$codes ];
 	} elsif (defined $labels && $labels eq 'interval') {
+		# A probability vector that leaves out 0 (or 1) stretches the first (or
+		# last) bin over every value below (or above) its edge, so that bin's
+		# label is open on that side. Up to 0.3430 qcut([1 .. 10], [0.25, 0.75],
+		# labels => 'interval') labeled 1 and 10 '[3.25, 7.75]'.
+		my $lo_open = $probs->[0]  > 0;
+		my $hi_open = $probs->[-1] < 1;
+		my $last = $#$edges - 1;
 		my @iv;
-		for my $b (0 .. $#$edges - 1) {
+		for my $b (0 .. $last) {
 			my $l = $edges->[$b];
 			my $r = $edges->[$b + 1];
-			$iv[$b] = $b == 0 ? "[$l, $r]" : "($l, $r]";
+			my $left  = $b == 0     ? ($lo_open ? '(-Inf' : "[$l") : "($l";
+			my $right = $b == $last ? ($hi_open ? 'Inf)'  : "$r]") : "$r]";
+			$iv[$b] = "$left, $right";
 		}
 		$out = [ map { $iv[$_] } @$codes ];
 	} else {
@@ -2893,7 +2946,8 @@ sub _unzip_member {
 # The message for an archive that is not a readable one.
 sub _zip_bad {
 	my ($file, $why) = @_;
-	die "read_table: '$file' is not a readable .xlsx workbook: $why\n";
+	my $what = $file =~ /\.o[dt]s\z/i ? '.ods spreadsheet' : '.xlsx workbook';
+	die "read_table: '$file' is not a readable $what: $why\n";
 }
 
 # The central directory of $file, read once: { file => $file, entries =>
@@ -3304,12 +3358,12 @@ sub _xlsx_choose_sheet {
 # The part is decompressed here and parsed by xlsx_ws_scan() in LikeR.xs, which
 # is also where the reason it is not done in perl any more is written down.
 sub _parse_xlsx_sheet {
-	my ($zip, $sst, $path, $callback, $plan) = @_;
+	my ($zip, $sst, $path, $callback, $plan, $skip) = @_;
 	my $ws = _unzip_member($zip, $path);
 	die "read_table: could not read worksheet '$path' in "
 		. (ref $zip ? $zip->{file} : $zip) . "\n"
 		unless defined $ws;
-	_parse_xlsx_sheet_xs($$ws, $sst, $callback, $plan);
+	_parse_xlsx_sheet_xs($$ws, $sst, $callback, $plan, $skip);
 	return;
 }
 
@@ -3527,17 +3581,23 @@ sub read_table {
 	# 0.3213 only .xlsx was recognised, and an .xlsm was read as text and
 	# reported as an alignment error in a ragged row.
 	my $is_xlsx = $file =~ /\.xl(?:sx|sm|tx|tm)\z/i;
+	# An OpenDocument spreadsheet, and its template form, .ots, which holds its
+	# sheets in the same part (OpenDocument 1.2 part 3, appendix C, gives the
+	# two media types). Read as an .xlsx is wherever it is not the cells: see
+	# ods_scan() in LikeR.xs.
+	my $is_ods  = $file =~ /\.o[dt]s\z/i;
+	my $is_book = $is_xlsx || $is_ods;	# a workbook of sheets, not a delimited file
 	# What a name or token the caller passes is turned into before it is
 	# compared with a field: the bytes a delimited file holds, but the
-	# characters an .xlsx's names and cells are (see _as_bytes, _as_chars)
-	my $as_field = $is_xlsx ? \&_as_chars : \&_as_bytes;
-	my $codec   = $is_xlsx ? '' : _sniff_compression($file);
+	# characters a workbook's names and cells are (see _as_bytes, _as_chars)
+	my $as_field = $is_book ? \&_as_chars : \&_as_bytes;
+	my $codec   = $is_book ? '' : _sniff_compression($file);
 	die "read_table: \"$file\" is $codec-compressed, which read_table cannot "
 	  . "decompress; decompress it first, or recompress it with gzip or bzip2\n"
 		if $codec =~ /\A(?:xz|lzma|zstd|lzop)\z/;
 	# quote => '' makes '"' text, so it opens no quoted field for the line-end
 	# scan either; the value itself is checked further down
-	my $cr_eol  = $is_xlsx ? 0  : _eol_is_cr($file, $codec,
+	my $cr_eol  = $is_book ? 0  : _eol_is_cr($file, $codec,
 		!(defined $input_args{quote} && !ref $input_args{quote} && $input_args{quote} eq ''));	# lines end in a bare CR
 	my $eol     = $cr_eol ? "\r" : "\n";
 	# The extension only picks the default sep, and a compressed file's is
@@ -3558,11 +3618,12 @@ sub read_table {
 	my %allowed_args = map { $_ => 1 } (
 		'comment', 'output_type', 'filter', 'row_names', 'sep',
 		'auto_row_names', 'sheet', 'na_strings', 'header', 'col_names', 'quote',
-		'explode', 'colClasses', 'drop_cols', 'keep_cols',
+		'explode', 'colClasses', 'drop_cols', 'keep_cols', 'skiprows',
 		# private, undocumented: the multi-sheet expansion passes an already
 		# parsed worksheet list / shared-string table to each per-sheet recursion
-		# so a big sharedStrings.xml is not re-decompressed once per worksheet.
-		'_xlsx_sheets', '_sst', '_sheet_ix', '_zip',
+		# so a big sharedStrings.xml is not re-decompressed once per worksheet,
+		# nor an .ods's content.xml.
+		'_sheets', '_sst', '_sheet_ix', '_zip', '_ods_xml',
 		# private, for t/read_table.filter.t: keep every row in the perl
 		# closure, which is the reference the parser's filter path is held to
 		'_closure',
@@ -3633,19 +3694,19 @@ sub read_table {
 		if $otype ne 'hoh' && defined $args{'row_names'};
 	# compared with the header's bytes, both here and in _vcf_explode()
 	$args{'row_names'} = $as_field->($args{'row_names'}) if defined $args{'row_names'};
-	# 'sheet' picks a worksheet, which only an .xlsx has; it was ignored on
+	# 'sheet' picks a worksheet, which only a workbook has; it was ignored on
 	# any other file up to 0.3213, as 'explode' is refused on a non-VCF.
-	_usage_error('read_table', "'sheet' applies only to an .xlsx, and \"$file\" is not "
-	  . "named as one")
-		if defined $args{sheet} && !$is_xlsx;
+	_usage_error('read_table', "'sheet' applies only to an .xlsx or an .ods, and \"$file\" "
+	  . "is not named as one")
+		if defined $args{sheet} && !$is_book;
 	# A qr// separator is found by perl's regex engine; any other sep is
-	# a literal string, as it has always been. A regex is not looked at for an
-	# .xlsx, where a literal sep is not either.
+	# a literal string, as it has always been. A regex is not looked at for a
+	# workbook, where a literal sep is not either.
 	if (ref $args{sep} && ref $args{sep} ne 'Regexp') {
 		_usage_error('read_table', "'sep' must be a string or a qr// regex, not a "
 		  . ref($args{sep}) . " reference");
 	}
-	my $sep_re = (ref $args{sep} && !$is_xlsx) ? $args{sep} : undef;
+	my $sep_re = (ref $args{sep} && !$is_book) ? $args{sep} : undef;
 	# Refused before the file is read, so that qr/\s*/ fails the same way
 	# whatever the file holds. A pattern that matches nothing but an empty
 	# string -- a bare lookahead, say -- passes this, and is refused where it
@@ -3684,6 +3745,35 @@ sub read_table {
 				&& ($args{quote} eq '' || $args{quote} eq '"');
 		$quote = $args{quote} eq '"' ? 1 : 0;
 	}
+	# skiprows, pandas' read_csv() and read_excel() argument (pandas 3.0.4): rows
+	# left out before anything else is read, by 0-based index -- a count of
+	# leading rows, a list of indices, or a sub that is passed each index and
+	# answers true to leave the row out. A row is what pandas counts: a sheet's
+	# row number less one, blank rows included, and in a delimited file a
+	# record, so a quoted field across lines is one row, and a blank or comment
+	# line is one too. The header is then the first row left, as in pandas. The
+	# parsers take the list sorted and once each, which is done here; an index
+	# past ~0 can be no row of anything and is dropped, and a count past it is
+	# every row there is.
+	my $skip;	# undef = none; else a count, an ascending ARRAY of indices, or a CODE reference
+	if (defined $args{skiprows}) {
+		my $s = $args{skiprows};
+		my $bad = "'skiprows' must be a non-negative integer, an ARRAY reference of them, "
+		  . "or a CODE reference";
+		if ((reftype($s) // '') eq 'CODE') {
+			$skip = $s;
+		} elsif (ref $s eq 'ARRAY') {
+			_usage_error('read_table', $bad)
+				if grep { !defined($_) || ref($_) || !/\A[0-9]+\z/ } @$s;
+			my %seen;
+			my @at = sort { $a <=> $b } grep { $_ <= ~0 && !$seen{$_}++ } map { $_ + 0 } @$s;
+			$skip = \@at if @at;
+		} elsif (!ref $s && $s =~ /\A[0-9]+\z/) {
+			$skip = $s > ~0 ? ~0 : $s + 0 if $s > 0;
+		} else {
+			_usage_error('read_table', $bad);
+		}
+	}
 
 	# The file is read plain, as an aoa, with every option but the output
 	# type and row_names, so 'filter' sees the file's own columns (FORMAT and
@@ -3708,15 +3798,18 @@ sub read_table {
 			%na ? \%na : undef, $all_text ? 0 : 1);
 	}
 
-	# A multi-worksheet .xlsx with no explicit 'sheet' is returned as a hash
-	# keyed by worksheet name, each value being that sheet parsed with the same
-	# options (recursing one sheet at a time keeps every table's state, and any
-	# hoh row_names default, independent). A single-worksheet workbook, or an
-	# explicit 'sheet', still returns that one table directly.
-	# Resolve the worksheet list once and reuse it below (it decompresses and
-	# parses workbook.xml + its rels, so recomputing it in the main xlsx branch
-	# would double that work for every single-sheet / explicit-sheet read).
-	my ($xlsx_sheets, $xlsx_rels, $xlsx_zip);
+	# A workbook of more than one sheet, with no explicit 'sheet', is returned as
+	# a hash keyed by sheet name, each value being that sheet parsed with the
+	# same options (recursing one sheet at a time keeps every table's state,
+	# and any hoh row_names default, independent). A single-sheet workbook, or
+	# an explicit 'sheet', still returns that one table directly.
+	# Resolve the sheet list once and reuse it below (for an .xlsx it
+	# decompresses and parses workbook.xml + its rels, so recomputing it in the
+	# main xlsx branch would double that work for every single-sheet /
+	# explicit-sheet read). $sheets holds hashrefs with a 'name' (or undef),
+	# and for an .xlsx the worksheet part's 'path', for an .ods the sheet's
+	# byte range in content.xml, 'from' and 'to'.
+	my ($sheets, $xlsx_rels, $xlsx_zip, $ods_xml);
 	if ($is_xlsx) {
 		# The archive's central directory is read once per read_table call and
 		# handed to every member lookup, and to each sheet of a workbook read
@@ -3724,52 +3817,64 @@ sub read_table {
 		$xlsx_zip = $args{_zip} // _zip_open($file);
 		# Reuse a caller-supplied worksheet list (from the multi-sheet expansion
 		# below) rather than re-parsing workbook.xml + its rels for every sheet.
-		if ($args{_xlsx_sheets}) {
-			$xlsx_sheets = $args{_xlsx_sheets};
+		if ($args{_sheets}) {
+			$sheets = $args{_sheets};
 		} else {
-			$xlsx_rels   = _xlsx_rels($xlsx_zip);
-			$xlsx_sheets = _xlsx_sheets($xlsx_zip, $xlsx_rels);
+			$xlsx_rels = _xlsx_rels($xlsx_zip);
+			$sheets    = _xlsx_sheets($xlsx_zip, $xlsx_rels);
 		}
-		if (!defined $args{sheet} && !defined $args{_sheet_ix}
-				&& @$xlsx_sheets > 1) {
-			# Decompress + parse the shared-string table once for the whole
-			# workbook and hand it to each per-sheet read, instead of every
-			# recursion re-reading (a potentially large) sharedStrings.xml.
-			my $sst = _xlsx_shared_strings($xlsx_zip, $xlsx_rels);
-			# Two sheets of one name cannot both be keys of the hash, and the
-			# later used to replace the earlier without a word. Excel itself
-			# refuses such a workbook; a hostile or damaged one can have it.
-			my %seen_name;
-			for my $sh (@$xlsx_sheets) {
-				next unless defined $sh->{name};
-				die "read_table: worksheet name '$sh->{name}' is used by more than "
-				  . "one sheet of $file\n" if $seen_name{ $sh->{name} }++;
-			}
-			# A sheet with no name is keyed "SheetN", N its position -- or the
-			# next N no other sheet is named, since up to 0.3213 an unnamed
-			# first sheet and a sheet called "Sheet1" were both keyed "Sheet1",
-			# and one of the two tables was silently lost.
-			my %taken = map { defined $_->{name} ? ($_->{name} => 1) : () }
-				@$xlsx_sheets;
-			my %book;
-			for my $i (0 .. $#$xlsx_sheets) {
-				my $name = $xlsx_sheets->[$i]{name};
-				if (!defined $name) {
-					my $n = $i + 1;
-					$n++ while $taken{"Sheet$n"};
-					$name = "Sheet$n";
-					$taken{$name} = 1;
-				}
-				# by position, privately: 'sheet' takes a name before a
-				# number, so sheets named "2" and "1" would swap places
-				$book{$name} = read_table($file, %input_args,
-					_sheet_ix    => $i,
-					_xlsx_sheets => $xlsx_sheets,
-					_zip         => $xlsx_zip,
-					_sst         => $sst);
-			}
-			return \%book;
+	} elsif ($is_ods) {
+		# All of an .ods's sheets are in content.xml, which is inflated once
+		# and handed to each sheet's read as a reference, so that it is not
+		# copied either.
+		$ods_xml = $args{_ods_xml} // do {
+			my $x = _unzip_member(_zip_open($file), 'content.xml');
+			_zip_bad($file, 'it has no content.xml') unless defined $x;
+			$x;
+		};
+		$sheets = $args{_sheets} // [ map { { name => $_->[0], from => $_->[1], to => $_->[2] } }
+			@{ _ods_tables_xs($$ods_xml) } ];
+		die "read_table: '$file' has no sheet: its content.xml holds no table:table\n"
+			unless @$sheets;
+	}
+	if ($is_book && !defined $args{sheet} && !defined $args{_sheet_ix} && @$sheets > 1) {
+		# What each sheet's read is handed so as not to redo the work: for an
+		# .xlsx, the shared-string table, decompressed and parsed once for the
+		# whole workbook instead of by every recursion; for an .ods, content.xml.
+		my %once = $is_xlsx
+			? (_zip => $xlsx_zip, _sst => _xlsx_shared_strings($xlsx_zip, $xlsx_rels))
+			: (_ods_xml => $ods_xml);
+		# Two sheets of one name cannot both be keys of the hash, and the
+		# later used to replace the earlier without a word. Excel itself
+		# refuses such a workbook; a hostile or damaged one can have it.
+		my %seen_name;
+		for my $sh (@$sheets) {
+			next unless defined $sh->{name};
+			die "read_table: worksheet name '$sh->{name}' is used by more than "
+			  . "one sheet of $file\n" if $seen_name{ $sh->{name} }++;
 		}
+		# A sheet with no name is keyed "SheetN", N its position -- or the
+		# next N no other sheet is named, since up to 0.3213 an unnamed
+		# first sheet and a sheet called "Sheet1" were both keyed "Sheet1",
+		# and one of the two tables was silently lost.
+		my %taken = map { defined $_->{name} ? ($_->{name} => 1) : () } @$sheets;
+		my %book;
+		for my $i (0 .. $#$sheets) {
+			my $name = $sheets->[$i]{name};
+			if (!defined $name) {
+				my $n = $i + 1;
+				$n++ while $taken{"Sheet$n"};
+				$name = "Sheet$n";
+				$taken{$name} = 1;
+			}
+			# by position, privately: 'sheet' takes a name before a
+			# number, so sheets named "2" and "1" would swap places
+			$book{$name} = read_table($file, %input_args,
+				_sheet_ix => $i,
+				_sheets   => $sheets,
+				%once);
+		}
+		return \%book;
 	}
 
 # R's write.table(col.names=TRUE) default omits the header label for the
@@ -4000,7 +4105,7 @@ sub read_table {
 			# the file, and the worksheet when a workbook is read one sheet at a time
 			my $in = $file;
 			if (defined $args{_sheet_ix}) {
-				my $sn = $xlsx_sheets->[ $args{_sheet_ix} ]{name};
+				my $sn = $sheets->[ $args{_sheet_ix} ]{name};
 				$in .= defined $sn ? " (sheet \"$sn\")" : ' (sheet ' . ($args{_sheet_ix} + 1) . ')';
 			}
 			my $hit = sub {	# does $sel{$k} name or match this header name?
@@ -4018,8 +4123,8 @@ sub read_table {
 			my %out;
 			for my $name (@uniq_header) {
 				# the two spellings a name is tried as: for a delimited file
-				# the bytes it holds and the characters they spell; for an
-				# .xlsx the characters it holds and the bytes they encode to
+				# the bytes it holds and the characters they spell; for a
+				# workbook the characters it holds and the bytes they encode to
 				#
 				# The copy is "$name", not $name: an .xlsx's name is a copy of a
 				# shared hash key, and on perl 5.32 utf8::encode() of such a copy
@@ -4028,7 +4133,7 @@ sub read_table {
 				# marked found (a stringified copy owns its buffer).
 				my $chars = "$name";
 				my $wide;
-				if ($is_xlsx) {
+				if ($is_book) {
 					utf8::encode($chars);
 					$wide = $chars ne $name;
 				} else {
@@ -4210,7 +4315,7 @@ sub read_table {
 		# an .xlsx, whose cells are not split, nor where 'col_names' set the
 		# width.
 		$sep_note = undef;
-		if ($w == 1 && !$is_xlsx && !$col_names) {
+		if ($w == 1 && !$is_book && !$col_names) {
 			my $where = $want_header ? 'the header' : 'data row 1';
 			if ($sep_re) {
 				$sep_note = "$where has no match for the sep regex $sep_re, so "
@@ -4239,18 +4344,38 @@ sub read_table {
 	# ordinary leading comment and is discarded. A marker hugging its text ("#id,val") is
 	# delivered by the parser and held as a candidate in the same way by the
 	# callback, so it never reaches this branch.
-	if ($want_header && !$is_xlsx && length( $args{comment} // '' )
+	if ($want_header && !$is_book && length( $args{comment} // '' )
 			&& length( $args{sep} // '' )) {
-		# $/ is the caller's, and under a `local $/;` this read the whole
-		# file; _parse_csv_file() splits on "\n" (or "\r", see _eol_is_cr)
-		# whatever $/ is, and so does this. A UTF-8 byte-order mark is dropped
-		# here as the parser drops it.
-		my $fh    = $codec ? _open_decompressed($file, $codec)
-		                   : _open_read($file);
-		binmode $fh unless $codec;	# the parser's bytes; see _eol_is_cr for the codec case
-		my $first = do { local $/ = $eol; <$fh> };
-		_close($fh);
-		$first =~ s/\A\xEF\xBB\xBF// if defined $first;
+		my $first;
+		if (defined $skip) {
+			# The first row skiprows keeps, which only the parser can find, by
+			# its own reading of rows and quotes: it is asked for that row's
+			# first line (peek) and stops there. A sub is told nothing new
+			# by the parse that follows: it gets the answers the peek got, so
+			# that the caller's sub is asked once per row, as pandas asks it.
+			my $peek_skip = $skip;
+			if (ref $skip ne 'ARRAY' && ref $skip) {
+				my ($user, %told) = ($skip);
+				$peek_skip = sub { $told{ $_[0] } = $user->( $_[0] ) ? 1 : 0 };
+				$skip      = sub { exists $told{ $_[0] } ? delete $told{ $_[0] } : $user->( $_[0] ) };
+			}
+			my $fh = $codec ? _open_decompressed($file, $codec) : undef;
+			$first = _parse_csv_file($file, $sep_re ? '' : $args{sep}, '', undef, undef,
+				$quote, 0, $sep_re, $sep_re && _sep_re_is_ws($sep_re) ? 1 : 0, $fh,
+				$cr_eol, $peek_skip, 1);
+			_close($fh) if $fh;
+		} else {
+			# $/ is the caller's, and under a `local $/;` this read the whole
+			# file; _parse_csv_file() splits on "\n" (or "\r", see _eol_is_cr)
+			# whatever $/ is, and so does this. A UTF-8 byte-order mark is dropped
+			# here as the parser drops it.
+			my $fh = $codec ? _open_decompressed($file, $codec)
+			                : _open_read($file);
+			binmode $fh unless $codec;	# the parser's bytes; see _eol_is_cr for the codec case
+			$first = do { local $/ = $eol; <$fh> };
+			_close($fh);
+			$first =~ s/\A\xEF\xBB\xBF// if defined $first;
+		}
 		if (defined $first && $first =~ /^\Q$args{comment}\E\s/) {
 			if ($cr_eol) { $first =~ s/\r\z// } else { $first =~ s/\r?\n\z// }
 			# The marker and the blanks after it come off before the cut, so
@@ -4300,7 +4425,7 @@ sub read_table {
 		# the quote marks in every name or value: R's write.csv() writes
 		# exactly that header, and it is read as intended only with the
 		# default quote. 'quote' means nothing to an .xlsx, so it is not checked.
-		if (!$header_seen && !$quote && !$is_xlsx && @$line_ref
+		if (!$header_seen && !$quote && !$is_book && @$line_ref
 				&& !grep { !defined || !/\A".*"\z/s } @$line_ref) {
 			warn "read_table: every field on the first line of $file is "
 				. "wrapped in '\"', and quote => '' keeps the quote marks as "
@@ -4330,7 +4455,7 @@ sub read_table {
 		# character inside quotes as text, and up to 0.3213 "#a",b came back
 		# as a column named a -- or, where the next row was text as well, not
 		# at all, that row being taken for the header in its place.
-		if ((!$header_seen || $provisional_hdr) && !$is_xlsx && !$first_quoted
+		if ((!$header_seen || $provisional_hdr) && !$is_book && !$first_quoted
 				&& length( $args{comment} // '' )
 				&& @$line_ref && defined $line_ref->[0]
 				&& index($line_ref->[0], $args{comment}) == 0) {
@@ -4501,19 +4626,27 @@ sub read_table {
 			}
 		}
 	};
-	if ($is_xlsx) {
+	if ($is_book) {
 		# the sheet first, so a bad 'sheet' is refused before the whole
 		# shared-string table has been inflated and parsed for nothing
-		my $chosen = defined $args{_sheet_ix} ? $xlsx_sheets->[ $args{_sheet_ix} ]
-		           : _xlsx_choose_sheet($file, $xlsx_sheets, $args{sheet});
-		my $sst    = $args{_sst} // _xlsx_shared_strings($xlsx_zip, $xlsx_rels);
-		_parse_xlsx_sheet($xlsx_zip, $sst, $chosen->{path}, $on_line, $plan);
+		my $ix     = $args{_sheet_ix};
+		my $chosen = defined $ix ? $sheets->[$ix]
+		           : _xlsx_choose_sheet($file, $sheets, $args{sheet});
+		if ($is_xlsx) {
+			my $sst = $args{_sst} // _xlsx_shared_strings($xlsx_zip, $xlsx_rels);
+			_parse_xlsx_sheet($xlsx_zip, $sst, $chosen->{path}, $on_line, $plan, $skip);
+		} else {
+			# the sheet as the messages name it: its name, or its position
+			($ix) = grep { $sheets->[$_] == $chosen } 0 .. $#$sheets unless defined $ix;
+			_parse_ods_sheet_xs($$ods_xml, $chosen->{from}, $chosen->{to}, $on_line,
+				$plan, $skip, $file, $chosen->{name} // 'Sheet' . ($ix + 1));
+		}
 	} else {
 		my $fh = $codec ? _open_decompressed($file, $codec) : undef;
 		_parse_csv_file($file, $sep_re ? '' : $args{sep} // '',
 			$args{comment} // '', $on_line, $plan, $quote,
 			$want_header ? 0 : 1, $sep_re,
-			$sep_re && _sep_re_is_ws($sep_re) ? 1 : 0, $fh, $cr_eol);
+			$sep_re && _sep_re_is_ws($sep_re) ? 1 : 0, $fh, $cr_eol, $skip);
 		_close($fh) if $fh;
 	}
 	# A hoh's repeated row names, from this closure and from the fast path
@@ -4845,6 +4978,10 @@ sub melt {
 	my @val = !defined $arg{value_vars}        ? ( grep { !$is_id{$_} } @universe )
 	        : ref $arg{value_vars} eq 'ARRAY'  ? @{ $arg{value_vars} }
 	        :                                    ( $arg{value_vars} );
+	# A name repeated in value_vars is melted once, at its first place, as
+	# pandas does (3.0.4): up to 0.3430 value_vars => ['B', 'B'] emitted every
+	# row of B twice.
+	{ my %s; @val = grep { !$s{$_}++ } @val }
 	for my $c (@id, @val) {
 		die "melt: column '$c' not found\n" unless $uni{$c};
 	}
@@ -6684,7 +6821,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3430
+version 0.3431
 
 =head1 Synopsis
 
@@ -9306,6 +9443,8 @@ deterministic layout. Each column is the per-frame arrays joined in frame order.
 Because HoA is column-major, a column missing from a frame — or a ragged short
 column within a frame — is padded with undef so every output column ends up the
 same length (the total number of rows).
+A column whose value is defined but not an array reference dies, naming it: a hash
+of scalars such as C<< { a =E<gt> 1, b =E<gt> 2 } >> is not a frame.
 
  my $a = { g => [ 'a', 'a' ], v => [ 1, 2 ] };
  my $b = { g => [ 'b' ],      w => [ 9 ]    };   # v absent here, w is new
@@ -10453,6 +10592,17 @@ The first argument may be a single number or an array reference, and an array
 reference comes back the same length and in the same order — again as C<pnorm>
 does. An C<undef> element becomes C<NaN>.
 
+Each distribution parameter may be an array reference too, as in R, and then
+the first argument and the parameters are recycled to the longest: a shorter
+one is reused from its start, without a warning when its length does not divide
+the longest, any empty one makes the answer empty, and an C<undef> element is
+C<NaN> there. The answer is an array reference whenever any argument is one.
+This holds for C<dnorm> and C<pnorm> as well.
+
+ pt(2, df => [1, 2, 3]);                 # [0.852416, 0.908248, 0.930337]
+ qt(0.975, df => [1 .. 10, 20, 50, 100, 1000]);   # R's TDist.Rd example
+ dnorm([0, 1], mean => [0, 1], sd => [1, 2]);  # [0.398942, 0.199471]
+
  my $z  = qnorm(0.975);                 # 1.959963984540054
  my $zs = qnorm([0.025, 0.5, 0.975]);   # [-1.9599639845, 0, 1.9599639845]
 
@@ -10774,6 +10924,10 @@ Usage:
 but default mean, standard deviation, and log can be passed as parameters:
 
  $x = dnorm(0, mean => 0, sd => 2, 'log' => 0);
+
+C<mean> and C<sd> may be array references, recycled against C<x> as R recycles them
+(see L</"Distribution functions">). A negative C<sd> gives
+C<NaN> there, with one warning for the call, as in R.
 
 Where the density is 0 — C<x> infinite, C<< sd =E<gt> Inf >>, C<< sd =E<gt> 0 >> away from the
 mean — C<< log =E<gt> 1 >> gives C<-Inf>, as R does (up to 0.33 it gave C<0>). An C<undef>
@@ -14019,7 +14173,8 @@ works like mean, taking array references and arrays:
 
  median( $test_data[$i][0] )
 
-median will die if any undefined values are provided
+median will die if any undefined values are provided, or if there are no values
+at all: C<median([])> dies, where R's C<median(numeric(0))> is C<NA>.
 
 For an even count the two middle values are averaged by halving each first
 when their sum would overflow, so C<median([1e308, 1e308])> is C<1e308>, as in R.
@@ -14041,6 +14196,8 @@ selected column (C<value_vars>) is unpivoted into a C<variable>/C<value> pair.
 Column identifiers are names for AoH/HoA/HoH frames and 0-based integer
 positions for AoA. C<value_vars> defaults to every column not in C<id_vars>, in
 C<colnames()> order.
+A name repeated in C<id_vars> or C<value_vars> is used once, at its first place, as
+pandas does.
 
 Output row order is B<column-major>: all rows for C<value_vars[0]>, then all
 rows for C<value_vars[1]>, and so on, preserving input row order within each
@@ -14177,8 +14334,9 @@ shape:
 
 =over
 
-=item * B<Array of hashes> (AoH) — each row is a hash; the columns are its keys, so
-the count is how many keys a row has.
+=item * B<Array of hashes> (AoH) — each row is a hash; the columns are every key any
+row has, so the count is the number of distinct keys across the rows. A row
+that lacks a key has a missing cell there, as everywhere else in the module.
 
 =item * B<Array of arrays> (AoA) — each row is a list; the columns are its slots, so
 the count is how long a row is.
@@ -14186,12 +14344,17 @@ the count is how long a row is.
 =item * B<Hash of arrays> (HoA) — the keys I<are> the columns, so the count is the
 number of keys.
 
-=item * B<Hash of hashes> (HoH) — each value is a row hash; the columns are that
-hash's keys, so the count is how many keys a row has.
+=item * B<Hash of hashes> (HoH) — each value is a row hash; the columns are every key
+any row hash has, counted as for an AoH.
 
 =back
 
 A plain flat list (C<[1,2,3]>) is treated as a single column.
+
+For an unblessed AoH or HoH the count is C<scalar colnames($frame)>:
+
+ ncol([ {a=>1,b=>2}, {c=>3,d=>4} ]) # 4   a, b, c and d
+ ncol([ {a=>1}, {a=>2,b=>3} ])      # 2   row 0 has no b
 
 =head3 Edge cases
 
@@ -14208,8 +14371,9 @@ C<ncol> would rather stop than hand back a wrong number:
 
 =over
 
-=item * B<Ragged frame> — if the rows disagree on how many columns they have (AoH,
-AoA, or HoH), there is no single column count, so it dies instead of guessing.
+=item * B<Ragged AoA> — if the rows of an array of arrays disagree on how long they
+are, there is no single column count, so it dies instead of guessing. (Hash
+rows cannot be ragged this way: a missing key is a missing cell.)
 
 =item * B<Junk input> — C<undef>, a plain scalar, a SCALAR/CODE/GLOB ref, or a hash
 whose values aren't all arrays (HoA) or all hashes (HoH) dies with a message
@@ -14667,6 +14831,9 @@ before a numeric reduction; C<< skipna =E<gt> 0 >> makes a numeric reducer retur
 its bucket contains any NA.
 
 Rows whose C<columns>-tuple contains NA are skipped (an unnameable column).
+A row whose C<index> key is NA is kept as a row of its own, sorted last, and an
+output column whose every cell is NA is kept as C<undef> cells (or C<fill_value>);
+pandas' default C<dropna=True> drops both, and C<pivot_table> has no C<dropna>.
 With no C<index>, all rows collapse to a single C<all> row.
 
 =head3 Generated column names
@@ -15369,7 +15536,8 @@ are needed to form a bin.
 array reference of probabilities in C<[0, 1]> giving explicit cut
 boundaries, e.g. C<[0, 0.5, 0.95, 1]>. An explicit vector is sorted for you,
 and any probability outside C<[0, 1]> is clamped into it rather than being an
-error.
+error. Each probability must be a number: an C<undef>, a word or a
+C<NaN> in C<$q> dies naming its index.
 
 =back
 
@@ -15490,7 +15658,10 @@ you got:
 If a probability vector omits C<0> or C<1>, the end bins still stretch over the
 whole range: a value below the first cutpoint lands in bin C<0>, one above the
 last lands in the last bin. pandas returns NA for those, so include C<0> and C<1>
-unless the stretching is what you want.
+unless the stretching is what you want. With C<< labels =E<gt> 'interval' >> a stretched
+end bin is labeled open on that side, so
+C<< qcut([1 .. 10], [0.25, 0.75], labels =E<gt> 'interval') >> labels every value
+C<(-Inf, Inf)>, and C<[0, 0.5, 0.9]> gives C<[1, 5.5]> and C<(5.5, Inf)>.
 
 =head3 Examples
 
@@ -15842,8 +16013,13 @@ minimal example:
 </tr>
 <tr>
   <td><code>sheet</code></td>
-  <td>which worksheet to read from an <code>.xlsx</code> file: a sheet name, or a 1-based index when no sheet has that name (default: first sheet). An error for any other file</td>
+  <td>which sheet to read from an <code>.xlsx</code> or <code>.ods</code> file: a sheet name, or a 1-based index when no sheet has that name (default: first sheet). An error for any other file</td>
   <td><code>sheet =&gt; 'Sheet2'</code></td>
+</tr>
+<tr>
+  <td><code>skiprows</code></td>
+  <td>pandas': rows to leave out before anything else is read, by 0-based index — a count of leading rows, an array reference of indices, or a code reference that is passed each index and returns true to leave that row out. The header is the first row left. See [skipping rows](#skipping-rows-skiprows)</td>
+  <td><code>skiprows =&gt; 2</code>, <code>skiprows =&gt; [0, 2]</code>, <code>skiprows =&gt; sub { $_[0] % 2 }</code></td>
 </tr>
 <tr>
   <td><code>na_strings</code></td>
@@ -15939,8 +16115,8 @@ export writes, is dropped rather than read as part of the first column's name,
 as pandas' C<read_csv> drops it.
 
 A delimited file is read as bytes and its fields come back as bytes; nothing is
-decoded. (An C<.xlsx> is the exception: its text comes back as characters, see
-I<Excel (.xlsx) files> below.) Text you pass in to be compared with a field — a C<sep>, a C<comment> marker, an
+decoded. (A workbook is the exception: an C<.xlsx>'s or C<.ods>'s text comes back
+as characters, see I<Excel (.xlsx) files> below.) Text you pass in to be compared with a field — a C<sep>, a C<comment> marker, an
 C<na_strings> token, a C<filter> key, C<row_names> or a C<sheet> name — is
 compared as UTF-8 bytes when perl holds it as characters, as it does under
 C<use utf8> or for a string you have decoded. So C<< 'na_strings' =E<gt> '—' >> under
@@ -16521,6 +16697,46 @@ as it appears in the file or by its clean name:
 
  read_table('ranks.tabular.tsv', filter => { '# PDB' => sub { $_ == 2 } });
 
+=head3 skipping rows (C<skiprows>)
+
+C<skiprows> is pandas' C<read_csv> and C<read_excel> argument, read the same way.
+It leaves rows out before anything else is read, so the header is the first
+row left, as in pandas:
+
+ my $d = read_table('export.csv',  skiprows => 3);          # the first three rows
+ my $d = read_table('report.xlsx', skiprows => [0, 2]);     # rows 0 and 2
+ my $d = read_table('log.csv',     skiprows => sub { $_[0] % 2 });   # the odd rows
+
+The indices count from 0, and a row is what pandas counts:
+
+=over
+
+=item * In a sheet of an C<.xlsx> or C<.ods>, row C<i> is the sheet's row C<i + 1>,
+blank rows included: pandas' C<testskiprows> sheet has a blank row 0, the
+header in row 1 and a blank row 2, and C<< skiprows =E<gt> [0, 2] >> reads it as a
+header and four rows.
+
+=item * In a delimited file a row is a record: a quoted field that runs across
+lines makes one row of all its lines, which are kept or left out together,
+and a blank line or a comment line is a row of its own. In a row that is
+left out, a C<"> that does not start its field opens no quote, as in
+pandas. (R's C<read.table(skip = n)> counts lines instead; for a file with
+no quoted line breaks the two are the same.)
+
+=back
+
+A code reference is passed the index and nothing else, and is asked once per
+row, in order, up to the last row of the file, or of the sheet's last row with
+a value. A row it leaves out is not read at all, so it cannot be a ragged row
+or a bad one. A count or an index past the last row is no error, and leaving
+out every row gives an empty table (pandas raises C<EmptyDataError>). A row
+that is left out of a sheet does not widen the table, where pandas gives each
+of its cells past the header an "Unnamed" column of C<NaN>: a title row above a
+table, which is what C<skiprows> is mostly for, is often wider than the table.
+In a workbook read whole, C<skiprows> applies to every sheet. Tested against
+pandas' own tests in C<t/read_table.skiprows.pandas.t>, and in
+C<t/read_table.skiprows.t>.
+
 =head3 Excel (.xlsx) files
 
 A file whose name ends in C<.xlsx> — or C<.xlsm>, C<.xltx> or C<.xltm>, the
@@ -16622,6 +16838,77 @@ apply to C<.xlsx> files, so a cell such as C<#id> is read as it is. A workbook
 whose elements carry a namespace prefix (C<< E<lt>x:rowE<gt> >>, as the Open XML SDK writes
 them) is read like any other. Tested in C<t/read_table.xlsx.t>,
 C<t/read_table.xlsx.parser.t> and C<t/read_table.xlsx.xml.t>.
+
+=head3 OpenDocument (.ods) files
+
+A file whose name ends in C<.ods>, LibreOffice's and OpenOffice's spreadsheet
+format, or C<.ots>, its template, is read as an C<.xlsx> is, with no extra
+dependencies and the same options: C<sheet> picks a sheet, a workbook of more
+than one sheet with no C<sheet> comes back as a hash keyed by sheet name, text
+is characters, blank rows between rows of values are rows of C<undef>, and the
+header is the first row with a value:
+
+ my $data = read_table('samples.ods');
+ my $book = read_table('report.ods');                 # { Sheet1 => [...], ... }
+ my $data = read_table('report.ods', sheet => 'Results', skiprows => 1);
+
+A cell reads as pandas' C<read_excel(engine="odf")> reads it, by its
+C<office:value-type>:
+
+=for html <table>
+<thead>
+<tr>
+  <th>Type</th>
+  <th>Read as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>float</code>, <code>percentage</code>, <code>currency</code></td>
+  <td>the number stored, <code>office:value</code>: <code>0.25</code> for a cell showing <code>25%</code></td>
+</tr>
+<tr>
+  <td><code>date</code></td>
+  <td>the date stored, as its ISO 8601 text: <code>2015-01-01T00:00:00</code></td>
+</tr>
+<tr>
+  <td><code>time</code></td>
+  <td>the text the cell shows, <code>02:45:56.100</code>, as pandas reads it: the stored <code>office:time-value</code> drops the fraction of a second</td>
+</tr>
+<tr>
+  <td><code>boolean</code></td>
+  <td><code>1</code> or <code>0</code>, as an <code>.xlsx</code>'s boolean cell reads</td>
+</tr>
+<tr>
+  <td><code>string</code></td>
+  <td>the cell's text</td>
+</tr>
+<tr>
+  <td>none</td>
+  <td>the cell's text; pandas reads such a cell as empty</td>
+</tr>
+</tbody>
+</table>
+
+A cell's text is its paragraphs joined by C<"\n"> (pandas joins them with
+nothing), with C<< E<lt>text:s/E<gt> >>, C<< E<lt>text:tab/E<gt> >> and C<< E<lt>text:line-break/E<gt> >> read as the
+spaces, tab and line break they stand for, and the white space of the XML
+itself collapsed as OpenDocument says it is; a comment attached to the cell
+(C<< E<lt>office:annotationE<gt> >>) is not part of it. A formula whose result is an error
+reads as the error's text, C<#N/A>, as in an C<.xlsx>; pandas returns C<NaN> for
+C<#N/A>, which C<< na_strings =E<gt> '#N/A' >> gives too. A cell type that OpenDocument
+does not define is an error, as in pandas.
+
+A row or cell that the file marks as repeated (C<table:number-rows-repeated>,
+C<table:number-columns-repeated>) is that many rows or cells, and C<skiprows>
+counts each of them. The runs of empty rows and cells that LibreOffice writes
+to the end of every sheet are never built. A cell that a merged cell covers is
+empty, and the merged cell's value is in its first column only. A sheet is read
+to row 16,777,216 and column 16,384, LibreOffice's largest; a value past either
+is an error rather than a table of millions of blank rows. A table nested in a
+cell is part of that cell, not a sheet. Only C<content.xml> is read, so styles,
+number formats and formulas other than their results are not. Tested against
+pandas' own tests in C<t/read_table.ods.pandas.t>, and in C<t/read_table.ods.t>.
 
 =head2 rename_cols
 
@@ -16858,8 +17145,10 @@ copies it.
 =back
 
 The draw is a partial Fisher-Yates shuffle from perl's own PRNG, so
-C<srand($seed)> makes it reproducible, and it costs time and memory in
-proportion to C<n> rather than to the size of the population.
+C<srand($seed)> makes it reproducible. From an array, a draw of fewer than a
+twentieth of the elements costs time and memory in proportion to C<n>; a larger
+one, and any draw from a hash, costs them in proportion to the size of the
+population, since every key is collected before the shuffle.
 
 =head2 scale
 
@@ -18038,14 +18327,14 @@ like an array reference above, returns C<< { a =E<gt> 1, b =E<gt> 2} >>
  );
  my $vc = value_counts(\@records, 'dept');
 
-with a key, the value at that key is counted in each hash, so the above returns C<< { Sales =E<gt> 2, Eng =E<gt> 1 } >>. A record that lacks the key is skipped. Passing an array of hashes without a key, or with an element that is not a hash reference, is a fatal error.
+with a key, the value at that key is counted in each hash, so the above returns C<< { Sales =E<gt> 2, Eng =E<gt> 1 } >>. A record that lacks the key is skipped. A key that no record has dies, naming it (C<value_counts: column 'x' not found>), as C<dropna> and C<drop_duplicates> die on an absent column; an empty frame still gives C<{}>. Passing an array of hashes without a key, or with an element that is not a hash reference, is a fatal error.
 
 =head3 Array of arrays
 
  my @rows = (['a', 1], ['b', 1], ['a', 2]);
  my $vc = value_counts(\@rows, 0);
 
-when the elements are array references, the key is treated as a numeric column index, so the above returns C<< { a =E<gt> 2, b =E<gt> 1 } >>. A non-numeric index against array-reference elements is a fatal error.
+when the elements are array references, the key is treated as a numeric column index, so the above returns C<< { a =E<gt> 2, b =E<gt> 1 } >>. A non-numeric index against array-reference elements is a fatal error. So is an index past the end of every row.
 
 =head3 Hash
 

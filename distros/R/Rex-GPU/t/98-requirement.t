@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -25,8 +26,19 @@ use Test::More;
 # sit inside (karr #72, maintainer decision -- NVIDIA's own driver README
 # still lists Hopper as proprietary-supported, with no Grace exception):
 # open kernel module, min_branch 535 (2342) / 565 (2348), compute 1. The
-# neighbours 2341/2343/2347/2349 stay on the block's unbound $TAH row, so the
+# neighbours 2341/2343/2347/2349 stay on the Hopper block's row, so the
 # boundary of each narrow row is pinned on both sides.
+#
+# k107 REPLACES the karr #54 claim "1DF7..28FF is one row without
+# bounds" (2330 H100, 2684 RTX 4090 and 28f8 => no min_branch), deliberately:
+# Debian 11's 470 passed it for Ada and Hopper, which no 470 README lists.
+# Now Turing/Ampere 1DF7..22FF and 2400..25FF stay unbound, Hopper
+# 2300..23FF and Ada 2600..28FF need 520, and 88 IDs that NVIDIA's
+# supportedchips READMEs list first in a later branch have single-ID rows
+# with that branch (%FIRST_LISTED below, copied from the research, not from
+# the code). Their neighbours fall back to the block, which pins every row to
+# one ID. The Debian non-free branches (470/535/550) against those rows are in
+# the satisfied_by matrix.
 #
 # NOT covered: which driver a real host gets. The Setup classes pick their
 # sources with this object (t/99, t/96), but none of it runs a package
@@ -48,21 +60,58 @@ my $BW      = [ 'Blackwell', 'open', 570, undef ];
 my $BWU     = [ 'Blackwell Ultra', 'open', 580, undef ];
 my $GB10    = [ 'Blackwell', 'open', 580, undef ];
 my $MPV     = [ 'Maxwell/Pascal/Volta', 'proprietary', undef, 580 ];
-my $TAH     = [ 'Turing/Ampere/Ada/Hopper', 'either', undef, undef ];
+my $TA      = [ 'Turing/Ampere', 'either', undef, undef ];
+my $HOP     = [ 'Hopper', 'either', 520, undef ];
+my $ADA     = [ 'Ada', 'either', 520, undef ];
 my $KEP     = [ 'Kepler or older', 'proprietary', undef, 470 ];
 my $GH200A  = [ 'Grace Hopper', 'open', 535, undef ];   # 2342, 120GB/480GB
 my $GH200B  = [ 'Grace Hopper', 'open', 565, undef ];   # 2348, 144G HBM3e
+
+# k107: the IDs NVIDIA lists first in a branch newer than their block's
+# floor (Turing/Ampere: 470, Hopper and Ada: 520), by that branch.
+my %FIRST_LISTED = (
+  'Hopper' => {
+    525 => [qw( 2322 2324 2330 2339 )],
+    535 => [qw( 2321 2329 232c 233a )],
+    550 => [qw( 2335 )],
+    565 => [qw( 233b )],
+    580 => [qw( 230e )],
+  },
+  'Ada' => {
+    525 => [qw( 26b1 26b5 2704 2717 2730 2757 2770 2782 2786 27a0 27b0 27b8 27ba 27bb
+                27e0 2803 2805 2820 2838 2860 2882 28a0 28a1 28b8 28e0 28e1 28f8 )],
+    535 => [qw( 26b2 26b3 26b9 26ba 27b1 27b2 27b6 27fb 28b9 28ba 28bb )],
+    550 => [qw( 2685 2702 2705 2709 2783 2788 2808 2822 28a3 28b0 28e3 )],
+    555 => [qw( 2689 )],
+  },
+  'Turing/Ampere' => {
+    510 => [qw( 1f83 20f3 20f5 20f6 2207 2233 2238 24b1 24c9 2521 2544 25aa )],
+    515 => [qw( 2582 25ab 25ac 25ad 25ec 25ed 25fb )],
+    525 => [qw( 24c7 25bc 25bd )],
+    535 => [qw( 20bd 20fd 2584 )],
+    550 => [qw( 25b0 25b2 )],
+  },
+);
 
 subtest 'generation table at the range boundaries' => sub {
   my %want = (
     '0000' => $KEP, '0020' => $KEP, '102d' => $KEP, '133f' => $KEP,
     '1340' => $MPV, '1db4' => $MPV, '1DB4' => $MPV, '1df6' => $MPV,
-    '1df7' => $TAH, '1e02' => $TAH, '1f97' => $TAH, '2330' => $TAH, '28f8' => $TAH,
-    '28ff' => $TAH,
-    # GH200 (karr #72): narrow rows ahead of the Turing-to-Hopper block they
-    # sit inside; the neighbours just outside them stay $TAH.
-    '2341' => $TAH, '2342' => $GH200A, '2343' => $TAH,
-    '2347' => $TAH, '2348' => $GH200B, '2349' => $TAH,
+    # k107: Turing/Ampere | Hopper | Turing/Ampere | Ada, each edge on
+    # both sides; 2238/230e/2348/2414/25fb/2684/28f8 are the listed IDs
+    # nearest to an edge.
+    '1df7' => $TA, '1e02' => $TA, '1f97' => $TA, '2204' => $TA, '22ff' => $TA,
+    '2300' => $HOP, '2331' => $HOP, '2336' => $HOP, '23ff' => $HOP,
+    '2400' => $TA, '2414' => $TA, '25fa' => $TA, '25ff' => $TA,
+    '2600' => $ADA, '2684' => $ADA, '28ff' => $ADA,
+    '2238' => [ 'Turing/Ampere', 'either', 510, undef ],
+    '230e' => [ 'Hopper', 'either', 580, undef ],
+    '25fb' => [ 'Turing/Ampere', 'either', 515, undef ],
+    '28f8' => [ 'Ada', 'either', 525, undef ],
+    # GH200 (karr #72): narrow rows ahead of the Hopper block they sit
+    # inside; the neighbours just outside them stay $HOP.
+    '2341' => $HOP, '2342' => $GH200A, '2343' => $HOP,
+    '2347' => $HOP, '2348' => $GH200B, '2349' => $HOP,
     '2900' => $BW, '2901' => $BW, '2e11' => $BW, '2e13' => $BW, '2fff' => $BW,
     '2e12' => $GB10, '2E12' => $GB10,
     '3000' => $UNKNOWN, '3181' => $UNKNOWN,
@@ -80,6 +129,29 @@ subtest 'generation table at the range boundaries' => sub {
     my $req = $R->for_device_id($bad);
     is_deeply( shape($req), $UNKNOWN, 'malformed '.( $bad // 'undef' ).' => unknown' );
     is( $req->device_id, undef, '... with no device_id' );
+  }
+};
+
+subtest 'IDs listed first after their block floor: one row each (k107)' => sub {
+  my %block = ( 'Hopper' => $HOP, 'Ada' => $ADA, 'Turing/Ampere' => $TA );
+  my %own;
+  for my $generation ( keys %FIRST_LISTED ) {
+    for my $branch ( keys %{ $FIRST_LISTED{$generation} } ) {
+      $own{$_} = [ $generation, 'either', $branch, undef ] for @{ $FIRST_LISTED{$generation}{$branch} };
+    }
+  }
+  is( scalar keys %own, 88, '88 IDs with a row of their own' );
+  for my $id ( sort keys %own ) {
+    my $req = $R->for_device_id($id);
+    is_deeply( shape($req), $own{$id}, $id.' => '.$own{$id}[0].', '.$own{$id}[2].' or newer' );
+    is( $req->compute, 1, '... compute 1' );
+    # A neighbour without a row of its own falls back to the block: the row
+    # covers this one ID, not a range.
+    for my $next ( map { sprintf '%04x', hex($id) + $_ } -1, 1 ) {
+      next if $own{$next};
+      is_deeply( shape( $R->for_device_id($next) ), $block{ $own{$id}[0] },
+        '... neighbour '.$next.' => the '.$own{$id}[0].' block' );
+    }
   }
 };
 
@@ -110,6 +182,8 @@ subtest 'satisfied_by' => sub {
   my $open565 = { kernel_module => 'open',        branch => 565 };
   my $prop595 = { kernel_module => 'proprietary', branch => 595 };
   my $prop470 = { kernel_module => 'proprietary', branch => 470 };
+  my $prop535 = { kernel_module => 'proprietary', branch => 535 };
+  my $prop550 = { kernel_module => 'proprietary', branch => 550 };
   my $open_nobranch = { kernel_module => 'open' };
   my $nomodule      = { branch => 580 };
 
@@ -134,7 +208,22 @@ subtest 'satisfied_by' => sub {
     [ $R->for_device_id('102d'), $prop470,       1 ],
     [ $R->for_device_id('102d'), $prop,          0 ],
     [ $R->for_device_id('27b0'), $prop595,       1 ],
-    [ $R->for_device_id('27b0'), $open565,       1 ]
+    [ $R->for_device_id('27b0'), $open565,       1 ],
+    # k107: Debian's non-free branches (11: 470, 12: 535, 13: 550)
+    [ $R->for_device_id('2204'), $prop470,       1 ],   # RTX 3090, in 470.256.02
+    [ $R->for_device_id('1f83'), $prop470,       0 ],   # GTX 1630, first in 510
+    [ $R->for_device_id('2331'), $prop470,       0 ],   # H100 PCIe, Hopper block 520
+    [ $R->for_device_id('2684'), $prop470,       0 ],   # RTX 4090, Ada block 520
+    [ $R->for_device_id('27b0'), $prop470,       0 ],   # RTX 4000 SFF Ada, 525
+    [ $R->for_device_id('2600'), $prop470,       0 ],   # unlisted, Ada block
+    [ $R->for_device_id('26b9'), $prop535,       1 ],   # L40S, 535
+    [ $R->for_device_id('2335'), $prop535,       0 ],   # H200, 550
+    [ $R->for_device_id('2783'), $prop535,       0 ],   # RTX 4070 SUPER, 550
+    [ $R->for_device_id('2783'), $prop550,       1 ],
+    [ $R->for_device_id('2689'), $prop550,       0 ],   # RTX 4070 Ti SUPER, 555
+    [ $R->for_device_id('233b'), $prop550,       0 ],   # H200 NVL, 565
+    [ $R->for_device_id('230e'), $prop550,       0 ],   # H20 NVL16, 580
+    [ $R->for_device_id('230e'), $prop,          1 ]    # ... SUSE G06 / pinned 580
   );
   for my $row (@matrix) {
     my ( $req, $src, $want ) = @$row;
@@ -183,6 +272,10 @@ subtest 'satisfied_by: "newest branch, at least N" (branch_at_least)' => sub {
     qr/^branch 590 is newer than 580$/, 'why_not: exact branch too new' );
   like( $R->for_device_id('2901')->why_not({ kernel_module => 'open', branch => 565 }),
     qr/^branch 565 is older than 570$/, 'why_not: exact branch too old' );
+  like( $R->for_device_id('2684')->why_not({ kernel_module => 'proprietary', branch => 470 }),
+    qr/^branch 470 is older than 520$/, 'why_not: Debian 11 non-free for an RTX 4090 (k107)' );
+  is( $R->for_device_id('230e')->why_not({ kernel_module => 'open', branch_at_least => 580 }), undef,
+    'H20 NVL16 (580) fits a "newest, at least 580" source (Ubuntu, RHEL)' );
 };
 
 subtest 'intersect' => sub {
@@ -192,6 +285,7 @@ subtest 'intersect' => sub {
   my $b200 = $R->from_gpu({ name => 'B200',       device_id => '2901' });
   my $b300 = $R->from_gpu({ name => 'B300',       device_id => '3182' });
   my $h100 = $R->from_gpu({ name => 'H100',       device_id => '2330' });
+  my $a100 = $R->from_gpu({ name => 'A100',       device_id => '20b0' });
 
   is( $R->intersect($v100), $v100, 'one requirement comes back unchanged' );
 
@@ -207,8 +301,10 @@ subtest 'intersect' => sub {
   is_deeply( [ @{ shape($old) }[ 1 .. 3 ] ], [ 'proprietary', undef, 470 ],
     'max_branch is the lowest upper bound' );
 
-  is_deeply( [ @{ shape( $R->intersect( $h100, $h100 ) ) }[ 1 .. 3 ] ],
+  is_deeply( [ @{ shape( $R->intersect( $a100, $a100 ) ) }[ 1 .. 3 ] ],
     [ 'either', undef, undef ], 'either + either => either, no bounds' );
+  is_deeply( [ @{ shape( $R->intersect( $a100, $h100 ) ) }[ 1 .. 3 ] ],
+    [ 'either', 525, undef ], 'A100 + H100 => the H100 floor 525 (k107)' );
 
   my $nested = $R->intersect( $R->intersect( $v100, $p100 ), $h100 );
   is_deeply( $nested->members, [ $v100, $p100, $h100 ], 'nested intersections flatten' );
@@ -240,7 +336,7 @@ subtest 'intersect' => sub {
   like( $why[0], qr/^B200 \(Blackwell, 10de:2901\) needs the open kernel module, but Tesla V100/,
     '... module conflict first, naming the GPUs' );
   is( $R->intersect( $b200, $h100 )->who,
-    'B200 (Blackwell, 10de:2901), H100 (Turing/Ampere/Ada/Hopper, 10de:2330)',
+    'B200 (Blackwell, 10de:2901), H100 (Hopper, 10de:2330)',
     'who of an intersection lists its members' );
 
   ok( !eval { $R->intersect; 1 }, 'empty list dies' );
@@ -265,7 +361,8 @@ subtest 'subclass overrides generations' => sub {
   isa_ok( $h100, 'My::Test::Requirement' );
   is_deeply( shape($h100), [ 'Hopper (site)', 'open', 575, undef ], 'added row wins' );
   is_deeply( shape( My::Test::Requirement->for_device_id('1db4') ), $MPV, 'built-in rows kept' );
-  is_deeply( shape( $R->for_device_id('2330') ), $TAH, 'base class unaffected' );
+  is_deeply( shape( $R->for_device_id('2330') ), [ 'Hopper', 'either', 525, undef ],
+    'base class unaffected' );
   isa_ok( My::Test::Requirement->intersect( $h100, $h100 ), 'My::Test::Requirement' );
 };
 
@@ -276,7 +373,8 @@ subtest 'compute by generation: Maxwell and later 1, Kepler or older 0' => sub {
   # supports it -- the generation decides, not the name). The flag is now
   # three-valued: 1 (Maxwell .. Blackwell Ultra), 0 (Kepler or older, skipped
   # with a warning), undef (no row: the name rules and the unknown default).
-  for my $id (qw( 1340 1380 13c0 174d 1d01 1db4 1df6 1df7 1e02 1f97 2330 2342 2348 28ff
+  for my $id (qw( 1340 1380 13c0 174d 1d01 1db4 1df6 1df7 1e02 1f97 22ff 2300 2330 2342
+                  2348 23ff 2400 25ff 2600 2684 2783 28ff
                   2900 2901 2c18 2c77 2bb9 2e12 2fff 3182 31c2 31c3 )) {
     is( $R->for_device_id($id)->compute, 1, $id.' => table compute 1' );
     is( Rex::GPU::Detect->_is_nvidia_compute( '0300', 'Device', $id ), 1,

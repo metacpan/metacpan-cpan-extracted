@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # large-subset-valueprobe.pl (X27, step 3; post-0.11, 2026-11-12): probes the two assumptions of step 3
-# (large-subset-environment.md, section 12) with odd values, in dash, bash --posix and ours (t/try.pl):
+# (large-subset-environment.md, section 12) with odd values, in dash, bash --posix and ShellSpawn (t/try.pl):
 #   passthrough  a value from the environment that only passes through the shell reaches the program unchanged: values
 #                in the environment (X) or in a file read by $( ) (./v), through quoted words, assignments, ${X:-d},
 #                here-documents, export, and a program's output going on; /usr/bin/printf, /bin/cat and the like by
@@ -12,15 +12,15 @@
 # Prints every form and value where the three differ.  Usage (from the distribution's directory, after make; also:
 # make probe-values): perl doc/large-subset/tools/large-subset-valueprobe.pl
 # Known (2026-11-12): passthrough, none; splitglob, three, each a known difference: [^a]* (dash takes ^ literally;
-# not legalized: TODO A13), .* (dash also gives . and ..; rule E, G2), d*//e (bash collapses //; ours as dash, A5).
+# not legalized: TODO A13), .* (dash also gives . and ..; rule E, G2), d*//e (bash collapses //; ShellSpawn as dash, A5).
 use strict; use warnings; use Cwd 'abs_path'; use File::Temp 'tempdir';
 -e 't/try.pl' && -d 'blib' or die "run from the distribution's directory, after make\n";
 my $TOP = abs_path('.'); my $TRY = "$TOP/t/try.pl";
-my %SH = (dash => ['dash', '-c'], bash => ['bash', '--posix', '-c'], ours => [$^X, "-I$TOP/blib/lib", "-I$TOP/blib/arch", $TRY]);
+my %SH = (dash => ['dash', '-c'], bash => ['bash', '--posix', '-c'], shellspawn => [$^X, "-I$TOP/blib/lib", "-I$TOP/blib/arch", $TRY]);
 my $base = tempdir('valueprobe.XXXXXX', TMPDIR => 1, CLEANUP => 1);
 sub run3 {   # the three runs of TEXT; X in the environment if defined; ./v holds $file if defined; @files made first
   my ($text, $x, $file, @files) = @_; my %out;
-  for my $sh (qw(dash bash ours)) { my $d = "$base/$sh"; system 'rm', '-rf', $d; mkdir $d or die; mkdir "$d/d";
+  for my $sh (qw(dash bash shellspawn)) { my $d = "$base/$sh"; system 'rm', '-rf', $d; mkdir $d or die; mkdir "$d/d";
     for (@files) { open my $h, '>', "$d/$_" or die "$_: $!"; close $h }
     if (defined $file) { open my $h, '>:raw', "$d/v" or die; print $h $file; close $h }
     my $pid = open my $p, '-|' // die "fork: $!";
@@ -31,8 +31,8 @@ sub run3 {   # the three runs of TEXT; X in the environment if defined; ./v hold
 sub show { my $x = shift; $x = substr($x, 0, 30) . '...' . substr($x, -20) . ' (' . length($x) . ')' if length $x > 60;
   $x =~ s/([^\x20-\x7e])/sprintf '\\x%02x', ord $1/ge; $x }
 my ($n, $bad) = (0, 0);
-sub report { my ($form, $vn, $out) = @_; $n++; return if $out->{dash} eq $out->{bash} && $out->{bash} eq $out->{ours};
-  $bad++; printf "  %-22s %-14s dash %s | bash %s | ours %s\n", $form, $vn, map show($out->{$_}), qw(dash bash ours) }
+sub report { my ($form, $vn, $out) = @_; $n++; return if $out->{dash} eq $out->{bash} && $out->{bash} eq $out->{shellspawn};
+  $bad++; printf "  %-22s %-14s dash %s | bash %s | ShellSpawn %s\n", $form, $vn, map show($out->{$_}), qw(dash bash shellspawn) }
 
 print "passthrough:\n";
 my %V = (empty => '', space => ' ', two => "a  b", star => '*', dash_n => '-n', dashdash => '--', bslash => 'a\\b\\n',

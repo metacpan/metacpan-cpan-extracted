@@ -3,6 +3,8 @@
 
 class UV::Callback::Async : interface_t {
   
+  version_from UV;
+  
   use UV::Handle::Async;
   
   required method : void ($uv_async : UV::Handle::Async);

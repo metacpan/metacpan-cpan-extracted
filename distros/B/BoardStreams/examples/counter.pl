@@ -40,6 +40,18 @@ $hub->channel('counter:*',
             });
             return { n => $n };
         },
+        # Changes the counter after a pause, to have a request in the middle
+        # of being handled.
+        add_later => async sub ($ctx, $payload) {
+            await Mojo::Promise->timer($payload->{after} // 0.5);
+            my $n;
+            await $ctx->update(sub ($u) {
+                $n = $u->state->{n} += 1;
+                push $u->state->{log}->@*, 1;
+                $u->emit(added => { by => 1 });
+            });
+            return { n => $n };
+        },
         # Answers only when the test is over, to have an unanswered request.
         slow => sub ($ctx, $payload) { Mojo::Promise->timer(30) },
         # A real application would check who is asking before doing these.

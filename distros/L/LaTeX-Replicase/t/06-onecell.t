@@ -12,8 +12,9 @@ use warnings;
 use utf8;
 
 # use Test::More 'no_plan';
-use Test::More tests => 58;
+use Test::More tests => 60;
 use Test::More::UTF8;
+use Test::Number::Delta within => 1e-9;
 use Test::Exception;
 use Test::Warn;
 use Data::Dumper;
@@ -644,6 +645,9 @@ $op->{font_size} = 'LARGE'; # TeX-font size of text in cell/box,
 
 ( $cell ) = onecell( $string, $op );
 
+my $cell_scale = delete $cell->{scale};
+delta_ok( $cell_scale, 10/17.28, "Test #101.1: 'onecell()' scale = $cell_scale are close enough to equal 10/17.28 ");
+
 $cell_ref = {
 	stop => 176, # position in $string where the extraction of symbols into cell stopped
 	wxL => [ # arrays of line widths (*100pt) for 'lines'
@@ -672,7 +676,7 @@ $cell_ref = {
                      4267
              ],
 	numL => 23, # number of no empty lines
-	scale => 0.578703703703704, # 10/17.28,
+#	scale => 0.578703703703704, # 10/17.28,
 	lines => [ # arrays of no empty lines
                        'I was go\\-', #1
                        'ing to do ', #2
@@ -700,14 +704,17 @@ $cell_ref = {
               ]
 };
 
-is_deeply( $cell, $cell_ref, "Test #101: 'onecell()' with font_size => 'LARGE' option");
+is_deeply( $cell, $cell_ref, "Test #101.2: 'onecell()' with font_size => 'LARGE' option");
 
 ### Test 102
 $op->{documentclass} = 'extarticle'; # 'extsizes';
 
 ( $cell ) = onecell( $string, $op );
 
-is_deeply( $cell, $cell_ref, "Test #102: 'onecell()' with 'documentclass = extarticle' option");
+$cell_scale = delete $cell->{scale};
+delta_ok( $cell_scale, 10/17.28, "Test #102.1: 'onecell()' scale = $cell_scale are close enough to equal 10/17.28 ");
+
+is_deeply( $cell, $cell_ref, "Test #102.2: 'onecell()' with 'documentclass = extarticle' option");
 
 
 ###DEL###

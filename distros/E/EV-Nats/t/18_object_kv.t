@@ -19,6 +19,7 @@ use EV::Nats::KV;
 # synchronous mock hides the real ordering bug this exercises.
 {
     package MockJS;
+    our @ISA = ('EV::Nats::JetStream');   # the real get_msg over the mock json_api
     sub new {
         bless { store => {}, seq => 0, nats => MockConn->new, timeout => 100 }, shift;
     }
@@ -63,7 +64,7 @@ use EV::Nats::KV;
         my %subs = map { $_ => 1 } keys %{ $self->{store} };
         $cb->({ state => { subjects => \%subs } }, undef);
     }
-    sub _json_api {
+    sub json_api {
         my ($self, $subj, $body, $cb) = @_;
         if ($subj =~ /^STREAM\.MSG\.GET\./) {
             $self->{msg_gets}++;
@@ -132,19 +133,19 @@ sub padded_b64url { (my $e = encode_base64($_[0], '')) =~ tr{+/}{-_}; $e }
 
 subtest 'name encoding is padded base64url, legacy percent form kept' => sub {
     plan tests => 5;
-    is EV::Nats::ObjectStore::_encode_name('report.txt'), 'cmVwb3J0LnR4dA==',
+    is EV::Nats::ObjectStore::encode_name('report.txt'), 'cmVwb3J0LnR4dA==',
        'encode_name is padded base64url (nats.go form)';
-    is EV::Nats::ObjectStore::_decode_name('cmVwb3J0LnR4dA=='), 'report.txt',
-       'decode_name round-trips';
+    is EV::Nats::ObjectStore::decode_name_best('cmVwb3J0LnR4dA=='), 'report.txt',
+       'decode_name_best round-trips';
     my $uni = "r\x{e9}sum\x{e9}.txt";
-    is EV::Nats::ObjectStore::_decode_name(EV::Nats::ObjectStore::_encode_name($uni)),
+    is EV::Nats::ObjectStore::decode_name_best(EV::Nats::ObjectStore::encode_name($uni)),
        $uni, 'unicode name round-trips';
   SKIP: {
         skip 'legacy encoders not present (pre-0.06 ObjectStore)', 2
-            unless defined &EV::Nats::ObjectStore::_encode_name_legacy;
-        is EV::Nats::ObjectStore::_encode_name_legacy('a b.txt'), 'a%20b.txt',
+            unless defined &EV::Nats::ObjectStore::encode_name_legacy;
+        is EV::Nats::ObjectStore::encode_name_legacy('a b.txt'), 'a%20b.txt',
            'legacy percent encoder kept';
-        is EV::Nats::ObjectStore::_decode_name_legacy('a%20b.txt'), 'a b.txt',
+        is EV::Nats::ObjectStore::decode_name_legacy('a%20b.txt'), 'a b.txt',
            'legacy percent decoder kept';
     }
 };
@@ -314,7 +315,7 @@ subtest 'nats.go-style delete marker reads as missing (no KV-Operation header)' 
         name => 'gone.txt', bucket => 'B', nuid => '',
         size => 0, chunks => 0, digest => '', deleted => JSON::PP::true(),
     };
-    my $meta_subj = '$O.B.M.' . EV::Nats::ObjectStore::_encode_name('gone.txt');
+    my $meta_subj = '$O.B.M.' . EV::Nats::ObjectStore::encode_name('gone.txt');
     $js->{store}{$meta_subj} =
         { data => encode_base64(JSON::PP::encode_json($marker), ''), seq => ++$js->{seq} };
     push @{ $js->{order} }, $meta_subj;
@@ -462,7 +463,9 @@ subtest 'forked ObjectStore workers use independent chunk IDs' => sub {
         die "fork: $!" unless defined $pid;
         if (!$pid) {
             close $rd;
-            print $wr EV::Nats::ObjectStore::_nuid(), "\n";
+            EV::Nats::ObjectStore::nuid();
+            srand 42;   # an application seeding its own RNG must not matter
+            print $wr EV::Nats::ObjectStore::nuid(), "\n";
             close $wr;
             POSIX::_exit(0);
         }
@@ -474,6 +477,75 @@ subtest 'forked ObjectStore workers use independent chunk IDs' => sub {
         is $status, 0, 'worker generated its ID successfully';
     }
     isnt $ids[0], $ids[1], 'workers do not reuse the same chunk subject';
+};
+
+subtest 'put stores the bytes of an upgraded string and refuses wide characters' => sub {
+    plan tests => 4;
+    my $js = MockJS->new;   # one message per subject: a single chunk
+    my $os = EV::Nats::ObjectStore->new(js => $js, bucket => 'B');
+    my $data = "caf\xe9" x 3;
+    utf8::upgrade(my $up = $data);
+    my $put;
+    $os->put('menu', $up, sub { $put = [@_] });
+    $js->drain;
+    is $put->[0]{size}, 12, 'stored as 12 bytes';
+    my $got;
+    $os->get('menu', sub { $got = [@_] });
+    is_deeply [ @$got[0, 1] ], [ $data, undef ], 'reads back intact, digest verified';
+    eval { $os->put('smile', "\x{263a}", sub {}) };
+    like $@, qr/wide character/, 'a wide character croaks';
+    is scalar(grep { /\.C\./ } @{ $js->{order} }), 1, 'and published no chunk';
+};
+
+subtest 'put keeps a bounded window of chunks in flight' => sub {
+    plan tests => 3;
+    my $js = MockJS->new;
+    my $os = EV::Nats::ObjectStore->new(js => $js, bucket => 'B', chunk_size => 1);
+    my $put;
+    $os->put('big', 'x' x 40, sub { $put = [@_] });
+    is scalar @{ $js->{pending} }, 16, 'sixteen sent before the first ack';
+    $js->drain;
+    is $put->[1], undef, 'all forty stored';
+    is $put->[0]{chunks}, 40, 'in forty chunks';
+};
+
+subtest 'a name given as UTF-8 bytes or as characters is the same subject' => sub {
+    plan tests => 2;
+    my $bytes = "caf\xc3\xa9.txt";
+    is EV::Nats::ObjectStore::encode_name($bytes), padded_b64url($bytes), 'bytes are not encoded again';
+    my $chars = "caf\xe9.txt";
+    utf8::upgrade($chars);
+    is EV::Nats::ObjectStore::encode_name($chars), padded_b64url($bytes),
+       'a character string goes out as its UTF-8';
+};
+
+subtest 'the metadata names the object as other clients address it' => sub {
+    plan tests => 3;
+    my $js = MockJS->new;
+    my $os = EV::Nats::ObjectStore->new(js => $js, bucket => 'B');
+    my $bytes = "caf\xc3\xa9.txt";
+    my $subj = '$O.B.M.' . padded_b64url($bytes);
+    $os->put($bytes, 'x', sub {});
+    $js->drain;
+    my ($hp) = grep { $_->{subject} eq $subj } @{ $js->{hpubs} || [] };
+    is $hp && JSON::PP::decode_json($hp->{payload})->{name}, "caf\x{e9}.txt", 'put: the text, encoded once';
+    $js->{hpubs} = [];
+    $os->delete($bytes, sub {});
+    $js->drain;
+    ($hp) = grep { $_->{subject} eq $subj } @{ $js->{hpubs} || [] };
+    is $hp && JSON::PP::decode_json($hp->{payload})->{name}, "caf\x{e9}.txt", 'and the delete marker';
+    is EV::Nats::ObjectStore::meta_name("caf\xe9.txt"), "caf\xe9.txt", 'non-UTF-8 bytes are left as they are';
+};
+
+subtest 'bucket limits passed as strings go out as JSON numbers' => sub {
+    plan tests => 2;
+    my $js = MockJS->new;
+    my $config;
+    no warnings qw(redefine once);
+    local *MockJS::stream_create = sub { $config = JSON::PP::encode_json($_[1]) };
+    EV::Nats::KV->new(js => $js, bucket => 'B')->create_bucket({ max_history => '5', max_bytes => '1024' }, sub {});
+    like $config, qr/"max_msgs_per_subject":5[,}]/, 'max_history is a number';
+    like $config, qr/"max_bytes":1024[,}]/, 'max_bytes is a number';
 };
 
 done_testing;

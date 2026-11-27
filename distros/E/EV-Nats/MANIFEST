@@ -50,7 +50,6 @@ t/10_batch.t
 t/11_multi_conn.t
 t/12_multi_process.t
 t/13_misc.t
-t/14_module_load.t
 t/15_creds_file.t
 t/16_max_payload.t
 t/17_mock_protocol.t
@@ -59,6 +58,7 @@ t/19_client_guards.t
 t/21_jetstream_mock.t
 t/22_client_state.t
 t/lib/MockNats.pm
+t/lib/NatsLive.pm
 typemap
 xt/01_cluster_failover.t
 xt/02_unix_socket.t

@@ -7,6 +7,15 @@ Versions up to 0.17 were released from `Changes`, before this file existed.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-26
+
+- Document that Mailgun has deprecated the Events API of `event()` in favor of the Logs API, and point the TODO list at the successors of the deprecated Stats and Tags APIs (Metrics and the new Tags) (#48)
+- Add the webhooks of the domain (the v3 API): `domain_webhooks()`, `domain_webhook()`, `add_domain_webhook()`, `update_domain_webhook()` and `delete_domain_webhook()` (#46)
+- Add the suppressions of the domain: the bounces (`bounces()`, `bounce()`, `add_bounce()`, `add_bounces()`, `import_bounces()`, `delete_bounce()` and `delete_bounces()`), the unsubscribes and the complaints in methods of the same names, and the allowlist (`allowlist_entries()`, `allowlist_entry()`, `add_allowlist_entry()`, `import_allowlist()`, `delete_allowlist_entry()` and `delete_allowlist()`). `add_bounces()` sends `code` as a JSON string, even one given as a number, as Mailgun takes it, and `delete_unsubscribe()` takes an optional tag, to remove only that tag of the unsubscribe. The documentation of the imports gives the header row each kind needs (#44)
+- Add the rest of the templates of the domain: `templates()`, `template()`, `update_template()`, `rename_template()`, `copy_template()`, and the versions (`template_versions()`, `template_version()`, `add_template_version()`, `update_template_version()`, `delete_template_version()` and `copy_template_version()`). `add_template()` sends a decoded string (one with the UTF-8 flag) encoded in UTF-8, as `message()` does; one with a character above `0xFF` used to die. HTTP::Request::Common 6.07 or later is required, for the form of a PUT (#45)
+- Add the domains of the account (`domains()`, `get_domain()`, `add_domain()`, `update_domain()`, `verify_domain()` and `delete_domain()`) and the validation of an address (`validate_address()`). They call the v4 API on the host of the region; with `$API_BASE` (or `$API_BASE_EU`, `$API_BASE_AU`) replaced, on its host, with the `/v3` at its end replaced (#47)
+- Add the analytics of the v1 API, the successors of the deprecated Events, Stats and Tags APIs: `logs()`, `metrics()`, `usage_metrics()`, `tags()`, `update_tag()`, `delete_tag()` and `tag_limits()`. Each sends the JSON body Mailgun documents and returns one page; `all_logs()` returns every page of the logs, following `pagination.next`. Furl 3.08 or later is required, for the body of a DELETE (#48)
+
 ## [1.1.0] - 2026-11-22
 
 - Fix the methods that take a mailing list address, a member address or a template name: the value went into the URL path as it was, so one with `?`, `#`, `/` or `%` (all allowed in an e-mail address) sent the request to another URL. Such characters are now percent-encoded; `@`, `+` and the others a path segment can hold go out as before. Pass the address as it is: one already percent-encoded is encoded again. A missing (undefined or empty) address or name now dies instead of asking for another URL, such as `list(undef)` for every list (#34)
@@ -113,6 +122,7 @@ Versions up to 0.17 were released from `Changes`, before this file existed.
 
 - Original version
 
+[1.2.0]: https://github.com/kan/p5-web-service-mailgun/releases/tag/v1.2.0
 [1.1.0]: https://github.com/kan/p5-web-service-mailgun/releases/tag/v1.1.0
 [1.0.0]: https://github.com/kan/p5-web-service-mailgun/releases/tag/v1.0.0
 [0.17]: https://metacpan.org/release/MIKIHOSHI/WebService-Mailgun-0.17

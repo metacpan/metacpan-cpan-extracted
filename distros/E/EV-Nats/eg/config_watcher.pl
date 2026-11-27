@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Live config watcher — watches KV bucket for config changes, applies them
+# Live config watcher -watches KV bucket for config changes, applies them
 # Requires: nats-server -js
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ $nats = EV::Nats->new(
             $kv->put('db.port', '5432', sub {});
             $kv->put('cache.ttl', '300', sub {});
 
-            # Watch for changes
+            # the current config first, then every change
             my %config;
             $kv->watch('>', sub {
                 my ($key, $value, $op) = @_;
@@ -39,7 +39,7 @@ $nats = EV::Nats->new(
                 }
                 # Apply config (in a real app, trigger reconfiguration here)
                 print "  current config: " . join(', ', map { "$_=$config{$_}" } sort keys %config) . "\n";
-            });
+            }, { initial => 1 });
 
             # Simulate config updates
             my $step = 0;

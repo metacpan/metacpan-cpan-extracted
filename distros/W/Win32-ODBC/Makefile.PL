@@ -31,12 +31,29 @@ sub const_loadlibs {
 	$self->{LDLOADLIBS} .= " -lodbccp32";
 
     }
+    # odbccp32.lib is not a plain import library. Its functions load
+    # odbccp32.dll at run time, and the code that loads it calls
+    # _vsnwprintf_s. With a UCRT perl, ucrt.lib doesn't export that
+    # function, so it has to come from legacy_stdio_definitions.lib.
+    # That library in turn needs legacy_stdio_wide_specifiers.lib and
+    # adds it as a default library. But perl links extensions with
+    # -nodefaultlib, which ignores default libraries, so the link fails
+    # unless both are listed here.
+    if ($Config{cc} =~ /^cl/i && $Config{libc} =~ /^ucrt/i) {
+	$self->{LDLOADLIBS} .= " legacy_stdio_definitions.lib legacy_stdio_wide_specifiers.lib";
+    }
     return $self->SUPER::const_loadlibs;
 }
 
+# Run xsubpp through $(XSUBPPRUN), as MakeMaker's own .xs.c rule does.
+# MakeMaker quotes the program path in $(PERL), and nmake splits an
+# unquoted first argument after a quoted program at its first "/". So
+# a rule starting '$(PERL) -I$(PERL_ARCHLIB)' fails for a perl whose
+# archlib uses forward slashes. With an archlib of C:/perl/lib, perl
+# gets -IC: as an option and tries to run /perl/lib as its script.
 sub xs_c {
     '
 .xs.cpp:
-	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs >xstmp.c && $(MV) xstmp.c $*.cpp
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs >xstmp.c && $(MV) xstmp.c $*.cpp
 ';
 };

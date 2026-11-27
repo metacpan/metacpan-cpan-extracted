@@ -40,14 +40,16 @@ This module supports verifying HTTP Message Signatures (RFC 9421), notably those
 
 # RECENT CHANGES
 
-Changes for version v0.0.2 (2026-11-19)
+Changes for version v0.0.3 (2026-11-26)
 
+- Enhancements
+    - Changed the internals to use HTTP::libsfparse (via HTTP::StructuredField) for parsing structured fields.
+    - Added support for the rsa-pss-sha512 algorithm.
+    - The public key is checked if it corresponds to the algorithm.
 - Bug Fixes
-    - Removed use of "equ" operator and state hash variables that caused problems with older Perl versions.
-    - Specify minimum version of List::Util.
+    - Fixed the regex used to match dictionary keys.
 - Documentation
-    - Fixed broken Changes file.
-    - Move STATUS section to the top.
+    - Added a section to KNOWN ISSUES about Content-Digests.
 
 See the `Changes` file for more details.
 
@@ -56,12 +58,14 @@ See the `Changes` file for more details.
 This module lists the following modules as runtime dependencies:
 
 - [Carp](https://metacpan.org/pod/Carp)
-- [Crypt::PK::Ed25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AEd25519) version 0.089 or later
+- [Crypt::PK::Ed25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AEd25519)
+- [Crypt::PK::RSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ARSA)
 - [HTTP::Message](https://metacpan.org/pod/HTTP%3A%3AMessage)
+- [HTTP::StructuredField](https://metacpan.org/pod/HTTP%3A%3AStructuredField) version v0.0.3 or later
 - [HTTP::Tiny](https://metacpan.org/pod/HTTP%3A%3ATiny)
 - [Hash::MultiValue](https://metacpan.org/pod/Hash%3A%3AMultiValue)
 - [Hash::Ordered](https://metacpan.org/pod/Hash%3A%3AOrdered)
-- [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS)
+- [JSON](https://metacpan.org/pod/JSON)
 - [List::Util](https://metacpan.org/pod/List%3A%3AUtil) version 1.29 or later
 - [MIME::Base64](https://metacpan.org/pod/MIME%3A%3ABase64)
 - [Moo](https://metacpan.org/pod/Moo)
@@ -73,7 +77,6 @@ This module lists the following modules as runtime dependencies:
 - [Types::Common](https://metacpan.org/pod/Types%3A%3ACommon)
 - [Types::URI](https://metacpan.org/pod/Types%3A%3AURI)
 - [URI](https://metacpan.org/pod/URI)
-- [constant](https://metacpan.org/pod/constant)
 - [experimental](https://metacpan.org/pod/experimental)
 - [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean)
 - [perl](https://metacpan.org/pod/perl) version v5.24.0 or later
@@ -114,11 +117,6 @@ dzil install --install-command="cpan ."
 For more information, see [How to install CPAN modules](https://www.cpan.org/modules/INSTALL.html).
 
 # SECURITY CONSIDERATIONS
-
-## Structured Fields
-
-The current version of this module uses regular expressions for splitting dictionary and parameter fields,
-rather than using an HTTP Structured Field (RFC 9651) parser.
 
 ## Trusted Agents
 

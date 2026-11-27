@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -20,7 +21,7 @@ use lib "$Bin/lib";
 # -- recorded verbatim, never run. See t/96-golden-driver.t for the rest.
 # -----------------------------------------------------------------------------
 
-use Test::RexGPU::Golden qw( record_host golden_is host_names host_profile );
+use Test::RexGPU::Golden qw( record_host golden_is host_names host_profile dpkg_l );
 use Rex::GPU::NVIDIA;
 
 sub toolkit_on {
@@ -36,7 +37,7 @@ golden_is(toolkit_on(host_profile($_)), "toolkit/$_") for host_names();
 # The verify seam: package not installed after the install command.
 golden_is(
   toolkit_on(host_profile('debian-12', responses => [
-    [ q{dpkg -l nvidia-container-toolkit 2>/dev/null | grep -q '^ii'} => '', 1 ]
+    dpkg_l('nvidia-container-toolkit' => 'un')
   ])),
   'toolkit/debian-12--not-installed'
 );
@@ -128,12 +129,20 @@ for my $os (qw( debian-12 ubuntu-24.04 rocky-9 leap-16.0 )) {
 
 # nvidia-ctk on PATH but not from the package manager (e.g. copied in by hand):
 # the package is installed as on a fresh host.
+# On Debian the same `dpkg -l ... grep -q '^[hi]i'` is sent twice since k94:
+# by _toolkit_present (package absent: 1) and by verify_packages after the
+# install (package there now: 0). The host changes in between, so the answer
+# is stateful: first call not installed, every later one installed.
 golden_is(
   toolkit_on(host_profile('debian-12',
     can_run   => { 'nvidia-ctk' => 1 },
     responses => [
       [ 'nvidia-ctk --version 2>&1' => $CTK_VERSION, 0 ],
-      [ q{dpkg -l nvidia-container-toolkit 2>/dev/null | grep -q '^[hi]i'} => '', 1 ]
+      do {
+        my $calls = 0;
+        [ q{dpkg -l nvidia-container-toolkit 2>/dev/null | grep -q '^[hi]i'}
+            => sub { return ( '', $calls++ ? 0 : 1 ) } ]
+      }
     ]
   )),
   'toolkit/debian-12--ctk-without-package'
@@ -206,7 +215,7 @@ for my $os (qw( debian-12 debian-13 ubuntu-22.04 ubuntu-24.04 )) {
 # curl/gnupg could not be installed (e.g. lock never released): dies on dpkg.
 golden_is(
   toolkit_on(host_profile('ubuntu-24.04', responses => [
-    [ q{dpkg -l gnupg 2>/dev/null | grep -q '^ii'} => '', 1 ]
+    dpkg_l('gnupg' => 'un')
   ])),
   'toolkit/ubuntu-24.04--helpers-not-installed'
 );

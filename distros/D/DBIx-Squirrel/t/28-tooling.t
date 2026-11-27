@@ -3,9 +3,12 @@ use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 # DBIx::Squirrel::Tooling: every name a caller uses to do work, from one
-# module, by Ekorn::Pipeline::Tooling's tags and DBIx::Squirrel's own,
-# and DBIx::Squirrel's version of any name both export (roadmap
-# 2026-0025).
+# module, by tags named as Ekorn::Pipeline::Tooling's are and
+# DBIx::Squirrel's own, and DBIx::Squirrel's version of any name both
+# export (roadmap 2026-0025). What an Ekorn::Pipeline module's tag holds
+# is our own list, so a name Ekorn adds in a later v0.4.x, which a
+# DBIx::Squirrel already installed doesn't list, fails none of these
+# tests (roadmap 2026-0059).
 
 use DBIx::Squirrel;
 use DBIx::Squirrel::Tooling  ();
@@ -15,7 +18,8 @@ my $tooling = 'DBIx::Squirrel::Tooling';
 my $ekorn   = 'Ekorn::Pipeline::Tooling';
 
 # Each tag that follows a module, and the module: DBIx::Squirrel's where
-# it has one.
+# it has one. A tag of DBIx::Squirrel's modules holds all they export; a
+# tag of Ekorn::Pipeline's, the names we list.
 my %module = (
     core    => [qw(DBIx::Squirrel::Stop DBIx::Squirrel::Gather)],
     flow    => ['DBIx::Squirrel::Stages::Flow'],
@@ -29,6 +33,10 @@ my %module = (
     csv     => ['Ekorn::Pipeline::CSV'],
     words   => ['Ekorn::Pipeline::Factories'],
 );
+
+# Names a tag of DBIx::Squirrel's modules holds besides, from
+# Ekorn::Pipeline: is_stage, in :core (roadmap 2026-0061).
+my %extra = (core => {'Ekorn::Pipeline' => [qw(is_stage)]});
 
 # The names a module exports, by default or on request, sorted.
 sub exported_by ($module) {
@@ -45,9 +53,18 @@ sub tag ($name, $of = $tooling) {
     return [sort @{ ${ "${of}::EXPORT_TAGS" }{$name} }];
 }
 
-subtest 'each tag holds every name its modules export' => sub {
+subtest 'each tag holds every name its modules export, if ours' => sub {
     for my $tag (sort keys %module) {
-        is tag($tag), [sort map { exported_by($_) } @{ $module{$tag} }], ":$tag";
+        my @modules = @{ $module{$tag} };
+        my %theirs  = map { $_ => 1 } map { exported_by($_) } @modules;
+        if (grep { m( \A Ekorn:: )x } @modules) {
+            is [grep { !$theirs{$_} } @{ tag($tag) }], [],
+                ":$tag lists only names they export";
+        }
+        else {
+            my @extra = map { @$_ } values %{ $extra{$tag} // {} };
+            is tag($tag), [sort keys(%theirs), @extra], ":$tag";
+        }
     }
 };
 
@@ -61,9 +78,9 @@ subtest ':all is every tag, each name once' => sub {
     is [exported_by($tooling)], [sort keys %every], 'and is what it exports';
 };
 
-subtest 'not for callers: is_stage, is_sink, croakf, the operators' => sub {
+subtest 'not for callers: is_sink, croakf, the operators' => sub {
     my %all = map { $_ => 1 } @{ tag('all') };
-    ok !$all{$_}, "no $_" for qw(is_stage is_sink croakf chain drain);
+    ok !$all{$_}, "no $_" for qw(is_sink croakf chain drain);
 };
 
 subtest 'nothing by default' => sub {
@@ -77,19 +94,24 @@ subtest 'nothing by default' => sub {
 subtest "each name is its own module's sub, DBIx::Squirrel's first" => sub {
     for my $tag (sort keys %module) {
         for my $module (@{ $module{$tag} }) {
-            for my $name (exported_by($module)) {
+            my %theirs = map { $_ => 1 } exported_by($module);
+            for my $name (grep { $theirs{$_} } @{ tag($tag) }) {
                 ref_is $tooling->can($name), $module->can($name), "$name, from $module";
             }
         }
     }
     ref_is $tooling->can('gather'), DBIx::Squirrel::Gather->can('gather'),
         "gather, Factories' word too, is DBIx::Squirrel::Gather's";
+    for my $tag (sort keys %extra) {
+        for my $module (sort keys %{ $extra{$tag} }) {
+            ref_is $tooling->can($_), $module->can($_), "$_, from $module"
+                for @{ $extra{$tag}{$module} };
+        }
+    }
 };
 
 # Only the names both export: a name Ekorn::Pipeline adds to its Tooling
-# in a later v0.3.x isn't in a DBIx::Squirrel already installed, and
-# mustn't fail its tests. xt/ekorn-tooling.t checks that ours holds
-# every name Ekorn's does.
+# isn't in ours until we list it (roadmap 2026-0059).
 subtest 'each name both export is one sub' => sub {
     my %ours = map  { $_ => 1 } @{ tag('all') };
     my @both = grep { $ours{$_} } @{ tag('all', $ekorn) };

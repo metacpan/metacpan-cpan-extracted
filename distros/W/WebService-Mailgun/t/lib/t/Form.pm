@@ -38,8 +38,11 @@ sub request { $client->{request} }
 sub forget  { delete $client->{request} }
 
 # The form fields of the last request, in order, as [name, value, filename].
-sub fields {
-    my $req = request();
+sub fields { fields_of(request()) }
+
+# The form fields of a form-data request (an HTTP::Request), in order, as [name, value, filename].
+sub fields_of {
+    my ($req) = @_;
     my ($boundary) = $req->header('Content-Type') =~ /boundary="?([^";]+)"?/;
     my @fields;
     for my $part (grep { length } split /--\Q$boundary\E(?:--)?\r\n/, $req->content) {

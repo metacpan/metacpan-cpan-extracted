@@ -1,18 +1,32 @@
-# Perl on Windows: `system LIST` and its handles — drafts of bug reports (2026-11-07, 4 added 2026-11-10; not yet filed)
+# Perl on Windows: `system LIST` and its handles — drafts of bug reports (2026-11-07, report 4 added 2026-11-10, a decision on report 2 of 2026-11-13, report 6 added 2026-11-19; not yet filed)
 
-Found while making Proc::Spawner start children through Perl's own spawn (`system { FILE } 1, ARGV`, decision M2;
-[`doc/pspawn-spawner.md`](pspawn-spawner.md#my-section-8), section 8).  Seen with Strawberry Perl 5.38.2.2 (64-bit) under Wine 9.0 on Ubuntu 24.04;
-the code read is `win32/win32.c` of perl v5.38.2.  **Not checked on real Windows**; the reports should say so, or be
-checked there first.  Where to file: <https://github.com/Perl/perl5/issues> for 1, 2 and 4; point 3 may be a security
-issue and goes to Perl's security contact first (see `perlsecpolicy`), not to a public issue.
+We found these bugs while making Proc::Spawner start children through Perl's own spawn (`system { FILE } 1, ARGV`;
+the `1` asks Windows' Perl not to wait, and the call returns the process ID). That is the primitive *system1*, which
+Proc::Spawner uses where it has neither `posix_spawn` nor fork (decision M2 of the user, the author of Proc::Spawner;
+[`doc/pspawn-spawner.md`](pspawn-spawner.md#my-section-8), section 8).
+
+- **Where observed:** Strawberry Perl 5.38.2.2 (64-bit) under Wine 9.0 on Ubuntu 24.04. The code read is
+  `win32/win32.c` of perl v5.38.2 (for report 6 also of blead, 2026-11-19).
+- **Not checked on real Windows**, apart from one result the user reported (section 2). The reports should say so,
+  or be checked there first.
+- **Where to file:** <https://github.com/Perl/perl5/issues> for reports 1, 4 and 6 (report 2 is not to be filed as it
+  stands: section 2). Report 3 may be about a security
+  issue, so it goes to Perl's security contact first (see `perlsecpolicy`), not to a public issue.
 
 ## <a id="my-section-1"></a>1. `system LIST` / `exec LIST`: the command line is not quoted as the child splits it back
 
 **Summary.** On Windows a child gets one command line, which its C runtime splits back into `argv`
-(`CommandLineToArgvW`'s rules: `\"` is a quote character, backslashes before a `"` are halved, `""` is an empty
-argument).  `create_command_line()` in `win32/win32.c` puts an argument in quotes only when it contains blanks and no
-`"`, and escapes nothing.  So an argument with `"`, or ending in `\` inside quotes, or empty in some positions, does not
-arrive as given, although the list form of `system` promises the arguments as they are.
+(`CommandLineToArgvW`'s rules: `\"` gives a literal `"`, backslashes before a `"` are halved, `""` is an empty
+argument).  `create_command_line()` in `win32/win32.c` puts an argument in quotes only when it is empty, or contains blanks and no
+`"` (and does not already begin and end with `"`), and escapes nothing (checked in perl v5.38.2's source).  So an argument with `"`, or one with blanks that ends in `\` (the one case the reproduction below lacks), or an empty one where an earlier
+`"` left quoting open, does not arrive as given, although the list form of `system` promises the arguments as they are.  In particular:
+
+- an argument with blanks and no `"` gets quotes and arrives whole;
+- an argument with blanks and a `"` gets none: the child's runtime takes its `"` as quoting and drops them, and splits
+  it at the blanks outside its `"…"` pairs
+  (`'echo "$0|$1"'` arrives as two arguments, `echo` and `$0|$1`; checked under Wine, see
+  [`pspawn-shell-windows.md`](pspawn-shell-windows.md#my-a-command-sh));
+- an argument with a `"` and no blanks arrives whole but without its `"` (`'echo"$0"'` as `echo$0`).
 
 **To reproduce** (`args.pl` is `print join("|", map "[$_]", @ARGV), "\n";`):
 
@@ -27,7 +41,7 @@ system $^X, 'args.pl', 'a b', 'q"x', 'c\\\\', '', 'x "y" z', 'tail\\', 'd\\"e', 
 **Suggested fix:** for a program that is not `cmd.exe`, `command.com` or a batch file, quote every argument by the C
 runtime's rules (in quotes; each run of backslashes before a `"` doubled and the `"` escaped; trailing backslashes
 doubled), as Python's `subprocess.list2cmdline` and Rust's `std::process::Command` do.  An argument that already
-starts and ends with `"` is now copied as it is; that special case would go (or stay only for the shell cases).
+starts and ends with `"` is copied as it is by today's Perl; that special case would go (or stay only for the shell cases).
 
 ## <a id="my-section-2"></a>2. `system LIST` of a missing program runs cmd.exe
 
@@ -45,15 +59,20 @@ $r = system { 'nosuch_prog_xyz' } 'nosuch_prog_xyz', 'a';
 print "$r $?\n";                                       # under Wine: 65280 65280 (expected: -1)
 ```
 
-The second form retries with the same program (so no shell runs), but the result is `255 << 8`, not `-1`.
+The second form, whose block names the program, also retries: `Perl_do_aspawn` puts cmd.exe's words (`cmd.exe /x/d/c`)
+before the arguments but starts the program the block names again, so no shell runs; that fails too, and the result
+is `255 << 8`, not `-1`.
 
 **Suggested fix:** no shell retry for the list form (keep it for `system STRING`, if at all); return `-1` with `$!`
 when nothing could be started.
 
-**Not to be reported as it stands** (the user, 2026-11-13, in the work on a patch to Perl's spawn on Windows: "`dir`
-is sacrosanct"): the shell's own commands must keep working in the list form, `system 'dir', '/b'`.  On real Windows
-the first call above returns 256 (the user's report), not Wine's 12544.  Also (from that work): `system 1, STRING`,
-one string after the 1, reaches the shell only through this retry, and `IPC::Open3` relies on it (`system 1, @_`).
+**Not to be reported as it stands.** The user decided (2026-11-13, in the work on a patch to Perl's spawn on
+Windows: "`dir` is sacrosanct") that the shell's own commands must keep working in the list form, as in
+`system 'dir', '/b'`.  Two more facts from that work:
+
+- On real Windows the first call above returns 256 (the user's report), not Wine's 12544.
+- `system 1, STRING`, with one string after the 1, reaches the shell only through this retry, and `IPC::Open3` relies
+  on that (`system 1, @_`).
 
 ## <a id="my-section-3"></a>3. Batch files (to check, then report privately)
 
@@ -94,20 +113,62 @@ print "parent: child still waiting for end of file after 5 s\n"; kill 'KILL', $p
 
 ## <a id="my-section-5"></a>5. Where this distribution works around them, and what to do when Perl is fixed
 
-All of these concern the primitive `system1` only (Perl's own spawn, used where the module has no `posix_spawn`:
-on Windows only when it is masked, `PROC_SPAWNER_MISSING=posix_spawn`); the default primitive there,
-[`win_spawn.h`](../win_spawn.h), needs none of them.
+All of these concern only the primitive `system1`: Perl's own spawn, which Proc::Spawner uses where it has neither a
+`posix_spawn` (on Windows its own, `win_spawn.h`) nor fork, so on Windows only when its `posix_spawn` is masked (`PROC_SPAWNER_MISSING=posix_spawn`; Perl's emulated fork on
+Windows is not used).
+The default primitive on Windows, [`win_spawn.h`](../win_spawn.h), needs none of these workarounds.
 
 | Bug | Where | What is done | When Perl is fixed |
 |---|---|---|---|
 | 1 (argv) | the module | nothing: arguments are passed as they are (the user: no bug-for-bug workaround) | nothing to do |
-| 1 | [`t/windows.t`](../t/windows.t) | the tests of exact argv (and batch files, 3) are TODO under `system1` | they pass: remove the TODO |
-| 1 | [`t/try.pl`](../t/try.pl), [`t/portable.t`](../t/portable.t) | the shell string comes from a file (`TRY_FILE`), not from an argument | may stay (also convenient elsewhere) |
-| 1 | [`t/spawner.t`](../t/spawner.t) | the Perl programs it starts are written to files (`pe`), not given with `-e` | may go back to `-e` |
+| 1 | [`t/windows.t`](../t/windows.t) | the tests of exact argv (and batch files, 3) are TODO under `system1` | they pass: remove the TODO (for the batch-file tests, once report 3 is settled too) |
+| 1 | [`t/try.pl`](../t/try.pl), [`t/portable.t`](../t/portable.t) | the shell snippet comes from a file (`TRY_FILE`), not from an argument | may stay (also convenient elsewhere) |
+| 1 | [`t/spawner.t`](../t/spawner.t) | the Perl programs it starts are written to files (its function `pe`), not given with `-e` | may go back to `-e` |
 | 1 | [`t/portable.t`](../t/portable.t), [`t/loop.t`](../t/loop.t) | a line written without `"` in an argument; a child's words without `"` | may stay |
-| 1 | `sh` as Perl (SH1, [`pspawn-shell-windows.md`](pspawn-shell-windows.md)) | nothing: the text after `-c` is an argument; [`t/portable.t`](../t/portable.t)'s line `sh -c 'echo "$0..."' nm a b` is TODO under `system1`, and so are two lines of its battery, `A=1 B=$(…) sh -c 'echo "[$B]"'` (post-0.12, its list `%SYSTEM1`) | they pass: remove the TODO |
-| 2 (cmd.exe retry) | the module (`win_find` in `Spawner.pm`) | the program is looked up before Perl's spawn is called, so a missing one is ENOENT and Perl never retries through cmd.exe (nothing else here rests on the list form not reaching the shell: the retry stays in Perl, see 2) | nothing to do (the lookup is posix_spawn's meaning of FILE anyway) |
-| 4 (handles) | the module (`system1` in `Spawner.pm`, X38) | our fds from 3 up are made not inheritable around the call and put back after; not thread-safe | remove it for the fixed versions of Perl |
+| 1 | a command `sh` run as Perl with Proc::ShellSpawn (decision SH1, [`pspawn-shell-windows.md`](pspawn-shell-windows.md#my-a-command-sh)) | nothing: the text after `-c` is an argument; [`t/portable.t`](../t/portable.t)'s Windows-only line `sh -c 'echo "$0..."' nm a b` is TODO under `system1`, and so are two of the lines it takes from [`t/batteries/`](../t/batteries/), `A=1 B=$(true)$A sh -c 'echo "[$B]"'` and `A=1 B=$(echo $A) sh -c 'echo "[$B]"'` (the test's list `%SYSTEM1`): each passes `sh -c` a text with both blanks and `"`, which arrives split (section 1); `sh -c` texts with blanks and no `"` arrive whole and pass | they pass: remove the TODO |
+| 2 (cmd.exe retry) | the module (`win_find` in `Spawner.pm`) | the program is looked up before Perl's spawn is called (`posix_spawnp`'s meaning of FILE: `PATH` and `PATHEXT`, not Perl's), so a missing one fails at once with ENOENT, before Perl's retry (`system1` uses the block form, whose retry starts the same program again with cmd.exe's words before its arguments: section 2); the retry itself stays in Perl | nothing to do (the lookup is what `posix_spawnp` does with FILE anyway; so a command of cmd.exe, such as `dir`, is not found through `system1`: Proc::Spawner starts programs; the decision "`dir` is sacrosanct" of section 2 was made for Perl's own `system`) |
+| 4 (handles) | the module (`system1` in `Spawner.pm`, X38) | the calling process's fds from 3 up are made not inheritable for the call and put back after it; not thread-safe | remove it for the fixed versions of Perl |
+| 6 (errno) | the module | nothing: `system1` passes on the error Perl's spawn gives (ENOENT), and Proc::ShellSpawn reports a spawn failing with ENOENT as "not found", status 127, as `sh` does; so a command line longer than Windows takes, started through `system1`, is "not found", where [`win_spawn.h`](../win_spawn.h) gives "Argument list too long" (it checks the length itself: more than 32,766 characters and the terminating NUL is E2BIG); seen in the corpus run under Wine (2026-11-18 and 19) in 2 snippets, both `ldd /bin/* /usr/bin/* \| ...` | nothing to do |
 
 On POSIX, see [`perl-signals-findings.md`](perl-signals-findings.md) for Perl's signal and `waitpid` findings and
 what the loop does about them.
+
+## <a id="my-section-6"></a>6. `system LIST`: every failure of `CreateProcess` is reported as ENOENT
+
+(Found 2026-11-19, in the corpus run under Wine: through `system1`, `ldd /bin/* /usr/bin/*`, whose words expand to a
+command line longer than Windows takes, was "not found"; through `win_spawn.h` the same snippet gave "Argument list too
+long".)
+
+**Summary.** When `CreateProcess` fails, the spawn (`do_spawnvp_handles` in `win32/win32.c`) sets `errno = ENOENT`
+whatever the failure was, without looking at `GetLastError()`, although the same file has `translate_to_errno()` for
+this.  So a program that exists but cannot be started (access denied, not an executable) and a command line longer
+than Windows takes (32,767 characters, the program's name included) all come back as "No such file or directory"
+(read in the source: every failure of the call takes this path; only the long command line was tried).  The ENOENT
+also starts the retry of report 2 ("possible shell-builtin", `Perl_do_aspawn`); with the block form, as below and as
+`system1` calls it, the retry starts the same program again with cmd.exe's words before the arguments, a longer line
+still, which fails too, so the caller gets `255 << 8` with `$!` ENOENT, not `-1`.  Checked in the source: the line `errno = ENOENT;` after `CreateProcess` fails is line 4640 in
+perl v5.38.2 and line 4655 in blead (2026-11-19).
+
+**To reproduce** (`$prog` is any program; checked under Wine with a five-line program of ours that prints the code page
+and ignores its arguments, at `Z:\runwin\acp.exe`):
+
+```perl
+for my $n (32700, 32800) {
+    my $r = system { $prog } $prog, 'x' x $n;
+    printf "%d characters: returned %d, \$! %d (%s), \$^E %d\n", $n, $r, $! + 0, $!, $^E + 0;
+}
+```
+
+**Got** under Wine: 32,700 characters start the program (returned 0); 32,800 return 65280, with `$!` 2 (No such
+file or directory) and `$^E` 87 (ERROR_INVALID_PARAMETER: read after the retry, so it may be the retry's error; the
+first call's is not visible to the caller).  Not checked on real Windows, which may give another Windows error for
+the long line; Perl discards it either way.
+
+**Expected:** for a failure other than a missing program, no retry and `-1`, with `$!` saying why: E2BIG for the long
+command line (as `execve` gives on POSIX), EACCES for access denied, ENOEXEC for a file that is not a program.  (A
+missing program is report 2's case.)
+
+**Suggested fix:** set `errno` from `GetLastError()` (`translate_to_errno()`, with ERROR_BAD_EXE_FORMAT as ENOEXEC
+added), and check the command line's length before the call (E2BIG); then the retry of report 2, as long as it stays,
+happens only for a program really not found.
+

@@ -8,7 +8,7 @@ run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.serv
 run: apt-get -o DPkg::Lock::Timeout=120 update -q
 run: LC_ALL=C apt-cache policy nvidia-driver-580-server 2>/dev/null
 run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y linux-headers-5.15.0-151-generic nvidia-driver-580-server
-run: dpkg -l nvidia-driver-580-server 2>/dev/null | grep -q '^ii'
+run: dpkg -l nvidia-driver-580-server 2>/dev/null | grep -q '^[hi]i'
 file: /etc/modprobe.d/blacklist-nouveau.conf
   | blacklist nouveau
   | options nouveau modeset=0

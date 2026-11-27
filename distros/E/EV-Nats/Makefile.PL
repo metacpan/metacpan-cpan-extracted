@@ -85,6 +85,9 @@ WriteMakefile(
 
     META_MERGE => {
         'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => { recommends => { 'Cpanel::JSON::XS' => 0 } },
+        },
         resources => {
             repository => {
                 type => 'git',

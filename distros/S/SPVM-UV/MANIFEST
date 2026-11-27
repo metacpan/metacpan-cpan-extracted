@@ -73,6 +73,10 @@ lib/SPVM/UV/Handle/Stream.build
 lib/SPVM/UV/Handle/Stream.c
 lib/SPVM/UV/Handle/Stream.pm
 lib/SPVM/UV/Handle/Stream.spvm
+lib/SPVM/UV/Handle/TCP.build
+lib/SPVM/UV/Handle/TCP.c
+lib/SPVM/UV/Handle/TCP.pm
+lib/SPVM/UV/Handle/TCP.spvm
 lib/SPVM/UV/Handle/Timer.build
 lib/SPVM/UV/Handle/Timer.c
 lib/SPVM/UV/Handle/Timer.pm

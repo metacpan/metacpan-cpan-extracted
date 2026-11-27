@@ -5,13 +5,16 @@ author:
 build_requires:
   Data::Dumper: '2.183'
   ExtUtils::MakeMaker: '0'
+  Pod::Wordlist: '1.15'
   Storable: '2.00'
   Test::Exception: '0.43'
   Test::File::ShareDir: '1.001000'
   Test::More: '0.96'
   Test::More::UTF8: '0.05'
+  Test::Number::Delta: '1.04'
   Test::Output: '1.01'
   Test::Pod: '1.22'
+  Test::Spelling: '0.12'
   Test::Warn: '0.30'
   Text::Hyphen: '0.12'
   Text::Hyphen::RU: '0.12'
@@ -37,10 +40,11 @@ requires:
   File::Path: '2.18'
   File::ShareDir: '1.10'
   File::ShareDir::Install: '0.14'
+  Path::Tiny: '0.10'
   Storable: '2.00'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/AlessandroGorohovski/LaTeX-Replicase/issues
   repository: git://github.com/AlessandroGorohovski/LaTeX-Replicase.git
-version: '0.815'
+version: '0.816'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

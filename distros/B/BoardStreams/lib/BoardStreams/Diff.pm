@@ -1,7 +1,7 @@
 package BoardStreams::Diff;
 use v5.44;
 
-our $VERSION = "v0.0.56";
+our $VERSION = "v0.0.58";
 
 use Exporter 'import';
 use Mojo::JSON qw(encode_json);

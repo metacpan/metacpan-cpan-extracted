@@ -3,6 +3,8 @@
 
 class UV::Callback::Read : interface_t {
   
+  version_from UV;
+  
   use UV::Handle::Stream;
   
   required method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buffer : string);

@@ -10,8 +10,8 @@ use EV::Nats::KV;
 for my $reconnect (0, 1) {
     for my $method (qw(delete purge)) {
         my $nats = EV::Nats->new(reconnect => $reconnect, on_error => sub {});
-        my $js = bless { nats => $nats }, 'EV::Nats::JetStream';
-        my $kv = bless { js => $js, bucket => 'B' }, 'EV::Nats::KV';
+        my $js = EV::Nats::JetStream->new(nats => $nats);
+        my $kv = EV::Nats::KV->new(js => $js, bucket => 'B');
         my ($calls, $error) = (0, undef);
         my $ok = eval {
             $kv->$method('key', sub { ++$calls; $error = $_[1]; EV::break });

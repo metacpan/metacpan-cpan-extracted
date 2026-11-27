@@ -36,8 +36,8 @@ posix	NB:7886	=bash	=dash	out	0	echo -e "length(FOO_NO_WHITESPACE)==$(echo -ne "
 posix	NB:7887	=bash	=dash	out	0	echo -e "length(FOO)==$(echo -ne "${FOO}" | wc -m)"
 posix	NB:9669	=bash	=dash	rec	0	echo -e "\n/usr/local/boost_1_54_0/stage/lib" | sudo tee -a /etc/ld.so.conf
 posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes1	=bash	=dash	out	0	echo 'foo\nbar\n'
-posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes10	same	OURS	out	0	echo '\x4a'
-posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes11	same	OURS	out	0	echo '\xat'
+posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes10	same	SHELLSPAWN	out	0	echo '\x4a'
+posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes11	same	SHELLSPAWN	out	0	echo '\xat'
 posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes2	=bash	=dash	out	0	echo -e 'foi\nbar'
 posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes3	=bash	=dash	out	0	echo "n:\t42"
 posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes6	=bash	=dash	out	0	echo '\506'
@@ -48,8 +48,8 @@ posix	TL:common/echo.md:25	=bash	=dash	out	0	echo -e "Column 1\tColumn 2"
 posix	TL:common/nc.md:32	=bash	=dash	rec	0	echo -e "GET / HTTP/1.1\nHost: host\n\n" | nc host 80
 posix	TL:common/tsort.md:13	=bash	=dash	rec	0	echo -e "UI Backend\nBackend Database\nDocs UI" | tsort
 posix	TL:linux/mopac.md:12	timeout	timeout	files	0	touch test.out; echo "PM7\n#comment\n\nH 0.95506 0.05781 -0.03133\nF 1.89426 0.05781 -0.03133" >test
-utf8	SC:Checks/Commands.hs:prop_checkPrintfVar3	OURS	OURS	err	0	printf -v cow $(cmd)
-utf8	SC:Checks/ShellSupport.hs:prop_checkBashisms30	OURS	OURS	err	0	printf -v '%s' "$1"
+utf8	SC:Checks/Commands.hs:prop_checkPrintfVar3	SHELLSPAWN	SHELLSPAWN	err	0	printf -v cow $(cmd)
+utf8	SC:Checks/ShellSupport.hs:prop_checkBashisms30	SHELLSPAWN	SHELLSPAWN	err	0	printf -v '%s' "$1"
 utf8	TL:common/printf.md:21	same	=bash	out	0	printf "\u20AC %.2f\n" 123.4
 sigpipe	NB:101	same	same	err	0	yes 1 | command
 sigpipe	NB:10103	same	same	out	1	find "$STORAGEFOLDER" -name .todo -printf '%h\n' | uniq | xargs ls -l
@@ -64,19 +64,18 @@ sigpipe	NB:103	same	same	err	0	yes | cp * /tmp
 sigpipe	NB:104	same	same	err	0	yes | rm -ri foo
 sigpipe	NB:105	same	same	err	0	yes y | rm -ir dir1 dir2 dir3
 sigpipe	NB:106	msg=dash	msg=dash	err	0	yes '| COUNTRY' | sed $(wc -l < file)q | paste -d ' ' file -
-sigpipe	NB:11618	msg=dash	msg-own	err	0	echo 'string to be hashed' | md5
+sigpipe	NB:11621	msg=dash	msg-own	err	0	printf 'password' | md5
 sigpipe	NB:12196	same	same	files	1	find . -name "filename including space" -print0 | tee my_teed_file | xargs -0 ls -aldF > log.txt
 sigpipe	NB:12327	same	same	out	1	find . -name foo | xargs ls -tl
 sigpipe	NB:12419	msg=dash	msg-own	err	0	echo "* * * * * touch $(pwd)/washere1" | crontab
 sigpipe	NB:12420	msg=dash	msg-own	err	0	echo "30 * * * * touch $(pwd)/washere2" | crontab
-sigpipe	NB:1305	same	msg-own	err	0	(ls -t|head -n X;ls)|sort|uniq -u|xargs rm
 sigpipe	NB:1505	same	same	rec	1	ls -l | more
 sigpipe	NB:1523	same	same	out	1	find /home/backups -printf "%T@ %p\n" | sort -n | head -1 | cut -d" " -f2- | xargs ls -al
 sigpipe	NB:1542	same	same	err	0	yes | more
 sigpipe	NB:1579	same	same	err	0	yes 'c=(╱ ╲);printf ${c[RANDOM%2]}'|bash
 sigpipe	NB:1580	same	same	err	0	yes 'printf \\u$[2571+RANDOM%2]'|bash
 sigpipe	NB:1635	same	same	err	0	od -t x1 -An /bin/ls | head
-sigpipe	NB:1654	msg=dash	msg=dash	err	0	ls | column -c 80
+sigpipe	NB:1654	msg=dash	msg-own	err	0	ls | column -c 80
 sigpipe	NB:1689	msg=dash	msg=dash	err	0	seq 10000 | parallel -j100 wget https://www.example.com/page{}.html
 sigpipe	NB:1920	same	same	out	1	ls -l --color=always "$@" | egrep --color=never '^d|^[[:digit:]]+ d'
 sigpipe	NB:1921	same	same	out	1	ls -l --color=always "$@" | grep --color=never '^d'
@@ -91,14 +90,12 @@ sigpipe	NB:2999	same	same	out	1	find /path/to/dir -type f -mtime -7 -print0 | xa
 sigpipe	NB:329	same	same	err	0	seq 100000 | paste -sd+ | bc -l
 sigpipe	NB:335	msg=dash	msg=dash	err	0	find . -type f -iname "*.jpg" -ls | awk 'BEGIN {print "0"}; {print $7, "+"}; END {print "p"}' | dc
 sigpipe	NB:351	msg=dash	msg=dash	err	0	echo ',s/foo/bar/g; w' | tr \; '\012' | ed -s file.txt
-sigpipe	NB:3956	same	same	status+err	0	find . -type f -execdir /usr/bin/grep -iH '#!/bin/ksh' {} \; | tee /tmp/allfiles
-sigpipe	NB:3957	same	same	status+err	0	find . -type f -print | xargs /usr/bin/grep -il 'bin/ksh' | tee /tmp/allfiles
-sigpipe	NB:4253	same	same	out	1	find . -name "*zip" -type f | xargs ls -ltr | tail -1
+sigpipe	NB:4253	=dash	same	out	1	find . -name "*zip" -type f | xargs ls -ltr | tail -1
 sigpipe	NB:4254	same	same	out	1	find . -type f -print0 | xargs -0 ls -ltr | tail -n 1
 sigpipe	NB:4259	same	same	out	1	find . -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" " | sed 's/.*/"&"/' | xargs ls 
 sigpipe	NB:4263	same	same	out	1	find . -type f | xargs ls -ltr | tail -n 1
 sigpipe	NB:4313	same	same	out	1	find . -type l | xargs ls -ld
-sigpipe	NB:4440	=dash	=dash	out	0	{ time sleep 1; } 2>&1 | grep real
+sigpipe	NB:4440	=dash	=dash	out	1	{ time sleep 1; } 2>&1 | grep real
 sigpipe	NB:4535	msg=dash	msg=dash	err	0	cat file.txt | column -c 28 -s "\ "
 sigpipe	NB:4579	same	timeout	status	0	pass=$(LC_CTYPE=C < /dev/urandom tr -cd [:graph:] | tr -d '\n' | fold -w 32 | head -n 1)
 sigpipe	NB:4623	neither	neither	rec	1	ps -p $$ | awk '$1 == PP {print $4}' PP=$$
@@ -110,8 +107,7 @@ sigpipe	NB:4783	msg=bash	msg=bash	err	0	yes 0 | sed '1~2s/0/1/'
 sigpipe	NB:4785	msg=bash	timeout	status	0	yes 1 | nl | tee /tmp/to
 sigpipe	NB:4882	same	same	out	1	find /etc -name "*.txt" | xargs ls -l
 sigpipe	NB:4890	same	same	out	1	find . -name "*fink*" |xargs ls -l
-sigpipe	NB:4904	=bash	same	files	1	find . -name 'VPN_CALLRECORD_20140409*' -type f| xargs ls -lhrt |awk '{print $9}' > log.txt
-sigpipe	NB:4909	msg-own	same	err	1	find /home/jassi/ -name "aliencoders.[0-9]+" | xargs ls -lrt | awk print '$9'
+sigpipe	NB:4909	same	same	err	0	find /home/jassi/ -name "aliencoders.[0-9]+" | xargs ls -lrt | awk print '$9'
 sigpipe	NB:4948	same	same	out	1	ls -l --time-style=long-iso | sort -k6
 sigpipe	NB:4976	same	same	out	1	find . -maxdepth 2 -type f -print0 | xargs -0 -n1 ls -l
 sigpipe	NB:4984	same	same	out	1	find . -type f -print | xargs ls -l
@@ -123,7 +119,7 @@ sigpipe	NB:5077	same	same	out	1	find ~ -type f -mtime +1825 |xargs ls -l
 sigpipe	NB:5080	same	same	out	1	find . -type f -print0 | xargs -0 ls -l
 sigpipe	NB:5081	same	same	out	1	find . -type f | xargs ls -l
 sigpipe	NB:5137	neither	neither	out	0	env | sed 's/;/\\;/g'
-sigpipe	NB:5152	same	same	out	1	find . -print | xargs ls -gilds
+sigpipe	NB:5152	same	SHELLSPAWN	out	1	find . -print | xargs ls -gilds
 sigpipe	NB:5171	same	same	out	1	find /tmp /var/tmp -size +30M -mtime 31 -print0 | xargs -0 ls -l
 sigpipe	NB:5182	same	same	out	1	find . -type f |xargs ls -lS |head -20
 sigpipe	NB:5185	same	same	out	1	find -type f | grep -P '\w+-\d+x\d+\.\w+$' | sed -re 's/(\s)/\\\1/g' | xargs ls -l
@@ -133,14 +129,13 @@ sigpipe	NB:5391	neither	timeout	status+rec+files	1	mkdir $(cat /dev/urandom | tr
 sigpipe	NB:5505	=dash	=dash	err	1	time find /usr/src -name "*.html" -exec grep -H "foo" {} ';' | wc -l
 sigpipe	NB:5506	=dash	=dash	err	1	time find /usr/src -name "*.html" | xargs grep -l "foo" | wc -l
 sigpipe	NB:552	neither	neither	rec	1	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | wc -l
-sigpipe	NB:5699	timeout	timeout	status+out+err	0	yes | sed -n '200000000,${=;p};200000005q'
+sigpipe	NB:5699	timeout	same	status+out+err	0	yes | sed -n '200000000,${=;p};200000005q'
 sigpipe	NB:571	neither	neither	rec	1	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | grep screen | wc -l
 sigpipe	NB:5712	same	same	err	0	yes -- "-tcp" | head -n 2
 sigpipe	NB:5713	same	same	err	0	yes -- -tcp | head -n 2
 sigpipe	NB:5738	msg=dash	msg=dash	err	0	yes | execute_command
 sigpipe	NB:5764	same	same	err	0	yes | awk 'FNR<4 {print >>"file"; close("file")} 1' | more
-sigpipe	NB:5776	neither	=bash	files	1	{ echo foo; cat bar; } | tee bar > /dev/null
-sigpipe	NB:5788	same	msg-own	err	0	echo $PATH | awk -F: -f rem_dup.awk | paste -sd:
+sigpipe	NB:5776	SHELLSPAWN	=bash	files+err	1	{ echo foo; cat bar; } | tee bar > /dev/null
 sigpipe	NB:5799	msg=dash	msg=dash	err	0	echo -e "a\nb\ncccccccccccc\nd" | paste - - | column -t
 sigpipe	NB:5816	same	same	err	0	yes yes | sed -e 5s/yes/no/ -e 5q
 sigpipe	NB:5843	same	same	err	0	yes '#' | head -n 10 | tr -d '\n'
@@ -179,24 +174,23 @@ sigpipe	NB:6436	neither	neither	rec	1	ps -p $$ | tail -1 | awk '{print $NF}'
 sigpipe	NB:6487	neither	timeout	status+out	1	cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1
 sigpipe	NB:6488	neither	neither	out+err	1	cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32
 sigpipe	NB:6489	neither	neither	out+err	1	cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f0-9' | head -c 32
-sigpipe	NB:6494	same	msg=dash	err	0	seq 1 10000 | head -1
+sigpipe	NB:6494	same	msg-own	err	0	seq 1 10000 | head -1
 sigpipe	NB:6643	same	same	out	1	ls -l | head -2 | tail -1
 sigpipe	NB:6644	same	same	out	1	ls -l | tail -n +2 | head -n1
 sigpipe	NB:6669	neither	neither	out	1	seq -f 'some line %g' 500 | nl | sort -R | cut -f2- | head -3
 sigpipe	NB:6694	same	same	err	0	yes "$OPTARG" | head -$opt
 sigpipe	NB:6728	same	same	err	0	tr -dc '1-65000' </dev/urandom | head -c N
-sigpipe	NB:6731	=dash	neither	out	1	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
+sigpipe	NB:6731	neither	neither	out	1	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
 sigpipe	NB:6732	neither	neither	rec	1	head -200 /dev/urandom |cksum | cut -f1 -d " " | awk '{print $1%63000+2001}'
-sigpipe	NB:6795	OURS	=bash	out+files	1	ls -a | tee output.file
 sigpipe	NB:6810	same	same	out	1	ls -ld /tmp /tnt | sed 's/^.*$/<-- & --->/'
-sigpipe	NB:6818	neither	neither	out+files+err	1	ls -lR / | tee -a output.file
-sigpipe	NB:6819	neither	neither	out+files	1	ls -lR / | tee output.file
+sigpipe	NB:6818	neither	neither	out+files	1	ls -lR / | tee -a output.file
+sigpipe	NB:6819	neither	neither	out+files+err	1	ls -lR / | tee output.file
 sigpipe	NB:682	same	same	err	0	yes | mv ...
 sigpipe	NB:6821	neither	neither	rec	1	ls -l /proc/$$/exe | sed 's%.*/%%'
 sigpipe	NB:683	msg=bash	msg=bash	err	0	yes a=\"20131202\" | sed -e :a -e 's/...\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)./\1 \2 \3/'
 sigpipe	NB:684	msg=dash	msg=dash	err	0	yes | pv --quiet --rate-limit 10
 sigpipe	NB:6844	neither	neither	rec	1	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | less
-sigpipe	NB:685	same	same	err	0	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
+sigpipe	NB:685	=dash	=dash	out+err	1	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
 sigpipe	NB:6866	same	same	out	1	find . -type f -printf '%T@ %p\n' | sort -n -r | head -${numl} | cut -f2- -d" " | sed -e 's,^\./,,' 
 sigpipe	NB:687	msg=dash	msg=dash	err	0	yes Y | command-that-asks-for-input
 sigpipe	NB:688	msg=dash	msg=dash	err	0	yes Yes | ./ittp-update.sh
@@ -218,27 +212,27 @@ sigpipe	NB:7365	msg=dash	msg=dash	err	0	find dir -name \*~ | xargs echo rm | ksh
 sigpipe	NB:739	neither	neither	out	1	head /dev/random -c16 | od -tx1 -w16 | head -n1 | cut -d' ' -f2- | tr -d ' '
 sigpipe	NB:7418	same	same	err	0	yes | /bin/rm -i *
 sigpipe	NB:7522	msg=dash	msg=dash	err	0	echo '1/2 [3] (27/03/2012 19:32:54) word word word word 4/5' | sed -e 's/(.*)//' -e 's/[^0-9]/ /g' |
-sigpipe	NB:7601	same	msg=dash	err	0	PATH=$(echo $PATH | tr ":" "\n" | grep -v $1 | tr "\n" ":")
-sigpipe	NB:7652	same	msg=bash	err	0	ls -tp | grep -v '/' | tail -n +"$1" | xargs -I {} rm -- {}
+sigpipe	NB:7652	same	same	err	0	ls -tp | grep -v '/' | tail -n +"$1" | xargs -I {} rm -- {}
 sigpipe	NB:7753	same	same	err	0	echo $(yes image.png | head -n10)
 sigpipe	NB:7754	same	same	err	0	yes image.png | head -n10 | xargs echo
-sigpipe	NB:7768	same	msg=bash	err	0	sort inputfile | uniq | sort -o inputfile
+sigpipe	NB:7781	msg-own	same	err	1	sed s/STRING_TO_REPLACE/STRING_TO_REPLACE_IT/g index.html | tee index.html
 sigpipe	NB:8063	same	timeout	status	0	foo=$(cat /dev/urandom | tr -dc '. ' | fold -w 100 | head -1)
 sigpipe	NB:8208	neither	neither	files	1	{ time ls; } 2>&1 | cat > time.txt
 sigpipe	NB:841	same	same	err	0	yes | cp -rf /zzz/zzz/* /xxx/xxx
 sigpipe	NB:842	msg=dash	msg=dash	err	0	pwd | tr -d '\n' | pbcopy
-sigpipe	NB:86	neither	neither	rec	0	v=5 env|less
 sigpipe	NB:8772	same	same	out	1	find . -type f -printf '%20s %p\n' | sort -n | cut -b22- | tr '\n' '\000' | xargs -0 ls -laSr
 sigpipe	NB:9021	msg=dash	msg=dash	err	0	{ yes yes | sed 4q; yes no | sed 1q; } | ./script
 sigpipe	NB:9219	same	same	out	1	ls -lrt | tail -n1
 sigpipe	NB:9602	msg=dash	msg=dash	err	0	yes | tr \\n x | head -c $BYTES | pv | grep n
 sigpipe	NB:9603	same	same	err	0	yes | tr \\n x | head -c $BYTES | grep n
 sigpipe	NB:9623	msg=dash	msg=dash	err	0	yes | tr \\n x | head -c $((1024*1024*1024)) | pv -L $((1024*1024)) | grep n
-sigpipe	NB:9672	same	same	err	1	echo 'ee' | tee /dev/stderr | foo
-sigpipe	NB:9680	=bash	same	out+files+err	1	echo "fifo forever" | cat - fifo | tee fifo
+sigpipe	NB:9672	same	same	err	0	echo 'ee' | tee /dev/stderr | foo
+sigpipe	NB:9680	same	msg=bash	err	1	echo "fifo forever" | cat - fifo | tee fifo
 sigpipe	NB:9682	neither	neither	out	1	echo foo | readlink /proc/self/fd/0
 sigpipe	NB:9690	same	same	err	0	yes | head -n10 > 10lines.txt
 sigpipe	NB:9691	same	same	err	0	yes "this is the text I want to add to a file"|head -200>myFile.txt
+sigpipe	NB:9741	same	same	status+err	1	ls 2>&1 | tee /tmp/ls.txt
+sigpipe	NB:9743	same	same	status+err	0	ls 2>&1 | tee -a /tmp/ls.txt
 sigpipe	NB:980	=dash	=dash	err	1	time find /usr/src -name "*.html" | xargs /usr/bin/grep -l "foo" | wc -l
 sigpipe	SC:Analytics.hs:prop_checkExtraMaskedReturns14	same	msg-own	err	0	echo asdf | false
 sigpipe	SC:Analytics.hs:prop_checkPipePitfalls5	msg=dash	msg=dash	err	0	ls -N | foo
@@ -248,55 +242,40 @@ sigpipe	SC:Analytics.hs:prop_checkPipeToNowhere21	same	same	err	0	yes | cp -ri f
 sigpipe	SC:Analytics.hs:prop_checkPipeToNowhere22	same	same	err	0	yes | rm --interactive *
 sigpipe	SC:Checks/Commands.hs:prop_checkExpr12	msg=dash	msg=dash	err	0	# shellcheck disable=SC2003 expr 1 | 2
 sigpipe	TL:common/$.md:24	msg=dash	msg-own	err	0	echo $PS0|PS1|PS2|PS3|PS4
-sigpipe	TL:common/ajson.md:20	msg=dash	msg=dash	err	0	echo '3' | ajson '2 * pi * $'
-sigpipe	TL:common/aws-secretsmanager.md:36	msg-own	msg=dash	err	1	aws secretsmanager rotate-secret --secret-id name|arn --rotation-lambda-arn arn_of_lambda_function -
-sigpipe	TL:common/b3sum.md:28	msg=dash	msg-own	err	0	echo known_blake3_checksum_of_the_file path/to/file | b3sum -c
 sigpipe	TL:common/bind.md:8	msg-own	msg-own	err	0	bind -p|-P
 sigpipe	TL:common/bw.md:24	msg=dash	msg=dash	err	0	echo -n '{"name":"My Folder1"}' | base64 | bw create folder
-sigpipe	TL:common/cargo-init.md:21	msg-own	msg=dash	err	1	cargo init --vcs git|hg|pijul|fossil|none
+sigpipe	TL:common/deno-fmt.md:28	msg=dash	msg=dash	err	0	echo "markdown_text" | deno fmt --ext md -
 sigpipe	TL:common/diffoscope.md:24	msg=dash	msg=dash	err	0	diffoscope --exclude-directory-metadata auto|yes|no|recursive path/to/directory1 path/to/directory2
-sigpipe	TL:common/espeak.md:13	msg=dash	msg=dash	err	0	echo "text" | espeak
-sigpipe	TL:common/mado.md:24	msg-own	msg=dash	err	1	mado check path/to/directory --output-format concise|mdl|markdownlint
-sigpipe	TL:common/mailx.md:12	msg=dash	msg-own	err	0	echo "content" | mailx -s "subject" to_addr
-sigpipe	TL:common/mosquitto_pub.md:28	msg=dash	msg-own	err	0	echo data.txt | mosquitto_pub -t sensors/temperature -l
-sigpipe	TL:common/neato.md:21	=dash	=dash	err	0	echo "graph {this -- that} " | neato -T gif >path/to/image.gif
+sigpipe	TL:common/dnsx.md:18	msg=dash	msg-own	err	0	echo example.com | dnsx -re -a|aaaa|cname|ns|txt|srv|ptr|mx|soa|any|axfr|caa
+sigpipe	TL:common/kitty.md:24	msg=dash	msg=dash	err	0	echo example | kitty +kitten clipboard
+sigpipe	TL:common/mlr.md:28	msg=dash	msg=dash	err	0	echo '{"key1":"value1", "key2":"value2"}' | mlr --ijson --ojson --jvstack cat
+sigpipe	TL:common/mosquitto_pub.md:28	msg=dash	msg=dash	err	0	echo data.txt | mosquitto_pub -t sensors/temperature -l
 sigpipe	TL:common/nms.md:12	msg=dash	msg=dash	err	0	ls -la | nms -a
 sigpipe	TL:common/numfmt.md:24	same	same	rec	1	ls -l | numfmt --header=1 --field 5 --to iec
 sigpipe	TL:common/parallel.md:13	msg=dash	msg=dash	err	0	ls *.txt | parallel -j 4 gzip
 sigpipe	TL:common/passwd.md:25	same	same	err	0	yes password | passwd
+sigpipe	TL:common/qrencode.md:29	msg=dash	msg=dash	err	0	echo string | qrencode -t utf8
 sigpipe	TL:common/sequin.md:13	msg=dash	msg=dash	err	0	ls -l --color=always | sequin
 sigpipe	TL:common/tqdm.md:12	msg=dash	msg=dash	err	0	seq 10000000 | tqdm --total 10000000 | command
 sigpipe	TL:common/tqdm.md:8	msg=dash	msg=dash	err	0	seq 10000000 | tqdm | command
 sigpipe	TL:common/tte.md:12	msg=dash	msg=dash	err	0	ls -la | tte matrix
-sigpipe	TL:common/tuc.md:13	msg=dash	msg=dash	err	0	echo "foo bar baz" | tuc -d ' ' -r ' ➡ '
 sigpipe	TL:common/tv.fzf.md:13	msg=dash	msg=dash	err	0	tv files|env|git-repos|...
 sigpipe	TL:common/yes.md:17	same	same	err	0	yes | sudo apt-get install program
-sigpipe	TL:common/zsh.md:25	msg=dash	msg-own	err	0	echo "echo 'zsh is executed'" | zsh
-sigpipe	TL:linux/atomupd-manager.md:24	msg=dash	msg-own	err	0	sudo atomupd-manager switch-branch stable|beta|preview|rc|bc|pc|main
-sigpipe	TL:linux/column.md:17	msg=dash	msg=dash	err	0	printf "header1,header2\nbar,foo\n" | column -t -s ,
-sigpipe	TL:linux/column.md:9	msg=dash	msg-own	err	0	printf "header1 header2\nbar foo\n" | column -c 30
+sigpipe	TL:linux/column.md:21	msg=dash	msg=dash	err	0	printf "header1\nbar\nfoobar\n" | column -c 30 -x
 sigpipe	TL:linux/datamash.md:12	msg=dash	msg=dash	err	0	echo -e '1.0\n2.5\n3.1\n4.3\n5.6\n5.7' | tr '.' ',' | datamash mean 1
 sigpipe	TL:linux/datamash.md:8	msg=dash	msg=dash	err	0	seq 3 | datamash max 1 min 1 mean 1 median 1
-sigpipe	TL:linux/dmenu.md:17	msg=dash	msg-own	err	0	echo -e "red\ngreen\nblue" | dmenu >color.txt
-sigpipe	TL:linux/dmenu.md:21	msg=dash	msg-own	err	0	ls | dmenu -m 1
+sigpipe	TL:linux/dmenu.md:21	msg=dash	msg=dash	err	0	ls | dmenu -m 1
 sigpipe	TL:linux/dmenu.md:25	msg=dash	msg=dash	err	0	ls | dmenu -b
-sigpipe	TL:linux/dmenu.md:9	msg=dash	msg=dash	err	0	ls | dmenu
+sigpipe	TL:linux/dmenu.md:9	msg=dash	msg-own	err	0	ls | dmenu
 sigpipe	TL:linux/fuzzel.md:16	msg=dash	msg=dash	err	0	ls | fuzzel -d
-sigpipe	TL:linux/journalctl.md:25	msg-own	msg=dash	err	1	journalctl -S now|today|yesterday|tomorrow|... -U "YYYY-MM-DD HH:MM:SS"
-sigpipe	TL:linux/nmcli-general.md:28	msg=dash	msg-own	err	0	sudo nmcli g l l INFO|OFF|ERR|WARN|DEBUG|TRACE domain domain_1,domain_2,...
-sigpipe	TL:linux/pridecat.md:24	msg=dash	msg-own	err	0	ls | pridecat --flag
-sigpipe	TL:linux/ss.md:12	msg-own	msg=dash	err	1	ss state|exclude bucket|big|connected|synchronized|...
-sigpipe	TL:linux/ttyplot.md:12	msg=dash	msg-own	err	0	{ echo 1 2 3; cat; } | ttyplot -t title -u unit
-sigpipe	TL:linux/walker.md:17	msg=dash	msg-own	err	0	printf "Choice1\nChoice2\nChoice3" | walker -d
-sigpipe	TL:linux/wine-start.md:25	msg=dash	msg-own	err	0	wine start /min|/max path\to\program.exe
-sigpipe	TL:linux/wl-copy.md:13	msg=dash	msg-own	err	0	ls | wl-copy
-sigpipe	TL:linux/wpctl.md:38	msg=dash	msg-own	err	0	wpctl set-mute @DEFAULT_SINK|SOURCE@ 1|0|toggle
-sigpipe	TL:linux/xclip.md:18	msg=dash	msg=dash	err	0	echo 123 | xclip -se c
+sigpipe	TL:linux/pridecat.md:24	msg=dash	msg=dash	err	0	ls | pridecat --flag
+sigpipe	TL:linux/wl-copy.md:13	msg=dash	msg=dash	err	0	ls | wl-copy
+sigpipe	TL:linux/xclip.md:14	msg=dash	msg-own	err	0	echo 123 | xclip -se primary|secondary|clipboard
 sigpipe	TL:linux/xcowsay.md:13	msg=dash	msg-own	err	0	ls | xcowsay
-sigpipe	TL:linux/zenity.md:25	OURS	msg-own	rec+err	0	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress
+sigpipe	TL:linux/zenity.md:25	msg=dash	msg-own	rec+err	1	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress
 noproc	NB:6335	same	same	status+err	0	zcat number.txt.gz | { zcat xxx.txt.gz | comm -12 /dev/fd/3 - ; } 3<&0
 noproc	NB:7825	=bash	same	status+out+err	0	echo "1\n2\n3\n4\n5" | paste -s -d, /dev/stdin
-noproc	NB:9672	same	msg=dash	err	1	echo 'ee' | tee /dev/stderr | foo
+noproc	NB:9672	same	msg=dash	err	0	echo 'ee' | tee /dev/stderr | foo
 noproc	SC:Analytics.hs:prop_checkPipeToNowhere9	same	=dash	status+rec+err	0	mv -i f . < /dev/stdin
 tmp	NB:3440	=dash	same	status+rec+err	0	find /mnt/naspath -mtime 0 -name .snapshot -prune -o \( \! -name *~ -print0 \) | du --files0-from=- 
 tmp	NB:3957	same	same	status+err	0	find . -type f -print | xargs /usr/bin/grep -il 'bin/ksh' | tee /tmp/allfiles
@@ -309,7 +288,7 @@ tmp	NB:5451	=bash	same	status+err	0	mkdir /tmp/new
 tmp	NB:6810	same	same	out	1	ls -ld /tmp /tnt | sed 's/^.*$/<-- & --->/'
 tmp	NB:6811	same	same	out	1	ls -ld /tmp /tnt
 tmp	NB:8171	=dash	same	status+rec+err	0	find . -name '*2011*' -print0 > /tmp/allfiles
-tmp	NB:9742	same	same	status+err	0	ls 2>&1 | tee --append /tmp/ls.txt
+tmp	NB:9742	same	same	status+err	1	ls 2>&1 | tee --append /tmp/ls.txt
 tmp	NB:9743	same	same	status+err	0	ls 2>&1 | tee -a /tmp/ls.txt
 random	NB:5390	neither	same	rec+files	1	cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | xargs mkdir
 random	NB:5391	neither	same	rec+files	1	mkdir $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
@@ -324,14 +303,13 @@ random	NB:6286	neither	same	status+out+err	1	cat /dev/urandom | tr -dC '[:graph:
 random	NB:6487	neither	same	out	1	cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1
 random	NB:6488	neither	same	out	1	cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32
 random	NB:6489	neither	same	out	1	cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f0-9' | head -c 32
-random	NB:6731	=dash	same	out	1	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
+random	NB:6731	neither	same	out	1	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
 random	NB:6732	neither	same	rec	1	head -200 /dev/urandom |cksum | cut -f1 -d " " | awk '{print $1%63000+2001}'
 random	NB:7019	neither	same	out	1	od -A n -N 2 -t u2 /dev/urandom
 random	NB:739	neither	same	out	1	head /dev/random -c16 | od -tx1 -w16 | head -n1 | cut -d' ' -f2- | tr -d ' '
 private	NB:10125	same	same	out	1	find /var -size +10000k -print0 | xargs -0 ls -lSh
 private	NB:1523	same	same	out	1	find /home/backups -printf "%T@ %p\n" | sort -n | head -1 | cut -d" " -f2- | xargs ls -al
 private	NB:4722	same	same	out	1	find /home -xdev -samefile file1 | xargs ls -l
-private	NB:4909	msg-own	msg=dash	err	1	find /home/jassi/ -name "aliencoders.[0-9]+" | xargs ls -lrt | awk print '$9'
 private	NB:6438	same	same	out	0	echo `whoami` `stat -c %i "/home"`
 private	NB:6804	same	same	rec+err	0	ls -hal /root/ | sudo tee /root/test.out
 private	NB:885	same	same	err	0	bash | tee /var/log/bash.out.log
@@ -636,7 +614,7 @@ output	NB:6794	same	same	out	0	echo "groups: [ $(groups myuser | sed -e 's/.\+\s
 output	NB:6841	same	same	out+rec	0	pstree $(pgrep -fn bash)
 output	NB:6842	same	same	out+rec	0	pstree -ap `pidof cron`
 output	NB:6846	same	same	out	0	pstree -aAp $(ps -ejH | awk -v v1=$mypid '$1==v1 {print $3}')
-output	NB:685	OURS	same	out	1	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
+output	NB:685	SHELLSPAWN	same	out	1	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
 output	NB:6876	same	same	out	0	echo `cat $FILE | head -n 100 | wc -c` / 1024 | bc -l
 output	NB:6887	same	same	out+rec+err	0	cat `find . -name "*.php"` | wc -l
 output	NB:6913	same	same	status+rec	0	TTY=$(tty) WHOLINE=$(who | grep "${TTY#/dev/}")
@@ -654,7 +632,7 @@ output	NB:7059	same	same	out+rec	0	sudo chown -R `whoami` ~/.npm
 output	NB:7122	same	same	out	0	cp -rv `ls -A | grep -vE "dirToExclude|targetDir"` targetDir
 output	NB:7123	same	same	out	0	cp -r `ls -A | grep -v "c"` $HOME/
 output	NB:7218	neither	neither	status+out+rec+err	1	stat --printf="%y %n\n" $(ls -tr $(find * -type f))
-output	NB:7219	same	OURS	status+out+rec+err	1	ls -ldt $(find .)
+output	NB:7219	same	same	status+out+rec+err	1	ls -ldt $(find .)
 output	NB:7220	same	same	status+out+rec+err	1	ls -ld $(find .)
 output	NB:7257	same	same	out+rec	0	rm `find . -name \*.pyc`
 output	NB:7261	same	same	out+rec	0	rm `find ./ -name '.DS_Store'` -rf
@@ -767,7 +745,7 @@ output	NB:9523	same	=dash	status+err	0	unset $(locale|cut -d= -f1)
 output	NB:956	same	same	out+rec+err	0	cat $(find /usr/share/doc/ -name '*.txt') | zegrep -ic '\<exception\>'
 output	NB:9583	neither	neither	rec+err	1	touch -t `date +%m%d0000` /tmp/$$
 output	NB:9614	same	msg=dash	status+err	0	command $(zcat input1.txt.gz) $(zcat input2.txt)
-output	NB:9728	same	same	out+files	0	echo $(date) "0" | tee -a log.csv
+output	NB:9728	same	=bash	out+files	0	echo $(date) "0" | tee -a log.csv
 output	NB:9729	same	same	out+files	0	echo $(date) "1" | tee -a log.csv
 output	NB:9753	same	same	out+rec	0	tar czvf mytarfile.tgz `find . -mtime -30`
 output	NB:9789	same	same	out+rec	0	find /mydir -type f -name "*.txt" -print0 | xargs -0 chown root $(mktemp)
@@ -830,7 +808,7 @@ mtime	NB:4945	same	same	out	1	ls -alrt `pwd`/*
 mtime	NB:4948	same	same	out	1	ls -l --time-style=long-iso | sort -k6
 mtime	NB:5150	same	same	out	1	ls -ald `which c++`
 mtime	NB:5293	neither	neither	out	1	ls -l /proc/self/fd/
-mtime	NB:5485	=dash	=dash	out	1	TIMEFORMAT=%R && time ls -l
+mtime	NB:5485	=dash	=dash	out+err	1	TIMEFORMAT=%R && time ls -l
 mtime	NB:5505	=dash	=dash	err	1	time find /usr/src -name "*.html" -exec grep -H "foo" {} ';' | wc -l
 mtime	NB:5506	=dash	=dash	err	1	time find /usr/src -name "*.html" | xargs grep -l "foo" | wc -l
 mtime	NB:6128	same	same	out	1	echo $(ls -l $(which bash))
@@ -839,10 +817,10 @@ mtime	NB:6132	same	same	out	1	ls `which g++` -al
 mtime	NB:6133	same	same	out	1	ls `which gcc` -al
 mtime	NB:6643	same	same	out	1	ls -l | head -2 | tail -1
 mtime	NB:6644	same	same	out	1	ls -l | tail -n +2 | head -n1
-mtime	NB:6799	neither	neither	out	1	ls -l -- "$dir/$file"
+mtime	NB:6799	neither	=dash	out	1	ls -l -- "$dir/$file"
 mtime	NB:6808	same	same	out	1	ls -lb
-mtime	NB:6810	same	same	out	1	ls -ld /tmp /tnt | sed 's/^.*$/<-- & --->/'
-mtime	NB:6811	same	same	out	1	ls -ld /tmp /tnt
+mtime	NB:6810	same	same	out	0	ls -ld /tmp /tnt | sed 's/^.*$/<-- & --->/'
+mtime	NB:6811	same	same	out	0	ls -ld /tmp /tnt
 mtime	NB:6818	neither	neither	out+files+err	1	ls -lR / | tee -a output.file
 mtime	NB:6819	neither	neither	out+files+err	1	ls -lR / | tee output.file
 mtime	NB:6821	neither	neither	rec	1	ls -l /proc/$$/exe | sed 's%.*/%%'
@@ -853,27 +831,20 @@ mtime	NB:7296	=dash	=dash	files	1	{ time find / 2>/dev/null; } 2>time.txt
 mtime	NB:7655	same	same	rec	0	ls -tQ | tail -n+4 | xargs rm
 mtime	NB:7659	same	same	rec	0	ls -C1 -t| awk 'NR>5'|xargs rm
 mtime	NB:7661	same	same	rec	0	rm `ls -t | awk 'NR>5'`
-mtime	NB:7890	neither	neither	files	0	{ time sleep 1 ; } 2> time.txt
-mtime	NB:7891	neither	neither	files	1	{ time sleep 1 2> sleep.stderr ; } 2> time.txt
-mtime	NB:7892	=dash	=dash	err	1	time sleep 1
 mtime	NB:7932	same	same	out	0	ls -t | head -n1
-mtime	NB:8207	neither	neither	files	1	(time ls) > ls_results 2> time_results
-mtime	NB:8208	neither	neither	files	1	{ time ls; } 2>&1 | cat > time.txt
-mtime	NB:8214	neither	neither	files	0	(time ls) > outfile 2>&1
 mtime	NB:9219	same	same	out	1	ls -lrt | tail -n1
 mtime	NB:9246	same	same	out	0	ls -lt | tr -d 0-9
 mtime	NB:9583	neither	neither	rec+err	1	touch -t `date +%m%d0000` /tmp/$$
 mtime	NB:980	=dash	=dash	err	1	time find /usr/src -name "*.html" | xargs /usr/bin/grep -l "foo" | wc -l
 mtime	SC:Analytics.hs:prop_checkAssignAteCommand4	same	same	out	1	A=foo ls -l
-mtime	SC:Analytics.hs:prop_checkExtraMaskedReturns37	=dash	=dash	err	1	time $(time false)
 mtime	SC:Analytics.hs:prop_checkShebang3	same	same	out	1	ls -l
 mtime	SC:Checks/Commands.hs:prop_checkPrintfVar11	neither	neither	out	1	printf '%(%s%s)T' -1
 mtime	SC:Checks/Commands.hs:prop_checkPrintfVar19	neither	neither	out	1	printf '%(%s)T'
 mtime	SC:Checks/Commands.hs:prop_checkPrintfVar20	neither	neither	out	1	printf '%d %(%s)T' 42
 mtime	SC:Checks/Commands.hs:prop_checkPrintfVar21	neither	neither	out	1	printf '%d %(%s)T'
-mtime	SC:Checks/Commands.hs:prop_checkTimeParameters2	=dash	=dash	err	0	time sleep 10
 mtime	TL:common/ls.md:20	same	same	out	1	ls -la
 mtime	TL:common/ls.md:24	same	same	out	1	ls -lh
 mtime	TL:common/ls.md:28	same	same	out	1	ls -lSR
 mtime	TL:common/ls.md:32	same	same	out	1	ls -ltr
 mtime	TL:common/numfmt.md:24	same	same	rec	1	ls -l | numfmt --header=1 --field 5 --to iec
+mtime	TL:common/times.md:10	neither	neither	out	1	times

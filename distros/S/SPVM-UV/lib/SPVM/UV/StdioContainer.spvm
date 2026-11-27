@@ -3,6 +3,8 @@
 
 class UV::StdioContainer : pointer {
   
+  version_from UV;
+  
   use UV;
   use UV::Handle::Stream;
   

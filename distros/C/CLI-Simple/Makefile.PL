@@ -67,39 +67,51 @@ WriteMakefile(
       'provides'=>{
                       'CLI::Simple'=>{
                                          'file'=>'lib/CLI/Simple.pm',
-                                         'version'=>'2.4.0'
+                                         'version'=>'2.7.0'
                                        },
                       'CLI::Simple::Constants'=>{
                                                     'file'=>'lib/CLI/Simple/Constants.pm',
-                                                    'version'=>'2.4.0'
+                                                    'version'=>'2.6.0'
                                                   },
                       'CLI::Simple::DumpSpec'=>{
                                                    'file'=>'lib/CLI/Simple/DumpSpec.pm',
-                                                   'version'=>'undef'
+                                                   'version'=>'2.6.0'
                                                  },
                       'CLI::Simple::Helpers'=>{
                                                   'file'=>'lib/CLI/Simple/Helpers.pm',
-                                                  'version'=>'undef'
+                                                  'version'=>'2.6.0'
                                                 },
                       'CLI::Simple::Migrate'=>{
                                                   'file'=>'lib/CLI/Simple/Migrate.pm',
-                                                  'version'=>'undef'
+                                                  'version'=>'2.6.0'
                                                 },
                       'CLI::Simple::Modulino'=>{
                                                    'file'=>'lib/CLI/Simple/Modulino.pm',
-                                                   'version'=>'undef'
+                                                   'version'=>'2.6.0'
                                                  },
+                      'CLI::Simple::Options'=>{
+                                                  'file'=>'lib/CLI/Simple/Options.pm',
+                                                  'version'=>'2.7.0'
+                                                },
                       'CLI::Simple::Scaffold'=>{
                                                    'file'=>'lib/CLI/Simple/Scaffold.pm',
-                                                   'version'=>'undef'
+                                                   'version'=>'2.6.0'
                                                  },
                       'CLI::Simple::Shell'=>{
                                                 'file'=>'lib/CLI/Simple/Shell.pm',
-                                                'version'=>'undef'
+                                                'version'=>'2.6.0'
                                               },
+                      'CLI::Simple::TempDir'=>{
+                                                  'file'=>'lib/CLI/Simple/TempDir.pm',
+                                                  'version'=>'2.6.0'
+                                                },
+                      'CLI::Simple::TempFile'=>{
+                                                   'file'=>'lib/CLI/Simple/TempFile.pm',
+                                                   'version'=>'2.6.0'
+                                                 },
                       'CLI::Simple::Utils'=>{
                                                 'file'=>'lib/CLI/Simple/Utils.pm',
-                                                'version'=>'2.4.0'
+                                                'version'=>'2.6.0'
                                               }
                     },
       'resources'=>{

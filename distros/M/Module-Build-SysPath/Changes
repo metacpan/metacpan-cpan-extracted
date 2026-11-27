@@ -1,5 +1,12 @@
 Revision history for Module-Build-SysPath
 
+0.22    26 November 2026
+    - Fix integration tests failing when PERL_MB_OPT or .modulebuildrc sets
+      an install base, for example under local::lib. Module::Build applied
+      it on every ./Build run, so the tests also installed their
+      Acme::Test::SysPath fixture into the user's real install base.
+      (CPAN Testers report for 0.21 on Perl 5.24.4)
+
 0.21    25 November 2026
     - Fix integration tests run by non-root users from release distributions
       that ship read-only fixtures. (GitHub issue #6, Slaven Rezić)

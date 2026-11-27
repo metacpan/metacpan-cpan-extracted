@@ -1,7 +1,7 @@
 # ABSTRACT: NVIDIA driver setup for Ubuntu (experimental)
 
 package Rex::GPU::NVIDIA::Setup::Ubuntu;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use Moo;
 use Rex::Logger ();
 use namespace::autoclean;
@@ -96,7 +96,8 @@ sub prepare_nvlink_fabric_source {
   my $repo = $self->_nvlsm_repo
     or die 'No NVIDIA CUDA repository for nvlsm on this Ubuntu host; the driver and '
       ."Fabric Manager are installed, nvlsm is not\n";
-  $self->run_cmd("dpkg -l cuda-keyring 2>/dev/null | grep -q '^ii'", auto_die => 0);
+  # k94: a held (hi) cuda-keyring has the same files, so it counts too
+  $self->run_cmd("dpkg -l cuda-keyring 2>/dev/null | grep -q '^[hi]i'", auto_die => 0);
   if ($? == 0) {
     Rex::Logger::info('  cuda-keyring is installed: NVIDIA\'s CUDA repository is already '
       .'configured (with its own apt pin), nothing is added');
@@ -186,7 +187,7 @@ Rex::GPU::NVIDIA::Setup::Ubuntu - NVIDIA driver setup for Ubuntu (experimental)
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -241,9 +242,10 @@ its exact branch, is looked up only after C<apt-get update>
 cannot use, dies before any driver package is installed. There is no
 hard-coded fallback package, and no other source is tried then.
 
-So a GPU without constraints (Turing to Hopper except GH200, no GPU) gets
-C<ubuntu-server>, Blackwell and GH200 C<ubuntu-server-open>, Maxwell/Pascal/Volta
-C<ubuntu-server-580>.
+So Turing to Hopper except GH200 -- without constraints or with only a
+branch floor (Ada and Hopper 520 or newer, single IDs up to 580), all within
+the "at least 580" -- and no GPU get C<ubuntu-server>, Blackwell and GH200
+C<ubuntu-server-open>, Maxwell/Pascal/Volta C<ubuntu-server-580>.
 
 Each names C<nvidia-fabricmanager-NNN> as its Fabric Manager (for a host
 with NVSwitches, see L<Rex::GPU::NVIDIA::Setup/nvswitches>): NNN is the
@@ -292,8 +294,9 @@ update>.
 
 =back
 
-A host that has C<cuda-keyring> installed already has the repository (with
-NVIDIA's own pin): nothing is added there, only C<apt-get update>. Dies,
+A host that has C<cuda-keyring> installed (C<ii> or C<hi> in C<dpkg -l>,
+not half configured) already has the repository (with NVIDIA's own pin):
+nothing is added there, only C<apt-get update>. Dies,
 before anything is added, when the key cannot be fetched; the driver and
 Fabric Manager stay installed.
 
@@ -337,7 +340,7 @@ L<Rex::GPU::NVIDIA/install_driver>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

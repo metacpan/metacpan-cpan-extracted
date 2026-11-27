@@ -32,7 +32,7 @@ our %EXPORT_TAGS = ('all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.815';
+our $VERSION = '0.816';
 our $DEBUG = 0;
 
 our $qs = qr/^|_|\b/o;
@@ -1525,7 +1525,7 @@ push @{$op->{logs}}, "~~> l.$. NOT HASH.SCALAR or NOT defined %%%V:". $ki if $op
 }
 
 
-sub _code2dec {
+sub _hex2dec {
 	my @arr;
 	my $f16 = 0;
 	for my $h ( map{ hex } split /\s+/, $_[0] ) { # $codes
@@ -1554,7 +1554,7 @@ sub _code2dec {
 }
 
 
-sub _code2sym {
+sub _hex2sym {
 	my @arr;
 	my $f16 = 0;
 	for my $h ( map{ hex } split /\s+/, $_[0] ) { # $codes
@@ -1585,6 +1585,68 @@ sub _code2sym {
 }
 
 
+sub _hex2hex8 {
+	my @arr;
+	my $f16 = 0;
+	for my $h ( map{ hex } split /\s+/, $_[0] ) { # hex
+
+		if( $h >= 0xD800 and $h <= 0xDBFF ) {# HIGH utf16 code
+			push @arr, 0x10000 + (($h - 0xD800) << 10);
+			$f16 = 1;
+		}
+		elsif( $h >= 0xDC00 and $h <= 0xDFFF ) { # LOW utf16 code
+			$h -= 0xDC00;
+			if( $f16 ) {
+				$arr[-1] = sprintf("%X", $arr[-1] + $h );
+				$f16 = 0;
+			}
+			else {
+				push @arr, sprintf("%X", 0x10000 + $h );
+			}
+		}
+		else {
+			$arr[-1] = sprintf("%X", $arr[-1] ) if $f16;
+			push @arr, sprintf("%04X", $h );
+			$f16 = 0;
+		}
+	}
+	$arr[-1] = sprintf("%X", $arr[-1] ) if $f16;
+
+	return join ' ', @arr; # hex(s)
+}
+
+
+sub _dec2hex {
+	my @arr;
+	my $f16 = 0;
+	for my $d ( split /\s+/, $_[0] ) { # dec
+
+		if( $d >= 0xD800 and $d <= 0xDBFF ) {# HIGH utf16 code
+			push @arr, 0x10000 + (($d - 0xD800) << 10);
+			$f16 = 1;
+		}
+		elsif( $d >= 0xDC00 and $d <= 0xDFFF ) { # LOW utf16 code
+			$d -= 0xDC00;
+			if( $f16 ) {
+				$arr[-1] = sprintf("%X", $arr[-1] + $d );
+				$f16 = 0;
+			}
+			else {
+				push @arr, sprintf("%X", 0x10000 + $d );
+			}
+		}
+		else {
+			$arr[-1] = sprintf("%X", $arr[-1] ) if $f16;
+			push @arr, sprintf("%04X", $d );
+			$f16 = 0;
+		}
+	}
+	$arr[-1] = sprintf("%X", $arr[-1] ) if $f16;
+
+	return join ' ', @arr; # hex(s)
+}
+
+
 sub _get_mate {
 	my( $glyph, $agl, $op ) = @_;
 
@@ -1598,13 +1660,13 @@ sub _get_mate {
 		my $code = $1;
 
 		if( $op->{mate} =~/^sym/) {
-			$mate = &_code2sym( $code );
+			$mate = &_hex2sym( $code );
 		}
 		elsif( $op->{mate} =~/^hex/) {
-			$mate = $code;
+			$mate = &_hex2hex8( $code );
 		}
 		else { # dec
-			$mate = &_code2dec( $code );
+			$mate = &_hex2dec( $code );
 		}
 	}
 	else {
@@ -1642,10 +1704,7 @@ sub AGLkit {
 			}
 		}
 		elsif( $op->{mate} =~/^hex/) {
-
-			for my $v ( values %$agl ) {
-				$v = join ' ', map{ sprintf("%04X", $_) } split /\s+/, $v;
-			}
+			$_ = &_dec2hex($_) for values %$agl;
 		}
 	}
 
@@ -1670,15 +1729,17 @@ sub AGLkit {
 			my $mate;
 			if( $op->{mate} ) {
 				if( $op->{mate} =~/^sym/) {
-					$mate = &_code2sym( $codes );
+					$mate = &_hex2sym( $codes );
 				}
 				elsif( $op->{mate} =~/^hex/) {
-					($mate = $codes) =~s/\s+/ /g;
-					$mate = uc $mate;
+#					($mate = $codes) =~s/\s+/ /g;
+#					$mate = uc $mate;
+
+					$mate = &_hex2hex8( $codes );
 				}
 			}
 
-			$agl->{ $glyph } = $mate // &_code2dec( $codes ); # By default, decimal Unicode number
+			$agl->{ $glyph } = $mate // &_hex2dec( $codes ); # By default, decimal Unicode number
 		}
 
 		close $AGL;
@@ -2235,8 +2296,11 @@ _onecell_M0:
 
 
 	my $wxLsum = 0;
-	if( $ArSc && $op->{merge} ) {
-		$wxLsum += $_ for @wxL;
+	if( $ArSc ) {
+		for( @wxL ) {
+			$_ = int($_ + 1/2);
+			$wxLsum += $_ ;
+		}
 	}
 
 	return $ArSc ?
@@ -2897,7 +2961,7 @@ If C<< myParam => "some text" >> then this template (pattern) will produce a TeX
 
   some text
 
-If C<< myParam => "\x{001}" >> (or C<< "\x{001}some text" >>), the result will be as folllow:
+If C<< myParam => "\x{001}" >> (or C<< "\x{001}some text" >>), the result will be as follow:
 
   Default value
 
@@ -3993,7 +4057,7 @@ In this scenario, the number of hyphenated words is kept to a reasonable minimum
 within a cell/box may increase by one or two. This depends on the width of the cell/box: the narrower (smaller) the width (e.g. option C<< cell_width < 10mm >>),
 the more likely it is that the number of lines will exceed that of case (A).
 
-If the strings obtained in case (B) are not used for PDF creation (via the 'C<pdflatex>' command) --- and the original text C<$string> is used
+If the strings obtained in case (B) are not used for PDF creation (e.g. via the 'C<pdflatex>' command) --- and the original text C<$string> is used
 instead -- then the results from (B) will match the PDF output (in terms of word hyphenation and the number of lines within a cell) only
 if the text language is correctly specified -- either for the entire document (in the preamble) or specifically for that cell (for instance,
 by using the 'C<otherlanguage>' environment or commands such as 'C<\foreignlanguage{}{}>' and 'C<\selectlanguage{}>') --- and provided that
@@ -4044,7 +4108,7 @@ By default, this value is 'normalsize'.
 
 Regular space between words (pt) -- fontdimen 2.
 In LaTeX, you can determine the compressibility parameters for the space between words by accessing 
-the font parameters (see above C<\fontdimen> 2)
+the font parameters (see below C<\fontdimen> 2)
 
 You can output the current interword space parameters to the compilation log or directly onto the page using 
 the C<\the\fontdimen> command:
@@ -4192,6 +4256,7 @@ OUTPUT:
                      ],
           stop => 176, # position in $string where the extraction of symbols into cell stopped
           wxL => [ # array of line widths (*100pt) for 'lines', standardized to 'base_font_size'=10pt and 'font_size'='normalsize'.
+                   # Rounded to the nearest whole number
                      8106,
                      8247,
                      7530,
@@ -4210,7 +4275,7 @@ OUTPUT:
         };
 
   $VAR1 = {
-          wxL => [
+          wxL => [ # Rounded to the nearest whole number
                      87768
                    ],
           lines => [
@@ -4248,7 +4313,7 @@ Its main difference from L</"onecell()"> is that it distributes a C<$string> int
 per cell (see C<limit> option).
 
 This subroutine addresses a well-known, long-standing issue:
-the "infinite loop in LaTeX’s C<`longtable`> environment when a cell contains a large amount of text",
+the "infinite loop in LaTeX's C<`longtable`> environment when a cell contains a large amount of text",
 which typically occurs when a table row is taller than the available space on the page, preventing LaTeX from 
 splitting it across pages. C<`longtable`> environment attempts to move the entire line to the next page, but it 
 still doesn't fit there in its entirety, which leads to an infinite compilation loop.
@@ -4282,6 +4347,7 @@ An array of cells (or table column) to be populated with lines, running from top
 =item wxC
 
 An array of line widths (*100pt) from 'C<cells>', standardized to 'base_font_size'=10pt and 'font_size'='normalsize'.
+Rounded to the nearest whole number.
 
 =item scale
 
@@ -4349,7 +4415,7 @@ OUTPUT:
                      ],
           end => -1,
           scale => 1,
-          wxC => [ # arrays of line widths (*100pt) for 'cells'
+          wxC => [ # arrays of line widths (*100pt) for 'cells'. Rounded to the nearest whole number
                      39588,
                      39424,
                      9372
@@ -4375,6 +4441,7 @@ The distribution uses L<File::Basename>,
 L<File::Path>,
 L<File::Compare>,
 L<File::ShareDir>,
+L<File::ShareDir::Install>,
 L<Storable>,
 and L<Carp>.
 

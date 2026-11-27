@@ -1,0 +1,19 @@
+# golden: amd/ubuntu-24.04--dkms--key-mismatch
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: cat /proc/cmdline 2>/dev/null
+run: grep -rsHE --include='*.conf' '^[[:space:]]*(blacklist[[:space:]]+amdgpu|install[[:space:]]+amdgpu[[:space:]]+(/usr)?/bin/(false|true))([[:space:]]|$)' /etc/modprobe.d /run/modprobe.d /usr/lib/modprobe.d /lib/modprobe.d 2>/dev/null
+run: dpkg --print-architecture
+run: uname -r
+run: od -An -tu1 -j4 -N1 /sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c 2>/dev/null
+run: cat /etc/apt/sources.list.d/amdgpu.list 2>/dev/null
+run: dkms status -m amdgpu -k 6.8.0-85-generic 2>&1
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: command -v curl >/dev/null 2>&1
+run: command -v gpg >/dev/null 2>&1
+run: mkdir -p -m 0755 /etc/apt/keyrings && rm -rf /etc/apt/keyrings/rocm.gpg.tmp.d && mkdir -m 0700 /etc/apt/keyrings/rocm.gpg.tmp.d && curl -fsSL --proto =https https://repo.radeon.com/rocm/rocm.gpg.key -o /etc/apt/keyrings/rocm.gpg.tmp.d/key.asc
+run: GNUPGHOME=/etc/apt/keyrings/rocm.gpg.tmp.d gpg --batch --with-colons --show-keys /etc/apt/keyrings/rocm.gpg.tmp.d/key.asc 2>/dev/null
+run: rm -rf /etc/apt/keyrings/rocm.gpg.tmp.d
+DIE: The key from https://repo.radeon.com/rocm/rocm.gpg.key is not the AMD signing key expected (fingerprint CA8BB4727A47B4D09B4EE8969386B48A1A693C5C; got DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF); /etc/apt/keyrings/rocm.gpg was not changed

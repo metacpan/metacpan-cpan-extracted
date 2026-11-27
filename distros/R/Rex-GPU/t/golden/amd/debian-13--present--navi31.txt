@@ -1,0 +1,4 @@
+# golden: amd/debian-13--present--navi31
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>

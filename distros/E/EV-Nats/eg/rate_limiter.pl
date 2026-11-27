@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
-# Rate limiter service — request/reply pattern for centralized rate limiting
+# Rate limiter service -request/reply pattern for centralized rate limiting
 # Usage:
-#   perl eg/rate_limiter.pl service     — run the limiter service
-#   perl eg/rate_limiter.pl client      — run a client that checks limits
+#   perl eg/rate_limiter.pl service     -run the limiter service
+#   perl eg/rate_limiter.pl client      -run a client that checks limits
 use strict;
 use warnings;
 use EV;

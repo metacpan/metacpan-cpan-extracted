@@ -1,11 +1,11 @@
-# t/flavors-outcomes.pl per flavor, compared by t/flavors-compare.pl; under Wine 9 with Strawberry Perl 5.38.2.2 (built with its own gcc and gmake), Proc::Spawner post-0.12 (commit 6c084cc), Run 0.07 in blib/lib; 2026-11-18
+# t/flavors-outcomes.pl per flavor, compared by t/flavors-compare.pl; under Wine 9 with Strawberry Perl 5.38.2.2 (built with its own gcc and gmake), Proc::Spawner 0.14 (commit d6743d1), Run 0.07 in blib/lib; 2026-11-26
 # flavors: as built (win_spawn.h's posix_spawn); redirections only; system1 (posix_spawn missing: Perl's own spawn through Run)
-# the six Windows test files (t/loop.t t/windows.t t/parsers.t t/programs.t t/portable.t t/win_spawn.t), run through cmd /c with Windows' own standard handles; the quick tests only
+# the seven Windows test files (t/loop.t t/windows.t t/parsers.t t/programs.t t/portable.t t/win_spawn.t t/options.t), run through cmd /c with Windows' own standard handles; the quick tests only
 
 flavor                          ok      FAILED TODO-FAILED TODO-PASSED        SKIP FILE-SKIPPED FILE-FAILED
-W1-as-built                    161           0           0           0          20           0           0
-W2-redirections-only           161           0           0           0          20           0           0
-W3-system1                     156           0           5           0          24           0           0
+W1-as-built                    219           0           0           0          25           0           0
+W2-redirections-only           219           0           0           0          25           0           0
+W3-system1                     214           0           5           0          29           0           0
 
 Tests whose outcome differs between the flavors (absent: the test does not exist in that flavor):
 t/loop.t       80 children: each its own status
@@ -15,7 +15,7 @@ t/loop.t       80 children: each its own status
 t/windows.t    argv arrives exactly; the status
     W1-as-built            ok           
     W2-redirections-only   ok           
-    W3-system1             TODO-FAILED  Perl's system LIST does not quote arguments as the C runtime parses them back (❰BUG❱ in Perl, reported)
+    W3-system1             TODO-FAILED  Perl's system LIST does not quote arguments as the C runtime parses them back (❰BUG❱ in Perl, drafted in doc/perl-win32-system-bugs.md, not yet filed)
 t/windows.t    fd 3 (through the C runtime)
     W1-as-built            ok           
     W2-redirections-only   ok           
@@ -72,7 +72,7 @@ t/windows.t    skip: kill_with_parent: Perl's own spawn makes no job
     W1-as-built            absent       
     W2-redirections-only   absent       
     W3-system1             SKIP         kill_with_parent: Perl's own spawn makes no job
-t/windows.t    skip: kill_with_parent: Perl's own spawn makes no job#2
+t/windows.t    skip: kill_with_parent: Perl's own spawn makes no job#2
     W1-as-built            absent       
     W2-redirections-only   absent       
     W3-system1             SKIP         kill_with_parent: Perl's own spawn makes no job
@@ -96,7 +96,7 @@ t/win_spawn.t  skip: system1: Perl's own system 1, ... always makes a new group
     W1-as-built            absent       
     W2-redirections-only   absent       
     W3-system1             SKIP         system1: Perl's own system 1, ... always makes a new group
-t/win_spawn.t  skip: system1: Perl's own system 1, ... always makes a new group#2
+t/win_spawn.t  skip: system1: Perl's own system 1, ... always makes a new group#2
     W1-as-built            absent       
     W2-redirections-only   absent       
     W3-system1             SKIP         system1: Perl's own system 1, ... always makes a new group

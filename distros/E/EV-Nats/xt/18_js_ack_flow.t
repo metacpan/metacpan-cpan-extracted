@@ -42,7 +42,7 @@ is $published, 2, 'published 2 messages';
 $js->consumer_create($stream, {
     durable_name => 'acker',
     ack_policy   => 'explicit',
-    ack_wait     => 1_000_000_000,  # 1s — short enough to test NAK redelivery
+    ack_wait     => 1_000_000_000,  # 1s -short enough to test NAK redelivery
 }, sub { EV::break });
 $guard = EV::timer(3, 0, sub { EV::break });
 EV::run;

@@ -22,6 +22,8 @@ no_index:
     - t
     - xt
     - src
+recommends:
+  Cpanel::JSON::XS: '0'
 requires:
   Digest::SHA: '0'
   EV: '4.11'
@@ -32,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-ev-nats/issues
   repository: https://github.com/vividsnow/perl5-ev-nats.git
-version: '0.07'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Large;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 # EXPERIMENTAL, awaiting approval: what Proc::ShellSpawn needs to run Proc::ShellSubset::Large trees
 # (doc/large-subset/large-subset-spec.md, sections 4 and 5), as handlers named in Proc::ShellSpawn's tables:
 #   x_NAME(CONTEXT, NODE, TAIL, K)         command nodes { func | export | readonly | local | exec => ... }
@@ -97,11 +97,7 @@ sub x_exec {
   my ($c, $x, $tail, $k) = @_;
   ProcSS::redirect($c, $x->{redir} // [], sub {
     my ($m, $opened) = @_ or return ProcSS::leave($c, 2);   # a special builtin: a failed redirection ends the shell
-    ProcSS::hold($_) for grep defined, values %$m; ProcSS::release($_) for @$opened;
-    my $old = $c->{held} && !$c->{released} ? $c->{map} : {};
-    $c->{map} = $m; ProcSS::release($_) for grep defined, values %$old;
-    push @{$c->{shell}{scope}}, $c unless $c->{held};   # released when the shell ends
-    @$c{qw(held released)} = (1, 0); ProcSS::defer($k, 0) }) }
+    ProcSS::keep_map($c, $m, $opened); ProcSS::defer($k, 0) }) }
 
 # ------------------------------------------------------------------ builtins
 sub b_shift {

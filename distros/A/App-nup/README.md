@@ -23,6 +23,8 @@ nup - n-up, multi-column paged output for commands and files
      -C  --pane=#[,#]       number of columns, and rows (e.g., 2,2)
      -P  --page=#           page height in lines
      -S  --pane-width=#     pane width (default: 85)
+     -w  --width=#          output width
+    --ac --column-opts      options for ansicolumn
     --bs --border-style=#   border style (default: heavy-box)
     --ls --line-style=#     line style (none/truncate/wrap/wordwrap)
          --runin=#          run-in width for line breaking
@@ -48,7 +50,7 @@ nup - n-up, multi-column paged output for commands and files
 
 # VERSION
 
-Version 1.24
+Version 1.25
 
 # DESCRIPTION
 
@@ -70,11 +72,12 @@ file name and hands the file names and everything after them to
 [ansicolumn](https://metacpan.org/pod/ansicolumn) unchanged.  Options of `ansicolumn` that `nup` does
 not provide can therefore be given after the file names:
 
-    nup -C2 file1.txt file2.txt -w 170
+    nup -C2 file1.txt file2.txt --tabstop 4
 
-Here `-w 170` sets the output width for `ansicolumn`.  To set the
-width when no terminal is available, the `COLUMNS` environment
-variable works in both modes; see ["Terminal Size"](#terminal-size).
+They can be given by `--column-opts` as well, which works in command
+mode too:
+
+    nup -C2 --column-opts --tabstop 4 -- file1.txt file2.txt
 
 # OPTIONS
 
@@ -271,6 +274,24 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
 
     Set the pane width in characters. Default is 85.
 
+- **-w** _N_, **--width**=_N_
+
+    Set the output width in characters.  It is given to `ansicolumn`.
+    To set the width when no terminal is available, the `COLUMNS`
+    environment variable works as well; see ["Terminal Size"](#terminal-size).
+
+- **--ac** _OPTIONS_ ... **--**, **--column-opts** _OPTIONS_ ... **--**
+
+    Give other options to [ansicolumn](https://metacpan.org/pod/ansicolumn).  The arguments up to `--` are
+    taken as they are, and the `--` is removed:
+
+        nup --column-opts --tabstop 4 -s : -- file
+        nup --column-opts --tabstop 4 -- man nup
+
+    The options after the `--` are those of `nup` again.  To end the
+    options there, give another `--`.  A single option can be given
+    without `--` as `--column-opts=--tabstop=4`.
+
 ## Style Options
 
 - **--bs**=_STYLE_, **--border-style**=_STYLE_
@@ -439,10 +460,9 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
         275 80 pdf
 
     For a paper, the size is that of a sheet, which follows `-T`, `-o`,
-    `-P`, the number of rows, `--pdf-opts` and `-w` of `ansicolumn`
-    given after the file names.  For the terminal, it is the size of the
-    terminal.  This is for a program that formats text before giving it
-    to `nup`, as [mdee(1)](https://metacpan.org/pod/App%3A%3Amdee) does.
+    `-P`, `-w`, the number of rows and `--pdf-opts`.  For the terminal,
+    it is the size of the terminal.  This is for a program that formats
+    text before giving it to `nup`, as [mdee(1)](https://metacpan.org/pod/App%3A%3Amdee) does.
 
 - **--pdf-opts**=_OPTIONS_
 
@@ -453,15 +473,14 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
         nup -o nup.pdf --pdf-opts='-l 80 -m 15' man nup
 
 The `-P` option sets the number of lines of a page for PDF as well:
-a sheet has that many lines for each row.  The `-w` option of
-`ansicolumn`, given after the files or the command, sets the number
-of columns of a sheet.  The font size follows them, and the one that
-is not given is decided to fill the sheet.  With neither of them, a
+a sheet has that many lines for each row.  The `-w` option sets the
+number of columns of a sheet.  The font size follows them, and the one
+that is not given is decided to fill the sheet.  With neither of them, a
 sheet has 60 lines.
 
     nup -o nup.pdf -P 80 man nup         # 80 lines on a sheet
     nup -o nup.pdf -C2,2 -P 40 man nup   # 2x2 pages of 40 lines
-    nup -o nup.pdf -C3 file -w 300       # 300 columns on a sheet
+    nup -o nup.pdf -C3 -w 300 file       # 300 columns on a sheet
 
 ## Terminal Size
 
@@ -626,7 +645,7 @@ Typical n-up usage:
     nup -L -C4 man perl        # four pages on the screen at a time
     nup -L *.txt               # files side by side, scrolled sideways
     nup file1.txt file2.txt    # view files side by side
-    nup -C2 a.txt b.txt -w 170 # 2 columns, width 170 (ansicolumn -w)
+    nup -C2 -w 170 a.txt b.txt # 2 columns, width 170
     nup -e ./script.sh         # force command mode for a file
     nup -o nup.pdf man nup     # print to PDF (requires ansi2pdf)
     nup -T a4p -C1 file | lpr  # print on A4 in portrait

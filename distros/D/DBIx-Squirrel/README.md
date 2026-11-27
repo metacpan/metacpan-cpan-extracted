@@ -4,86 +4,138 @@
 
 # DBIx-Squirrel
 
-DBI, minus the boilerplate, plus a pipeline.
-
-With DBIx::Squirrel, you still write SQL, as you do with the DBI. It
-takes away the friction around it: placeholders in whatever style you
-like, iterators over results, and a pipeline of stages written beside
-the query. It never hides the SQL, and it isn't an ORM.
+You write the SQL; DBIx::Squirrel takes away the DBI machinery around
+it, with placeholders in any common style, a list into `IN (...)` from
+one placeholder, and results read through an iterator, and every
+handle is still a DBI handle. Rows can also be changed as they're
+read, by small functions written beside the query.
 
 ```perl
-my @to_copy = $dbh->iterate(
-    'SELECT name FROM track WHERE plays > :plays ORDER BY plays DESC',
-    plays => 5000,
-    pluck,                           # each row's name
-    drop_if { $on_my_phone{$_} },    # a hash: what the database can't know
+my $albums = $dbh->iterate(
+    'SELECT title, year FROM album WHERE artist_id = :artist ORDER BY year',
+    artist => 2,
+    sub { "$_->[0] ($_->[1])" },    # each row made a string
+);
+while (my($album) = $albums->next) {
+    say $album;
+}
+```
+
+The iterator reads rows as you ask for them, so a large result is
+never held in memory unless you ask for all of it.
+
+It isn't an ORM. It never hides the SQL, and never runs a query you
+didn't write. Where it and the DBI do the same thing, they give the
+same result.
+
+There are three things to learn: placeholders, the iterator, and
+stages, the small functions that change rows. Each is useful without
+the next, so you can stop at any of them.
+
+## Part 1: DBIx::Squirrel
+
+Everything in this part is DBIx::Squirrel's own. It's the whole
+library: a query sent, and its rows read back. Part 2 is about
+something else, data going to and from files, and you needn't read it
+to use anything here.
+
+## What it saves you
+
+Each of these is work a DBI user does every week, shown first with the
+DBI, then with DBIx::Squirrel. The DBI is the foundation;
+DBIx::Squirrel does the chores around it.
+
+### A list goes into `IN (...)` without building the SQL.
+
+With the DBI, the statement is built for each list, with a `?` for
+each value:
+
+```perl
+my $marks = join ', ', ('?') x @years;
+my $rows  = $dbh->selectall_arrayref("SELECT title FROM album WHERE year IN ($marks)", undef, @years);
+```
+
+A placeholder prefixed with `...` takes an array reference, and the
+SQL stays one string, the same whatever the list:
+
+```perl
+my $rows = $dbh->selectall_arrayref('SELECT title FROM album WHERE year IN (...:years)', years => \@years);
+```
+
+### Values bound in the wrong place are caught.
+
+With `?`, values go in the order the marks appear, so two swapped run
+without a word, and here update nothing:
+
+```
+$dbh->do('UPDATE track SET plays = ? WHERE id = ?', undef, $id, $plays);
+```
+
+Named values go in any order, and one used twice in the SQL is given
+once. A name the statement doesn't have, or a placeholder given no
+value, croaks before anything runs:
+
+```perl
+$dbh->do('UPDATE track SET plays = :plays WHERE id = :id', id => $id, plays => $plays);
+$dbh->do('UPDATE track SET plays = :plays WHERE id = :id', id => $id, play => $plays);
+# croaks: Expected a placeholder of the statement (play)
+```
+
+### Rows are shaped beside the query, and reading stops when it's done.
+
+Say you want the ten most played tracks that aren't on your phone
+already, which only your program knows. With the DBI, that's a loop:
+
+```perl
+my $sth = $dbh->prepare('SELECT name FROM track ORDER BY plays DESC');
+$sth->execute;
+my @next_ten;
+while (my($name) = $sth->fetchrow_array) {
+    next if $on_my_phone{$name};
+    push @next_ten, $name;
+    last if @next_ten == 10;
+}
+$sth->finish;
+```
+
+With DBIx::Squirrel, the steps are written after the query, each in a
+line, and rows stop being read after the tenth:
+
+```perl
+use DBIx::Squirrel::Stages::Rows qw(pluck);
+use DBIx::Squirrel::Stages::Flow qw(drop_if take);
+
+my @next_ten = $dbh->iterate(
+    'SELECT name FROM track ORDER BY plays DESC',
+    pluck,                           # each row's only column
+    drop_if { $on_my_phone{$_} },    # already copied
+    take(10),                        # the first ten of what's left
 )->all;
 ```
 
-It's a subclass of the DBI, so everything the DBI does still works.
-Where the two do the same thing, they give the same result.
+A `LIMIT 10` in the SQL couldn't do this, as the test is in Perl.
+What the SQL can say, it should: a condition or a limit in the query
+lets the database use its indexes and send fewer rows.
 
-## Why use it
+### One row means one row.
 
-The DBI is the right foundation, and it's low-level on purpose. Most
-code written around it does the same few chores, by hand, each time.
-DBIx::Squirrel does them for you.
+`selectrow_hashref` gives the first row, and says nothing if there
+were more:
 
-- **Placeholders you can read.**
+```perl
+my $album = $dbh->selectrow_hashref('SELECT * FROM album WHERE artist_id = ?', undef, 2);
+say $album->{title};
+```
 
-    With `?`, values go in the order the marks appear. A value used twice
-    is passed twice, and changing the SQL can mean changing the code that
-    calls it. Named placeholders bind by name, with each value given once.
-    They work on any driver, whatever placeholders it supports itself, so
-    SQL written with PostgreSQL's `$1` runs unchanged on SQLite. Values
-    that don't match the placeholders croak, rather than being bound in
-    the wrong place.
+`single` gives the only row, and warns if there's another. From
+`results`, each row has a method for each column, so a misspelt
+column dies, where a misspelt hash key gives `undef`:
 
-- **Rows that come out ready to use.**
-
-    There's no fetch loop to write, and no array to push onto. The stages
-    that map, filter and expand the rows sit beside the query. You can
-    read what a result holds next to the SQL that makes it. Rows are
-    fetched in batches, so you can work through a large result a row at a
-    time without holding all of it in memory. Ready-made stages do the
-    common jobs, such as picking out a column, handing rows out in
-    batches, or watching them go by.
-
-    The SQL still does what SQL does best. A condition or a limit belongs
-    in the query, where the database can use its indexes and send fewer
-    rows. Stages are for the work SQL can't do, and for steps you add
-    without changing a query: one shared, or with a name, or one you're
-    debugging.
-
-- **Files in and out, without the plumbing.**
-
-    A query goes out to a CSV file in one call, with its column names as
-    the header, and fields quoted where they need to be:
-
-    ```perl
-    $dbh->iterate('SELECT name, plays FROM track', to_csv(file => 'tracks.csv', header => 1));
-    ```
-
-    A CSV file comes in the same way: each row a hash keyed by the header,
-    straight into a statement's named placeholders, a batch to a
-    transaction, with no arrays to build and no columns to count. JSON
-    Lines go in and out much the same way, with `as_hash` to write each
-    row as an object.
-
-- **Queries with names.**
-
-    A statement and its stages can become a function with a name of its
-    own. The SQL is written in one place, and the code that uses it reads
-    as plainly as `titles_by 2`. Callers can add stages of their own, or a
-    sink, so one statement gives the first row, a count, a file or every
-    result, without growing an option for each.
-
-- **Nothing to unlearn, and nothing to undo.**
-
-    Your handles, attributes, drivers and existing code all still work,
-    because it's still the DBI. Use as much as helps, and stop there. It
-    isn't an ORM. You write the SQL, so everything your database can do is
-    still there, and it never runs a query you didn't write.
+```perl
+my $album = $dbh->results('SELECT * FROM album WHERE artist_id = :artist', artist => 2)->single;
+# warns: Expected only one item, but there were more
+say $album->title;
+```
 
 ## One step at a time
 
@@ -98,8 +150,9 @@ use DBIx::Squirrel;
 my $dbh = DBIx::Squirrel->connect('dbi:SQLite:dbname=music.db', '', '');
 ```
 
-Your DBI code runs as it did. `connect` and `prepare` croak if they
-fail, so there's no `or die` to write.
+Your DBI code runs as it did: `$dbh->isa('DBI::db')` is true, as
+`$sth->isa('DBI::st')` is for its statements. `connect` and `prepare`
+croak if they fail, so there's no `or die` to write.
 
 ### 2. Write placeholders in the style you like.
 
@@ -111,31 +164,50 @@ my $album = $dbh->selectrow_hashref('SELECT * FROM album WHERE id = $1', 2);
 ```
 
 `?`, `?1`, `:1`, `$1`, `:name` and `$name` are each rewritten as
-`?` for the DBI. A numbered or named placeholder takes one value,
-wherever it appears. `do` and the select methods need no `undef`
-before the values.
+`?` for the DBI. They work on any driver, whatever placeholders it
+supports itself, so SQL written with PostgreSQL's `$1` runs unchanged
+on SQLite. A numbered or named placeholder takes one value, wherever
+it appears, and a list placeholder, written `...:name`, takes an array
+reference.
+
+`do` returns the number of rows changed, as the DBI's does, and
+`0E0`, true but zero, when there were none:
 
 ```perl
-my $of_years = $dbh->selectall_arrayref('SELECT * FROM album WHERE year IN (...:years)',
-    years => [1967, 1994]);
+my $changed = $dbh->do('UPDATE track SET plays = plays + 1 WHERE id = :id', id => $id);
+say 'No such track' if $changed == 0;
 ```
-
-A placeholder with `...` before it takes a list. It's written as a
-`?` for each value in the array reference given.
 
 ### 3. Iterate over the results.
 
 ```perl
 my $albums = $dbh->iterate('SELECT title, year FROM album ORDER BY year');
-while (my($row) = $albums->next) {
-    say "$row->[0] ($row->[1])";
+while (my($album) = $albums->next) {
+    say "$album->[0] ($album->[1])";
 }
 ```
 
-Rows are fetched in batches, and the statement is finished when they
-run out. `all` takes the rest at once, nearly as quickly as plain
-DBI. `first` takes the next one, and `single` the only one, warning
-if there's another.
+`iterate` takes the SQL, then the bind values, and gives an iterator.
+Rows are fetched in batches, so a large result is read a row at a
+time, without holding all of it in memory, and the statement is
+finished when the rows run out. The iterator's other methods take the
+rest at once: `all`, nearly as quickly as plain DBI, as a list,
+`all_arrayref` as an array reference, `first` the next, and
+`single` the only one, warning if there's another.
+
+Attributes, where you give them, come straight after the SQL, before
+the values, as with `do`. Those whose names start `ekorn_` are
+DBIx::Squirrel's own, such as `ekorn_slice`, which fetches rows as
+hashes:
+
+```perl
+my $artists = $dbh->iterate(
+    'SELECT id, name FROM artist WHERE id > :id ORDER BY id',
+    {ekorn_slice => {}},
+    id => 1,
+);
+say $_->{name} for $artists->all;
+```
 
 ### 4. Add stages.
 
@@ -146,60 +218,29 @@ my @hits = $dbh->iterate(
 )->all;
 ```
 
-Each row goes through the stages, given as `$_`. A stage returns
-nothing to drop the row, one value in its place, or several. It can
-also stop the iteration early. To leave rows out, though, or stop
-after so many, write it in the SQL if you can: dropping rows or
-stopping early in a stage is for what the SQL can't say, or for a
-query you'd rather not change. A stage made with `gather` can hold
-rows, and give them out at the end, in batches or as one value.
-`pipe` runs anything else through stages the same way.
+Stages come after the bind values. Each row goes through them in turn,
+given as `$_`. A stage returns one value in the row's place, nothing
+to drop the row, or several. `DBIx::Squirrel::Stop` lets a stage end
+the run early. To change every row of a large result, `map` over
+`all` is quicker; stages are for rows read one at a time, for runs
+that stop early, and for steps that should stay with the query.
 
-Ready-made stages come with it, for jobs that come up again and again.
-They're in four modules: `take` and `drop` in
-[DBIx::Squirrel::Stages::Flow](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3AFlow), with `take_if`, `drop_if`,
-`take_while` and more on request, `pluck` and `as_hash` in
-[DBIx::Squirrel::Stages::Rows](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ARows), `batch` and `collect` in
-[DBIx::Squirrel::Stages::Batch](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ABatch), and `peek` and `count_into` in
-[DBIx::Squirrel::Stages::Taps](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ATaps), with `dump_to` and `tee` on
-request.
+Ready-made stages come in four modules, each exporting the first it
+names, and the rest on request:
 
-A sink, given last, says what the call gives in place of an iterator:
-`keep_all` every result, `count_items` how many, `keep_first` the
-first, and others. They're in [Ekorn::Pipeline::Sinks](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3ASinks).
-[DBIx::Squirrel::Tooling](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3ATooling) exports every stage, sink and word from one
-module, by tags, as `:stages` and `:sinks`, or `:all`:
+- [DBIx::Squirrel::Stages::Rows](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ARows): `pluck`, a column of each
+row, and `as_hash`, each row as a hash.
+- [DBIx::Squirrel::Stages::Flow](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3AFlow): `take` and `drop`, the first
+so many rows or all but them, with `take_if`, `drop_if`,
+`take_while`, `drop_while` and more.
+- [DBIx::Squirrel::Stages::Batch](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ABatch): `batch`, rows in arrays of
+so many, and `collect`, all of them in one.
+- [DBIx::Squirrel::Stages::Taps](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AStages%3A%3ATaps): `peek`, to watch rows go by
+without changing them, and `count_into`, to count them, with
+`dump_to` on request.
 
-```perl
-use DBIx::Squirrel::Tooling qw(:all);
-
-my @next_ten = $dbh->iterate(
-    'SELECT name FROM track ORDER BY plays DESC',
-    pluck('name'),
-    drop_if { $on_my_phone{$_} },    # already copied
-    take(10),                        # the first ten of what's left
-    keep_all,
-);
-```
-
-`take(10)` comes after a test in Perl, so a `LIMIT` in the SQL
-couldn't do its job. While debugging, `peek { warn ... }` anywhere in
-the stages shows the rows going by, without a change to the query.
-`dump_to` writes each one out in full with Data::Dumper, and where
-Text::Redact::Secrets is installed, it hides the long, random secrets
-it finds, such as the password in a DSN.
-
-Where [Ekorn::Pipeline::Operators](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AOperators) is in scope, `|` chains them too,
-as in `$it | count_items`. The reference says how to write your own
-stages to work alongside them.
-
-The pipeline is
-[Ekorn::Pipeline](https://github.com/nukopian/Ekorn-Pipeline). It
-began here, and is now a distribution of its own, so that any function
-can take stages from its caller. DBIx::Squirrel uses it as it is, and
-keeps its own names for its modules of functions, such as
-`DBIx::Squirrel::Stop`. The stages that need a database, such as
-`pluck`, are DBIx::Squirrel's own.
+While debugging, `peek { warn ... }` anywhere among the stages shows
+the rows going by, with no change to the query.
 
 ### 5. Have rows as objects.
 
@@ -211,39 +252,32 @@ say $album->title, ' (', $album->year, ')';
 Each row has a method for each column, and stages can work on the
 objects.
 
-### 6. Give your databases and statements names.
+### 6. If you like, give your databases and statements names.
 
 ```perl
-use DBIx::Squirrel::Tooling qw(pluck take keep_all);
+use DBIx::Squirrel::Stages::Rows qw(pluck);
 use DBIx::Squirrel::Sugar
     database  => {music => ['dbi:SQLite:dbname=music.db', '', '']},
     statement => {
         titles_by => [music => 'SELECT title FROM album WHERE artist_id = ?', pluck],
     };
 
-my @titles = titles_by 2, keep_all;
-my @first  = titles_by 2, take(1), keep_all;
+my @titles = titles_by(2)->all;
+my $first  = titles_by(2)->first;
 ```
 
-[DBIx::Squirrel::Sugar](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3ASugar) makes each a function with its own name. A
-statement's stages are declared beside its SQL. Called, it gives an
-iterator over the results, or, with a sink last, the sink's result.
-Stages given in the call run after the statement's own, so code that
-uses a statement can add a step, such as `take`, without changing the
-SQL other code shares.
-Given `pipeline`, it names pipelines too, which a statement can name
-among its stages.
+[DBIx::Squirrel::Sugar](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3ASugar) makes each a function with its own name, and
+a statement's stages are declared beside its SQL. Called, it gives an
+iterator over the results. Stages given in the call run after the
+statement's own, so code that uses a statement can add a step, such
+as `take`, without changing the SQL other code shares.
 
-## Documentation
+## Where you can stop
 
-[The reference](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AManual%3A%3AReference) describes every
-feature in detail, with examples.
-[The user guide](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AManual%3A%3AHowTo) is a tour of the
-package, a layer at a time, from the DBI underneath to the shortcuts
-on top, with recipes that work; its "When should I use it, and when
-not?" says where the package helps, and where plain DBI or SQL is the
-better choice. Each module's POD, starting with
-[DBIx::Squirrel](https://metacpan.org/pod/DBIx%3A%3ASquirrel), says the same more briefly.
+That's DBIx::Squirrel: placeholders, the iterator and stages, on
+handles that are still the DBI's. Rows as objects and named statements
+are conveniences built on them. If it does what you need, you can stop
+here, and nothing else is needed.
 
 ## Installing
 
@@ -252,6 +286,47 @@ cpanm DBIx::Squirrel
 ```
 
 It needs Perl 5.36 or later.
+
+## Part 2: With Ekorn::Pipeline
+
+Part 1 is the round trip to the database: a query sent, and its rows
+read back. Part 2 is data crossing the database's edge: query results
+written to files, JSON and CSV, loaded from them in batches, or sent
+to several places in one run. That's Ekorn::Pipeline's work, and
+DBIx::Squirrel's iterator is one of its sources.
+
+Stages began in DBIx::Squirrel, in 2024, as a way to change query
+results as they're fetched. The pipeline behind them was useful, and
+usable, well beyond database rows, so in 2026 it moved into a
+distribution of its own,
+[Ekorn::Pipeline](https://github.com/nukopian/Ekorn-Pipeline), as
+[the guide's Part 2](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AManual%3A%3AHowTo#Part-2:-With-Ekorn::Pipeline)
+tells.
+
+With it, a query goes to a CSV file in one call, with its column names
+as the header:
+
+```perl
+use DBIx::Squirrel::Tooling qw(to_csv);
+
+$dbh->iterate('SELECT name, plays FROM track', to_csv(file => 'tracks.csv', header => 1));
+```
+
+[DBIx::Squirrel::Tooling](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3ATooling) imports DBIx::Squirrel's stages and
+Ekorn::Pipeline's sources, sinks and words from one module, by tags.
+The guide's Part 2 shows them at work with a database, and
+[Ekorn::Pipeline](https://metacpan.org/pod/Ekorn%3A%3APipeline)'s own documents say the rest.
+
+## Documentation
+
+[The user guide](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AManual%3A%3AHowTo) is a tour, with recipes
+that work: its Part 1 covers DBIx::Squirrel, and its Part 2 the work
+it does with Ekorn::Pipeline. Its "When should I use it, and when
+not?" says where the package helps, and where plain DBI or SQL is the
+better choice. [The reference](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AManual%3A%3AReference)
+describes every feature in detail, with examples, in the same two
+parts. Each module's POD, starting with [DBIx::Squirrel](https://metacpan.org/pod/DBIx%3A%3ASquirrel), says the
+same more briefly.
 
 ## Upgrading
 

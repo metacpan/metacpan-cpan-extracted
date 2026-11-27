@@ -1,5 +1,15 @@
 Revision history for EV::Nats
 
+0.09  2026-11-27
+    - stream_list, consumer_list and KV/ObjectStore key listings no longer
+      skip or repeat entries when the list changes while it is paged.
+
+0.08  2026-11-26
+    - KV and ObjectStore read with Direct Get; add direct_get and ack_sync.
+    - KV watch uses a JetStream consumer: no gap after a reconnect.
+    - Fix reconnect, drain, failover and paging edge cases; live tests
+      need TEST_NATS_HOST or TEST_NATS_PORT.
+
 0.07  2026-11-25
     - Fix timeouts armed after a blocking callback firing early; sockets
       are close-on-exec.

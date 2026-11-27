@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# Regenerate README.md from the POD in lib/Class/Shared.pm.
+#
+# README.md is generated, never edited by hand.  The converter is Pod::Github's
+# pod2github, because its output (## headings, fenced perl blocks, MetaCPAN
+# links) is the style the committed README.md uses; pod2markdown does not
+# reproduce it.
+#
+# Usage: maint/regen-readme        (or: make readme)
+
+set -eu
+
+cd "$(dirname "$0")/.." || exit 1
+
+source=lib/Class/Shared.pm
+target=README.md
+
+if ! command -v pod2github >/dev/null 2>&1; then
+	echo "regen-readme: pod2github not found; it comes from the Pod::Github distribution." >&2
+	echo "regen-readme: install it with: cpanm Pod::Github" >&2
+	exit 1
+fi
+
+# Convert to a temporary file and move it into place, so a failed run leaves
+# the committed README untouched.
+tmp="$target.new.$$"
+trap 'rm -f "$tmp"' EXIT HUP INT TERM
+
+if ! pod2github "$source" > "$tmp"; then
+	echo "regen-readme: pod2github failed; $target left unchanged" >&2
+	exit 1
+fi
+
+if [ ! -s "$tmp" ]; then
+	echo "regen-readme: pod2github produced no output; $target left unchanged" >&2
+	exit 1
+fi
+
+if cmp -s "$tmp" "$target"; then
+	echo "regen-readme: $target already matches the POD in $source"
+else
+	mv "$tmp" "$target"
+	echo "regen-readme: wrote $target from the POD in $source"
+fi

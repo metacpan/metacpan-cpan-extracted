@@ -1,8 +1,6 @@
-NAME - query the "World Register of Marine Species" WoRMS
+NAME
 
-VERSION
-
-    version 1.9
+    Net::WoRMS - query the "World Register of Marine Species" WoRMS
 
 SYNOPSIS
 
@@ -66,14 +64,14 @@ DEPENDENCIES
 
       to end the switch-case/while-given madness
 
-CONFIGURATION
+DEFAULT SETTINGS
 
-    $END_POINT = 'http://www.marinespecies.org/aphia.php?p=soap'
+    $END_POINT = 'https://www.marinespecies.org/aphia.php?p=soap'
 
       The access point to retrieve data via the Simple Object Access
       Protocol.
 
-    $APHIA_NS = 'http://aphia/v1.0'
+    $APHIA_NS = 'https://aphia/v1.0'
 
       Namespace and corresponding URI. In the development context these
       variables are considered as a constants. There are methods to change
@@ -95,15 +93,10 @@ CONFIGURATION
 
       The format hash mostly for validation.
 
-    %ORDER_HASH
+    %ORDER HASH
 
-      Dictionary to sort and translate the retrieved field names from the
-      WoRMS database and bring them into a consistent form.
-
-    @TYPE
-
-      Type array corresponding to @ORDER_SCORE/@ORDER_DOT and the
-      %ORDER_HASH to handle quotes and NULL values.
+      Dictionary to sort, parse and translate the retrieved field names
+      from the WoRMS database and bring them into a consistent form.
 
 FIELDS
 
@@ -214,6 +207,31 @@ METHODS
       results due to offset maping issues.
 
  OUTPUT
+
+    quoteAuthor($author)
+
+      The function will translate abbrevation in names like <D'Alambert> to
+      the UTF8 form <D’Alambert> to avoid qouting in SQL fields.
+
+    quoteString($str, $fmt)
+
+      The function will quote $str to prevent SQL injection problems with:
+
+      undef
+
+            $str = $fmt eq 'SQL' ? 'NULL' : 'NA';
+
+      backspaced control sequences
+
+            $str = '\r'; # becomes '\\r'
+
+      control sequences
+
+            $str = "\r"; # becomes '<CR>'
+
+      embedded single quotes
+
+            $str = "'"; # becomes "''"
 
     printRecord($record, $first, $last, $spc)
 

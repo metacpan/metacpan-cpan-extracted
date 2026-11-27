@@ -1,7 +1,7 @@
 # ABSTRACT: GPU hardware detection via PCI class codes
 
 package Rex::GPU::Detect;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use v5.14.4;
 use warnings;
 
@@ -12,6 +12,8 @@ use Rex::Commands::Run;
 use Rex::Config ();
 use Rex::Logger;
 use Scalar::Util qw( blessed );
+use Rex::GPU::AMD ();
+use Rex::GPU::AMD::Hardware;
 use Rex::GPU::NVIDIA ();
 use Rex::GPU::NVIDIA::Requirement;
 use Rex::GPU::NVIDIA::VGPU;
@@ -29,10 +31,14 @@ use vars qw(@EXPORT);
 # [0300] = VGA controller, [0302] = 3D controller (datacenter GPUs)
 my $PCI_DISPLAY_RE = qr/\[03(?:00|02)\]/;
 
-# [0380] = "Display controller" (karr #75): AMD Instinct MI100/MI200/MI300
-# enumerate there. Accepted for vendor 1002 only, never as a display class of
-# its own -- an NVIDIA device at [0380] stays unlisted, as before.
-my $AMD_ACCELERATOR_RE = qr/\[0380\]/;
+# [0380] = "Display controller" (karr #75): AMD Instinct MI100/MI210/MI250
+# and the Strix Halo APU (1002:1586, live on synapse) enumerate there.
+# [1200] = "Processing accelerators" (karr k1): the MI300 and MI350 series
+# (MI300A/MI300X/MI325X/MI350X/MI355X) enumerate there, not at [0380] as the
+# k75 comment had it (hardware curator for k1, from AMD's acceptance
+# guides). Both are accepted for vendor 1002 only, never as display classes
+# of their own -- an NVIDIA device at [0380] or [1200] stays unlisted.
+my $AMD_ACCELERATOR_RE = qr/\[(?:0380|1200)\]/;
 
 # Virtual GPU vendor IDs — skip these (no host driver needed): virtio,
 # QEMU/QXL, VMware, VirtualBox. Read through virtual_display_vendor_ids, by
@@ -80,7 +86,7 @@ sub detect {
   my $class = _invocant(@_) // return __PACKAGE__->configured_class->detect(@_);
   $class->_ensure_lspci;
 
-  my $pci_output = run "lspci -nn 2>&1 | grep -E '\\[03(00|02)\\]|\\[0380\\].*\\[1002:'",
+  my $pci_output = run "lspci -nn 2>&1 | grep -E '\\[03(00|02)\\]|\\[(0380|1200)\\].*\\[1002:'",
     auto_die => 0;
 
   my $result = { nvidia => [], amd => [], nvswitch => [] };
@@ -97,7 +103,8 @@ sub detect {
   my $virtual = 0;
   my @nvidia_slots;
   for my $line (split /\n/, $pci_output) {
-    # [0380] counts for AMD only (karr #75), whatever the grep let through.
+    # [0380] and [1200] count for AMD only (karr #75, k1), whatever the grep
+    # let through.
     next if $line =~ $AMD_ACCELERATOR_RE && $line !~ $AMD_VENDOR_RE;
     if ($line =~ $NVIDIA_VENDOR_RE) {
       my $gpu = $class->_parse_nvidia_line($line);
@@ -117,6 +124,10 @@ sub detect {
 
   Rex::Logger::info("Virtual GPU detected (virtio/QEMU/VMware/VBox) — skipping")
     if $virtual && !@{$result->{nvidia}} && !@{$result->{amd}};
+
+  # AMD (karr k1): the running driver's gfx target, only where there is an
+  # AMD GPU, so a host without one runs no extra command.
+  $class->_resolve_amd($result->{amd}) if @{$result->{amd}};
 
   # NVSwitch (karr #23): only where there is an NVIDIA GPU for it to connect,
   # so a host without one runs no extra command.
@@ -396,22 +407,71 @@ sub legacy_driver_requirement {
 sub _parse_amd_line {
   my ( $class, $line ) = @_;
 
-  my ($pci_class) = $line =~ /\[(03\d{2})\]/;
+  my ($pci_class) = $line =~ /\[(03\d{2}|1200)\]/;
   # Same form as _parse_nvidia_line: vendor stripped, the rest up to the
   # [1002:xxxx] id as lspci prints it. Vendor 1002 spellings across pci.ids
   # versions: current, the 2010-era "nee ATI" one, and the pre-2010 one.
   my ($name) = $line =~ /:\s+(?:Advanced\s+Micro\s+Devices,\s+Inc\.\s+\[AMD\/ATI\]|Advanced\s+Micro\s+Devices\s+\[AMD\]\s+nee\s+ATI|ATI\s+Technologies\s+Inc\.?)\s+(.+?)\s*\[1002:/;
   $name //= 'Unknown AMD GPU';
   $pci_class //= '0300';
+  my ($device_id) = $line =~ /\[1002:([0-9a-f]{4})\]/i;
+  $device_id = lc $device_id if defined $device_id;
+  my ($slot) = $line =~ /\A(\S+)\s/;
+  # A pci.ids without the device (Ubuntu 24.04's for 1002:1586, live on
+  # synapse) makes lspci print the bare placeholder "Device" (older pciutils
+  # "Device 1586"): named like the sysfs path instead, so messages say which
+  # GPU (karr k1).
+  $name = 'AMD GPU [1002:'.( $device_id // '????' ).']'
+    if $name =~ /\ADevice(?:\s+[0-9a-f]{4})?\z/i;
 
-  Rex::Logger::info("  [info] AMD: $name (PCI class $pci_class)");
-
-  return {
+  return $class->_amd_gpu(
     name      => $name,
-    vendor    => 'amd',
     pci_class => $pci_class,
-    compute   => 0,  # AMD compute support not yet implemented
+    slot      => $class->amd_class->normalize_slot($slot),
+    device_id => $device_id,
+  );
+}
+
+# An AMD element (karr k1): gfx_target, compute and integrated from the
+# device table (amd_hardware_class), all undef for an ID without a row --
+# compute undef is "unknown", and gpu_setup installs nothing for it. The keys
+# are always there. _resolve_amd may refine them from the running driver.
+sub _amd_gpu {
+  my ( $class, %gpu ) = @_;
+  my $hw = $class->amd_hardware_class->resolve(device_id => $gpu{device_id}, name => $gpu{name});
+  return {
+    vendor => 'amd',
+    %gpu,
+    map { $_ => $hw->{$_} } qw( gfx_target compute integrated )
   };
+}
+
+# One read-only command, the AMD driver state (Rex::GPU::AMD's state
+# script): a GPU the running driver lists in the KFD topology gets that gfx
+# target, which wins over the device table (with a warning when they
+# differ). A state that cannot be read leaves the table's values; detection
+# never dies over it. Then one status line per AMD GPU.
+sub _resolve_amd {
+  my ( $class, $gpus ) = @_;
+  my $amd = $class->amd_class;
+  my $state = eval { $amd->parse_state(scalar run($amd->state_script, auto_die => 0)) };
+  Rex::Logger::info('  [info] AMD driver state not readable -- gfx targets from the device table only')
+    unless $state;
+  for my $gpu (@$gpus) {
+    my ( $node ) = $state ? $amd->kfd_nodes($state, $gpu) : ();
+    if ($node && defined $node->{gfx_target}) {
+      my $hw = $class->amd_hardware_class->resolve(device_id => $gpu->{device_id},
+        kfd_gfx_target => $node->{gfx_target}, name => $gpu->{name});
+      $gpu->{$_} = $hw->{$_} for qw( gfx_target compute integrated );
+    }
+    my $status = !defined $gpu->{compute} ? 'undecided' : $gpu->{compute} ? 'ok' : 'skip';
+    Rex::Logger::info('  ['.$status.'] AMD: '.$gpu->{name}.' (PCI class '.$gpu->{pci_class}
+      .( defined $gpu->{slot} ? ', '.$gpu->{slot} : '' ).', '
+      .( $gpu->{gfx_target} // 'gfx target unknown' )
+      .( $gpu->{integrated} ? ', integrated' : '' ).')'
+      .( defined $gpu->{compute} ? '' : ' -- no hardware row, compute left undecided (undef)' ));
+  }
+  return;
 }
 
 
@@ -435,6 +495,10 @@ sub requirement_class { 'Rex::GPU::NVIDIA::Requirement' }
 sub vgpu_class { 'Rex::GPU::NVIDIA::VGPU' }
 
 sub nvidia_class { 'Rex::GPU::NVIDIA' }
+
+sub amd_class { 'Rex::GPU::AMD' }
+
+sub amd_hardware_class { 'Rex::GPU::AMD::Hardware' }
 
 sub nvswitch_device_ids { sort keys %NVSWITCH_DEVICE_IDS }
 
@@ -466,7 +530,7 @@ Rex::GPU::Detect - GPU hardware detection via PCI class codes
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -491,10 +555,11 @@ C</sys/bus/pci/devices> instead, without C<lspci> (opt-in).
 
 PCI class codes C<0300> (VGA compatible controller) and C<0302> (3D
 controller) identify display/GPU hardware. The module filters C<lspci -nn>
-output for these class codes, then classifies devices by vendor ID. Class
-C<0380> (Display controller, where AMD Instinct MI100/MI200/MI300
-enumerate) is accepted for vendor C<1002> only; an NVIDIA device at C<0380>
-is not listed:
+output for these class codes, then classifies devices by vendor ID. Classes
+C<0380> (Display controller: AMD Instinct MI100/MI210/MI250, the Strix Halo
+APU) and C<1200> (Processing accelerator: the AMD Instinct MI300 and MI350
+series) are accepted for vendor C<1002> only; an NVIDIA device at C<0380> or
+C<1200> is not listed:
 
 =over
 
@@ -560,7 +625,7 @@ rules, first match wins:
 =over
 
 =item * A Kepler-or-older device ID (below C<1340>, see below) — B<not>
-compute, whatever the PCI class. This is checked first (karr #55), so a Kepler
+compute, whatever the PCI class. This is checked first, so a Kepler
 Tesla (K80, K40, K20), which enumerates as class C<0302>, is skipped with the
 Kepler warning like a Kepler display card, and a newer GPU on the same host
 is still installed.
@@ -615,8 +680,7 @@ Each names only Maxwell-or-later products.
 
 Unrecognised NVIDIA GPU models default to C<compute =E<gt> 0> and emit a
 warning. L<Rex::GPU::Detect::Sysfs>, which has no names, stops before the
-name rules: C<compute =E<gt> undef> there, also with a warning. AMD GPU C<compute> is always C<0>; AMD driver support is not yet
-implemented.
+name rules: C<compute =E<gt> undef> there, also with a warning.
 
 Each detected NVIDIA GPU also carries its raw C<device_id> (the C<[10de:XXXX]>
 field, or C<undef> if lspci printed none). L<Rex::GPU> passes every compute
@@ -626,6 +690,35 @@ kernel module for Blackwell-architecture silicon (B200/GB200/B300, GeForce
 RTX 50xx, RTX PRO Blackwell, GB10), which has no proprietary one, the
 proprietary 580 branch for a pre-Turing GPU (Maxwell/Pascal/Volta, e.g. the
 V100), and a refusal for a Kepler-or-older one passed to it directly.
+
+=head2 AMD compute classification
+
+B<Experimental.> An AMD GPU is classified by its LLVM gfx target (C<gfx1151>,
+C<gfx942>, ...), from L<Rex::GPU::AMD::Hardware> (through
+L</amd_hardware_class>):
+
+=over
+
+=item * C<gfx_target>: what the running C<amdgpu> reports for the GPU's PCI
+address in the KFD topology, if it does; else the device table's entry for
+the PCI device ID. When both are known and differ, the driver's wins and a
+warning names both.
+
+=item * C<compute>: C<1> if AMD supports ROCm on that gfx target, C<0> if
+it is known not to, C<undef> (unknown) when there is no row for it -- the
+safe default: L<Rex::GPU/gpu_setup> installs no driver for an unknown GPU,
+and a status line says C<[undecided]>.
+
+=item * C<integrated>: C<1> for an integrated GPU (APU, e.g. the Ryzen AI
+Max C<gfx1151>), C<0> for a discrete one, C<undef> without a row.
+L<Rex::GPU/gpu_setup> installs a driver for an integrated GPU only with
+C<amd_integrated =E<gt> 1>.
+
+=back
+
+C<compute> is the truthful "ROCm-capable" flag, also for an APU. The table
+grows by research with a cited source per row, never by guessing; a GPU
+without a row stays unknown.
 
 =head1 FUNCTIONS
 
@@ -679,10 +772,14 @@ detected NVSwitch, see below):
     ],
     amd => [
       {
-        name      => "Navi 31 [Radeon RX 7900 XTX]",
-        vendor    => "amd",
-        pci_class => "0300",
-        compute   => 0,        # AMD compute support not yet implemented
+        name       => "AMD GPU [1002:1586]",  # see below
+        vendor     => "amd",
+        pci_class  => "0380",          # "0300", "0302", "0380" or "1200"
+        slot       => "0000:95:00.0",  # PCI address, always with its domain
+        device_id  => "1586",          # [1002:XXXX]
+        gfx_target => "gfx1151",       # undef if unknown
+        compute    => 1,               # 1 ROCm-capable, 0 not, undef unknown
+        integrated => 1,               # 1 APU, 0 discrete, undef unknown
       }
     ],
     nvswitch => [
@@ -717,6 +814,16 @@ of device ID and subsystem ID is an NVIDIA vGPU type, C<0> otherwise; with
 C<1> also C<vgpu_type>, NVIDIA's name for the type. See L</NVIDIA vGPU
 guests>. C<compute> is not affected by it. A host without an NVIDIA GPU runs
 neither this command nor the NVSwitch one.
+
+When an AMD GPU was found, one more read-only command reads the AMD driver
+state (L<Rex::GPU::AMD/state_script>: sysfs and the KFD topology, shell
+builtins only). Every C<amd> element has C<slot>, C<device_id>,
+C<gfx_target>, C<compute> and C<integrated>, always all present; see
+L</AMD compute classification>. A host without an AMD GPU does not run this
+command. An AMD C<name> is what C<lspci> prints after the vendor, except
+where the host's C<pci.ids> does not know the device and C<lspci> prints
+only C<Device>: then it is C<AMD GPU [1002:XXXX]>, as with
+L<Rex::GPU::Detect::Sysfs>.
 
 If no supported GPU is found, or if the only display devices are virtual,
 all three arrays are empty (C<[]>) -- C<nvswitch> too, since it is only
@@ -818,6 +925,19 @@ B<Experimental.> The class detection asks for the RHEL-family OS names, for
 the C<pciutils> bootstrap: L<Rex::GPU::NVIDIA>. Override it in a subclass to
 use another.
 
+=head2 amd_class
+
+B<Experimental.> The class detection asks for the AMD driver state (its
+L<Rex::GPU::AMD/state_script>, L<Rex::GPU::AMD/parse_state> and
+L<Rex::GPU::AMD/kfd_nodes>) and for the full form of a PCI address:
+L<Rex::GPU::AMD>. Override it in a subclass to use another.
+
+=head2 amd_hardware_class
+
+B<Experimental.> The class detection asks for an AMD GPU's gfx target,
+C<compute> and C<integrated>: L<Rex::GPU::AMD::Hardware>. Override it in a
+subclass to use your own rows.
+
 =head2 nvswitch_device_ids
 
   my @ids = Rex::GPU::Detect->nvswitch_device_ids;   # ( '1ac2', '1af1', '22a3' )
@@ -840,14 +960,14 @@ in a subclass to change both.
 
 =head1 SEE ALSO
 
-L<Rex::GPU>, L<Rex::GPU::NVIDIA>,
+L<Rex::GPU>, L<Rex::GPU::NVIDIA>, L<Rex::GPU::AMD>,
 L<https://pci-ids.ucw.cz/> (PCI ID database)
 
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

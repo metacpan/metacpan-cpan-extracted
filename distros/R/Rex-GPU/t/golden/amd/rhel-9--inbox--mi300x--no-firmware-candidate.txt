@@ -1,0 +1,13 @@
+# golden: amd/rhel-9--inbox--mi300x--no-firmware-candidate
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: cat /proc/cmdline 2>/dev/null
+run: grep -rsHE --include='*.conf' '^[[:space:]]*(blacklist[[:space:]]+amdgpu|install[[:space:]]+amdgpu[[:space:]]+(/usr)?/bin/(false|true))([[:space:]]|$)' /etc/modprobe.d /run/modprobe.d /usr/lib/modprobe.d /lib/modprobe.d 2>/dev/null
+run: uname -r
+run: modinfo -n amdgpu 2>/dev/null
+run: rpm -q linux-firmware 2>&1
+run: rpm -q linux-firmware 2>&1
+run: dnf -q repoquery --available linux-firmware 2>&1
+DIE: install_driver: none of the amdgpu firmware packages (linux-firmware) can be installed from the host's package sources. Nothing was installed

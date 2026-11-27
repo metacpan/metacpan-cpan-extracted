@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.07';
+    our $VERSION = '0.09';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -42,9 +42,7 @@ sub creds_file {
 
 sub subscribe_max {
     my ($self, $subject, $cb, $max_msgs, $queue_group) = @_;
-    my $sid = defined $queue_group
-        ? $self->subscribe($subject, $cb, $queue_group)
-        : $self->subscribe($subject, $cb);
+    my $sid = $self->subscribe($subject, $cb, $queue_group);
     if ($max_msgs && $max_msgs > 0) {
         if (!eval { $self->unsubscribe($sid, $max_msgs); 1 }) {
             my $err = $@;
@@ -135,9 +133,6 @@ stats counters.
 =head2 Higher-level APIs
 
 L<EV::Nats::JetStream>, L<EV::Nats::KV>, L<EV::Nats::ObjectStore>.
-
-B<Note:> DNS resolution via C<getaddrinfo> is blocking. Use numeric IP
-addresses for latency-sensitive applications.
 
 =head1 METHODS
 
@@ -267,7 +262,8 @@ Maximum unacked PINGs before the connection is declared stale.
 
 =item reconnect => Bool (default 0)
 
-Enable automatic reconnection.
+Enable automatic reconnection. A failed initial connect is retried the
+same way, so a client may start before its server.
 
 =item reconnect_delay => Int (ms, default 2000)
 
@@ -308,7 +304,8 @@ Called after the CONNECT/PONG handshake completes.
 
 =item on_disconnect => sub { }
 
-Called when the connection drops, before any auto-reconnect attempt.
+Called when the connection drops, before any auto-reconnect attempt. An
+attempt that never connects reports through C<on_error> only.
 
 =item on_error => sub { my ($err) = @_ }
 
@@ -344,9 +341,8 @@ L</connect>.
 =head2 disconnect
 
 Cancel any pending reconnect, drop queued writes, close the socket,
-and fire C<on_disconnect>. C<intentional_disconnect> is set so no
-auto-reconnect is scheduled. For a clean shutdown that flushes
-pending writes first, see L</drain>.
+and fire C<on_disconnect>. No auto-reconnect is scheduled. For a clean
+shutdown that flushes pending writes first, see L</drain>.
 
 =head2 is_connected
 
@@ -357,8 +353,8 @@ or reconnect is in progress.
 
     publish($subject, [$payload], [$reply_to])
 
-Publish a message. Alias: C<pub>. Croaks on an undef or empty
-subject.
+Publish a message. Alias: C<pub>. Croaks on an undef, empty or
+over-long subject.
 
     $nats->publish('foo', 'hello');
     $nats->publish('foo', 'hello', 'reply.subject');
@@ -377,7 +373,8 @@ subject or headers, or headers not starting with C<NATS/1.0>.
     subscribe($subject, $cb, [$queue_group])
 
 Subscribe to a subject. Returns subscription ID. Alias: C<sub>.
-Croaks on an undef or empty subject.
+Croaks on an undef or empty subject, or one with an empty token
+(C<a..b>).
 
     my $sid = $nats->subscribe('foo.*', sub {
         my ($subject, $payload, $reply, $headers) = @_;
@@ -410,10 +407,9 @@ C<$max_msgs> messages have been delivered.
 
     unsubscribe($sid, [$max_msgs])
 
-Unsubscribe. With C<$max_msgs>, the server is told to deliver that
-many more messages and then drop the subscription. The auto-unsub
-state is restored on reconnect (so the partial count survives a
-disconnect). Alias: C<unsub>.
+Unsubscribe. With C<$max_msgs>, the subscription ends once that many
+messages have been delivered in total, at once if they already have.
+The count survives a reconnect. Alias: C<unsub>.
 
 =head2 request
 
@@ -432,8 +428,9 @@ Callback receives C<($response, $error)>. For replies that include
 NATS message headers (HMSG), a third argument C<$headers> with the
 raw header block is also passed. Error is set on timeout
 ("request timeout"), no responders ("no responders"), or a dropped
-connection ("disconnected"). A C<$timeout_ms> of 0 disables the
-timeout; the callback then waits indefinitely.
+connection ("disconnected"). A request made while reconnecting waits
+for the connection. A C<$timeout_ms> of 0 disables the timeout; the
+callback then waits indefinitely.
 
 =head2 hrequest
 
@@ -448,8 +445,10 @@ C<hreq>.
 
 Graceful shutdown: sends UNSUB for all subscriptions, flushes pending
 writes with a PING fence, fires C<$cb> when the server confirms with
-PONG, then disconnects. No new messages will be received after drain
-is initiated.
+PONG, then disconnects. Messages already on their way are still
+delivered, and what their callbacks publish is sent before the
+disconnect. A later L</connect> does not restore the drained
+subscriptions.
 
 C<$cb> receives a single argument: C<undef> on clean drain, or an error
 string (e.g. C<"disconnected">) if the connection dropped before the
@@ -517,8 +516,9 @@ etc.
     max_payload([$limit])
 
 Server-advertised maximum payload size in bytes. Returns the current
-value; with an argument, overrides it (publishes above this croak
-locally before reaching the wire).
+value; with an argument, overrides it until the server's next INFO
+(publishes above this croak locally before reaching the wire). Inbound
+messages may exceed it, as JetStream replies do, up to 64 MiB.
 
 =head2 waiting_count
 
@@ -723,18 +723,14 @@ True if NKey/JWT signing is available (also requires OpenSSL).
 
 =head1 BENCHMARKS
 
-Measured on Linux with TCP loopback, Perl 5.40, nats-server 2.12,
-100-byte payloads (C<bench/benchmark.pl>):
+Measured on Linux with TCP loopback, Perl 5.40, 100-byte payloads
+(C<bench/benchmark.pl>):
 
                                 100K msgs    200K msgs
     PUB fire-and-forget         4.7M         5.0M msgs/sec
     PUB + SUB (loopback)        1.8M         1.6M msgs/sec
     PUB + SUB (8B payload)      2.2M         1.9M msgs/sec
-    REQ/REP (pipelined, 64)     334K               msgs/sec
-
-Connected-path publish appends directly to the write buffer with no
-per-message allocation. Write coalescing via C<ev_prepare> batches
-all publishes per event-loop iteration into a single C<write()> syscall.
+    REQ/REP (64 in flight)      334K               msgs/sec
 
 Run C<perl bench/benchmark.pl> for full results. Set C<BENCH_MESSAGES>,
 C<BENCH_PAYLOAD>, C<BENCH_HOST>, C<BENCH_PORT> to customize.
@@ -761,13 +757,15 @@ suffixes per request.
 =item * DNS resolution via C<getaddrinfo> is blocking. Use numeric IP
 addresses for latency-sensitive applications.
 
-
 =item * TLS requires OpenSSL headers at build time (auto-detected).
 
 =item * NKey auth requires OpenSSL with Ed25519 support (1.1.1+).
 
 =item * The module handles all data as bytes. Encode UTF-8 strings before
 passing them.
+
+=item * A die in a callback leaves C<EV::run> once the client has finished
+handling the event that ran it.
 
 =item * Cluster URL discovery (the C<connect_urls> field of INFO) is
 trusted by default. On failover the client connects to whatever
@@ -789,8 +787,8 @@ destroyed before the L<EV> loop it was attached to.
 
 =item TEST_NATS_HOST, TEST_NATS_PORT
 
-Set these to run the test suite against a NATS server
-(default: 127.0.0.1:4222).
+The live-server tests run only against the server these name; without
+them they skip.
 
 =back
 

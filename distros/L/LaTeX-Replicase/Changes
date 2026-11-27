@@ -144,3 +144,9 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Increased diversity of code test coverage (~92 %).
 	- The manual has been corrected and expanded.
 
+0.816 Tue Nov 26 12:24:24 2026
+	- Fixed tests for floating point numbers.
+	- Added new tests.
+	- Added several new internal subroutines.
+	- Increased diversity of code test coverage.
+	- The manual has been corrected.

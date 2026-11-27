@@ -5,7 +5,7 @@ use experimental 'class';
 # Perl counterpart of the JavaScript client, ported from it and meant to
 # behave identically. See the POD at the end of this file.
 class BoardStreams::Client {
-    our $VERSION = "v0.0.56";
+    our $VERSION = "v0.0.58";
 
     use Mojo::UserAgent;
     use RxPerl::Mojo qw(rx_behavior_subject rx_interval rx_observable rx_timer);
@@ -14,15 +14,17 @@ class BoardStreams::Client {
 
     use BoardStreams ();
     use BoardStreams::Client::Channel;
+    use BoardStreams::Client::Membership;
     use BoardStreams::Client::Error;
 
     field $url :param;
     field $min_delay :param = 0.5;    # seconds before the first reconnection attempt; doubles per attempt
     field $max_delay :param = 30;     # upper limit for that delay, in seconds
+    field $idle_delay :param = 30;   # seconds the connection is kept with no channel joined; undef for ever
     field $ua :param = undef;         # a Mojo::UserAgent to connect with
 
     field $status_subject = rx_behavior_subject->new('connecting');
-    field %channels;
+    field %channels;                   # memberships by channel name
     field $socket;                    # the current connection attempt: { tx => ... } once established
     field $open = 0;                  # true once the server has greeted with the same protocol version
     field $attempt = 0;
@@ -31,16 +33,19 @@ class BoardStreams::Client {
     field $silence_limit = 0;
     field $last_seen = 0;
     field $fatal;
+    field $idle_timer;               # subscription of the wait before going idle
+    field $idle = 0;                 # true while the connection is closed for lack of channels
 
     ADJUST {
         # The server's heartbeats and this client's own check decide when a
         # connection is dead, whatever the heartbeat interval is.
         $ua //= Mojo::UserAgent->new->inactivity_timeout(0);
         $self->_connect;
+        $self->_rest;
     }
 
     # The state of the connection: 'connecting', 'connected',
-    # 'disconnected' or 'closed'. Replays the current value.
+    # 'disconnected', 'idle' or 'closed'. Replays the current value.
     method status_o {
         return rx_observable->new(sub ($subscriber) {
             $status_subject->subscribe($subscriber);
@@ -48,19 +53,25 @@ class BoardStreams::Client {
         });
     }
 
-    # Joins a channel, or returns the channel if it is already joined.
+    # Joins a channel. Every call returns a channel object of its own, and
+    # the ones for the same name share one membership on the server, which
+    # lasts until each of them has left.
     method join ($name) {
-        return $channels{$name} if $channels{$name};
-        my $channel = $channels{$name} = BoardStreams::Client::Channel->new(
+        $idle_timer->unsubscribe if $idle_timer;
+        undef $idle_timer;
+        return $channels{$name}->open if $channels{$name};
+        my $membership = $channels{$name} = BoardStreams::Client::Membership->new(
             name => $name,
             link => {
                 send      => sub ($message) { $self->_send($message) },
-                forget    => sub { delete $channels{$name} },
+                forget    => sub { delete $channels{$name}; $self->_rest },
                 reconnect => sub { $self->_lost($socket) },
             },
         );
-        if    ($fatal) { $channel->_receive({ type => 'rejected', reason => $fatal->reason, data => $fatal->data }) }
-        elsif ($open)  { $channel->_connected }
+        my $channel = $membership->open;
+        if    ($fatal) { $membership->receive({ type => 'rejected', reason => $fatal->reason, data => $fatal->data }) }
+        elsif ($idle)  { $self->_wake }
+        elsif ($open)  { $membership->connected }
         return $channel;
     }
 
@@ -97,7 +108,7 @@ class BoardStreams::Client {
                         unless ($message->{protocol} // '') eq BoardStreams::PROTOCOL_VERSION;
                     $open = 1;
                     $status_subject->next('connected');
-                    $_->_connected for values %channels;
+                    $_->connected for values %channels;
                 }
                 return $self->_watch($message->{interval}) if $type eq 'heartbeat';
                 # The server is closing this connection on purpose; coming
@@ -106,8 +117,8 @@ class BoardStreams::Client {
                     reason => $message->{reason}, data => $message->{data})) if $type eq 'disconnect';
                 my ($channel) = defined $message->{channel} && !ref $message->{channel}
                     ? grep { defined } $channels{ $message->{channel} }
-                    : grep { $_->_owns($message->{id}) } values %channels;
-                $channel->_receive($message) if $channel;
+                    : grep { $_->owns($message->{id}) } values %channels;
+                $channel->receive($message) if $channel;
             });
             $tx->on(finish => sub {
                 $mine->{finished} = 1;
@@ -131,7 +142,7 @@ class BoardStreams::Client {
     # future, is refused with the given error.
     method _fail ($error) {
         $fatal = $error;
-        $_->_receive({ type => 'rejected', reason => $error->reason, data => $error->data }) for values %channels;
+        $_->receive({ type => 'rejected', reason => $error->reason, data => $error->data }) for values %channels;
         $self->_shutdown;
     }
 
@@ -139,6 +150,9 @@ class BoardStreams::Client {
         $status_subject->next('closed');
         $timer->unsubscribe if $timer;
         undef $timer;
+        $idle_timer->unsubscribe if $idle_timer;
+        undef $idle_timer;
+        $idle = 0;
         $self->_lost($socket);
         $status_subject->complete;
     }
@@ -166,8 +180,8 @@ class BoardStreams::Client {
         $watchdog->unsubscribe if $watchdog;
         undef $watchdog;
         $lost->{tx}->finish if $lost->{tx} and !$lost->{finished};
-        $_->_disconnected for values %channels;
-        return if $status_subject->get_value eq 'closed';
+        $_->disconnected for values %channels;
+        return if $idle or $status_subject->get_value eq 'closed';
         $status_subject->next('disconnected');
         my $nominal = $min_delay * 2**$attempt++;
         $nominal = $max_delay if $nominal > $max_delay;
@@ -180,6 +194,28 @@ class BoardStreams::Client {
     # Between half and all of the nominal delay, at random, so that the
     # clients a server lets go of at once do not all come back at once.
     method _jitter { 0.5 + rand() / 2 }
+
+    # With no channel joined there is nothing to receive, so after a while
+    # the connection is closed, until the next join opens one again.
+    method _rest {
+        return if !defined $idle_delay or %channels or $idle or $idle_timer;
+        return if $status_subject->get_value eq 'closed';
+        $idle_timer = rx_timer($idle_delay)->subscribe(sub {
+            undef $idle_timer;
+            $idle = 1;
+            $timer->unsubscribe if $timer;
+            undef $timer;
+            $self->_lost($socket);
+            $status_subject->next('idle');
+        });
+    }
+
+    method _wake {
+        $idle    = 0;
+        $attempt = 0;
+        $status_subject->next('connecting');
+        $self->_connect;
+    }
 
     method _send ($message) {
         $socket->{tx}->send({ json => $message }) if $open and $socket and $socket->{tx};
@@ -285,6 +321,13 @@ random by up to half.
 
 Upper limit for that delay, in seconds. Defaults to 30.
 
+=item idle_delay
+
+Seconds that the connection is kept open while no channel is joined.
+Defaults to 30. After that the connection is closed and the status becomes
+C<idle>; the next L</join> opens it again. Pass C<undef> to keep it open
+regardless.
+
 =item ua
 
 A L<Mojo::UserAgent> to connect with, for example one with TLS options or
@@ -292,20 +335,28 @@ cookies set. By default the client makes its own.
 
 =back
 
-Note that the JavaScript client takes these delays in milliseconds.
+Note that the JavaScript client takes these three delays in milliseconds.
 
 =head2 join
 
     my $channel = $bs->join('chat:lobby');
 
-Joins a channel and returns it, or returns the channel if it is already
-joined. The channel can be used straight away: actions and requests are
-held until the server confirms the join.
+Joins a channel and returns a channel object. It can be used straight
+away: actions and requests are held until the server confirms the join.
+
+Every call returns an object of its own, and the objects for one name
+share a single membership on the server: the channel is joined once and
+each event is received once. So separate parts of a program can each join
+a channel and each L</leave> it when done. An object obtained while the
+channel is already joined is joined at once. A refused join, a kick, a
+deletion and L</close> end all the objects of a channel together.
 
 =head2 status_o
 
 Observable of the connection's status: C<connecting>, C<connected>,
-C<disconnected> or C<closed>. Replays the current value.
+C<disconnected>, C<idle> or C<closed>. Replays the current value. C<idle>
+means that the connection was closed because no channel was joined; see
+C<idle_delay>.
 
 =head2 close
 
@@ -373,7 +424,14 @@ the state is current again, but some events were missed.
 
 =head2 leave
 
-Leaves the channel. Unanswered requests are rejected.
+Ends this use of the channel: the object's observables complete, its
+status becomes C<left>, and its unanswered requests are rejected with the
+reason C<left>. Actions it has already sent are still delivered. Calling it
+again does nothing.
+
+The client leaves the channel on the server when every object that
+L</join> returned for it has left. An object that is dropped without
+calling C<leave> keeps the channel joined.
 
 =head1 ERRORS
 

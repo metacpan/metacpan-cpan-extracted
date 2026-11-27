@@ -11,7 +11,7 @@ $Carp::Internal{ 'Net::Correios' }++;
 
 package Net::Correios;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 my %libs = (
   token        => 'Token',
@@ -55,6 +55,8 @@ sub new {
         contrato => $args{contrato},
         cartao => $args{cartao},
         sandbox => !!$args{sandbox},
+        token_ttl => $args{token_ttl} // 24 * 60 * 60,
+        token_renew_before => $args{token_renew_before} // 10 * 60,
         base_url => 'https://api' . (('hom')x!!$args{sandbox}) . '.correios.com.br/',
         auth_basic => $auth_basic,
         agent => HTTP::Tiny->new(
@@ -75,14 +77,33 @@ sub access_token {
     die 'token deve ser "cartao", "contrato" ou undef'
         if defined $token_type && $token_type ne 'cartao' && $token_type ne 'contrato';
 
-    my $storage_key = 'token' . (defined $token_type ? '_' . $token_type : '');
-    return $self->{$storage_key} if defined $self->{$storage_key};
+    my $suffix      = defined $token_type ? '_' . $token_type : '';
+    my $storage_key = 'token' . $suffix;
+    my $expires_key = 'token_expires' . $suffix;
+
+    if (defined $self->{$storage_key}) {
+        my $expires = $self->{$expires_key};
+        return $self->{$storage_key} if ( !$expires || time < $expires - $self->{token_renew_before} );
+    }
 
     my $token_res = $self->token->autentica(
         (defined $token_type ? ($token_type => $self->{$token_type}) : ())
     );
 
     $self->{$storage_key} = $token_res->{token};
+
+    # Correios tokens are JWTs with the real expiration date in epoch seconds.
+    my @jwt = split /\./, ($token_res->{token} // '');
+    my $expires;
+    if (@jwt == 3) {
+        my $payload = $jwt[1];
+        $payload =~ tr{-_}{+/}; # JWTs use base64url
+        $payload .= '=' x ((4 - length($payload) % 4) % 4);
+        my $claims = eval { JSON::decode_json(MIME::Base64::decode_base64($payload)) };
+        $expires = $claims->{exp} if ref $claims eq 'HASH' && $claims->{exp};
+    }
+    $self->{$expires_key} = $expires // (time + $self->{token_ttl});
+
     if ($token_res->{cartaoPostagem} && (!$self->{cartao} || $self->{cartao} eq $token_res->{cartaoPostagem}{numero})) {
         $self->{dr} = $token_res->{cartaoPostagem}{dr};
         $self->{contrato} = $token_res->{cartaoPostagem}{contrato} if !$self->{contrato};
@@ -94,6 +115,20 @@ sub make_request {
     my ($self, $token_type, $method, $url, $args) = @_;
     $args = {} if !defined $args;
     $url = $self->{base_url} . $url;
+
+    my $res = $self->_authorized_request($token_type, $method, $url, $args);
+
+    return $res unless ($res->{content} // '') =~ /GTW-007|token\s+expirado/i;
+
+    # cached token was refused, so the request was not processed. Retry!
+    my $suffix = defined $token_type ? '_' . $token_type : '';
+    delete $self->{'token' . $suffix};
+    delete $self->{'token_expires' . $suffix};
+    return $self->_authorized_request($token_type, $method, $url, $args);
+}
+
+sub _authorized_request {
+    my ($self, $token_type, $method, $url, $args) = @_;
     my $token = $self->access_token($token_type);
     $args->{headers}{Authorization} = 'Bearer ' . $token;
     my $res = $self->{agent}->request($method, $url, $args);
@@ -232,6 +267,19 @@ desses passos.
 Cria um novo objeto para se comunicar com a API dos Correios. Este objeto pode
 ser reaproveitado em todos os endpoints que seu programa usar, já que ele faz
 automaticamente a gestão dos tokens de acesso à API.
+
+O construtor aceita ainda os seguintes parâmatros opcionais.
+
+=over 4
+
+=item * C<token_ttl> - tempo de vida, em segundos, considerado para um token
+quando a API não informa a data de expiração. Padrão: 86400 (24 horas).
+
+=item * C<token_renew_before> - quantos segundos antes da expiração o token
+deve ser renovado. Padrão: 600 (10 minutos). Não deve ser maior que 1800
+(30 minutos), que é a janela em que os Correios devolvem um token novo.
+
+=back
 
 =head3 Depurando requisições à API
 

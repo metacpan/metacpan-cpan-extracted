@@ -3,6 +3,8 @@
 
 class UV::Handle::Process extends UV::Handle {
   
+  version_from UV;
+  
   use UV;
   use UV::Constant;
   use UV::Callback::Exit;

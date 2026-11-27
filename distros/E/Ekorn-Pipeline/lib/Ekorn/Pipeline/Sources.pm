@@ -8,7 +8,7 @@ use Ekorn::Pipeline::Errors    qw(croakf);
 use Ekorn::Pipeline::Factories qw(source);
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.5';
 
 our @EXPORT_OK   = qw(from_array from_fh from_file counter);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);

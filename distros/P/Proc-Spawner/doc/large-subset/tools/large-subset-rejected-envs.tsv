@@ -1,0 +1,34 @@
+# large-subset-rejected-envs.tsv: rejected snippets of the work list, run in dash and bash --posix in the base
+# environment and in example environments made by reading them (large-subset-rejected-setups.jsonl; make
+# corpus-rejected-envs), compared as large-subset-rejected.pl compares.  Columns (tab): id; over all its environments:
+# alike in every one, alike in some, differ in every one; each environment's outcome (dash's status/bash's status);
+# what each environment does; the text (⏎: a newline).
+# Column 5 (the text) is not shipped; to restore it: perl -Ilib doc/large-subset/tools/large-subset-restore.pl
+#   -samples corpus-work/samples.jsonl doc/large-subset/tools/large-subset-rejected-envs.tsv > WHOLE.tsv
+#   (from the distribution's directory; needs: corpus-work/samples.jsonl, made by make corpora corpus-samples; no shell
+#   snippet is run)
+NB:10611	alike in some	base:differ(2/1) 1:same(0/0) 2:same(0/0) 3:same(0/0)	1: src/js a directory with a.js; $jsbuild=["out"] | 2: src/js a directory with a.js; $jsbuild=["x1"]; $@ of ["x1"] | 3: src/js absent; $jsbuild=[""]; $@ of ["two  words","*","last"]
+NB:6901	differ in every one	base:differ(2/1) 1:differ(2/1) 2:differ(2/1)	1: standard input: two lines | 2: standard input: a line without its newline
+NB:9059	alike in every one	base:messages-only(127/127) 1:messages-only(127/127) 2:messages-only(127/127)	1: input.txt.gz a file of two lines (not gzip) | 2: input.txt.gz a directory
+NB:9531	alike in every one	base:same(0/0) 1:same(0/0)	1: $BASH_FUNC_ls%%=["() { echo f; }"] (a function bash imports, dash does not)
+SC:Analytics.hs:prop_checkBadParameterSubstitution1	differ in every one	base:differ(2/127) 1:differ(2/127) 2:differ(2/127)	1: $foo=["x1"]; $n=["x1"] | 2: $foo=["two  words *"]; $n=[""]
+SC:Analytics.hs:prop_checkBadParameterSubstitution11	differ in every one	base:differ(2/127) 1:differ(2/127)	1: $x=["x1.tar"]
+SC:Analytics.hs:prop_checkBadParameterSubstitution4	differ in every one	base:differ(2/127) 1:differ(2/127)	1: $var=["x1"]; $n=["x1"]; $i=["1"]
+SC:Analytics.hs:prop_checkBadParameterSubstitution7	differ in every one	base:differ(2/127) 1:differ(2/127)	1: $var=["x1"]
+SC:Analytics.hs:prop_checkBadParameterSubstitution8	differ in every one	base:differ(2/127) 1:differ(2/127)	1: $x=["x1"]
+SC:Analytics.hs:prop_checkCharRangeGlob9	alike in some	base:differ(2/1) 1:differ(2/0) 2:same(0/0)	1: standard input: two lines | 2: arrk a file (the pattern arr[keykey] matches it); standard input: two lines
+SC:Analytics.hs:prop_checkExpansionWithRedirection3	differ in every one	base:differ(2/127) 1:differ(2/127)	1: bar a file of two lines
+SC:Analytics.hs:prop_checkGlobAsCommand2	alike in every one	base:messages-only(127/127) 1:messages-only(127/127)	1: vari a file (the pattern var[i] matches it)
+SC:Analytics.hs:prop_checkLoopVariableReassignment4	alike in every one	base:same(0/0) 1:same(0/0) 2:same(0/0)	1: x1.bar, y1.bar files | 2: x1.bar a directory
+SC:Analytics.hs:prop_checkRedirectToSame8	alike in some	base:differ(2/1) 1:same(0/0) 2:differ(2/1) 3:differ(2/1)	1: $fname=["x1"]; x1 a file of two lines | 2: $fname=["x1"]; x1 absent | 3: $fname=[""]
+SC:Analytics.hs:prop_checkSingleQuotedVariables5	alike in some	base:differ(0/0) 1:same(0/0) 2:differ(0/0)	1: $SECONDS=["5"] | 2: $SECONDS=["x1"]
+SC:Analytics.hs:prop_checkUnnecessaryArithmeticExpansionIndex3	differ in every one	base:differ(127/0) 1:differ(127/0)	1: a2=n a file (the pattern a[2]=n matches it)
+SC:Analytics.hs:prop_checkUnused11	differ in every one	base:differ(2/1) 1:differ(0/1)	1: foo5=3 a file (the pattern foo[5]=3 matches it)
+SC:Analytics.hs:prop_checkUnused9	differ in every one	base:differ(2/1) 1:differ(2/1)	1: standard input: two lines
+SC:Checks/Commands.hs:prop_checkEvalArray3	differ in every one	base:differ(2/0) 1:differ(2/127) 2:differ(2/127)	1: $args=["x1"] | 2: $args=["two  words *"]
+SC:Checks/Commands.hs:prop_checkEvalArray4	differ in every one	base:differ(2/0) 1:differ(2/127) 2:differ(2/127)	1: $args=["x1"] | 2: $args=["two  words *"]
+SC:Checks/Commands.hs:prop_checkExportedExpansions4	alike in some	base:differ(2/127) 1:differ(0/0) 2:same(0/0) 3:differ(2/1)	1: $foo=[""] | 2: $foo=["x1"] | 3: $foo=["two  words *"]
+SC:Checks/Commands.hs:prop_checkReadExpansions9	alike in some	base:differ(2/1) 1:differ(2/0) 2:same(0/0)	1: standard input: two lines | 2: arrv a file (the pattern arr[val] matches it); standard input: two lines
+SC:Checks/ShellSupport.hs:prop_checkBashisms52b	alike in some	base:differ(2/1) 1:messages-only(127/127) 2:differ(2/127) 3:differ(2/1)	1: $var=["1"] | 2: $var=["x1"] | 3: $var=[""]
+SC:Checks/ShellSupport.hs:prop_checkMultiDimensionalArrays1	alike in every one	base:messages-only(127/127) 1:messages-only(127/127)	1: fooab=3 a file (the pattern foo[a][b]=3 matches it)
+TL:common/~.md:16	alike in some	base:same(2/2) 1:differ(2/0) 2:differ(2/0) 3:same(2/2)	1: $OLDPWD=["/"] | 2: $OLDPWD=["x1"]; x1 a directory | 3: $OLDPWD=[""]

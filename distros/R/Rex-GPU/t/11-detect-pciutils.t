@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -32,7 +33,7 @@ use lib "$Bin/lib";
 use Test::RexGPU::Golden qw( record_host golden_is host_profile );
 use Rex::GPU::Detect;
 
-my $LSPCI_READ = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]|\[0380\].*\[1002:'};
+my $LSPCI_READ = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]|\[(0380|1200)\].*\[1002:'};
 my $ADA_LINE   = '01:00.0 VGA compatible controller [0300]: NVIDIA Corporation '
   .'AD104GL [RTX 4000 SFF Ada Generation] [10de:27b0] (rev a1)';
 

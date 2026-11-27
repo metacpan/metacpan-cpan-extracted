@@ -206,6 +206,47 @@ SKIP: { skip 'Windows: the POSIX settings (t/windows.t has what Windows has)', 1
     local $ENV{PATH} = join $Config::Config{path_sep}, '/nonexistent-dir', dirname $PERL;
     my $p = Proc::Spawner::spawn($name, pe('exit 4'), undef, [], { search => 1 });
     ok $p && waitpid($p, 0) == $p && $? >> 8 == 4, 'search through a PATH of two entries' } }
+# closefrom (post-0.13; TODO B, it had no test): natively, or done here (emulated; through Run with system1)
+SKIP: { skip 'Windows: fds above 2 (t/windows.t)', 14 if $WIN;
+  my $probe = pe('print join("", map { open(my $f, ">&=", $_) ? 1 : 0 } @ARGV), "\n"');   # 1: the fd is open
+  my $run = sub {   # the probe's output for fds 8 and 9, with these file actions after its fd 1 into a pipe
+    pipe my $r, my $w or die; my $p = Proc::Spawner::spawn($PERL, [@$probe, 8, 9], undef, [[dup2 => fileno $w, 1], @_], {});
+    close $w; my $o = $p ? do { local $/; <$r> } : "spawn failed: $!"; waitpid $p, 0 if $p; $o };
+  is $run->([dup2 => 2, 8], [dup2 => 2, 9]), "11\n", 'fds 8 and 9 given';
+  is $run->([dup2 => 2, 8], [dup2 => 2, 9], [closefrom => 9]), "10\n", 'closefrom 9 after them: 9 closed, 8 kept';
+  # X67 (post-0.13): where only closefrom is missing, a call without it leaves its fd actions to posix_spawn
+  skip 'X67: needs posix_spawn doing dup2, close, open natively', 12
+    if $Proc::Spawner::FALLBACK || grep $Proc::Spawner::MISSING{$_}, qw(dup2 close open);
+  local %Proc::Spawner::MISSING = (%Proc::Spawner::MISSING, closefrom => 1);
+  my $here = 0; my $orig = \&Proc::Spawner::emulate_actions;
+  no warnings 'redefine'; local *Proc::Spawner::emulate_actions = sub { $here++; $orig->(@_) };
+  is $run->([dup2 => 2, 8], [dup2 => 2, 9]), "11\n", 'closefrom missing, not asked: fds given';
+  is $here, 0, 'closefrom missing, not asked: no fd action done in this process (X67)';
+  is $run->([dup2 => 2, 8], [dup2 => 2, 9], [closefrom => 9]), "10\n", 'closefrom missing, asked: 9 closed, 8 kept';
+  is $here, 0, 'closefrom missing, asked: as closes, left to posix_spawn (no fd action done in this process)';
+  { my $run61 = sub {   # the probe's output for fd 61, which this process itself holds open and inheritable
+      pipe my $r, my $w or die; my $p = Proc::Spawner::spawn($PERL, [@$probe, 61], undef, [[dup2 => fileno $w, 1], @_], {});
+      close $w; my $o = $p ? do { local $/; <$r> } : "spawn failed: $!"; waitpid $p, 0 if $p; $o };
+    defined POSIX::dup2(2, 61) or die "dup2: $!";
+    is $run61->(), "1\n", 'an fd of this process without close-on-exec: the child has it';
+    is $run61->([closefrom => 60]), "0\n", 'closefrom missing, asked: an fd inherited from this process is closed too';
+    is $here, 0, 'and that too is left to posix_spawn';
+    POSIX::close(61) }
+  # the closes are of what the child has at that point: this process's inheritable fds, the earlier targets, less the closed
+  open my $inh, '<', $0 or die; my $fi = fileno $inh; Proc::Spawner::__set_cloexec($fi, 0);
+  my @inh = Proc::Spawner::inheritable_from($fi);
+  ok scalar(grep $_ == $fi, @inh), 'inheritable_from: an fd without close-on-exec is listed';
+  my @as = Proc::Spawner::closefrom_as_closes([dup2 => 2, $fi + 20], [open => $fi + 21, '/dev/null', 0], [close => $fi + 20],
+                                              [closefrom => $fi], [dup2 => 2, $fi + 30], [closefrom => $fi + 5]);
+  my %first = map +($_ => 1), @inh, $fi + 21;   # (not $fi + 20: closed before)
+  is_deeply [map "@$_[0, 1]", @as[3 .. $#as]], [(map "close $_", sort { $a <=> $b } keys %first), 'dup2 2', 'close ' . ($fi + 30)],
+    'closefrom as closes: the inherited fds and the targets still open; a second one closes only what came after';
+  Proc::Spawner::__set_cloexec($fi, 1);
+  ok !grep($_ == $fi, Proc::Spawner::inheritable_from($fi)), 'inheritable_from: not an fd with the flag';
+  close $inh;
+  local %Proc::Spawner::MISSING = (%Proc::Spawner::MISSING, dup2 => 1);   # another kind missing too: all done here, as before
+  is $run->([dup2 => 2, 8], [dup2 => 2, 9], [closefrom => 9]), "10\n", 'closefrom and dup2 missing, asked: done here';
+  is $here, 1, 'closefrom and dup2 missing: the fd actions done in this process' }
 # X59 (post-0.12): reaped(PID), documented for a caller of spawn who waits itself, was gone since W5 (post-0.10)
 { my ($pid) = Proc::Spawner::spawn($^X, [$^X, '-e', 'exit 5'], undef, [], {}); waitpid $pid, 0;
   is $? >> 8, 5, 'a child of spawn, waited for here'; ok eval { Proc::Spawner::reaped($pid); 1 }, 'reaped(PID) then (X59)' }

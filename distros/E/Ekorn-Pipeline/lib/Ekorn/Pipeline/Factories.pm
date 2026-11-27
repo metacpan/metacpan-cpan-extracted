@@ -11,7 +11,7 @@ use Ekorn::Pipeline::Sink   qw();
 use Ekorn::Pipeline::Source qw();
 use Ekorn::Pipeline::Stage  qw();
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.5';
 
 our @EXPORT_OK
     = qw(pipeline stage gather source generator yield sink_one sink_many);

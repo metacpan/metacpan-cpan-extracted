@@ -3,6 +3,8 @@
 
 class UV::Callback::Write : interface_t {
   
+  version_from UV;
+  
   use UV::Request::Write;
   
   required method : void ($uv_req_write : UV::Request::Write, $status : int);

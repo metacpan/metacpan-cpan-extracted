@@ -1,0 +1,126 @@
+{
+   "abstract" : "Keep one instance of a class and let other processes call it",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-Shared",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "Perl::Critic" : "0",
+            "Pod::Github" : "0.04",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Socket::SSL" : "2.0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "IO::Socket::INET" : "0",
+            "IO::Socket::UNIX" : "0",
+            "Log::Abstraction" : "0.41",
+            "Object::Configure" : "0.26",
+            "POSIX" : "0",
+            "Params::Get" : "0.17",
+            "Params::Validate::Strict" : "0.43",
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Storable" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.026",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IO::Socket::SSL" : "0",
+            "Lingua::Conjunction" : "0",
+            "Net::SSLeay" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0",
+            "Test::More" : "0.98",
+            "Test::Most" : "0",
+            "Test::Needs" : "0",
+            "Test::Permissions" : "0",
+            "Test::Returns" : "0",
+            "Test::Without::Module" : "0"
+         },
+         "suggests" : {
+            "Database::Abstraction" : "0.57",
+            "Date::Manip" : "6.00",
+            "Template" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Shared" : {
+         "file" : "lib/Class/Shared.pm",
+         "version" : "0.001.0"
+      },
+      "Class::Shared::Backend" : {
+         "file" : "lib/Class/Shared/Backend.pm",
+         "version" : "0.001.0"
+      },
+      "Class::Shared::Frontend" : {
+         "file" : "lib/Class/Shared/Frontend.pm",
+         "version" : "0.001.0"
+      },
+      "Class::Shared::Protocol" : {
+         "file" : "lib/Class/Shared/Protocol.pm",
+         "version" : "0.001.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Class-Shared@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Shared",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Shared"
+      },
+      "homepage" : "https://metacpan.org/pod/Class::Shared",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nigelhorne/Class-Shared.git",
+         "web" : "https://github.com/nigelhorne/Class-Shared"
+      }
+   },
+   "version" : "0.001.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

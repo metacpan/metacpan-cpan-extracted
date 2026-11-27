@@ -60,7 +60,7 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-  XS::Parse::Keyword
+  HTTP::libsfparse
 );
 
 my @exclude = qw(

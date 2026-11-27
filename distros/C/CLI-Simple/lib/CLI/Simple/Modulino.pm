@@ -9,6 +9,8 @@ use English qw(-no_match_vars);
 
 use parent qw(CLI::Simple);
 
+our $VERSION = '2.6.0';
+
 caller or exit __PACKAGE__->main;
 
 ########################################################################

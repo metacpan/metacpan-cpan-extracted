@@ -26,6 +26,7 @@ ok(SPVM::TestCase::UV->async);
 ok(SPVM::TestCase::UV->pipe);
 ok(SPVM::TestCase::UV->spawn);
 ok(SPVM::TestCase::UV->signal);
+ok(SPVM::TestCase::UV->tcp);
 
 {
     my $tmp_dir = File::Temp->newdir;

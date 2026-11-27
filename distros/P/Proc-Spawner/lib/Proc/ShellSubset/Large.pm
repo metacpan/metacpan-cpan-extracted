@@ -1,5 +1,5 @@
 package Proc::ShellSubset::Large;  # The large subset (doc/large-subset/large-subset-spec.md): Proc::ShellSubset, and where it rejects, a wider grammar
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use strict; use warnings; use Proc::ShellSubset; use List::Util qw(pairs pairvalues);
 
 # Proc::ShellSubset::Large::parse($string, %opt) returns a List, or { error, pos, last, tree } as Proc::ShellSubset::parse does.
@@ -45,7 +45,11 @@ our (%O, $M, @OPEN, $ATT, $LAST, $LOOP, $FORALL, $RLIT, %KW, %BI, %SH, $NM, $END
 our ($FUNC, @HD, $AP, $NOAT, %LOC, %UNSET) = 0;
 our ($SUBLOOP, $LN, $SRC, $LOFF, $CUT, @ASH) = (0, 0, '', 0, 0);   # loops around the subshell we are in (they end it: break, continue as dash, rule E);
              #   whether $LINENO is used here, and the text, for line numbers (G8, rule E)
-sub lineof { $LOFF + 1 + (substr($SRC, 0, opos(shift)) =~ tr/\n//) }   # LOFF: lines before this text (the rest of a text, P1)
+our $NLP;   # X30: where $SRC's newlines are, found once per text, so that a command's line is a search, not a count from the start
+sub lineof {   # the line of position $_[0]: LOFF (lines before this text: the rest of a text, P1), and the newlines before it
+  my $q = opos(shift); $NLP //= do { my (@n, $i); $i = -1; push @n, $i while ($i = index($SRC, "\n", $i + 1)) >= 0; \@n };
+  my ($lo, $hi) = (0, scalar @$NLP); while ($lo < $hi) { my $m = ($lo + $hi) >> 1; $NLP->[$m] < $q ? ($lo = $m + 1) : ($hi = $m) }
+  $LOFF + 1 + $lo }
 our %FDEF;   # 3A (post-0.04): names this text defines as functions somewhere; commands by these names are left
              #   to run time, where a function defined by then comes before the builtin (POSIX order)
 our (%ALIAS, @AEXP, $ANEXT);   # B1: alias name -> [[position from which it holds, value or undef], ...] in this text;
@@ -158,7 +162,7 @@ sub large {   # the large grammar: Proc::ShellSubset::parse with replacements
   local %FDEF = map +($_ => 1), grep $OWN{$_} || $LBI{$_} || $CHK{$_} || $TREECHK{$_},   # 3A: names with checks of their own;
     $s =~ /(?:^|[\s;&|(){}])($NM)[ \t]*\([ \t]*\)/g;                       #   a loose scan: a false hit only defers checks
   local %BI = %LBI; local %SH = %SH; delete @SH{qw(IFS OPTIND OLDPWD PPID)};   # PPID: both shells set it (post4-0.03)
-  local ($SUBLOOP, $LN, $SRC, $LOFF, $CUT, @ASH) = (0, $s =~ /LINENO/ && !$o{nolineno}, $s, $o{lineoff} // 0, 0); $LN ? delete $SH{LINENO} : ($SH{LINENO} = 1);   # G8: not in eval or trap text
+  local ($SUBLOOP, $LN, $SRC, $LOFF, $CUT, $NLP, @ASH) = (0, $s =~ /LINENO/ && !$o{nolineno}, $s, $o{lineoff} // 0, 0); $LN ? delete $SH{LINENO} : ($SH{LINENO} = 1);   # G8: not in eval or trap text
   delete $SH{UID} if $s =~ /(?:^|[\s;&|(){}])UID=/;   # G15 (rule E, as dash): an ordinary variable where the text sets it
   local $TILDEPW = 1;   # G16 (rule E, as bash): ~ without HOME is the home in the password file
   local *shell = sub { local $SUBLOOP = $SUBLOOP + ($LOOP // 0); $o_shell->(@_) };
@@ -299,11 +303,13 @@ sub l_simple {
         E("'local NAME' without a value", $AP) if grep !defined, pairvalues @dv; $LOC{$_->[0]} = 1 for pairs @dv }
       return %$c = ($n => \@dv) }
     elsif ($n eq 'cd') {                                                   # cd [-L|-P]... [--] [DIR] (P6: the last of -L, -P counts)
-      my ($i, $phys) = (1, 0); while (!ref $av[$i] && ($av[$i] // '') =~ /^-[LP]+\z/) { $phys = substr($av[$i++], -1) eq 'P' }
-      $i++ if $i > 1 && !ref $av[$i] && ($av[$i] // '') eq '--';
+      my ($i, $phys, $dd) = (1, 0, 0); while (!ref $av[$i] && ($av[$i] // '') =~ /^-[LP]+\z/) { $phys = substr($av[$i++], -1) eq 'P' }
+      if ($i > 1 && !ref $av[$i] && ($av[$i] // '') eq '--') { $i++; $dd = 1 }
       !@env && !defined $ENV{CDPATH} && (ref $av[$i] || ($av[$i] // '') !~ /^-./ && ($i == 1 || ($av[$i] // '') ne '-'))
         or E('unsupported cd form', $AP);                                  # 'cd -' is allowed (F12), but not after options
-      return %$c = (cd => $av[$i], $phys ? (cd_p => 1) : (), @av > $i + 1 ? (cd_extra => 1) : (), @r ? (redir => \@r) : ()) }   # more operands: an error, as bash (rule E)
+      return %$c = (cd => $av[$i], $phys ? (cd_p => 1) : (), $dd ? (cd_dd => 1) : (),   # X80: every operand word kept, for the
+        @av > $i + 1 ? (cd_more => [@av[$i + 1 .. $#av]]) : (), @r ? (redir => \@r) : ()) }   # executor to expand; then more than one
+                                                                           # operand is an error, as bash (rule E, X54)
     if (my $chk = $CHK{$n}) { E($_, $AP) for grep $_, $chk->(@av[1 .. $#av]) }
     if ($n eq 'unalias' || $n eq 'alias' && grep ref || /=/, @av[1 .. $#av]) {                     # listing: anywhere
       (grep ref, @av[1 .. $#av]) ? ($CUT = 1) : alias_def($n, $p0, \@env, \@r, @av[1 .. $#av]) } }   # P1: known only when it runs

@@ -56,8 +56,20 @@
     * [With no names](#with-no-names)
   * [init](#init)
 * [USING PACKAGE VARIABLES](#using-package-variables)
+* [COMMAND DECLARATIONS](#command-declarations)
+  * [Traditional Declarations](#traditional-declarations)
+  * [Extended Declarations](#extended-declarations)
+  * [Command Attributes](#command-attributes)
 * [COMMAND LINE OPTIONS](#command-line-options)
   * [Getopt::Long Configuration](#getoptlong-configuration)
+* [OPTION DECLARATIONS AND VALIDATION](#option-declarations-and-validation)
+  * [Option Types](#option-types)
+  * [Type Inference](#type-inference)
+  * [Option Attributes](#option-attributes)
+  * [Validation](#validation)
+  * [Collection Options](#collection-options)
+  * [Finalization](#finalization)
+  * [Reading File Options](#reading-file-options)
 * [COMMAND ARGUMENTS](#command-arguments)
   * [set\_args](#set\args)
 * [CUSTOM ERROR HANDLER](#custom-error-handler)
@@ -66,6 +78,11 @@
   * [Implementing an Option Provider](#implementing-an-option-provider)
   * [Option Resolution and Precedence](#option-resolution-and-precedence)
 * [ADDING ADDITIONAL ACCESSORS](#adding-additional-accessors)
+* [TEMPORARY RESOURCES](#temporary-resources)
+  * [Declaring Temporary Resources](#declaring-temporary-resources)
+  * [Resource Attributes](#resource-attributes)
+  * [Resource Ownership and Cleanup](#resource-ownership-and-cleanup)
+  * [Using the Roles Independently](#using-the-roles-independently)
 * [LOGGING](#logging)
   * [Colored Output](#colored-output)
   * [Per Command Log Levels](#per-command-log-levels)
@@ -82,7 +99,7 @@
 * [AUTHOR](#author)
 # NAME
 
-CLI::Simple - a minimalist object oriented base class for CLI applications
+CLI::Simple - a lightweight, low-friction, extensible framework for command-line applications
 
 # SYNOPSIS
 
@@ -225,9 +242,16 @@ on the command line. This eliminates repetitive initialization logic
 while leaving each provider responsible for how and where it obtains
 its values.
 
+Version 2.6.0 extends option declarations with optional metadata,
+validation constraints, and finalizers. Applications can declare
+the values they require and how those values should be prepared.
+`CLI::Simple` resolves, validates, and finalizes options before
+application initialization, allowing command handlers to work
+with application-ready values.
+
 # VERSION
 
-This documentation refers to version 2.4.0.
+This documentation refers to version 2.7.0.
 
 # FEATURES
 
@@ -244,6 +268,8 @@ This documentation refers to version 2.4.0.
 - optional pager support for help output via [IO::Pager](https://metacpan.org/pod/IO%3A%3APager)
 - customizable help sections via `help_sections`
 - pluggable option providers with ordered resolution and precedence
+- automatic temporary file and directory creation with managed cleanup
+- declarative option validation and finalization
 
 # QUICK START
 
@@ -838,15 +864,19 @@ your way.
 
 ## Validation, Defaults, and Configuration
 
-`CLI::Simple` does not impose a validation model. You may:
+`CLI::Simple` provides optional declarative option validation
+without requiring applications to adopt it.
 
-- Use `Getopt::Long` option specifications for argument types and
-`default_options` to supply default values
-- Write your own validation logic in `init()`
-- Throw exceptions, emit usage, or exit early at any point
+Applications may continue using traditional [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong)
+specifications, implement their own validation in `init()`,
+or declare validation constraints through the `options`
+constructor argument.
 
-The lifecycle is explicit and under your control. You decide how much structure
-you want to add on top of it.
+Option providers and defaults are resolved before validation,
+ensuring that declared constraints apply consistently regardless
+of where values originate.
+
+See ["OPTION DECLARATIONS AND VALIDATION"](#option-declarations-and-validation).
 
 ## When to Use
 
@@ -893,31 +923,34 @@ For interactive CLI handling or complex command trees, consider
 
     The constructor parses command-line arguments using [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong),
     normalizes option names, and creates accessors for the declared options.
-    After completing command and logger initialization, `CLI::Simple` resolves
-    any remaining options through registered option providers, applies
-    application defaults, and invokes the application's `init()` method,
-    if defined.
 
-    The order of initialization is significant. Command-line values take
-    precedence over provider-supplied values, providers are consulted in
-    registration order, and defaults are applied only to options that remain
-    unresolved. By the time `init()` is called, all available option values
-    have been assigned to their respective accessors.
+    After command and logger initialization, `CLI::Simple` resolves
+    option values through registered providers and applies application
+    defaults.
 
-    The `init()` method remains available for application-specific
-    initialization, but applications no longer need to implement their own
-    option-source resolution and precedence logic when using option
-    providers. See ["OPTION PROVIDERS"](#option-providers) for details.
+    Resolved values are then validated against any declared constraints
+    and optionally finalized. Temporary files and directories declared
+    through the constructor are created before the application's `init()`
+    method is invoked.
 
-    - Validating command-line arguments.
-    - Loading configuration files based on a `--config` option.
-    - Dynamically overriding the command (e.g., `$self->command('new_default')`).
-    - Overriding default options
-    - Performing any setup required **before** a command is run.
+    The order is significant. Command-line values take precedence over
+    provider-supplied values, providers are consulted in registration
+    order, and defaults are applied only to unresolved options.
 
-- **Phase 3: Execution (`run`)**
+    By the time `init()` runs, all declared option processing and
+    temporary-resource initialization have completed.
 
-    Dispatches to the command method determined during initialization.
+    Applications can use `init()` for additional initialization that
+    is specific to their requirements, such as:
+
+    - Performing application-specific validation beyond the
+    declared option constraints.
+    - Loading and processing configuration files that are not
+    handled through option finalization.
+    - Dynamically selecting a command using `command()`.
+    - Adjusting application settings based on resolved option values.
+    - Establishing connections or preparing other resources needed
+    before command execution.
 
 ## Opt-in Default Command
 
@@ -1206,10 +1239,7 @@ separately.
 
 ## use\_log4perl
 
-    __PACKAGE__->use_log4perl(
-      log_level => 'info',
-      color     => 1,
-    );
+    __PACKAGE__->use_log4perl;
 
 Enables [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) integration for the application class.
 `CLI::Simple` initializes logging during object construction, before
@@ -1235,8 +1265,8 @@ their precedence when multiple providers can resolve the same option.
 
 The array reference specifies which application options the provider
 may resolve. An empty array reference allows the provider to resolve
-any eligible application option declared through `option_specs` or
-`extra_options`.
+any eligible application option declared through `options`,
+`option_specs` or `extra_options`.
 
 The provider must implement a resolver method named
 `_provider_name_resolve()` and may optionally implement
@@ -1251,14 +1281,9 @@ examples, and resolution rules.
 
     new( args )
 
-Instantiates a new `CLI::Simple` instance, parses command-line options,
-creates the corresponding accessors, and optionally initializes logging.
-Registered option providers are then consulted, application defaults
-are applied, and the application's `init()` method is invoked, if
-defined.
-
-See ["OPTION PROVIDERS"](#option-providers) for details on option resolution and
-precedence.
+Instantiates a new `CLI::Simple` instance, parses options, optionally
+initializes logging, and makes options available via dynamically
+generated accessors.
 
 _Note: The `new()` constructor uses [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong)'s `GetOptions`,
 which directly modifies `@ARGV` by removing any recognized
@@ -1282,20 +1307,9 @@ name and its arguments._
 
 - commands (required)
 
-    A hash mapping command names to either a subroutine reference or an
-    array reference.
-
-    If an array reference is used, the first element must be a subroutine
-    reference and the second should be a valid log level. (See
-    ["Per Command Log Levels"](#per-command-log-levels).)
-
-    Example:
-
-        {
-          send          => \&send_message,
-          receive       => \&receive_message,
-          list_messages => [ \&list_messages, 'error' ],
-        }
+    A hash reference mapping command names to code references, array
+    references, extended hash-reference declarations, or command aliases.
+    See ["COMMAND DECLARATIONS"](#command-declarations) for the supported forms and attributes.
 
     If your script does not use command names, you may set a `default` key
     to the subroutine or method to run:
@@ -1314,24 +1328,57 @@ name and its arguments._
 
 - default\_options (optional)
 
-    A hash reference providing default values for options. These values
-    are applied only when the corresponding option has not been resolved
-    by the command line or a registered option provider.
+    A hash reference providing default values for options.
+
+    Defaults are applied after command-line options and registered option
+    providers have been resolved. A default is used only when the
+    corresponding option remains unresolved.
 
 - extra\_options (optional)
 
-    An array reference of names for additional accessors you want to create,
-    even if they are not part of `option_specs`.
+    An array reference of names for additional accessors that are not
+    declared through `options` or `option_specs`.
+
+    These accessors can be initialized through option providers,
+    application defaults, or application code. They do not register
+    additional command-line options.
 
     Example:
 
         extra_options => [ qw(foo bar baz) ]
 
-- option\_specs (optional)
+- options / option\_specs
 
-    An array reference of option specifications, as accepted by
-    [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong). These define the command-line options your program
-    recognizes.
+    Declares the command-line options recognized by the application.
+
+    Both arguments accept either an array reference of [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong)
+    option specifications or a hash reference associating specifications
+    with optional metadata.
+
+    For example, a traditional declaration:
+
+        options => [ qw(help|h verbose|v port|p=i) ],
+
+    Or an extended declaration:
+
+        options => {
+          'port|p=i' => {
+            description => 'Port on which to listen',
+            required    => 1,
+            min         => 1,
+            max         => 65535,
+          },
+        },
+
+    Extended declarations support descriptive metadata, validation
+    constraints, and finalizers. Types are inferred from the option
+    specifications unless explicitly declared.
+
+    `options` is the preferred spelling. `option_specs` remains
+    supported for backward compatibility. The two arguments are
+    interchangeable but cannot be supplied together.
+
+    See ["OPTION DECLARATIONS AND VALIDATION"](#option-declarations-and-validation).
 
 - validate\_command
 
@@ -1353,14 +1400,14 @@ name and its arguments._
 
         sub init {
           my ($self) = @_;
-        
+
           my $command = $self->command;
-        
+
           if ( !exists $self->commands->{$command} ) {
             $self->command_args($command, $self->get_args);
             $self->command('get');
           }
-        
+
           return;
         }
 
@@ -1391,7 +1438,7 @@ To replace the argument list, pass an array reference or a list.
     commands
     commands(command, handler)
 
-Returns the command dispatch hash supplied to the constructor.
+Returns the normalized command dispatch hash.
 When called with a command name and handler, adds the command
 to the dispatch hash. `handler` must be a code reference.
 
@@ -1419,11 +1466,12 @@ Returns a hash reference containing the command-line options parsed
 by `Getopt::Long`. Option names are normalized to snake\_case.
 
 The hash contains only options explicitly supplied on the command
-line. It does not include values supplied by `default_options` or
-subsequently initialized by `init()`.
+line. It does not include values supplied by option providers or
+`default_options`, nor does it reflect subsequent option
+finalization.
 
-Applications can use this hash to distinguish command-line options
-from default values when resolving configuration.
+Applications can use this hash to distinguish command-line
+options from values obtained through other sources.
 
 ## run
 
@@ -1483,18 +1531,17 @@ after command-line options and arguments have been processed and
 before command dispatch. Use this method to perform application-specific
 initialization and validation.
 
-The `init()` method is invoked after command-line options have been
-parsed, registered option providers have resolved any remaining options,
-and application defaults have been applied. Consequently, all resolved
-option values are available through their corresponding accessors when
-`init()` executes.
+- temp\_file
 
-Applications may use `init()` to perform additional initialization,
-including validation of resolved values, establishing connections, or
-preparing resources needed by command handlers.
+    Declares one or more temporary files to be created during construction.
+    Accepts a boolean, a hash reference, or an array reference of hash
+    references. See ["TEMPORARY RESOURCES"](#temporary-resources).
 
-See ["OPTION PROVIDERS"](#option-providers) for details on option resolution and
-precedence.
+- temp\_dir
+
+    Declares one or more temporary directories to be created during
+    construction. Accepts the same declaration forms as `temp_file`.
+    See ["TEMPORARY RESOURCES"](#temporary-resources).
 
 # USING PACKAGE VARIABLES
 
@@ -1519,15 +1566,80 @@ The corresponding package variables are `$DEFAULT_OPTIONS`,
       bar => \&bar,
     };
 
+# COMMAND DECLARATIONS
+
+## Traditional Declarations
+
+The `commands` constructor argument maps command names to handlers.
+A handler may be a code reference or an array reference containing a
+code reference followed by a log level. A string names another command
+and serves as an alias.
+
+    commands => {
+      start  => \&cmd_start,
+      stop   => [ \&cmd_stop, 'debug' ],
+      status => \&cmd_status,
+      s      => 'status',
+    },
+
+See ["ALIASING OPTIONS AND COMMANDS"](#aliasing-options-and-commands) for alias resolution.
+
+## Extended Declarations
+
+As of version 2.7.0, a command can also be declared using a hash
+reference containing its handler and optional metadata. Traditional
+and extended declarations can coexist in the same commands hash.
+
+    commands => {
+      start => {
+        command     => \&cmd_start,
+        description => 'Start the application',
+        log_level   => 'info',
+      },
+      stop => \&cmd_stop,
+      s    => 'start',
+    },
+
+## Command Attributes
+
+- `command`
+
+    Required. A code reference implementing the command.
+
+- `description`
+
+    Optional scalar description of the command. Descriptions are retained
+    as metadata for future help generation. They do not automatically
+    appear in help output.
+
+- `log_level`
+
+    Optional scalar log level for the command. See
+    ["Per Command Log Levels"](#per-command-log-levels) for supported levels and precedence.
+
+Unknown attributes, missing or invalid handlers, and reference values
+for `description` or `log_level` cause an exception during
+normalization. Extended declarations are normalized to the traditional
+dispatch forms; the supplied declarations are not modified.
+
+These declarations apply to the programmatic constructor argument, not
+to command entries in a YAML manifest.
+
 # COMMAND LINE OPTIONS
 
 Command-line options are defined using [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong)-style
-specifications. You pass these into the constructor via the
-`option_specs` parameter:
+specifications and passed to the constructor through `options`
+or `option_specs`.
+
+The simplest form is an array reference:
 
     my $cli = CLI::Simple->new(
-      option_specs => [ qw( help|h foo-bar=s log-level=s ) ]
+      options => [ qw(help|h foo-bar=s log-level=s) ],
     );
+
+For additional metadata, including descriptions, validation rules,
+and finalizers, use a hash reference. See
+["OPTION DECLARATIONS AND VALIDATION"](#option-declarations-and-validation).
 
 Option values are accessible through automatically generated getter
 methods:
@@ -1560,6 +1672,222 @@ may be abbreviated to any unambiguous prefix.
 the last occurrence determines its value.
 
 All other Getopt::Long configuration settings retain their defaults.
+
+# OPTION DECLARATIONS AND VALIDATION
+
+`CLI::Simple` supports extended option declarations that combine
+[Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong) specifications with optional metadata.
+
+Either `options` or `option_specs` accepts a hash reference whose
+keys are option specifications and whose values describe the options:
+
+    options => {
+      'config|c=s' => {
+        description => 'Application configuration',
+        type        => 'file',
+        required    => 1,
+        slurp       => 1,
+        finalize    => sub {
+          my ( $self, $contents ) = @_;
+
+          return $self->process_config($contents);
+        },
+      },
+
+      'port|p=i' => {
+        description => 'Port on which to listen',
+        min         => 1,
+        max         => 65535,
+      },
+    },
+
+Traditional array-reference declarations remain supported. Types are
+inferred and validated for both forms. In an extended declaration, an
+empty hash reference is sufficient when no additional attributes are
+needed.
+
+## Option Types
+
+The following validation types are supported:
+
+- `string`
+
+    A scalar string. Inferred from `=s` or `:s`.
+
+- `integer`
+
+    A signed or unsigned integer. Inferred from `=i`, `:i`, or the
+    incremental counter suffix `+`.
+
+- `number`
+
+    A signed or unsigned decimal number, optionally with an exponent.
+    Inferred from `=f` or `:f`.
+
+- `boolean`
+
+    Inferred from a bare option name (with optional aliases) or the
+    negatable option suffix `!`. Validation accepts signed or unsigned
+    integers, not just zero and one. This also applies to values supplied
+    by providers or defaults.
+
+- `file`
+
+    A pathname identifying an existing regular file (Perl's `-f` test).
+    Declare this type explicitly, normally with a string specification.
+    Use `string` instead for an output pathname that need not yet exist.
+
+- `directory`
+
+    A pathname identifying an existing directory (Perl's `-d` test).
+    Declare this type explicitly, normally with a string specification.
+
+## Type Inference
+
+[Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong) determines how command-line values are parsed. The
+`type` attribute determines how resolved values are validated; it does
+not change the parsing specification.
+
+An explicit type may match the inferred type or refine `string` to
+`file` or `directory`, or `integer` to `number`. Other combinations
+cause an exception. For example:
+
+    'config|c=s' => { type => 'file' },
+    'count=i'    => { type => 'number' },
+
+The latter declaration still parses command-line values as integers.
+If a specification has no recognized suffix or bare-option form, no
+type is inferred. An explicit supported type may still be supplied.
+Without a type, scalar values are still checked for definedness and
+references, and any applicable declared constraints are enforced.
+
+## Option Attributes
+
+- `description`
+
+    Human-readable option metadata reserved for future help generation.
+
+- `type`
+
+    Explicit validation type, as described above.
+
+- `required`
+
+    `0` or `1`. If enabled, the resolved option must be defined. Zero
+    and the empty string satisfy this constraint, subject to other rules.
+
+- `min`, `max`
+
+    Inclusive numeric bounds for `integer` and `number` options.
+    Bounds must be decimal numbers without exponent notation, and the
+    minimum must not exceed the maximum.
+
+- `min_length`, `max_length`
+
+    Inclusive length bounds for `string` options, measured using Perl's
+    `length`. Bounds must be nonnegative integers, and the minimum must
+    not exceed the maximum.
+
+- `enum`
+
+    A nonempty array reference of defined scalar values. The option must
+    match one of these values using string equality. This constraint can
+    be combined with any supported type.
+
+- `slurp`
+
+    `0` or `1`. When enabled, reads the contents of a scalar `file`
+    option after validation. See ["Reading File Options"](#reading-file-options).
+
+- `finalize`
+
+    A code reference that transforms the validated value. See
+    ["Finalization"](#finalization).
+
+Unknown attributes and invalid constraint declarations cause an
+exception during normalization. `spec`, `inferred_type`, and
+`collection` are normalization metadata, not application attributes.
+
+## Validation
+
+Validation occurs after command-line options, option providers, and
+defaults have been resolved, and before finalization and `init()`.
+All resolved values are subject to the same constraints regardless of
+their source. An option is optional by default; an undefined optional
+value is neither validated nor finalized. Defined scalar options may
+not contain references before finalization.
+
+## Collection Options
+
+Specifications ending in `=s@`, `=i@`, or `=f@` (or their optional
+argument counterparts using `:`) declare array-reference values.
+The corresponding `%` suffix declares hash-reference values.
+
+    options => {
+      'ports=i@' => {
+        min => 1,
+        max => 65535,
+      },
+      'directories=s@' => {
+        type => 'directory',
+      },
+      'settings=s%' => {
+        max_length => 256,
+      },
+    },
+
+The type describes each array element or hash value, not the
+collection itself. Every element or value must be a defined scalar
+satisfying the declared constraints. Hash keys are not validated.
+Providers and defaults must supply the corresponding reference type.
+A required collection must be defined but may be empty. Length bounds
+apply to individual strings, not the number of collection entries.
+
+A finalizer receives the entire collection once, not each element
+individually. `slurp` cannot be enabled for collections.
+
+## Finalization
+
+An option may declare a `finalize` callback to transform its value
+after successful validation.
+
+    finalize => sub {
+      my ( $self, $value ) = @_;
+
+      return $self->prepare_value($value);
+    },
+
+The callback receives the application instance and validated value.
+Its return value replaces the option accessor's value without
+additional validation. The callback may return a reference or `undef`.
+All options are validated before finalization begins. Finalizers are
+invoked in sorted canonical option-name order, and a callback
+exception is reported with the option name.
+
+Finalization is optional and does not require explicit validation
+constraints.
+
+## Reading File Options
+
+File options may specify `slurp => 1`:
+
+    options => {
+      'template|t=s' => {
+        type  => 'file',
+        slurp => 1,
+      },
+    },
+
+The file is validated and its contents are read before any custom
+finalizer is invoked.
+
+If no finalizer is supplied, the accessor contains the file contents
+rather than the pathname.
+
+File contents are read as raw data; character decoding and
+format-specific deserialization are not performed automatically.
+
+For complete details, see [CLI::Simple::Options](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3AOptions).
 
 # COMMAND ARGUMENTS
 
@@ -1642,8 +1970,7 @@ an immediate exit.
 # SETTING DEFAULT VALUES FOR OPTIONS
 
 To assign default values to your options, pass a hash reference as the
-`default_options` argument to the constructor. These values will be
-used unless explicitly overridden by the user on the command line.
+`default_options` argument to the constructor.
 
 Example:
 
@@ -1710,8 +2037,8 @@ takes precedence. Subsequent providers are asked to resolve only those
 options that remain unresolved.
 
 An empty option list indicates that the provider may resolve any
-unresolved application option declared through `option_specs` or
-`extra_options`.
+unresolved application option declared through `options`,
+`option_specs` or `extra_options`.
 
 The provider name determines the methods `CLI::Simple` invokes. For
 example, a provider registered as `config` implements
@@ -1720,7 +2047,7 @@ example, a provider registered as `config` implements
 ## Implementing an Option Provider
 
 An option provider is a [Role::Tiny](https://metacpan.org/pod/Role%3A%3ATiny) role that implements a resolver
-method named ` _foo_config_resolve() `, where _name_ is the name used
+method named ` __name__resolve() `, where _name_ is the name used
 when registering the provider.
 
 For example, the following provider resolves options from a Perl hash:
@@ -1825,12 +2152,17 @@ Options are resolved in the following order:
     Any remaining unresolved options may be initialized from the application's
     `default_options`.
 
-After resolution and default initialization are complete, `CLI::Simple`
-invokes the application's `init()` method, if defined.
+After resolution and default initialization are complete,
+`CLI::Simple` validates the resolved option values and performs
+any declared finalization. Temporary resources are then created
+before the application's `init()` method is invoked.
 
-Consequently, application initialization and command handlers can access
-resolved option values through their normal accessors without needing
-to know which source supplied them.
+Consequently, application initialization and command handlers
+receive resolved, validated, and optionally finalized option
+values through their normal accessors, without needing to know
+which source supplied them.
+
+See ["OPTION DECLARATIONS AND VALIDATION"](#option-declarations-and-validation) for details.
 
 # ADDING ADDITIONAL ACCESSORS
 
@@ -1862,6 +2194,147 @@ internal use.
 Unlike `option_specs`, `extra_options` does not register
 command-line options. It only creates accessors for values that
 can be initialized or modified programmatically.
+
+# TEMPORARY RESOURCES
+
+Many command-line applications require temporary files or directories
+for intermediate processing. Traditionally, applications must create
+these resources, retain their paths, and arrange for cleanup when they
+are no longer needed.
+
+`CLI::Simple` can manage temporary files and directories automatically
+through the `temp_file` and `temp_dir` constructor arguments.
+
+Resources are created during object construction, before the application's
+`init()` method is invoked. Each resource is owned by the application
+instance and, by default, is automatically removed when that instance
+is destroyed.
+
+## Declaring Temporary Resources
+
+For example:
+
+    my $cli = __PACKAGE__->new(
+      temp_dir => {
+        accessor => 'workspace',
+        cleanup  => 1,
+      },
+
+      temp_file => [
+        {
+          accessor => 'report',
+          suffix   => '.csv',
+          cleanup  => 1,
+        },
+        {
+          accessor => 'debug_log',
+          suffix   => '.log',
+          cleanup  => 0,
+        },
+      ],
+
+      commands => {
+        process => \&cmd_process,
+      },
+    );
+
+`CLI::Simple` creates the resources and generates the corresponding
+accessors in the application class.
+
+The command handler can immediately use them:
+
+    sub cmd_process {
+      my ($self) = @_;
+
+      my $workspace = $self->get_workspace;
+      my $report    = $self->get_report;
+      my $debug_log = $self->get_debug_log;
+
+      # Perform application-specific processing.
+
+      return 0;
+    }
+
+The accessors return pathnames, not filehandles or resource objects.
+
+Both `temp_file` and `temp_dir` accept a boolean, a hash reference,
+or an array reference of hash references.
+
+A true value creates one resource using default settings:
+
+    temp_file => 1,
+    temp_dir  => 1,
+
+These declarations generate `get_temp_file()` and `get_temp_dir()`
+accessors, respectively. A false value disables resource creation.
+
+A hash reference configures a single resource, while an array reference
+allows multiple resources of the same type. When declaring multiple
+resources, specify distinct accessor names to expose their paths
+independently.
+
+## Resource Attributes
+
+The following attributes are supported by both temporary resource
+types:
+
+- `accessor`
+
+    Specifies the name used to generate the `get_` and `set_` accessors.
+    Defaults to `temp_file` or `temp_dir`, respectively.
+
+- `cleanup`
+
+    Controls automatic cleanup. Defaults to true. When false, the resource
+    remains on disk after the owning object is destroyed.
+
+- `dir`
+
+    Specifies the parent directory in which the temporary resource is
+    created. It does not specify the generated resource's pathname.
+
+- `template`
+
+    Specifies the naming template used by [File::Temp](https://metacpan.org/pod/File%3A%3ATemp).
+
+- `no_accessors`
+
+    Disables automatic accessor generation when true. Cannot be combined
+    with `accessor`.
+
+Temporary files additionally support `suffix`, which appends a
+specified suffix to the generated filename.
+
+## Resource Ownership and Cleanup
+
+Each application instance owns the temporary files and directories it
+creates. Resource ownership is independent of the generated accessors.
+
+Changing an accessor value does not change which resource the framework
+owns or which resource will be cleaned up.
+
+When `cleanup` is enabled, resources are normally removed when the
+owning object is destroyed. For temporary directories, this includes
+**all files and subdirectories contained within them**.
+
+Use `cleanup => 0` for resources that must survive application
+object destruction.
+
+Cleanup follows normal Perl object-lifetime semantics and cannot be
+guaranteed after abrupt process termination.
+
+## Using the Roles Independently
+
+The functionality is provided by [CLI::Simple::TempFile](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3ATempFile) and
+[CLI::Simple::TempDir](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3ATempDir), both implemented as [Role::Tiny](https://metacpan.org/pod/Role%3A%3ATiny) roles.
+
+These roles can also be composed into classes that do not use
+`CLI::Simple`. They expose `create_temp_file()` and
+`create_temp_dir()`, respectively, and provide the same ownership
+and optional accessor behavior.
+
+See [CLI::Simple::TempFile](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3ATempFile) and [CLI::Simple::TempDir](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3ATempDir) for complete
+attribute descriptions and standalone usage examples.
 
 # LOGGING
 
@@ -1937,9 +2410,10 @@ example, certain commands might perform complex actions that benefit
 from detailed logs, while others are designed solely to produce clean,
 structured output.
 
-To assign a custom log level to a command, use an array reference as
-the value for that command in the commands hash passed to the
-constructor.
+To assign a custom log level to a command, use the `log_level`
+attribute of an extended command declaration (see
+["Command Attributes"](#command-attributes)), or use an array reference as the value for
+that command in the commands hash passed to the constructor.
 
 The first two elements of the array reference are:
 

@@ -13,6 +13,15 @@ use utf8;
 
 # use Test::More 'no_plan';
 use Test::More tests => 98;
+
+# use Test::More;
+# if( $^O eq 'MSWin32') {
+#	plan skip_all => 'Test irrelevant on MSWin32';
+# }
+# else {
+#	plan tests => 98;
+# }
+
 use Test::More::UTF8;
 # use Test::NoWarnings;
 use Test::Exception;
@@ -2022,3 +2031,12 @@ is_deeply( $msg, $msg_ref_s, "Test #34.4: ");
 unlink $ofile_s;
 
 rmtree('t/tmp');
+
+# if( $^O eq 'MSWin32') {
+#	plan skip_all => 'Test irrelevant on MSWin32';
+# }
+# else {
+#	plan tests => 98;
+# }
+
+done_testing();

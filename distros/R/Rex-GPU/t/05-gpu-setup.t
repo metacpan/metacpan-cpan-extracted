@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -9,8 +10,10 @@ use Test::More;
 #
 # CLAIMS:
 #   * no GPU, AMD only, or NVIDIA without a compute GPU => no pipeline step
-#     runs; AMD only => exactly one warning (driver support not implemented),
-#     no GPU / no compute GPU => none from gpu_setup;
+#     runs; AMD only with a GPU of unknown compute (k1: no hardware row) =>
+#     exactly one warning naming it, no install; no GPU / no compute GPU =>
+#     none from gpu_setup. (AMD installs and the other skip reasons:
+#     t/15-amd-gpu-setup.t);
 #   * a compute GPU => install_driver, install_container_toolkit,
 #     generate_cdi_specs, configure_containerd, verify_nvidia, in that order;
 #     only the compute GPUs are passed;
@@ -67,11 +70,12 @@ subtest 'no GPU: nothing runs, no warning' => sub {
   is($r->{detect_calls}, 1, 'detects once');
 };
 
-subtest 'AMD only: nothing runs, exactly one warning' => sub {
+subtest 'AMD only (compute unknown): nothing runs, exactly one warning' => sub {
   my $r = setup_with(hosts(amd => [ $AMD ]), reboot => 1);
   is_deeply(steps($r), [], 'no install_driver, no pipeline step');
   is(scalar(@{ warns($r) }), 1, 'exactly one warning');
-  like(warns($r)->[0], qr/AMD GPU detected .* not yet implemented/, '... AMD driver support not implemented');
+  like(warns($r)->[0], qr/AMD GPU detected: AMD Radeon Pro W7600 -- no driver installed: no hardware row for it/,
+    '... naming the GPU and that it has no hardware row (k1; was "not yet implemented")');
 };
 
 subtest 'NVIDIA without a compute GPU: nothing runs, no warning from gpu_setup' => sub {

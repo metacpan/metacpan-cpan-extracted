@@ -1,5 +1,12 @@
 Revision history for Perl extension App-mdee
 
+1.30 2026-11-27T02:51:27Z
+
+    - Require App::nup 1.26, and give it the output width by -w and
+      the options of ansicolumn by --column-opts
+    - Images are shown through a pipe on BSD and Solaris as well:
+      bash took /dev/stdout there for a device which is not a pipe
+
 1.29 2026-11-26T06:47:13Z
 
     - On paper (-T, or -o with a PDF file), images are drawn by

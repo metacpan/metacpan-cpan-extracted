@@ -1,0 +1,8 @@
+# golden: amd/debian-13--rocm-10.1--gfx1151
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: cat /etc/os-release 2>/dev/null
+run: dpkg --print-architecture
+run: dpkg-query -W -f='${Package} ${Status} ${Version}\n' rocm-core amdrocm10.1-gfx1151 2>/dev/null
+run: uname -r
+DIE: install_rocm: AMD's ROCm compatibility matrix does not list gfx1151 for this OS and kernel: AMD supports them with the inbox driver only on Ubuntu 26.04 (GA kernel 7.0) and Ubuntu 24.04 (HWE kernel 7.0), per the ROCm 10.1 compatibility matrix; this host runs Debian GNU/Linux 13 (trixie) with kernel 6.12.48+deb13-amd64. Nothing was changed on the host

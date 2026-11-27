@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.20.0 - 2026-11-27
+
+### Features
+
+- Read a keyless answer without the AS's type ([`f2c9688`](https://github.com/vpndetection-io/sdk-perl/commit/f2c968847416c4e36f4f10a244841e43c8f6333c))
+
 ## 3.19.1 - 2026-11-25
 
 ### Fixes

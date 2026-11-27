@@ -2,6 +2,51 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.4.5 2026-11-26
+
+    A fix to the tests: they pass without Text::CSV.
+
+    Since v0.3.10, the tests failed wherever Text::CSV, which
+    Ekorn::Pipeline::CSV only recommends, wasn't installed, as on many
+    of CPAN Testers' smokers. It changes only the tests.
+
+    - t/30-csv.t is skipped when Text::CSV isn't installed, as
+      t/31-csv-without-text-csv.t already tests that case.
+
+v0.4.4 2026-11-26
+
+    A documentation release: the how-to's "Coming from DBIx::Squirrel"
+    corrected.
+
+    Two rows of the section described DBIx::Squirrel wrongly, as its
+    session pointed out. It changes only the docs.
+
+    - The how-to's "Coming from DBIx::Squirrel" no longer gives
+      DBIx::Squirrel's iterators finish, which is Ekorn's alone, says
+      its Tooling's tags hold their own lists, names is_stop as
+      DBIx::Squirrel's alone, and adds $DumpSecrets, tied between the
+      two.
+
+v0.4.3 2026-11-26
+
+    An iterator's next, and a way into the how-to for DBIx::Squirrel's
+    users.
+
+    Ekorn::Pipeline::Iterator has next, which does what calling the
+    iterator does, so a loop written for DBIx::Squirrel's iterators
+    reads Ekorn's too, and the how-to has a section for readers who
+    come to it from DBIx::Squirrel. It ships roadmap 2026-0056 and
+    2026-0057, and only adds.
+
+    - Ekorn::Pipeline::Iterator's next returns the next value, as
+      $next->() does, in any context: one value, or an empty list once
+      the values run out, so while (my($value) = $next->next) { ... }
+      reads every value. (roadmap 2026-0056)
+    - The how-to's "Coming from DBIx::Squirrel" gives Ekorn's names
+      for what DBIx::Squirrel's users know, says what's new to them
+      and where to start, and the README points to it.
+      (roadmap 2026-0057)
+
 v0.4.2 2026-11-25
 
     An iterator's values as an array reference, whatever the context.

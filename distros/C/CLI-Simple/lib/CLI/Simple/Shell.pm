@@ -3,6 +3,8 @@ package CLI::Simple::Shell;
 use strict;
 use warnings;
 
+our $VERSION = '2.6.0';
+
 1;
 
 __END__

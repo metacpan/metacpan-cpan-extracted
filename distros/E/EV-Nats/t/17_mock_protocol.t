@@ -445,7 +445,7 @@ subtest 'hostile INFO max_payload cannot poison the size guard' => sub {
     $mock->stop;
 
     is $reported, 2147483647, 'hostile max_payload clamped to INT_MAX';
-    ok((grep { /exceeding max_payload/ } @errs),
+    ok((grep { /server sent message exceeding/ } @errs),
        'oversized frame rejected with an error')
         or diag "errors: @errs";
     is scalar(@delivered), 0, 'hostile MSG never delivered';
@@ -501,6 +501,117 @@ subtest 'overflowing inbox id cannot match a live request' => sub {
 
     is $got, 'REAL', 'wrapped id ignored, real reply delivered';
     is $err, undef, 'no error';
+};
+
+subtest 'a server reply larger than max_payload is delivered' => sub {
+    plan tests => 3;
+    my $mock = MockNats->new(on_accept => sub {
+        my ($c) = @_;
+        MockNats->handshake($c, { server_id => 'fake', max_payload => 1024 }) or return;
+        my $buf = MockNats->read_until($c, qr/SUB big (\d+)\r\n/) or return;
+        my ($sid) = $buf =~ /SUB big (\d+)/;
+        syswrite $c, MockNats->msg_frame('big', $sid, undef, 'x' x 4096);
+        sleep 2;
+    })->start;
+    my ($nats, @got, @errs);
+    $nats = EV::Nats->new(
+        host => '127.0.0.1', port => $mock->port,
+        on_error   => sub { push @errs, $_[0] },
+        on_connect => sub { $nats->subscribe('big', sub { push @got, $_[1]; EV::break }) },
+    );
+    run_guarded(3);
+    is length($got[0] // ''), 4096, 'delivered whole';
+    is_deeply \@errs, [], 'no error';
+    ok $nats->is_connected, 'still connected';
+    $nats->disconnect;
+    $mock->stop;
+};
+
+subtest 'a nested loop in a callback neither replays nor drops frames' => sub {
+    plan tests => 1;
+    my $mock = MockNats->new(on_accept => sub {
+        my ($c) = @_;
+        MockNats->handshake($c) or return;
+        my $buf = MockNats->read_until($c, qr/SUB t (\d+)\r\n/) or return;
+        my ($sid) = $buf =~ /SUB t (\d+)/;
+        syswrite $c, "MSG t $sid 1\r\n1\r\n";
+        select undef, undef, undef, 0.1;
+        syswrite $c, "MSG t $sid 5\r\nhel";
+        select undef, undef, undef, 0.5;
+        syswrite $c, "lo\r\nMSG t $sid 3\r\nend\r\n";
+        sleep 2;
+    })->start;
+    my ($nats, @got);
+    $nats = EV::Nats->new(
+        host => '127.0.0.1', port => $mock->port,
+        on_error   => sub { push @got, "ERR:$_[0]" },
+        on_connect => sub {
+            $nats->subscribe('t', sub {
+                push @got, $_[1];
+                if ($_[1] eq '1') {   # as AnyEvent's $cv->recv does on EV
+                    my $w = EV::timer 0.3, 0, sub { EV::break };
+                    EV::run;
+                }
+                EV::break if $_[1] eq 'end';
+            });
+        },
+    );
+    run_guarded(3);
+    is_deeply \@got, ['1', 'hello', 'end'], 'each frame exactly once';
+    $nats->disconnect;
+    $mock->stop;
+};
+
+subtest 'an INFO longer than 4 KiB split across reads connects' => sub {
+    plan tests => 1;
+    my $mock = MockNats->new(on_accept => sub {
+        my ($c) = @_;
+        my $info = 'INFO ' . JSON::PP::encode_json({ server_id => 'fake', max_payload => 1048576,
+            connect_urls => [ map { "10.0.$_.1:4222" } 1 .. 400 ] }) . "\r\n";
+        syswrite $c, substr($info, 0, 5000);   # the first read alone is over 4 KiB
+        select undef, undef, undef, 0.2;
+        syswrite $c, substr($info, 5000);
+        MockNats->read_until($c, qr/PING\r\n/) or return;
+        syswrite $c, "PONG\r\n";
+        sleep 2;
+    })->start;
+    my $connected = 0;
+    my $nats = EV::Nats->new(
+        host => '127.0.0.1', port => $mock->port, reconnect => 0,
+        on_error   => sub { diag "error: $_[0]" },
+        on_connect => sub { $connected++; EV::break },
+    );
+    run_guarded(3);
+    is $connected, 1, 'connected';
+    $nats->disconnect;
+    $mock->stop;
+};
+
+subtest 'a non-fatal -ERR keeps the connection' => sub {
+    plan tests => 3;
+    my $mock = MockNats->new(on_accept => sub {
+        my ($c) = @_;
+        MockNats->handshake($c) or return;
+        my $buf = MockNats->read_until($c, qr/SUB s (\d+)\r\n/) or return;
+        my ($sid) = $buf =~ /SUB s (\d+)/;
+        syswrite $c, "-ERR 'Invalid Subject'\r\n-ERR 'Permissions Violation for Publish to \"x\"'\r\n";
+        syswrite $c, MockNats->msg_frame('s', $sid, undef, 'after');
+        sleep 2;
+    })->start;
+    my ($nats, @got, @errs);
+    my $disconnects = 0;
+    $nats = EV::Nats->new(
+        host => '127.0.0.1', port => $mock->port,
+        on_error      => sub { push @errs, $_[0] },
+        on_disconnect => sub { $disconnects++ },
+        on_connect    => sub { $nats->subscribe('s', sub { push @got, $_[1]; EV::break }) },
+    );
+    run_guarded(3);
+    is scalar @errs, 2, 'both reported';
+    is_deeply \@got, ['after'], 'delivery continues';
+    is $disconnects, 0, 'never disconnected';
+    $nats->disconnect;
+    $mock->stop;
 };
 
 done_testing;

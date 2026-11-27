@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
-# Circuit breaker — track failure rate, trip breaker, auto-recover
+# Circuit breaker -track failure rate, trip breaker, auto-recover
 # Usage:
-#   perl eg/circuit_breaker.pl service   — flaky service (fails 40%)
-#   perl eg/circuit_breaker.pl client    — client with circuit breaker
-#   perl eg/circuit_breaker.pl both      — run both in one process
+#   perl eg/circuit_breaker.pl service   -flaky service (fails 40%)
+#   perl eg/circuit_breaker.pl client    -client with circuit breaker
+#   perl eg/circuit_breaker.pl both      -run both in one process
 use strict;
 use warnings;
 use EV;
@@ -42,10 +42,10 @@ $nats = EV::Nats->new(
             my $trip = sub {
                 $state = 'open';
                 $failures = 0;
-                print "  CIRCUIT OPEN — rejecting requests for ${cooldown}s\n";
+                print "  CIRCUIT OPEN -rejecting requests for ${cooldown}s\n";
                 $recovery_timer = EV::timer $cooldown, 0, sub {
                     $state = 'half_open';
-                    print "  CIRCUIT HALF-OPEN — sending probe\n";
+                    print "  CIRCUIT HALF-OPEN -sending probe\n";
                     undef $recovery_timer;
                 };
             };
@@ -71,7 +71,7 @@ $nats = EV::Nats->new(
                     } else {
                         if ($state eq 'half_open') {
                             $state = 'closed';
-                            print "  CIRCUIT CLOSED — service recovered\n";
+                            print "  CIRCUIT CLOSED -service recovered\n";
                         }
                         $failures = 0;
                         print "req $id: OK ($resp)\n";

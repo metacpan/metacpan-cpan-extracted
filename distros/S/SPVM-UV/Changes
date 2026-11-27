@@ -1,3 +1,12 @@
+0.010 2026-11-27
+  [Summary]
+    * Support uv_tcp_t and add UV::Loop#alive.
+  [New Features]
+    * Add alive method to UV::Loop class.
+    * Add tcp_init method to UV::Loop class.
+    * Add UV::Handle::TCP class.
+  [Changes]
+    * Add version_from to all classes.
 0.009 2026-11-16
   [Summary]
     * Support uv_fs_event_t.

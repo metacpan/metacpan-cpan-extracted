@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "SOAP::Lite" => "0.711",
     "Syntax::Keyword::Match" => "0.15"
   },
-  "VERSION" => "1.9",
+  "VERSION" => "1.901",
   "test" => {
     "TESTS" => "t/*.t"
   }

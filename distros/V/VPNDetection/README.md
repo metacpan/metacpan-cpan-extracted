@@ -17,7 +17,7 @@ Requires Perl 5.22 or newer. [Mojolicious](https://metacpan.org/dist/Mojolicious
 
 ## Usage
 
-**No API key needed to start.** Unlimited, the free plan, answers `ip`, `is_vpn`, Tor and relay detection, `is_bot` (whether an automated client such as a crawler or a monitor uses the address), `is_anycast`, `hostname` (the reverse DNS name), country-level `location` and `asn` with the AS's country and RPKI status, with no daily or monthly cap, with a key or without one.
+**No API key needed to start.** Unlimited, the free plan, answers `ip`, `is_vpn`, Tor and relay detection, `is_anycast`, `hostname` (the reverse DNS name), country-level `location` and `asn` with the AS's country and RPKI status, with no daily or monthly cap, with a key or without one.
 
 ```perl
 use VPNDetection;
@@ -32,7 +32,7 @@ print $result->asn->{name};          # who runs the announcing network
 
 ### With an API key
 
-A paid plan answers every field: `is_hosting`, `is_cdn` and the four proxy flags as well, the carrier and satellite flags, the five service flags (SSH, SMTP, web, DNS resolver and BitTorrent), the `bot` detail (whose bot uses the address, the agents it serves, what they do and whether its operator vouches for it), city-level `location`, the `company` and the `abuse` contact, the provider (its ID and its name), confidence and last-seen detail behind each flag, and `user_agent`, the verdict on a user agent you send with a lookup. Its quotas differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.vpndetection.io), then pass it in:
+A paid plan answers every field: `is_hosting`, `is_cdn`, `is_bot` (whether an automated client such as a crawler or a monitor uses the address) and the four proxy flags as well, the AS's `type` (the kind of network it runs), the carrier and satellite flags, the five service flags (SSH, SMTP, web, DNS resolver and BitTorrent), the `bot` detail (whose bot uses the address, the agents it serves, what they do and whether its operator vouches for it), city-level `location`, the `company` and the `abuse` contact, the provider (its ID and its name), confidence and last-seen detail behind each flag, and `user_agent`, the verdict on a user agent you send with a lookup. Its quotas differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.vpndetection.io), then pass it in:
 
 ```perl
 my $client = VPNDetection->new(api_key => $ENV{VPNDETECTION_API_KEY});
@@ -300,7 +300,7 @@ Each redirect URI must be https on a public host name, or http on a loopback add
 
 ### Absent is not false
 
-Unlimited leaves out `is_hosting`, `is_cdn`, the four proxy flags, the carrier, satellite and service flags, `company` and `abuse`, and of the detail behind each flag it answers only Tor's and relay's; a free-plan key's answer carries `trial_expired`, true once its trial is spent, and a paid key's carries `cap_reached`, true once its organization's overage cap is reached and the answer has Unlimited's. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
+Unlimited leaves out `is_hosting`, `is_cdn`, `is_bot`, the four proxy flags, the carrier, satellite and service flags, the AS's `type`, `company` and `abuse`, and of the detail behind each flag it answers only Tor's and relay's; a free-plan key's answer carries `trial_expired`, true once its trial is spent, and a paid key's carries `cap_reached`, true once its organization's overage cap is reached and the answer has Unlimited's. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
 
 ```perl
 if ($result->is_hosting // 0) { ... }     # absent counts as false

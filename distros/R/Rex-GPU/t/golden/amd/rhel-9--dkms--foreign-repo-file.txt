@@ -1,0 +1,12 @@
+# golden: amd/rhel-9--dkms--foreign-repo-file
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: cat /proc/cmdline 2>/dev/null
+run: grep -rsHE --include='*.conf' '^[[:space:]]*(blacklist[[:space:]]+amdgpu|install[[:space:]]+amdgpu[[:space:]]+(/usr)?/bin/(false|true))([[:space:]]|$)' /etc/modprobe.d /run/modprobe.d /usr/lib/modprobe.d /lib/modprobe.d 2>/dev/null
+run: uname -m
+run: uname -r
+run: od -An -tu1 -j4 -N1 /sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c 2>/dev/null
+run: cat /etc/yum.repos.d/amdgpu.repo 2>/dev/null
+DIE: install_driver: /etc/yum.repos.d/amdgpu.repo exists with other content than amdgpu 31.60 needs; install_driver does not replace a repository it did not write. Nothing was changed on the host

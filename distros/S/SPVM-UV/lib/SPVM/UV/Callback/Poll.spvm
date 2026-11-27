@@ -3,6 +3,8 @@
 
 class UV::Callback::Poll : interface_t {
   
+  version_from UV;
+  
   use UV::Handle::Poll;
   
   required method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int);

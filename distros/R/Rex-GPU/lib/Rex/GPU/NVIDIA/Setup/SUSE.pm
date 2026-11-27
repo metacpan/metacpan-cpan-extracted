@@ -1,7 +1,7 @@
 # ABSTRACT: NVIDIA driver setup for openSUSE Leap (experimental)
 
 package Rex::GPU::NVIDIA::Setup::SUSE;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use Moo;
 use Rex::Logger ();
 use namespace::autoclean;
@@ -156,7 +156,7 @@ Rex::GPU::NVIDIA::Setup::SUSE - NVIDIA driver setup for openSUSE Leap (experimen
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -235,7 +235,7 @@ package carries it.
 
 C<16.0> on Leap 16 and later, the C<x.y> of the raw release string
 (C<15.6>) before -- never C<operating_system_version>, which strips the dots
-(C<156>, karr #6).
+(C<156>).
 
 =head2 repo_url
 
@@ -295,7 +295,7 @@ L<Rex::GPU::NVIDIA::Setup>, L<Rex::GPU::NVIDIA/install_driver>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

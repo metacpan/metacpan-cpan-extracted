@@ -364,9 +364,13 @@ Run it with `perl chat.pl daemon` and open the page in two browser windows.
 | `chat.joined()` | Promise that resolves on the first successful join |
 | `chat.status$` | `'joining'`, `'joined'`, `'rejected'` or `'left'` |
 | `chat.gaps$` | Emits when events were missed for good (see below) |
-| `chat.leave()` | Leaves the channel |
+| `chat.leave()` | Ends this use of the channel (see below) |
 
-The connection object has `bs.status$` (`'connecting'`, `'connected'`, `'disconnected'`, `'closed'`) and `bs.close()`.
+The connection object has `bs.status$` (`'connecting'`, `'connected'`, `'disconnected'`, `'idle'`, `'closed'`) and `bs.close()`.
+
+**No channels, no connection.** When no channel has been joined for 30 seconds, the client closes its connection and `bs.status$` becomes `'idle'`; the next `bs.join` opens one again. The `idleDelay` option changes that time (in milliseconds), and `idleDelay: null` keeps the connection open regardless.
+
+**Joining a channel more than once.** Every call of `bs.join` returns a channel object of its own, and the objects for one name share a single membership on the server: the channel is joined once, and each event travels over the WebSocket once. `leave()` ends only the object it is called on, and the client leaves the channel on the server when the last of them has left. So separate parts of a page can each join `chat:lobby` when they appear and leave it when they go, without knowing about each other. Call `leave()` once on every object you get from `join`; an object that is dropped without it keeps the channel joined. The Perl client works the same way.
 
 The observables are RxJS observables, so they work with RxJS operators:
 
@@ -487,7 +491,7 @@ What differs from the JavaScript client is only what the language makes differ:
 
 | JavaScript | Perl |
 |---|---|
-| `new BoardStreams(url, { minDelay, maxDelay })`, delays in milliseconds | `BoardStreams::Client->new(url => ..., min_delay => ..., max_delay => ...)`, delays in seconds |
+| `new BoardStreams(url, { minDelay, maxDelay, idleDelay })`, delays in milliseconds | `BoardStreams::Client->new(url => ..., min_delay => ..., max_delay => ..., idle_delay => ...)`, delays in seconds |
 | `state$`, `events$`, `gaps$`, `status$` (RxJS) | `state_o`, `events_o`, `gaps_o`, `status_o` (RxPerl) |
 | `state`, `on(name)`, `action`, `request`, `joined()`, `leave()`, `close()` | The same names |
 | Promises | `Mojo::Promise` objects |
@@ -513,6 +517,28 @@ React to a gap only if your page depends on events and not just on state:
 ```js
 chat.gaps$.subscribe(() => showNotice('Some activity was missed while you were away'));
 ```
+
+## Stopping and deploying
+
+Mojolicious can stop a server in two ways, and BoardStreams is quick in both.
+
+- **A graceful stop** is what the `QUIT` signal asks for, what hypnotoad does to its old workers in a hot deployment, and what happens to a worker that has served its share of connections. The server stops accepting connections and waits for the open ones to end, for up to its `graceful_timeout` (two minutes by default). A WebSocket never ends by itself, so when such a stop begins the plugin closes its WebSocket connections at once, and the process exits in about a second.
+- **An immediate stop** is what `TERM` and `INT` ask for. Connections are simply cut.
+
+Either way, browsers experience an ordinary lost connection. They are not told to stay away: they reconnect by themselves, to whichever process answers (another worker, or the new server once it is up), rejoin their channels and receive what they missed. A request or action that was on its way, or in the middle of being handled, is sent again and takes effect once.
+
+So a deployment needs nothing special from your code. Ordinary HTTP requests are another matter: only a graceful stop lets the ones in progress finish, which is the reason to prefer it.
+
+**With Docker.** `docker stop` sends `TERM` unless told otherwise, which is the immediate stop. For a graceful one, make the stop signal `QUIT`:
+
+```yaml
+services:
+  web:
+    command: ["perl", "app.pl", "prefork", "-m", "production"]
+    stop_signal: SIGQUIT
+```
+
+or `STOPSIGNAL SIGQUIT` in the Dockerfile. The server must be the container's main process for the signal to reach it, so start it with the list form of `command` or `CMD` shown above, not through a shell. A container that takes its whole `stop_grace_period` to stop and is then killed is the sign of a graceful stop that something is holding up; BoardStreams connections no longer do.
 
 ## Upgrading
 

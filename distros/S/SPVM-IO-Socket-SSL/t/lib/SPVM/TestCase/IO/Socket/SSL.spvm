@@ -3,6 +3,7 @@ class TestCase::IO::Socket::SSL {
   use Net::SSLeay::Constant as SSL;
   use Fn;
   use FindBin;
+  use Go::Timer;
   
   our $FILE_DIR : string;
   
@@ -515,7 +516,7 @@ class TestCase::IO::Socket::SSL {
         my $host = "127.0.0.1";
         
         # Create a context with a negative timeout to ensure an immediate timeout.
-        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, -1.0);
+        my $ctx_derived = Go::Context->background->with_timeout_sec_v2(-1.0);
         my $ctx = $ctx_derived->context;
         
         my $socket = IO::Socket::SSL->new({
@@ -574,7 +575,7 @@ class TestCase::IO::Socket::SSL {
           my $client_socket = $listen_socket->accept(Go->bg);
           
           # Sleep longer than the client's timeout to trigger the timeout.
-          Go->sleep(Go::Duration_1l->new_from_sec(1.0));
+          Go::Timer->sleep(Go::Duration_1l->new_from_sec(1.0));
           
           $client_socket->close;
           $listen_socket->close;
@@ -596,7 +597,7 @@ class TestCase::IO::Socket::SSL {
         });
         
         # Create a context with a short timeout (0.5 seconds)
-        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.5);
+        my $ctx_derived = Go::Context->background->with_timeout_sec_v2(0.5);
         my $ctx = $ctx_derived->context;
         
         my $buffer = (mutable string)new_string_len 1024;
@@ -642,7 +643,7 @@ class TestCase::IO::Socket::SSL {
         });
         
         # Create a context with a short timeout (0.5 seconds) for accept.
-        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.5);
+        my $ctx_derived = Go::Context->background->with_timeout_sec_v2(0.5);
         my $ctx = $ctx_derived->context;
         
         # This should block and eventually throw IOTimeout because no client connects.
@@ -697,7 +698,7 @@ class TestCase::IO::Socket::SSL {
           my $client_socket = $listen_socket->accept(Go->bg);
           
           # Keep the connection alive longer than the client's timeout.
-          Go->sleep(Go::Duration_1l->new_from_sec(2.0));
+          Go::Timer->sleep(Go::Duration_1l->new_from_sec(2.0));
           
           $client_socket->close;
           $listen_socket->close;
@@ -718,7 +719,7 @@ class TestCase::IO::Socket::SSL {
         });
         
         # Create a context with a very short timeout to ensure it triggers.
-        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.5);
+        my $ctx_derived = Go::Context->background->with_timeout_sec_v2(0.5);
         my $ctx = $ctx_derived->context;
         
         # Smaller payload, but send many times to fill the buffer.
@@ -776,7 +777,7 @@ class TestCase::IO::Socket::SSL {
           my $client_socket = $listen_socket->accept(Go->bg);
           
           # Server sleeps to trigger client-side read timeout
-          Go->sleep(Go::Duration_1l->new_from_sec(1.0));
+          Go::Timer->sleep(Go::Duration_1l->new_from_sec(1.0));
           
           $client_socket->close;
           $listen_socket->close;
@@ -793,7 +794,7 @@ class TestCase::IO::Socket::SSL {
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
         });
         
-        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.3);
+        my $ctx_derived = Go::Context->background->with_timeout_sec_v2(0.3);
         my $ctx = $ctx_derived->context;
         
         my $buffer = (mutable string)new_string_len 1024;
@@ -848,7 +849,7 @@ class TestCase::IO::Socket::SSL {
           my $client_socket = $listen_socket->accept(Go->bg);
           
           # Do not read to let the client's send buffer fill up.
-          Go->sleep(Go::Duration_1l->new_from_sec(2.0));
+          Go::Timer->sleep(Go::Duration_1l->new_from_sec(2.0));
           
           $client_socket->close;
           $listen_socket->close;
@@ -866,7 +867,7 @@ class TestCase::IO::Socket::SSL {
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
         });
         
-        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.3);
+        my $ctx_derived = Go::Context->background->with_timeout_sec_v2(0.3);
         my $ctx = $ctx_derived->context;
         
         my $payload = Fn->repeat("a", 8192);

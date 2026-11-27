@@ -18,8 +18,8 @@ use Test2::Plugin::NoWarnings;
 use B          qw();
 use File::Find qw();
 
-my $REFERENCE = 'docs/REFERENCE.md';
-skip_all "the reference isn't here" unless -e $REFERENCE;
+my @REFERENCES = grep { -e } qw(docs/REFERENCE.md);
+skip_all "the reference isn't here" unless @REFERENCES;
 
 # Modules for DBIx::Squirrel's own use: their entries list nothing.
 my %INTERNAL_MODULE = map { $_ => 1 } qw(
@@ -60,12 +60,12 @@ sub anchor ($heading) {
 # true if its section opens with a synopsis, and the index's entries, in
 # order: each a module's name, the text saying what it is, and its
 # names, in order, each with its text.
-sub index_entries () {
-    open my $in, '<', $REFERENCE or die "Can't read $REFERENCE: $!";
+sub index_entries ($reference) {
+    open my $in, '<', $reference or die "Can't read $reference: $!";
     my $text = do { local $/; <$in> };
     close $in;
     my($body, $index) = $text =~ m( \A (.*?) ^\#\#\ Index\n (.*) \z )xms
-        or die "No index in $REFERENCE";
+        or die "No index in $reference";
     my @lines = split m( \n )x, $body;
     my(%anchors, $in_code);
     for my $i (0 .. $#lines) {
@@ -144,119 +144,130 @@ sub public_names ($module) {
 }
 
 
-my($anchors, @entries) = index_entries();
 my @modules     = modules();
 my $ekorn_links = ekorn_index_links();
 
-is [map { $_->{module} } @entries],
-    [sort { sort_key($a) cmp sort_key($b) } @modules],
-    'each module has an entry, A to Z';
+for my $reference (@REFERENCES) {
+    subtest $reference => sub {
+        my($anchors, @entries) = index_entries($reference);
 
-for my $entry (@entries) {
-    my $module = $entry->{module};
-    my @names  = map { $_->[0] } @{ $entry->{names} };
-    is \@names, [sort { sort_key($a) cmp sort_key($b) } @names],
-        "$module: its names A to Z";
-    is [
-        map { $_->[0] }
-        grep {
-            $_->[1]
-                !~ m( \s See \s+ \[ [^\]]+ \] \( (?: \# | \Q$EKORN\E ) [^\)]+ \) \. \s* \z )xs
-        } @{ $entry->{names} }
-        ],
-        [], "$module: each name ends with a link to where it's described";
+        is [map { $_->{module} } @entries],
+            [sort { sort_key($a) cmp sort_key($b) } @modules],
+            'each module has an entry, A to Z';
 
-    # Its synopsis, all its forms, as code, is here; its link goes to a
-    # section of the reference text that shows it in use, which doesn't
-    # repeat the synopsis (2026-0042).
-    is [
-        map  { $_->[0] }
-        grep { $_->[1] !~ m( ^```perl\n .+? ^```$ )xms } @{ $entry->{names} }
-        ],
-        [], "$module: each name has a synopsis";
-    my(%to, %to_ekorn);
-    for my $name (@{ $entry->{names} }) {
-        my($ekorn, $to)
-            = $name->[1]
-            =~ m( \s See \s+ \[ [^\]]+ \] \( (\# | \Q$EKORN\E) ([^\)]+) \) \. \s* \z )xs;
-        if (defined $ekorn && $ekorn ne '#') {
-            $to_ekorn{$name->[0]} = $to;
+        for my $entry (@entries) {
+            my $module = $entry->{module};
+            my @names  = map { $_->[0] } @{ $entry->{names} };
+            is \@names, [sort { sort_key($a) cmp sort_key($b) } @names],
+                "$module: its names A to Z";
+            is [
+                map { $_->[0] }
+                grep {
+                    $_->[1]
+                        !~ m( \s See \s+ \[ [^\]]+ \] \( (?: \# | \Q$EKORN\E ) [^\)]+ \) \. \s* \z )xs
+                } @{ $entry->{names} }
+                ],
+                [], "$module: each name ends with a link to where it's described";
+
+            # Its synopsis, all its forms, as code, is here; its link goes to a
+            # section of the reference text that shows it in use, which doesn't
+            # repeat the synopsis (2026-0042).
+            is [
+                map  { $_->[0] }
+                grep { $_->[1] !~ m( ^```perl\n .+? ^```$ )xms } @{ $entry->{names} }
+                ],
+                [], "$module: each name has a synopsis";
+            my(%to, %to_ekorn);
+            for my $name (@{ $entry->{names} }) {
+                my($ekorn, $to)
+                    = $name->[1]
+                    =~ m( \s See \s+ \[ [^\]]+ \] \( (\# | \Q$EKORN\E) ([^\)]+) \) \. \s* \z )xs;
+                if (defined $ekorn && $ekorn ne '#') {
+                    $to_ekorn{$name->[0]} = $to;
+                }
+                else {
+                    $to{$name->[0]} = $to;
+                }
+            }
+            is [grep { !defined $to{$_} || !exists $anchors->{$to{$_}} } sort keys %to],
+                [], "$module: each name links to a section of the reference";
+            is [grep { defined $to{$_} && $anchors->{$to{$_}} } sort keys %to],
+                [], "$module: no section it links to opens with a synopsis";
+
+            # A link to Ekorn's reference goes where its index links the name
+            # (2026-0051, D3).
+            next unless %to_ekorn;
+        SKIP:
+            {
+                skip "Ekorn::Pipeline::Manual::Reference isn't installed", 1
+                    unless $ekorn_links;
+                is [
+                    grep { ($ekorn_links->{$_} // '') ne $to_ekorn{$_} }
+                    sort keys %to_ekorn
+                    ],
+                    [],
+                    "$module: each link to Ekorn's reference goes where its index links the name";
+            }
         }
-        else {
-            $to{$name->[0]} = $to;
-        }
-    }
-    is [grep { !defined $to{$_} || !exists $anchors->{$to{$_}} } sort keys %to],
-        [], "$module: each name links to a section of the reference";
-    is [grep { defined $to{$_} && $anchors->{$to{$_}} } sort keys %to],
-        [], "$module: no section it links to opens with a synopsis";
 
-    # A link to Ekorn's reference goes where its index links the name
-    # (2026-0051, D3).
-    next unless %to_ekorn;
-SKIP:
-    {
-        skip "Ekorn::Pipeline::Manual::Reference isn't installed", 1
-            unless $ekorn_links;
-        is [grep { ($ekorn_links->{$_} // '') ne $to_ekorn{$_} } sort keys %to_ekorn],
-            [],
-            "$module: each link to Ekorn's reference goes where its index links the name";
-    }
-}
-
-for my $entry (@entries) {
-    my($module, $about) = @$entry{qw(module about)};
-    my %listed = map { $_->[0] => $_->[1] } @{ $entry->{names} };
-    if ($module =~ m( ::Manual:: )x || $INTERNAL_MODULE{$module}) {
-        is [sort keys %listed], [], "$module: lists nothing";
-        next;
-    }
-    (my $file = "$module.pm") =~ s( :: )(/)xg;
-    require $file;
-    no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNoStrict)
-
-    # Tooling lists the names it exports that no other module of
-    # DBIx::Squirrel's does, Ekorn::Pipeline's, each upon request
-    # (2026-0051, D1), and says what its tags are.
-    if ($module eq 'DBIx::Squirrel::Tooling') {
-        my %ours;
-        for my $other (grep { $_ ne $module && !m( ::Manual:: )x } @modules) {
-            (my $file = "$other.pm") =~ s( :: )(/)xg;
+        for my $entry (@entries) {
+            my($module, $about) = @$entry{qw(module about)};
+            my %listed = map { $_->[0] => $_->[1] } @{ $entry->{names} };
+            if ($module =~ m( ::Manual:: )x || $INTERNAL_MODULE{$module}) {
+                is [sort keys %listed], [], "$module: lists nothing";
+                next;
+            }
+            (my $file = "$module.pm") =~ s( :: )(/)xg;
             require $file;
-            $ours{$_} = 1 for @{ "${other}::EXPORT" }, @{ "${other}::EXPORT_OK" };
+            no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNoStrict)
+
+            # Tooling lists the names it exports that no other module of
+            # DBIx::Squirrel's does, Ekorn::Pipeline's, each upon request
+            # (2026-0051, D1), and says what its tags are.
+            if ($module eq 'DBIx::Squirrel::Tooling') {
+                my %ours;
+                for my $other (grep { $_ ne $module && !m( ::Manual:: )x } @modules) {
+                    (my $file = "$other.pm") =~ s( :: )(/)xg;
+                    require $file;
+                    $ours{$_} = 1 for @{ "${other}::EXPORT" }, @{ "${other}::EXPORT_OK" };
+                }
+                my @ekorn = grep { !$ours{$_} } @{ "${module}::EXPORT_OK" };
+                is [sort keys %listed], [sort @ekorn],
+                    "$module: lists the names it exports from Ekorn";
+                is [
+                    grep { $listed{$_} !~ m( \s Exported \s+ upon \s+ request \. )x }
+                    sort keys %listed
+                    ],
+                    [], "$module: says they're exported upon request";
+                my @tags = sort keys %{ "${module}::EXPORT_TAGS" };
+                is [grep { $about !~ m( `:\Q$_\E` )x } @tags], [],
+                    "$module: names each tag";
+                next;
+            }
+
+            is [grep { !$listed{$_} } public_names($module)], [],
+                "$module: lists every public name";
+            is [grep { !$module->can($_) } sort keys %listed], [],
+                "$module: lists only names it has";
+
+            # An exported name it lists says how; a name exported by default is
+            # so on request too.
+            my %default = map { $_ => 1 } grep { $listed{$_} } @{ "${module}::EXPORT" };
+            my %request
+                = map { $_ => 1 } grep { $listed{$_} } @{ "${module}::EXPORT_OK" };
+            is [
+                grep { $listed{$_} !~ m( \s Exported \s+ by \s+ default \. )x }
+                sort keys %default
+                ],
+                [],
+                "$module: says which are exported by default";
+            my @upon_request = grep { !$default{$_} } sort keys %request;
+            is [grep { $listed{$_} !~ m( \s Exported \s+ upon \s+ request \. )x }
+                    @upon_request], [],
+                "$module: says which are exported upon request";
         }
-        my @ekorn = grep { !$ours{$_} } @{ "${module}::EXPORT_OK" };
-        is [sort keys %listed], [sort @ekorn],
-            "$module: lists the names it exports from Ekorn";
-        is [
-            grep { $listed{$_} !~ m( \s Exported \s+ upon \s+ request \. )x }
-            sort keys %listed
-            ],
-            [], "$module: says they're exported upon request";
-        my @tags = sort keys %{ "${module}::EXPORT_TAGS" };
-        is [grep { $about !~ m( `:\Q$_\E` )x } @tags], [], "$module: names each tag";
-        next;
-    }
 
-    is [grep { !$listed{$_} } public_names($module)], [],
-        "$module: lists every public name";
-    is [grep { !$module->can($_) } sort keys %listed], [],
-        "$module: lists only names it has";
-
-    # An exported name it lists says how; a name exported by default is
-    # so on request too.
-    my %default = map { $_ => 1 } grep { $listed{$_} } @{ "${module}::EXPORT" };
-    my %request = map { $_ => 1 } grep { $listed{$_} } @{ "${module}::EXPORT_OK" };
-    is [
-        grep { $listed{$_} !~ m( \s Exported \s+ by \s+ default \. )x }
-        sort keys %default
-        ],
-        [],
-        "$module: says which are exported by default";
-    my @upon_request = grep { !$default{$_} } sort keys %request;
-    is [grep { $listed{$_} !~ m( \s Exported \s+ upon \s+ request \. )x }
-            @upon_request], [],
-        "$module: says which are exported upon request";
+    };
 }
 
 done_testing;

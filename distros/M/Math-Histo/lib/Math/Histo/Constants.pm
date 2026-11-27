@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter qw(import);
 
-our $VERSION = '0.4.1';
+our $VERSION = '0.4.2';
 
 
 our %EXPORT_TAGS = (

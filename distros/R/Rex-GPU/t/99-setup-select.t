@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -230,7 +231,7 @@ PM
   my %facts = ( os => 'Ubuntu', release => '24.04', kernel => '6.8.0-1', arch => 'amd64' );
 
   my $s = $UBU->new(%facts, gpu => gpu_fixture('ada'), extra_requirement => { kernel_module => 'open' });
-  is($s->requirement->describe, 'open kernel module, any driver branch', 'Ada + open: intersected');
+  is($s->requirement->describe, 'open kernel module, driver branch 525 or newer', 'Ada + open: intersected (Ada floor 525, k107)');
   like($s->requirement->who, qr/RTX 4000 SFF Ada.*, the requirement option/, '... naming the GPU and the option');
 
   $s = $UBU->new(%facts, gpu => gpu_fixture('volta'), extra_requirement => { min_branch => 570 });

@@ -3,6 +3,8 @@
 
 class UV::Handle : pointer {
   
+  version_from UV;
+  
   allow UV::Loop;
   
   use UV::Callback::Close;

@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.19.1';
+our $VERSION = '3.20.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -43,7 +43,11 @@ my %OPTIONS = map { $_ => 1 } qw(
 # and never sends as null is required, a nullable or optional one may be absent
 # or null, and every one present has the spec's type at every depth, a `date` or
 # `date-time` RFC 3339's on a day that exists. A detail is as optional as the plan
-# makes it, so `{}` is one.
+# makes it, so `{}` is one. A field's third element is 1 for a member that is
+# required, and NOT_NULL for one an answer may lack (a plan without it) but never
+# serves as null.
+use constant NOT_NULL => 2;
+
 my $VPN_DETAIL = [fields => [
     (map { [$_ => ['string']] } qw(provider provider_name confidence method)), [last_seen => ['date']],
 ]];
@@ -104,7 +108,8 @@ my $LOCATION = [fields => [
     (map { [$_ => ['number']] } qw(latitude longitude)), [accuracy_radius => ['integer']],
 ]];
 my $ASN = [fields => [
-    [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name domain type prefix country rpki_status)),
+    [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name domain prefix country rpki_status)),
+    [type => ['string'], NOT_NULL],
 ]];
 my $COMPANY = [fields => [(map { [$_ => ['string'], 1] } qw(name domain)), (map { [$_ => ['string']] } qw(type country))]];
 my $ABUSE = [fields => [
@@ -647,7 +652,8 @@ sub _nonconforming {
     for my $field (@$inner) {
         my ($name, $member_shape, $required) = @$field;
         if (!defined $value->{$name}) {
-            return 'the API answered with no ' . join('.', @$at, $name) if $required;
+            return 'the API answered with no ' . join('.', @$at, $name)
+                if $required && ($required != NOT_NULL || exists $value->{$name});
             next;
         }
         my $w = _nonconforming($member_shape, $value->{$name}, [@$at, $name]);

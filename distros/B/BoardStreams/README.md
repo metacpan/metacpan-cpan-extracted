@@ -136,6 +136,15 @@ being served, and `$ctx->user` is that browser's identity.
 Neither is a ban: a browser can ask to join again or the user can reload
 the page, and it is the `join` handler that decides whether to let them in.
 
+# STOPPING
+
+When the server is stopped gracefully (the `QUIT` signal, a hypnotoad hot
+deployment, a worker reaching its `accepts` limit), the plugin closes its
+WebSocket connections at once, so that the process does not wait for them
+until `graceful_timeout`. Clients treat this as an ordinary lost
+connection: they reconnect to whichever process answers and catch up. See
+"Stopping and deploying" in the tutorial, which has a note for Docker.
+
 # UPGRADING
 
 The tables are upgraded automatically by the first process of a new version

@@ -7,8 +7,11 @@ lib/CLI/Simple/DumpSpec.pm
 lib/CLI/Simple/Helpers.pm
 lib/CLI/Simple/Migrate.pm
 lib/CLI/Simple/Modulino.pm
+lib/CLI/Simple/Options.pm
 lib/CLI/Simple/Scaffold.pm
 lib/CLI/Simple/Shell.pm
+lib/CLI/Simple/TempDir.pm
+lib/CLI/Simple/TempFile.pm
 lib/CLI/Simple/Utils.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -27,6 +30,18 @@ t/05-cli-simple-args.t
 t/06-cli-simple-default.t
 t/07-option-providers.t
 t/08-option-provider-resolution.t
+t/10-temp-file.t
+t/11-temp-dir.t
+t/12-temp-constructor.t
+t/13-options-normalization.t
+t/14-options-constructor.t
+t/15-options-validation.t
+t/16-options-validation-constructor.t
+t/17-options-finalization.t
+t/18-options-finalization-constructor.t
+t/19-options-slurp.t
+t/20-options-slurp-constructor.t
+t/21-command-normalization.t
 t/cli-simple-manifest.t
 t/cli-simple-selective-roles.t
 t/lib/CLISimpleHelpBoth.pm

@@ -8,7 +8,7 @@ grep -x "$_/dash", split /:/, $ENV{PATH} // '' or plan skip_all => 'no dash in P
 use Proc::Spawner;   # the shell layer needs chdir in the child: posix_spawn's extension, or done around the call (0.07)
 my $p = Proc::Spawner::spawn('/bin/true', ['true'], undef, [[chdir => '/']], {}) or plan skip_all => "no posix_spawn chdir in this libc: $!";
 waitpid $p, 0;
-$ENV{PROC_SHELLSPAWN_ECHO} = 'dash';   # ours with dash's echo (EC1; the default is coreutils' echo, checked by t/programs.t)
+$ENV{PROC_SHELLSPAWN_ECHO} = 'dash';   # ShellSpawn with dash's echo (EC1; the default is coreutils' echo, checked by t/programs.t)
 my $top = abs_path('.'); my %known;
 open my $k, '<', 't/dash-known.txt' or die "t/dash-known.txt: $!";
 while (<$k>) { next if /^#/; chomp; my ($f, $why, $c) = split /\t/, $_, 3; $known{"$f\t$c"} = $why }
@@ -28,6 +28,19 @@ for (@lines) {
     s/N+/N/g for $line =~ /tr 0-9 N/ ? ($d, $p) : ();
     my $why = $known{"$file\t$line"};
     if ($d eq $p) { $same++; note "$file: agrees now: $line ($why)" if $why && $why !~ /^FLAKY/; next }
-    push @bad, "$line\n  dash: " . ($d =~ s/\n/|/gr) . "\n  ours: " . ($p =~ s/\n/|/gr) unless $why }
+    push @bad, "$line\n  dash: " . ($d =~ s/\n/|/gr) . "\n  ShellSpawn: " . ($p =~ s/\n/|/gr) unless $why }
   ok !@bad, "$file: $same of " . @l . " agree with dash, the rest known" or diag join "\n", @bad }
+{ # X6: with no PATH in the environment both shells search a default one, and ShellSpawn searches dash's
+  my ($dash) = grep -x, map "$_/dash", split /:/, $ENV{PATH};
+  my $perl = $^X =~ m{/} ? $^X : (grep -x, map "$_/$^X", split /:/, $ENV{PATH})[0];
+  delete local $ENV{PATH}; my @bad;
+  my @s = ('ls -d /; echo st=$?', 'command -v ls >/dev/null; echo st=$?', '(ls -d /) | cat; x=$(ls -d /); echo "[$x]"',
+           'no-such-cmd-x; echo st=$?', 'ls -d / & wait; echo st=$?');
+  for my $c (@s) {
+    local $ENV{CMD} = $c;
+    my $d = qx{$dash -c "\$CMD" 2>&1 </dev/null; echo "<\$?>"};
+    my $p = qx{$perl -I$top/blib/arch $top/t/try.pl "\$CMD" 2>&1 </dev/null; echo "<\$?>"};
+    s/^\S*dash: \d+: //mg for $d; s/^sh: //mg for $p;
+    push @bad, "$c\n  dash: " . ($d =~ s/\n/|/gr) . "\n  ShellSpawn: " . ($p =~ s/\n/|/gr) if $d ne $p }
+  ok !@bad, scalar(@s) . ' strings without PATH in the environment: as dash (X6)' or diag join "\n", @bad }
 chdir $top; done_testing;

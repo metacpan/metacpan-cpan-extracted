@@ -1,6 +1,6 @@
 ---
 name: getty-git-usage
-description: "Use when committing, pushing or landing work in a Getty repo — rebase vs merge, history cleanup, stacked branches, releases. Commit wording: getty-git-commit-style."
+description: "Use when landing or pushing work in a Getty repo — rebase vs merge, a force-push after a rebase, stacked branches, cleaning up history before a PR. Commit messages and `Changes`: getty-git-commit-style."
 ---
 
 # Git usage
@@ -15,10 +15,10 @@ git rebase origin/main        # not merge
 git push --force-with-lease    # after a rebase, never plain --force
 ```
 
-For a pull request, `gh pr merge <n> --rebase --delete-branch`. Squash is the wrong
-choice where a release is cut from commit prefixes: squashing replaces the individual
-`feat:`/`fix:` subjects with the PR title, and a PR title without a prefix produces no
-release at all.
+For a pull request, `gh pr merge <n> --rebase --delete-branch`, not `--squash`.
+Squashing folds the branch's small commits into one, and with them goes what they are
+for: `git bisect` down to the commit that broke something, reverting one commit,
+cherry-picking one.
 
 Merge commits are not forbidden, they are just not the default. Reach for one when the
 branch genuinely represents parallel work whose shape is worth keeping — not to avoid a
@@ -34,12 +34,11 @@ body so the trail survives.
 ## Commits
 
 **Commit early and commit often.** One finished piece of work per commit, however
-small — a typo fix is a commit. Wrapping up what you just finished is expected and
-needs no separate go-ahead; pushing is the decision that waits. The history here is
-kept linear and never squashed precisely so those small commits survive into `main`,
-where they are what makes `git bisect`, a one-commit revert and a cherry-pick possible
-at all. Work parked in a working tree until it is "done" throws all three away and
-lands as a lump nobody can unpick later.
+small — a typo fix is a commit. Who commits is the house rule `agent-delegation`'s: the
+release-manager in an agent team, otherwise the main session. A local commit of
+finished work needs no separate go-ahead; the push is the decision that waits. Work
+parked in a working tree until it is "done" lands as one lump that nobody can bisect,
+revert or cherry-pick in parts.
 
 **Installed skills are not committed.** skilletor keeps the shared skills under
 `.claude/skills/` out of git; a repo commits `.claude/skilletor.json`,
@@ -47,12 +46,7 @@ lands as a lump nobody can unpick later.
 as a change after every edit to its source — untrack it
 (`git rm -r --cached .claude/skills/<name>`) instead of committing it.
 
-Conventional prefixes (`feat:`, `fix:`, `docs:`, `test:`, `ci:`, `chore:`, `refactor:`),
-always `--signoff`. The prefix is not decoration where a release workflow reads it:
-`feat:` cuts a minor, `fix:` a patch, `feat!:` or a `BREAKING CHANGE:` body a major.
-Everything else cuts nothing.
-
-Message wording, body structure and multi-repo commits: see `getty-git-commit-style`.
+Message wording and `Changes` entries: skill `getty-git-commit-style`.
 
 ## Before pushing
 

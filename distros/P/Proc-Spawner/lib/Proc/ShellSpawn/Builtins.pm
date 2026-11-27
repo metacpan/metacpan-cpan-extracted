@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Builtins;   # builtins run by the large subset: one function per builtin (B1-B3 of "Shell Corpus Gaps")
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use strict; use warnings; use feature 'current_sub';
 use Proc::ShellSpawn;
 # JU3 (post-0.12, the user, 2026-11-15): the shell layer's functions are called through the alias ProcSS (Proc::ShellSpawn
@@ -66,10 +66,10 @@ sub b_hash {
   return ProcSS::put($c, 1, join('', map "$h->{$_}\n", sort keys %$h), ProcSS::done($k, 0)) unless @a;
   if ($a[0] eq '-r') { %$h = (); return ProcSS::defer($k, 0) }
   my @bad;
-  for (@a) { next if $DASHBI{$_} || $c->{sh}{cmd}{$_}; my ($p) = ProcSS::find_cmd($c, $_, ProcSS::var($c, 'PATH'));
-    if (defined $p) { $h->{$_} = $p unless ProcSS::has_dir($_) } else { push @bad, $_ } }
+  for (@a) { next if $DASHBI{$_} || $c->{sh}{cmd}{$_}; my ($p, undef, undef, $e) = ProcSS::find_cmd($c, $_, ProcSS::var($c, 'PATH'));
+    if (defined $p) { $h->{$_} = $p unless ProcSS::has_dir($_) } else { push @bad, "$_: " . ProcSS::not_found($e) } }   # (X72)
   my $st = @bad ? 1 : 0;   # one message per name not found, each after the one before
-  ProcSS::loop_async(sub { my $next = shift; @bad ? ProcSS::msg($c, "hash: " . shift(@bad) . ": not found", $next) : $k->($st) }) }
+  ProcSS::loop_async(sub { my $next = shift; @bad ? ProcSS::msg($c, "hash: " . shift(@bad), $next) : $k->($st) }) }
 sub b_type {
   my ($c, $argv, $env, $k) = @_; my $sh = $c->{sh}; my ($t, $st) = ('', 0);
   for my $n (@$argv[1 .. $#$argv]) {

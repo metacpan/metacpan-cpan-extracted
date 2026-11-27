@@ -5,14 +5,14 @@ use experimental 'class';
 # browsers over WebSockets, and keeps channel state and events in
 # PostgreSQL so that they survive disconnections and restarts.
 class BoardStreams::Hub {
-    our $VERSION = "v0.0.56";
+    our $VERSION = "v0.0.58";
 
     use Future::AsyncAwait future_class => "Mojo::Promise";
     use Mojo::IOLoop;
     use Mojo::JSON qw(encode_json from_json to_json);
     use Mojo::Log;
     use Mojo::Promise;
-    use Scalar::Util qw(blessed);
+    use Scalar::Util qw(blessed weaken);
 
     use BoardStreams ();
     use BoardStreams::Context;
@@ -49,6 +49,8 @@ class BoardStreams::Hub {
     field $echo_awaited;      # number of the echo that has not come back yet
     field $scope;             # the PostgreSQL schema the tables are in
     field $outdated = 0;      # schema version that a newer process announced, if above this code's
+    field $stopping = 0;      # true once this process has begun to stop gracefully
+    field $on_finish;         # this hub's subscriber to the event loop's finish event
 
     my $SCHEMA = <<~'SQL';
         -- 1 up
@@ -355,6 +357,10 @@ class BoardStreams::Hub {
         # A process that cannot hear PostgreSQL would miss updates, kicks
         # and disconnects, so it serves nobody. The browser keeps trying.
         return $c->finish(1013) if $outdated or !$hearing;
+        # Nor does a process that is on its way out; the browser will find
+        # another, or the one that replaces this.
+        return $c->finish(1001) if $stopping;
+        $self->_watch_for_stop;
         my $id = ++$next_conn;
         my $user = $identify ? $identify->($c) : undef;
         $conns{$id} = { c => $c, channels => {}, user => (defined $user ? "$user" : undef) };
@@ -469,12 +475,44 @@ class BoardStreams::Hub {
         $self->_drop_all;
     }
 
-    method _drop_all {
+    method _drop_all ($code = 1013) {
         for my $id (keys %conns) {
             my $conn = delete $conns{$id};
             $self->_leave($id, $_) for keys $conn->{channels}->%*;
-            $conn->{c}->finish(1013);
+            $conn->{c}->finish($code);
         }
+    }
+
+    # A graceful stop (the QUIT signal, a hypnotoad hot deployment, a
+    # worker that has served its share of connections) waits for the
+    # connections of this process to end, and WebSockets never end by
+    # themselves. The event loop announces such a stop with its finish
+    # event, so this hub listens for it. It has to do so in the process
+    # that holds the connections, which need not be the one that built the
+    # hub, and again if the loop was reset meanwhile; so this is called
+    # for every new connection and subscribes when it finds itself absent.
+    method _watch_for_stop {
+        my $loop = Mojo::IOLoop->singleton;
+        $on_finish //= do {
+            weaken(my $hub = $self);
+            sub { $hub->_stop if $hub };
+        };
+        $loop->on(finish => $on_finish) unless grep { $_ == $on_finish } $loop->subscribers('finish')->@*;
+    }
+
+    # Lets go of every browser, so that the process can exit. They are
+    # not told to stay away: to them this is a lost connection like any
+    # other, and they reconnect, to whichever process answers.
+    method _stop {
+        return if $stopping++;
+        my @transactions = map { $_->{c}->tx } values %conns;
+        $log->info(sprintf 'BoardStreams: stopping gracefully; closing %d connection(s)', scalar @transactions);
+        $self->_drop_all(1001);
+        # A browser that does not answer the close must not hold the
+        # process up either.
+        Mojo::IOLoop->timer(1 => sub {
+            Mojo::IOLoop->remove($_->connection) for grep { !$_->is_finished } @transactions;
+        });
     }
 
     # A process running newer code has changed the tables. This code would

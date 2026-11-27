@@ -11,7 +11,7 @@ requires 'App::ansifold', '1.38';
 requires 'App::ansicolumn', '1.72';
 requires 'Term::ANSIColor::Concise', '3.03';
 
-requires 'App::nup', '1.24';
+requires 'App::nup', '1.26';
 requires 'Text::ANSI::Highlight', '0.04';
 requires 'Text::ANSI::Image', '0.02';
 requires 'Getopt::Long::Bash', '2.0.0';

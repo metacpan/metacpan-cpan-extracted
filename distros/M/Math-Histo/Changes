@@ -1,5 +1,15 @@
 Revision history for Math-Histo
 
+0.4.2   2026-11-26
+        - Fix Windows Strawberry Perl "Free to wrong pool" crashes in
+          Math::Histo::2D::serialize_binary, serialize_json, and
+          Math::Histo::Sketch::serialize_binary by using histo_free_buffer().
+        - Link -lpthread on non-Windows targets so libhistocli resolves
+          pthread_create on non-threaded Perls (e.g. FreeBSD).
+        - Convert C99 for-loop initial declarations in Histo.xs to C89-compatible
+          block-scoped declarations for GCC < 5 builds.
+        - Require Alien::libhisto 0.4.2+ in build, configure, and runtime prerequisites.
+
 0.4.1   2026-09-13
         - Fix compilation failure on Windows Strawberry Perl with PERL_IMPLICIT_SYS
           by adding Perl interpreter thread context (pTHX_/aTHX_) to histo_xs_cli_capture.

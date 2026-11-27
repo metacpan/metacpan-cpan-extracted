@@ -3,6 +3,8 @@
 
 class UV::Callback::Signal : interface_t {
   
+  version_from UV;
+  
   use UV::Handle::Signal;
   
   required method : void ($uv_signal : UV::Handle::Signal, $signum : int);

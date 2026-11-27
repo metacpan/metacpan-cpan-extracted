@@ -1,0 +1,1552 @@
+# large-subset-rejected.tsv: the snippets the large parser rejects, run in dash and bash --posix alone
+# (make corpus-rejected: large-subset-runcompare.pl -shells dash,bash, the environment of the base run), compared by
+# large-subset-rejected.pl as the match compares (messages count nowhere).  Columns (tab): id; group (README.md, "How
+# close", the rejected snippets); dash against bash: same, messages only, differ, timeout; the parts that differ; dash's
+# status; bash's status; the parser's reason (samples.tsv, why); the text, shortened (⏎: a newline).
+# Column 8 (the text, shortened) is not shipped; to restore it: perl -Ilib doc/large-subset/tools/large-subset-restore.pl
+#   -samples corpus-work/samples.jsonl doc/large-subset/tools/large-subset-rejected.tsv > WHOLE.tsv
+#   (from the distribution's directory; needs: corpus-work/samples.jsonl, made by make corpora corpus-samples; no shell
+#   snippet is run)
+BC:ch01/interactive	subtle, open	same		0	0	unsupported parameter form
+BC:ch03/func_choice.1	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch03/func_choose	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch03/select_dir	foreign, a shell cannot parse	differ	status+out	2	signal 25	keyword 'select'
+BC:ch05/check_arg_count	foreign, both parse	differ	status+out+files	0	1	'((' at the start of a command
+BC:ch05/use_up_option	foreign, both parse	messages only		0	0	keyword '[['
+BC:ch06/dashes	foreign, both parse	differ	files	0	0	'((' at the start of a command
+BC:ch06/dbinit.1	foreign, a shell cannot parse	differ	status	2	0	keyword 'select'
+BC:ch06/dbinit.2	foreign, a shell cannot parse	differ	status	2	0	keyword 'select'
+BC:ch06/func_calc	foreign, a shell cannot parse	differ	status+out+rec	2	0	keyword 'function'
+BC:ch06/rpncalc	foreign, both parse	same		1	1	bad arithmetic expression
+BC:ch06/trackmatch	foreign, both parse	messages only		0	0	keyword '[['
+BC:ch07/asar.awk	foreign, a shell cannot parse	messages only		2	2	'NAME[' as a command (bash reads an array)
+BC:ch07/hist.awk	foreign, a shell cannot parse	messages only		2	2	keyword 'function'
+BC:ch10/ad	foreign, a shell cannot parse	same		1	1	keyword 'function'
+BC:ch10/func_max.1	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch10/func_max.2	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch10/hard_to_kill	foreign, a shell cannot parse	timeout		2	signal 9	keyword 'function'
+BC:ch12/cdscript	foreign, both parse	differ	status+out+rec+files	0	2	'((' at the start of a command
+BC:ch12/dash	foreign, a shell cannot parse	differ	status+out	2	0	keyword 'function'
+BC:ch12/load_mp3	foreign, a shell cannot parse	differ	status+out+rec	2	0	keyword 'function'
+BC:ch12/mkalbum	foreign, both parse	differ	status+rec+files	0	255	'((' at the start of a command
+BC:ch12/oodiff	foreign, a shell cannot parse	differ	status	2	1	keyword 'function'
+BC:ch13/dbiniter	foreign, a shell cannot parse	differ	status+out	2	1	keyword 'select'
+BC:ch13/onebyone	foreign, a shell cannot parse	differ	status	2	0	'for' needs a variable name
+BC:ch13/parseViaArray	foreign, a shell cannot parse	differ	status+out	2	0	builtin 'declare'
+BC:ch13/parseViaFunc	foreign, a shell cannot parse	differ	status+out+rec	2	0	keyword 'function'
+BC:ch13/pluralize	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch14/MakeTemp	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch14/chkpath.1	foreign, both parse	differ	status+out+rec	2	0	unsupported parameter form
+BC:ch14/chkpath.2	foreign, both parse	differ	status+out+rec	2	0	unsupported parameter form
+BC:ch14/make_temp	foreign, both parse	differ	rec	0	0	shell-set variable 'RANDOM'
+BC:ch14/security_template	foreign, both parse	differ	files	0	0	'export' without arguments, or quoted
+BC:ch15/email_sample	foreign, both parse	messages only		127	127	shell-set variable 'HOSTNAME'
+BC:ch15/fpmath	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch15/func_split	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch16/add_to_bash_profile	foreign, both parse	differ	status	0	1	shell-set variable 'BASH_VERSION'
+BC:ch16/add_to_bashrc	foreign, both parse	differ	status	0	1	shell-set variable 'BASH_VERSION'
+BC:ch16/bash_logout	subtle	differ	status+rec	0	1	shell-set variable 'PS1'
+BC:ch16/bash_profile	foreign, both parse	differ	status	1	2	shell-set variable 'BASH_VERSION'
+BC:ch16/bashrc	foreign, a shell cannot parse	differ	status	1	2	shell-set variable 'BASH_VERSION'
+BC:ch16/builtin_tty.c	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+BC:ch16/colors	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+BC:ch16/func_cd	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch16/func_kill	foreign, a shell cannot parse	differ	status	2	0	'local NAME' without a value
+BC:ch16/func_mcd	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch16/func_pathmunge	foreign, a shell cannot parse	differ	status+rec	2	0	keyword 'function'
+BC:ch16/func_signals	foreign, a shell cannot parse	differ	status	2	0	'local NAME' without a value
+BC:ch16/func_trunc_PWD	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch16/func_tweak_path	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch16/run_screen	foreign, a shell cannot parse	differ	status+out	2	1	keyword 'select'
+BC:ch17/func_commify	foreign, a shell cannot parse	differ	status+files	2	0	keyword 'function'
+BC:ch17/func_shift_by	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+BC:ch17/perl_sub_commify	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+BC:ch19/buggy	subtle	messages only		120	120	unsupported 'set' option '-x'
+NB:100	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:10018	foreign, both parse	same		0	0	bash-only $ form
+NB:10053	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:10101	foreign, a shell cannot parse	messages only		2	2	missing command
+NB:1033	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:1035	foreign, both parse	differ	rec	0	0	bash-only $ form
+NB:1047	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:10490	foreign, a shell cannot parse	messages only		2	2	unexpected ')'
+NB:10517	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:10529	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:1060	foreign, a shell cannot parse	timeout		2	124	process substitution (bash)
+NB:10611	work list	differ	status	2	1	'$@' where it is not split (dash joins with IFS, bash with blanks)
+NB:10697	foreign, a shell cannot parse	messages only		2	2	builtin 'shopt'
+NB:10719	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:10739	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:10746	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:10760	foreign, a shell cannot parse	messages only		2	2	unexpected end
+NB:11143	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:11177	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:11259	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:1137	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:11370	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:11384	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:11411	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:11444	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:11445	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:11446	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:11447	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1145	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:11450	foreign, a shell cannot parse	messages only		2	2	unterminated backquote
+NB:11454	foreign, a shell cannot parse	differ	status+rec	2	127	unexpected '|'
+NB:11457	foreign, both parse	same		0	0	'&>' (dash: '&', then a redirection; bash: both outputs)
+NB:11458	foreign, both parse	same		0	0	'&>' (dash: '&', then a redirection; bash: both outputs)
+NB:11511	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:11530	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1158	foreign, both parse	differ	rec+files	0	0	bash-only $ form
+NB:11640	foreign, a shell cannot parse	messages only		2	2	keyword 'do'
+NB:11713	foreign, both parse	differ	status+out	2	0	unsupported 'jobs' form
+NB:1178	foreign, both parse	differ	rec+files	0	0	unquoted '{'
+NB:1179	foreign, both parse	differ	rec+files	0	0	unquoted '{'
+NB:1182	foreign, both parse	differ	rec+files	0	0	unquoted '{'
+NB:11848	foreign, a shell cannot parse	messages only		2	2	unsupported 'read' argument
+NB:1186	foreign, a shell cannot parse	differ	status+rec	2	127	process substitution (bash)
+NB:11863	foreign, both parse	messages only		0	0	unsupported 'jobs' form
+NB:1187	foreign, a shell cannot parse	differ	status+rec	2	127	process substitution (bash)
+NB:1190	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:12054	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:12087	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:12092	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:12117	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:12157	foreign, a shell cannot parse	differ	status+rec	2	0	here-document delimiter with an expansion
+NB:1216	foreign, both parse	differ	status+rec	2	0	unsupported parameter form
+NB:12161	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:12173	foreign, a shell cannot parse	differ	status+rec	2	0	unexpected '('
+NB:12247	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:123	foreign, both parse	differ	status	127	0	'LBUFFER+='
+NB:12398	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:12422	work list	same		0	0	unsupported 'alias' argument
+NB:12437	foreign, a shell cannot parse	differ	status	2	0	bash-only $ form
+NB:12464	work list	messages only		1	1	unsupported 'alias' argument
+NB:12578	foreign, both parse	differ	status+rec	2	0	unsupported parameter form
+NB:12579	foreign, both parse	differ	rec	0	0	unsupported parameter form
+NB:12586	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:126	foreign, both parse	differ	status	127	0	'KEY+='
+NB:1261	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1265	foreign, both parse	differ	rec	0	0	unsupported parameter form
+NB:1271	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1320	foreign, a shell cannot parse	differ	status+rec	2	0	missing command
+NB:1324	foreign, both parse	same		0	0	'&>' (dash: '&', then a redirection; bash: both outputs)
+NB:1405	foreign, both parse	messages only		0	0	unsupported parameter form
+NB:1465	foreign, both parse	same		0	0	keyword '[['
+NB:1489	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1490	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1491	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1492	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1527	subtle	differ	rec	0	0	'set' without arguments (it lists)
+NB:1543	subtle	same		1	1	'set' without arguments (it lists)
+NB:1544	subtle	same		0	0	'set' without arguments (it lists)
+NB:1563	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1564	foreign, both parse	differ	rec	1	1	unquoted '{'
+NB:1566	subtle	differ	status+out	1	0	'set' without arguments (it lists)
+NB:1675	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:1709	subtle	same		0	0	unsupported 'set' option '-x'
+NB:1714	foreign, both parse	differ	status	2	0	unsupported 'set -o' form
+NB:1715	foreign, both parse	differ	status	2	0	unsupported 'set' option '-H'
+NB:1717	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1718	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1719	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1720	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1721	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1722	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1723	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1724	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1725	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1726	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1727	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1728	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1729	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1730	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1731	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1732	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1733	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1734	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1735	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1736	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1737	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:1738	foreign, both parse	differ	rec+files	0	0	unquoted '{'
+NB:1742	foreign, both parse	differ	status	127	1	builtin 'pushd'
+NB:1772	foreign, a shell cannot parse	differ	status	2	0	process substitution (bash)
+NB:1793	foreign, both parse	differ	rec	127	127	unquoted '{'
+NB:1825	foreign, both parse	differ	rec	127	127	unquoted '{'
+NB:1828	foreign, both parse	differ	status	127	1	builtin 'source'
+NB:1846	foreign, both parse	differ	status	127	2	builtin 'source'
+NB:1856	foreign, both parse	differ	status	2	0	unsupported 'set -o' form
+NB:1860	work list	differ	status	2	255	unsupported exit status
+NB:1864	foreign, both parse	differ	status+rec	2	0	unsupported parameter form
+NB:1865	foreign, both parse	differ	status	127	1	builtin 'pushd'
+NB:1875	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1876	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1877	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1878	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1879	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1881	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1904	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1905	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:1995	foreign, both parse	same		0	0	builtin 'let'
+NB:1996	foreign, both parse	same		0	0	builtin 'let'
+NB:1997	foreign, both parse	same		0	0	builtin 'let'
+NB:2022	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:2134	foreign, both parse	messages only		0	0	unsupported 'read' argument
+NB:2253	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:2307	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:2325	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:238	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:2553	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:281	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:2815	foreign, both parse	messages only		0	0	unsupported 'read' argument
+NB:2849	foreign, both parse	messages only		0	0	unsupported 'read' argument
+NB:3008	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:3042	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:3083	foreign, a shell cannot parse	differ	status+rec	2	0	missing word
+NB:3159	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:322	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:3300	foreign, both parse	same		0	0	bash-only $ form
+NB:3334	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:338	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:3422	foreign, both parse	differ	status+rec	2	0	builtin 'mapfile'
+NB:3427	foreign, a shell cannot parse	differ	status+rec	2	0	missing word
+NB:3434	foreign, both parse	same		0	0	'&>' (dash: '&', then a redirection; bash: both outputs)
+NB:352	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:3526	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:3630	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:3806	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:3812	foreign, a shell cannot parse	messages only		2	2	missing command
+NB:3934	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:4034	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:4202	foreign, both parse	differ	status+rec	2	0	'>&' takes one digit or '-'
+NB:4285	foreign, both parse	differ	status+rec	2	0	unsupported parameter form
+NB:4289	foreign, both parse	messages only		0	0	bash-only $ form
+NB:4292	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:4330	foreign, a shell cannot parse	differ	status+rec	2	1	unsupported 'read' argument
+NB:4442	foreign, both parse	differ	rec	2	2	unquoted '{'
+NB:4443	foreign, both parse	differ	rec	2	2	unquoted '{'
+NB:4450	foreign, both parse	differ	status+out	1	0	builtin 'shopt'
+NB:4451	foreign, both parse	differ	status+out	1	0	builtin 'shopt'
+NB:4452	subtle	same		0	0	'set' without arguments (it lists)
+NB:4456	subtle	same		1	1	'set' without arguments (it lists)
+NB:4469	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4478	foreign, both parse	same		1	1	shell-set variable 'BASH_SOURCE'
+NB:4481	foreign, both parse	differ	status+rec	2	1	unsupported parameter form
+NB:4482	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4486	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4487	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4488	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4490	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4492	foreign, a shell cannot parse	differ	status+rec	2	127	process substitution (bash)
+NB:4493	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4538	foreign, both parse	messages only		127	127	unsupported parameter form
+NB:4539	foreign, both parse	messages only		127	127	unsupported parameter form
+NB:4543	foreign, both parse	messages only		127	127	bash-only $ form
+NB:4548	foreign, both parse	messages only		127	127	bash-only $ form
+NB:4549	foreign, both parse	messages only		127	127	bash-only $ form
+NB:4556	foreign, both parse	messages only		127	127	bash-only $ form
+NB:4558	foreign, both parse	messages only		127	127	bash-only $ form
+NB:4566	foreign, a shell cannot parse	differ	status	2	127	process substitution (bash)
+NB:4573	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:4577	foreign, both parse	messages only		0	0	unsupported 'read' argument
+NB:4580	foreign, both parse	differ	out	0	0	unquoted '{'
+NB:4581	foreign, both parse	differ	out	0	0	unquoted '{'
+NB:4582	foreign, a shell cannot parse	differ	status+out+rec	2	1	process substitution (bash)
+NB:4594	foreign, both parse	messages only		0	0	unsupported 'read' argument
+NB:4615	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4618	foreign, both parse	differ	status+out+rec	1	0	bash-only $ form
+NB:4622	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:4632	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:4705	foreign, both parse	differ	status+rec	1	0	bash-only $ form
+NB:4710	foreign, both parse	differ	status	127	1	builtin 'shopt'
+NB:4741	foreign, both parse	differ	status	2	0	unsupported parameter form
+NB:4748	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4755	foreign, both parse	differ	status+out	127	1	builtin 'shopt'
+NB:4757	foreign, both parse	differ	rec	0	0	bash-only $ form
+NB:4758	foreign, both parse	differ	rec	0	0	bash-only $ form
+NB:4759	foreign, both parse	differ	rec	0	0	bash-only $ form
+NB:4769	foreign, both parse	differ	status+out	0	127	bash-only $ form
+NB:4781	foreign, both parse	differ	status	127	1	builtin 'source'
+NB:4786	foreign, both parse	differ	status+out+rec	1	0	bash-only $ form
+NB:4814	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4815	foreign, both parse	differ	status	127	0	builtin 'source'
+NB:4817	foreign, both parse	differ	status	0	1	builtin 'source'
+NB:4818	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4822	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4825	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4826	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4828	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4829	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4830	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4831	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4832	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4833	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4834	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:4910	foreign, a shell cannot parse	differ	status+out+rec	2	0	unexpected '|'
+NB:4920	subtle	same		0	0	'set' without arguments (it lists)
+NB:4933	subtle	differ	out	0	0	'set' without arguments (it lists)
+NB:5042	subtle	same		0	0	'set' without arguments (it lists)
+NB:5043	subtle	differ	status+out	1	0	'set' without arguments (it lists)
+NB:5046	foreign, both parse	same		0	0	keyword '[['
+NB:5050	foreign, both parse	same		0	0	keyword '[['
+NB:5051	foreign, both parse	same		0	0	bash-only $ form
+NB:5105	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5111	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5113	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:512	foreign, a shell cannot parse	differ	status	2	0	missing word
+NB:5129	foreign, both parse	differ	out+rec	0	0	bash-only $ form
+NB:5135	subtle	differ	status+out	1	0	'set' without arguments (it lists)
+NB:5136	subtle	differ	status+out	1	0	'set' without arguments (it lists)
+NB:5138	subtle	differ	status+out	1	0	'set' without arguments (it lists)
+NB:5139	subtle	differ	status+out	1	0	'set' without arguments (it lists)
+NB:5140	subtle	differ	status+out	1	0	'set' without arguments (it lists)
+NB:5141	subtle	differ	status+out	1	0	'set' without arguments (it lists)
+NB:5156	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5157	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5158	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5176	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5213	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5253	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:5260	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:5261	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:5265	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:5266	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+NB:5308	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:5367	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:5378	foreign, both parse	differ	rec	1	1	unquoted '{'
+NB:5379	foreign, both parse	differ	rec	1	1	unquoted '{'
+NB:538	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5380	foreign, both parse	differ	rec	1	1	unquoted '{'
+NB:541	foreign, both parse	messages only		1	1	builtin 'shopt'
+NB:5410	foreign, both parse	differ	rec	1	1	unquoted '{'
+NB:5422	foreign, both parse	differ	rec	1	1	bash-only $ form
+NB:5423	foreign, both parse	differ	status+rec	1	123	bash-only $ form
+NB:544	foreign, both parse	messages only		0	0	keyword '[['
+NB:5512	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5513	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5514	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5515	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5516	foreign, a shell cannot parse	differ	rec	2	2	process substitution (bash)
+NB:5517	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5521	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5523	foreign, both parse	messages only		127	127	bash-only $ form
+NB:5524	foreign, both parse	differ	rec	127	127	unquoted '{'
+NB:5528	foreign, a shell cannot parse	differ	status+rec	2	127	process substitution (bash)
+NB:554	foreign, both parse	messages only		0	0	'read' without a variable name
+NB:556	foreign, both parse	differ	status+out	127	0	keyword '[['
+NB:559	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5619	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:5620	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:5652	foreign, both parse	differ	rec	0	0	unsupported 'type' form
+NB:5694	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5731	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5733	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5734	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:5737	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5755	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5765	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:5768	foreign, both parse	differ	status	127	1	builtin 'popd'
+NB:5774	foreign, both parse	differ	status+rec	127	1	keyword '[['
+NB:5786	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:58	foreign, a shell cannot parse	differ	status+rec	2	127	process substitution (bash)
+NB:5827	foreign, a shell cannot parse	messages only		2	2	unexpected end
+NB:5842	foreign, both parse	differ	out	0	0	unquoted '{'
+NB:5940	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:5941	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:5982	foreign, both parse	messages only		0	0	bash-only $ form
+NB:5989	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6014	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6015	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6016	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6029	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6030	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6039	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6043	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:6049	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6050	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6051	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6053	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6054	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6056	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:607	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:608	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6080	work list	differ	out	0	0	unsupported 'set -o' form
+NB:6085	foreign, a shell cannot parse	differ	status+rec	2	0	here-document delimiter with an expansion
+NB:6087	foreign, a shell cannot parse	differ	status+rec	2	0	unsupported parameter form
+NB:609	foreign, a shell cannot parse	differ	status+out+rec	2	1	process substitution (bash)
+NB:6096	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:610	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6100	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6103	foreign, both parse	differ	rec	1	1	unquoted '{'
+NB:611	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6110	foreign, both parse	differ	out+rec	0	0	bash-only $ form
+NB:6115	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6117	foreign, both parse	differ	rec	0	0	bash-only $ form
+NB:6125	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:613	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:6156	foreign, both parse	differ	status+out+rec	2	0	unsupported parameter form
+NB:6160	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:6208	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6209	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6213	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:6214	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6215	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6216	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6218	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6227	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6252	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6254	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:6277	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6279	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6310	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:6350	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6352	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:6401	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6448	foreign, both parse	messages only		0	0	unsupported 'read' argument
+NB:6451	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6456	foreign, both parse	same		0	0	shell-set variable 'BASH_SOURCE'
+NB:6485	foreign, a shell cannot parse	differ	status+rec	2	0	unexpected '|'
+NB:6497	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6524	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:653	foreign, a shell cannot parse	differ	status+rec	2	127	process substitution (bash)
+NB:6539	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6547	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:6548	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6633	foreign, a shell cannot parse	differ	status+out	2	0	process substitution (bash)
+NB:6646	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6670	foreign, both parse	differ	status+rec	127	1	bash-only $ form
+NB:6675	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:6677	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6684	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6685	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6695	foreign, a shell cannot parse	differ	status	2	127	here-document delimiter with an expansion
+NB:6697	foreign, a shell cannot parse	differ	status	2	127	here-document delimiter with an expansion
+NB:67	foreign, both parse	differ	status	127	1	builtin 'pushd'
+NB:6701	foreign, both parse	differ	rec	2	2	unsupported parameter form
+NB:6702	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6703	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:672	foreign, both parse	messages only		127	127	shell-set variable 'HOSTNAME'
+NB:6730	foreign, both parse	differ	rec	0	0	shell-set variable 'RANDOM'
+NB:6746	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:6817	foreign, a shell cannot parse	differ	status+out+rec+files	2	0	unexpected '|'
+NB:6830	foreign, both parse	differ	out	0	0	bash-only $ form
+NB:6832	foreign, both parse	same		0	0	shell-set variable 'BASH_SOURCE'
+NB:6860	foreign, both parse	differ	status+out	127	1	builtin 'shopt'
+NB:6867	foreign, a shell cannot parse	differ	status+out+rec	2	0	'for' needs a variable name
+NB:689	foreign, both parse	differ	rec	127	127	bash-only $ form
+NB:6900	foreign, both parse	differ	rec	1	1	bash-only $ form
+NB:6901	work list	differ	status	2	1	unsupported 'read' argument
+NB:6905	foreign, both parse	differ	status+out	127	0	builtin 'pushd'
+NB:6906	foreign, both parse	differ	status	127	1	builtin 'pushd'
+NB:6907	foreign, both parse	differ	status+out	127	0	builtin 'pushd'
+NB:6908	foreign, both parse	differ	status+out	127	0	builtin 'pushd'
+NB:6909	foreign, both parse	differ	status+out	127	0	builtin 'pushd'
+NB:6910	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+NB:6911	foreign, both parse	differ	status+out+rec	127	0	builtin 'pushd'
+NB:6921	foreign, a shell cannot parse	differ	status+rec	2	1	here-document delimiter with an expansion
+NB:6926	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:6927	foreign, both parse	differ	status	2	1	'read' without a variable name
+NB:6928	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6929	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6932	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6933	foreign, both parse	differ	status	2	1	unsupported parameter form
+NB:6934	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6937	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6939	foreign, both parse	differ	status	2	1	'read' without a variable name
+NB:6940	foreign, both parse	differ	status	2	1	'read' without a variable name
+NB:6941	foreign, both parse	differ	status	2	1	'read' without a variable name
+NB:6942	foreign, both parse	differ	status	2	1	'read' without a variable name
+NB:6943	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6949	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6953	foreign, both parse	same		1	1	bash-only $ form
+NB:6956	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6957	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6963	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6964	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6967	foreign, both parse	differ	status	2	1	'read' without a variable name
+NB:6971	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:6973	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6975	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6978	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6979	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6980	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6981	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6983	foreign, both parse	messages only		2	2	unsupported 'read' argument
+NB:6984	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6985	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6986	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6987	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:6988	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6989	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6990	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6991	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6992	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6993	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6994	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6995	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:6998	foreign, a shell cannot parse	differ	status+rec	2	1	bash-only $ form
+NB:6999	foreign, both parse	differ	status+rec	127	1	builtin 'source'
+NB:7000	foreign, both parse	differ	rec	127	127	unquoted '{'
+NB:7002	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:7004	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:7005	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:7006	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:7008	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:7009	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:7010	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:7011	foreign, a shell cannot parse	differ	status	2	1	here-document delimiter with an expansion
+NB:7012	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:7013	foreign, a shell cannot parse	differ	status	2	0	here-document delimiter with an expansion
+NB:7031	foreign, both parse	messages only		0	0	unsupported parameter form
+NB:7084	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:709	foreign, both parse	same		0	0	unsupported parameter form
+NB:710	foreign, both parse	same		0	0	unsupported parameter form
+NB:7207	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:7208	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:7209	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:7210	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:7248	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:7272	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:7275	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+NB:7291	foreign, a shell cannot parse	differ	status+rec	2	0	unexpected '|'
+NB:7292	foreign, a shell cannot parse	differ	status+rec+files	2	0	missing word
+NB:7294	foreign, both parse	differ	status+out+rec	1	0	'&>' (dash: '&', then a redirection; bash: both outputs)
+NB:7295	foreign, a shell cannot parse	differ	status+out+rec	2	0	unexpected '|'
+NB:738	foreign, both parse	differ	rec	0	0	bash-only $ form
+NB:740	foreign, a shell cannot parse	differ	status	2	0	here-document delimiter with an expansion
+NB:7508	foreign, both parse	differ	status+rec	1	0	bash-only $ form
+NB:7509	foreign, both parse	differ	status+rec	1	0	bash-only $ form
+NB:7580	foreign, both parse	messages only		0	0	unsupported 'read' argument
+NB:7581	foreign, both parse	messages only		0	0	unsupported 'read' argument
+NB:7582	foreign, both parse	messages only		0	0	unsupported 'read' argument
+NB:7673	foreign, both parse	messages only		0	0	an input redirection without a command (bash: $(<file) reads the file)
+NB:7691	foreign, both parse	messages only		127	127	unquoted '{'
+NB:7698	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:7717	foreign, a shell cannot parse	messages only		2	2	unexpected '.'
+NB:7755	foreign, both parse	differ	rec	0	0	shell-set variable 'UID'
+NB:7816	foreign, both parse	messages only		0	0	unsupported parameter form
+NB:7827	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:7867	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:7908	foreign, both parse	differ	status	127	0	builtin 'source'
+NB:7928	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+NB:7931	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:7945	foreign, both parse	differ	status	127	1	builtin 'pushd'
+NB:7959	foreign, both parse	differ	rec	1	1	bash-only $ form
+NB:7960	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:8009	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:8022	foreign, both parse	messages only		127	127	unquoted '{'
+NB:8049	foreign, a shell cannot parse	differ	status	2	0	here-string (bash)
+NB:8068	foreign, both parse	messages only		0	0	unsupported 'jobs' form
+NB:8077	foreign, both parse	differ	status+rec	1	0	unsupported 'type' form
+NB:8094	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:8106	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:8109	foreign, both parse	differ	status	2	1	'local' outside a function
+NB:8117	foreign, both parse	differ	status+rec	2	1	unsupported parameter form
+NB:8118	foreign, both parse	differ	status+rec	2	1	unsupported parameter form
+NB:8120	foreign, both parse	same		1	1	shell-set variable 'BASH_SOURCE'
+NB:8131	foreign, a shell cannot parse	differ	status+rec	2	0	unexpected '('
+NB:8140	foreign, both parse	same		1	1	shell-set variable 'BASH_SOURCE'
+NB:8142	foreign, a shell cannot parse	differ	status+rec	2	1	unexpected '('
+NB:8154	foreign, both parse	differ	status+rec	2	0	unsupported parameter form
+NB:8239	foreign, both parse	differ	status	2	1	builtin 'shopt'
+NB:8321	foreign, a shell cannot parse	differ	status+rec	2	1	missing word
+NB:8322	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:8329	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:8330	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:8331	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:835	foreign, both parse	messages only		0	0	bash-only $ form
+NB:8489	subtle	differ	status+out	1	0	'set' without arguments (it lists)
+NB:8606	foreign, a shell cannot parse	messages only		2	2	builtin 'shopt'
+NB:8653	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:876	foreign, both parse	messages only		127	127	unquoted '{'
+NB:88	foreign, both parse	differ	status	127	1	builtin 'pushd'
+NB:8907	foreign, both parse	differ	rec	0	0	unquoted '{'
+NB:8993	foreign, a shell cannot parse	differ	status+rec	2	1	unexpected '|'
+NB:9059	work list	messages only		127	127	unsupported 'command' form
+NB:9128	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:9130	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:9132	foreign, both parse	differ	status	2	0	unsupported 'set -o' form
+NB:9133	subtle	same		0	0	unsupported 'set -o' form
+NB:9134	subtle	same		0	0	unsupported 'set' option '-v'
+NB:9135	subtle	same		0	0	unsupported 'set -o' form
+NB:9155	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:9161	foreign, both parse	differ	status	2	0	unsupported 'read' argument
+NB:9188	foreign, a shell cannot parse	differ	status	2	0	process substitution (bash)
+NB:9198	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:9205	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:9207	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:9208	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:9209	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:9223	subtle	same		0	0	unsupported 'set' option '-ex'
+NB:9231	subtle	differ	out	0	0	'set' without arguments (it lists)
+NB:928	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:9289	foreign, both parse	differ	status	127	1	builtin 'shopt'
+NB:9290	foreign, both parse	differ	status+out	127	1	builtin 'shopt'
+NB:9291	foreign, both parse	differ	status+out	127	1	builtin 'shopt'
+NB:9292	foreign, both parse	differ	status+out	127	1	builtin 'shopt'
+NB:9293	foreign, both parse	differ	status+out	127	1	builtin 'shopt'
+NB:9294	foreign, both parse	differ	status+out	127	1	builtin 'shopt'
+NB:9299	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:9300	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:9301	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:9302	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:9303	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:9304	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:9305	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:9306	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:9308	foreign, a shell cannot parse	differ	status+rec	2	0	here-string (bash)
+NB:9320	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:9331	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:9334	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:9338	foreign, both parse	differ	rec	2	2	bash-only $ form
+NB:9345	foreign, both parse	differ	status	127	2	builtin 'source'
+NB:9346	foreign, both parse	differ	status	127	1	builtin 'source'
+NB:9347	foreign, both parse	differ	status+rec	127	1	unsupported parameter form
+NB:9348	foreign, both parse	differ	status+rec	127	1	builtin 'source'
+NB:9366	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:9367	foreign, a shell cannot parse	messages only		2	2	missing word
+NB:9430	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:9469	foreign, both parse	messages only		0	0	keyword '[['
+NB:9470	foreign, both parse	messages only		0	0	keyword '[['
+NB:9479	work list	messages only		2	2	unsupported 'set' option '-g'
+NB:9491	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:9507	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:9508	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+NB:9509	foreign, both parse	differ	status	2	1	bash-only $ form
+NB:9515	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:9524	foreign, both parse	differ	status	2	0	unsupported 'unset' argument
+NB:9527	foreign, both parse	differ	status	2	0	unsupported 'unset' argument
+NB:9528	foreign, both parse	differ	status	2	0	shell-set variable 'RANDOM'
+NB:9529	foreign, both parse	differ	status	2	0	unsupported 'unset' argument
+NB:9531	work list	same		0	0	unsupported 'unset' argument
+NB:9532	foreign, both parse	differ	status	127	0	builtin 'shopt'
+NB:9576	foreign, a shell cannot parse	differ	rec	2	2	process substitution (bash)
+NB:9601	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+NB:9607	foreign, both parse	differ	rec	0	0	bash-only $ form
+NB:9608	foreign, both parse	differ	out+rec	0	0	bash-only $ form
+NB:9610	foreign, a shell cannot parse	differ	rec	2	2	process substitution (bash)
+NB:9611	foreign, a shell cannot parse	differ	status	2	0	process substitution (bash)
+NB:9641	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:9674	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:9683	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+NB:9684	foreign, a shell cannot parse	differ	status+out+rec+files	2	0	process substitution (bash)
+NB:9692	foreign, a shell cannot parse	differ	status+out+rec	2	1	process substitution (bash)
+NB:9710	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:9722	foreign, a shell cannot parse	differ	status+rec+files	2	0	unexpected '|'
+NB:9724	foreign, a shell cannot parse	differ	status+rec+files	2	0	unexpected '|'
+NB:9725	foreign, a shell cannot parse	differ	status+rec+files	2	0	missing word
+NB:9727	foreign, a shell cannot parse	differ	status+rec+files	2	0	process substitution (bash)
+NB:9737	foreign, a shell cannot parse	differ	status+rec+files	2	127	process substitution (bash)
+NB:976	foreign, both parse	differ	out+rec	0	0	bash-only $ form
+NB:9760	foreign, both parse	differ	status	127	0	bash-only $ form
+NB:9832	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+NB:9880	foreign, both parse	differ	status+out+rec	1	0	bash-only $ form
+NB:9944	foreign, a shell cannot parse	messages only		2	2	unterminated double quote
+NB:9967	foreign, both parse	differ	rec	0	0	unquoted '{'
+PB:README.md:1040	foreign, both parse	same		0	0	bash-only $ form
+PB:README.md:1072	foreign, both parse	same		0	0	keyword '[['
+PB:README.md:1112	foreign, both parse	same		0	0	'local NAME' without a value
+PB:README.md:1145	foreign, both parse	differ	status	2	127	unsupported parameter form
+PB:README.md:1320	foreign, both parse	differ	out	0	0	unquoted '{'
+PB:README.md:1348	foreign, both parse	differ	out+rec	0	0	unquoted '{'
+PB:README.md:1483	foreign, both parse	differ	status	0	1	'((' at the start of a command
+PB:README.md:1499	foreign, both parse	differ	status+files	0	1	'((' at the start of a command
+PB:README.md:1535	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+PB:README.md:1542	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+PB:README.md:1548	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+PB:README.md:1611	foreign, a shell cannot parse	messages only		2	2	empty group
+PB:README.md:1630	foreign, both parse	differ	status	127	0	shell-set variable 'BASH'
+PB:README.md:1636	foreign, both parse	differ	status	2	127	shell-set variable 'BASH_VERSION'
+PB:README.md:1655	foreign, both parse	differ	status	2	0	unsupported parameter form
+PB:README.md:1672	foreign, both parse	differ	rec	127	127	shell-set variable 'HOSTNAME'
+PB:README.md:1682	foreign, both parse	differ	status+rec	127	0	shell-set variable 'HOSTTYPE'
+PB:README.md:1691	foreign, both parse	messages only		127	127	shell-set variable 'OSTYPE'
+PB:README.md:1705	foreign, both parse	messages only		127	127	shell-set variable 'SECONDS'
+PB:README.md:1714	foreign, both parse	messages only		127	127	shell-set variable 'RANDOM'
+PB:README.md:1730	foreign, both parse	same		0	0	builtin 'shopt'
+PB:README.md:1755	foreign, both parse	same		0	0	unsupported 'read' argument
+PB:README.md:1782	foreign, both parse	same		0	0	bash-only $ form
+PB:README.md:1807	foreign, both parse	same		0	0	unsupported parameter form
+PB:README.md:1848	foreign, a shell cannot parse	differ	status+out	2	0	'for' needs a variable name
+PB:README.md:1864	foreign, a shell cannot parse	timeout		signal 25	124	'for' needs a variable name
+PB:README.md:1874	work list	same		0	0	'((' at the start of a command
+PB:README.md:1895	foreign, both parse	differ	status	127	1	keyword '[['
+PB:README.md:1917	foreign, both parse	differ	status	1	0	shell-set variable 'OSTYPE'
+PB:README.md:194	foreign, both parse	same		0	0	shell-set variable '_'
+PB:README.md:1959	foreign, a shell cannot parse	differ	status	2	0	missing word
+PB:README.md:1979	foreign, a shell cannot parse	differ	status	2	0	'{NAME}' before a redirection (bash: a named descriptor)
+PB:README.md:1989	foreign, a shell cannot parse	differ	out	2	2	unsupported 'type' form
+PB:README.md:2049	foreign, both parse	differ	status	2	127	unsupported parameter form
+PB:README.md:2062	foreign, a shell cannot parse	differ	status	2	0	'for' needs a variable name
+PB:README.md:2102	foreign, both parse	same		0	0	'((' at the start of a command
+PB:README.md:2119	foreign, a shell cannot parse	differ	status+out	2	0	'for' needs a variable name
+PB:README.md:2133	foreign, a shell cannot parse	differ	status	2	0	bash-only $ form
+PB:README.md:2166	foreign, both parse	same		0	0	'&>' (dash: '&', then a redirection; bash: both outputs)
+PB:README.md:2180	foreign, both parse	differ	status+out	2	0	unsupported 'local' argument
+PB:README.md:259	foreign, both parse	same		0	0	keyword '[['
+PB:README.md:284	foreign, a shell cannot parse	differ	status+out	2	0	keyword '[['
+PB:README.md:309	foreign, a shell cannot parse	differ	status	2	0	here-document delimiter with an expansion
+PB:README.md:349	foreign, both parse	same		0	0	unsupported parameter form
+PB:README.md:375	foreign, both parse	same		0	0	unsupported parameter form
+PB:README.md:401	work list	same		0	0	unsupported parameter form
+PB:README.md:425	foreign, both parse	same		0	0	unsupported parameter form
+PB:README.md:445	foreign, both parse	same		0	0	unsupported parameter form
+PB:README.md:469	foreign, both parse	same		0	0	unsupported parameter form
+PB:README.md:526	foreign, a shell cannot parse	differ	status	2	0	'for' needs a variable name
+PB:README.md:557	foreign, both parse	same		0	0	unsupported parameter form
+PB:README.md:576	foreign, both parse	differ	status+out	2	0	keyword '[['
+PB:README.md:612	foreign, both parse	differ	out	0	0	keyword '[['
+PB:README.md:625	foreign, both parse	differ	out	0	0	keyword '[['
+PB:README.md:650	foreign, both parse	same		0	0	builtin 'shopt'
+PB:README.md:661	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+PB:README.md:688	foreign, both parse	same		0	0	builtin 'declare'
+PB:README.md:703	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+PB:README.md:722	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+PB:README.md:732	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+PB:README.md:748	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+PB:README.md:762	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+PB:README.md:780	foreign, both parse	differ	out	0	0	unquoted '{'
+PB:README.md:791	foreign, a shell cannot parse	differ	status+out	2	0	'for' needs a variable name
+PB:README.md:801	foreign, a shell cannot parse	differ	status+out	2	0	unexpected '('
+PB:README.md:812	foreign, a shell cannot parse	differ	status+out	2	0	unexpected '('
+PB:README.md:838	foreign, both parse	differ	status+out	127	0	unquoted '{'
+PB:README.md:878	foreign, both parse	differ	status	2	1	an input redirection without a command (bash: $(<file) reads the file)
+PB:README.md:886	foreign, a shell cannot parse	differ	status	2	1	bash-only $ form
+PB:README.md:907	foreign, both parse	same		0	0	builtin 'mapfile'
+PB:README.md:934	foreign, both parse	same		0	0	builtin 'mapfile'
+PB:README.md:959	foreign, both parse	same		0	0	builtin 'mapfile'
+PB:README.md:971	foreign, both parse	same		0	0	shell-set variable '_'
+PS:README.md:1003	subtle, open	messages only		127	127	unsupported parameter form
+SC:Analytics.hs:prop_checkAndEq1	foreign, both parse	differ	out	0	0	keyword '[['
+SC:Analytics.hs:prop_checkAndEq10	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkAndEq2	foreign, both parse	same		0	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkAndEq5	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkAndEq8	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkArithmeticBadOctal1	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticBadOctal2	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticBadOctal3	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref10	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref11	foreign, both parse	differ	status	127	0	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkArithmeticDeref11b	foreign, both parse	messages only		127	127	builtin 'declare'
+SC:Analytics.hs:prop_checkArithmeticDeref12	foreign, a shell cannot parse	timeout		2	124	'for' needs a variable name
+SC:Analytics.hs:prop_checkArithmeticDeref13	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref14	foreign, both parse	differ	status	0	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref15	foreign, both parse	differ	status	2	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref16	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref2	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref3	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref4	foreign, both parse	messages only		0	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref5	foreign, both parse	differ	status	0	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref6	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref7	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkArithmeticDeref8	foreign, both parse	differ	status	127	0	builtin 'let'
+SC:Analytics.hs:prop_checkArithmeticDeref9	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkArrayAsString2	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkArrayAsString4	foreign, both parse	same		0	0	unquoted '{'
+SC:Analytics.hs:prop_checkArrayAsString7	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayAssignmentIndices1	foreign, a shell cannot parse	differ	status	2	0	builtin 'declare'
+SC:Analytics.hs:prop_checkArrayAssignmentIndices10	foreign, a shell cannot parse	differ	status	2	0	builtin 'declare'
+SC:Analytics.hs:prop_checkArrayAssignmentIndices11	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayAssignmentIndices12	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayAssignmentIndices13	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayAssignmentIndices2	foreign, a shell cannot parse	differ	status	2	0	builtin 'declare'
+SC:Analytics.hs:prop_checkArrayAssignmentIndices3	foreign, a shell cannot parse	differ	status	2	0	builtin 'declare'
+SC:Analytics.hs:prop_checkArrayAssignmentIndices4	foreign, a shell cannot parse	differ	status	2	0	builtin 'typeset'
+SC:Analytics.hs:prop_checkArrayAssignmentIndices5	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayAssignmentIndices6	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayAssignmentIndices7	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayAssignmentIndices8	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayAssignmentIndices9	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayValueUsedAsIndex1	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkArrayValueUsedAsIndex2	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkArrayValueUsedAsIndex3	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkArrayValueUsedAsIndex4	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkArrayValueUsedAsIndex5	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkArrayValueUsedAsIndex7	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkArrayValueUsedAsIndex8	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkArrayValueUsedAsIndex9	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkArrayWithoutIndex1	foreign, a shell cannot parse	differ	status+out	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayWithoutIndex10	foreign, a shell cannot parse	differ	status+out	2	0	here-string (bash)
+SC:Analytics.hs:prop_checkArrayWithoutIndex11	foreign, both parse	same		0	0	unsupported 'read' argument
+SC:Analytics.hs:prop_checkArrayWithoutIndex2	foreign, a shell cannot parse	differ	status+out	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayWithoutIndex3	foreign, a shell cannot parse	differ	status+out	2	0	keyword 'coproc'
+SC:Analytics.hs:prop_checkArrayWithoutIndex4	foreign, both parse	differ	out+rec	0	0	keyword 'coproc'
+SC:Analytics.hs:prop_checkArrayWithoutIndex5	foreign, both parse	differ	out	0	0	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkArrayWithoutIndex6	foreign, both parse	same		0	0	shell-set variable 'PIPESTATUS'
+SC:Analytics.hs:prop_checkArrayWithoutIndex7	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkArrayWithoutIndex8	foreign, both parse	messages only		0	0	builtin 'declare'
+SC:Analytics.hs:prop_checkArrayWithoutIndex9	foreign, a shell cannot parse	differ	status+out	2	0	here-string (bash)
+SC:Analytics.hs:prop_checkBadParameterSubstitution1	work list	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkBadParameterSubstitution10	foreign, a shell cannot parse	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkBadParameterSubstitution11	work list	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkBadParameterSubstitution2	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkBadParameterSubstitution4	work list	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkBadParameterSubstitution6	foreign, a shell cannot parse	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkBadParameterSubstitution7	work list	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkBadParameterSubstitution8	work list	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkBatsTestDoesNotUseNegation1	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkBatsTestDoesNotUseNegation2	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkBatsTestDoesNotUseNegation3	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkBatsTestDoesNotUseNegation4	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkBatsTestDoesNotUseNegation5	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkBatsTestDoesNotUseNegation6	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkBlatantRecursion1	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+SC:Analytics.hs:prop_checkBlatantRecursion7	foreign, both parse	same		0	0	builtin 'builtin'
+SC:Analytics.hs:prop_checkCdAndBack3	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkCharRangeGlob6	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkCharRangeGlob7	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkCharRangeGlob8	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkCharRangeGlob9	work list	differ	status	2	1	unsupported 'read' argument
+SC:Analytics.hs:prop_checkCommarrays1	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkCommarrays2	foreign, a shell cannot parse	differ	status	2	0	'a+='
+SC:Analytics.hs:prop_checkCommarrays3	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkCommarrays4	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkCommarrays5	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkCommarrays6	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkCommarrays7	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkComparisonAgainstGlob	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkComparisonAgainstGlob2	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkComparisonAgainstGlob5	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkComparisonAgainstGlob7	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkConcatenatedDollarAt2	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkConcatenatedDollarAt5	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkConditionalAndOrs2	foreign, a shell cannot parse	differ	status	127	2	keyword '[['
+SC:Analytics.hs:prop_checkConditionalAndOrs3	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkConstantIfs1	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkConstantIfs10	foreign, both parse	differ	status	127	1	unsupported ~ form
+SC:Analytics.hs:prop_checkConstantIfs11	foreign, both parse	differ	status	127	1	unsupported ~ form
+SC:Analytics.hs:prop_checkConstantIfs12	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkConstantIfs2b	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkConstantIfs3	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkConstantIfs4	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkConstantIfs5	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkConstantIfs6	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkConstantIfs8	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkConstantIfs9	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkConstantNullary	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkConstantNullary3	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkConstantNullary4	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkConstantNullary5	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkDollarBrackets1	foreign, both parse	differ	out	0	0	bash-only $ form
+SC:Analytics.hs:prop_checkDollarQuoteParen1	foreign, both parse	messages only		127	127	bash-only $ form
+SC:Analytics.hs:prop_checkDollarQuoteParen2	foreign, both parse	messages only		127	127	bash-only $ form
+SC:Analytics.hs:prop_checkDollarQuoteParen4	foreign, both parse	messages only		127	127	bash-only $ form
+SC:Analytics.hs:prop_checkDollarStar10	foreign, both parse	differ	rec	2	2	unsupported parameter form
+SC:Analytics.hs:prop_checkDollarStar3	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkDollarStar4	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkDollarStar5	foreign, both parse	differ	status+out+rec	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkDollarStar6	foreign, both parse	differ	status+out+rec	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkDollarStar8	foreign, both parse	same		2	2	unsupported parameter form
+SC:Analytics.hs:prop_checkDollarStar9	foreign, both parse	differ	status+out+rec	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkDoubleBracketOperators1	foreign, a shell cannot parse	differ	status	127	2	keyword '[['
+SC:Analytics.hs:prop_checkExpansionWithRedirection3	work list	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkExtraMaskedReturns1	foreign, a shell cannot parse	differ	status+out+rec	2	0	missing word
+SC:Analytics.hs:prop_checkExtraMaskedReturns13	foreign, a shell cannot parse	differ	status	2	0	here-document delimiter with an expansion
+SC:Analytics.hs:prop_checkExtraMaskedReturns16	foreign, a shell cannot parse	differ	status+rec	2	0	missing word
+SC:Analytics.hs:prop_checkExtraMaskedReturns17	foreign, a shell cannot parse	differ	status	2	1	unexpected '('
+SC:Analytics.hs:prop_checkExtraMaskedReturns18	foreign, a shell cannot parse	differ	status	2	1	unexpected '('
+SC:Analytics.hs:prop_checkExtraMaskedReturns19	foreign, a shell cannot parse	differ	status	2	1	unexpected '('
+SC:Analytics.hs:prop_checkExtraMaskedReturns2	foreign, a shell cannot parse	differ	status+rec	2	1	process substitution (bash)
+SC:Analytics.hs:prop_checkExtraMaskedReturns20	foreign, a shell cannot parse	differ	status	2	1	unexpected '('
+SC:Analytics.hs:prop_checkExtraMaskedReturns22	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkExtraMaskedReturns26	foreign, a shell cannot parse	differ	status	2	1	unexpected '('
+SC:Analytics.hs:prop_checkExtraMaskedReturns29	foreign, a shell cannot parse	differ	status	2	1	missing word
+SC:Analytics.hs:prop_checkExtraMaskedReturns3	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+SC:Analytics.hs:prop_checkExtraMaskedReturns30	foreign, a shell cannot parse	differ	status	2	1	missing word
+SC:Analytics.hs:prop_checkExtraMaskedReturns31	foreign, a shell cannot parse	differ	status+rec	2	1	missing word
+SC:Analytics.hs:prop_checkExtraMaskedReturns32	foreign, a shell cannot parse	differ	status+rec	2	1	missing word
+SC:Analytics.hs:prop_checkExtraMaskedReturns35	foreign, both parse	same		0	0	unsupported 'local' argument
+SC:Analytics.hs:prop_checkExtraMaskedReturns5	foreign, both parse	differ	status	2	1	unsupported 'set -o' form
+SC:Analytics.hs:prop_checkFlagAsCommand1	foreign, a shell cannot parse	differ	status	2	1	starts with - or +: sh would read it as options
+SC:Analytics.hs:prop_checkForDecimals1	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkForDecimals2	foreign, both parse	differ	status	127	1	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkForDecimals3	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkForInQuoted4a	foreign, both parse	same		0	0	unquoted '{'
+SC:Analytics.hs:prop_checkForInQuoted6	foreign, both parse	differ	status	2	1	unsupported parameter form
+SC:Analytics.hs:prop_checkFunctionDeclarations1	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+SC:Analytics.hs:prop_checkFunctionDeclarations2	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+SC:Analytics.hs:prop_checkGlobAsCommand2	work list	messages only		127	127	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkGlobbedRegex1	foreign, both parse	differ	status	127	2	keyword '[['
+SC:Analytics.hs:prop_checkGlobbedRegex2	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkGlobbedRegex4	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkGlobbedRegex5	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkGlobbedRegex6	foreign, a shell cannot parse	differ	status	2	0	keyword '[['
+SC:Analytics.hs:prop_checkGlobbedRegex7	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkGlobbedRegex8	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkGrepQ1	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkGrepQ6	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkInexplicablyUnquoted12	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkInexplicablyUnquoted7	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkInexplicablyUnquoted9	foreign, a shell cannot parse	differ	status	2	1	keyword '[['
+SC:Analytics.hs:prop_checkLiteralBreakingTest	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkLoopVariableReassignment2	foreign, a shell cannot parse	differ	status	2	0	'for' needs a variable name
+SC:Analytics.hs:prop_checkLoopVariableReassignment4	work list	same		0	0	shell-set variable '_'
+SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection1	foreign, both parse	differ	status+rec+files	2	0	bad arithmetic expression
+SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection2	foreign, both parse	differ	status	2	1	bad arithmetic expression
+SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection3	foreign, both parse	timeout		2	124	bad arithmetic expression
+SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection4	foreign, a shell cannot parse	differ	status+out+rec	2	0	here-document delimiter with an expansion
+SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection5	foreign, both parse	differ	status+out+rec	2	0	bad arithmetic expression
+SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection7	foreign, both parse	differ	status+out+rec	2	0	bad arithmetic expression
+SC:Analytics.hs:prop_checkNullaryExpansionTest1	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNullaryExpansionTest2	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNullaryExpansionTest3	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkNullaryExpansionTest4	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNullaryExpansionTest5	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNullaryExpansionTest6	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons1	foreign, both parse	differ	status	2	0	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons14	foreign, both parse	differ	status	2	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons17	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons18	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons19	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons2	foreign, a shell cannot parse	differ	status+files	127	2	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons20	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons21	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons22	foreign, both parse	differ	status	2	0	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons23	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons24	foreign, both parse	differ	status	2	1	shell-set variable 'RANDOM'
+SC:Analytics.hs:prop_checkNumberComparisons25	foreign, both parse	differ	status	2	0	bad arithmetic expression
+SC:Analytics.hs:prop_checkNumberComparisons3	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons4	foreign, both parse	differ	status+files	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons5	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons6	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkNumberComparisons7	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkOrNeq1	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkOrNeq2	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkOrNeq5	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkOrNeq8	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkPS13	foreign, both parse	same		0	0	bash-only $ form
+SC:Analytics.hs:prop_checkPS14	foreign, both parse	same		0	0	bash-only $ form
+SC:Analytics.hs:prop_checkPS14a	foreign, both parse	same		0	0	bash-only $ form
+SC:Analytics.hs:prop_checkPipeToNowhere14	foreign, both parse	differ	files	0	0	'&>' (dash: '&', then a redirection; bash: both outputs)
+SC:Analytics.hs:prop_checkPipeToNowhere15	foreign, a shell cannot parse	differ	status+rec+files	2	1	unexpected '|'
+SC:Analytics.hs:prop_checkPipeToNowhere3	foreign, a shell cannot parse	differ	status+out	2	0	here-string (bash)
+SC:Analytics.hs:prop_checkPlusEqualsNumber1	foreign, both parse	differ	status	127	0	'x+='
+SC:Analytics.hs:prop_checkPlusEqualsNumber2	foreign, both parse	differ	status	127	0	'x+='
+SC:Analytics.hs:prop_checkPlusEqualsNumber3	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkPlusEqualsNumber4	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkPlusEqualsNumber5	foreign, both parse	differ	status	127	0	'x+='
+SC:Analytics.hs:prop_checkPlusEqualsNumber6	foreign, both parse	differ	status	127	0	'x+='
+SC:Analytics.hs:prop_checkPlusEqualsNumber7	foreign, both parse	differ	status	127	0	'x+='
+SC:Analytics.hs:prop_checkPlusEqualsNumber8	foreign, both parse	differ	status	127	0	'x+='
+SC:Analytics.hs:prop_checkPlusEqualsNumber9	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkQuotedCondRegex1	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkQuotedCondRegex2	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkQuotedCondRegex3	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkQuotedCondRegex4	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkQuotedCondRegex5	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkQuotedCondRegex6	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkQuotesInLiterals3	foreign, a shell cannot parse	differ	status	2	127	unexpected '('
+SC:Analytics.hs:prop_checkReadWithoutR1	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+SC:Analytics.hs:prop_checkReadWithoutR2	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+SC:Analytics.hs:prop_checkReadWithoutR3	foreign, both parse	differ	status	2	0	unsupported 'read' argument
+SC:Analytics.hs:prop_checkReadWithoutR4	foreign, both parse	messages only		2	2	unsupported 'read' argument
+SC:Analytics.hs:prop_checkReadWithoutR5	foreign, both parse	differ	status	2	0	unsupported 'read' argument
+SC:Analytics.hs:prop_checkReadWithoutR6	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+SC:Analytics.hs:prop_checkRedirectToSame10	foreign, both parse	differ	status	2	1	builtin 'mapfile'
+SC:Analytics.hs:prop_checkRedirectToSame8	work list	differ	status	2	1	shell-set variable '_'
+SC:Analytics.hs:prop_checkRedirectedNowhere7	foreign, both parse	differ	status	2	1	an input redirection without a command (bash: $(<file) reads the file)
+SC:Analytics.hs:prop_checkRedirectedNowhere8	foreign, both parse	differ	status	2	1	an input redirection without a command (bash: $(<file) reads the file)
+SC:Analytics.hs:prop_checkRequireDoubleBracket4	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkRequireDoubleEquals1	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkRequireDoubleEquals3	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkRequireDoubleEquals5	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkReturnAgainstZero11	foreign, a shell cannot parse	differ	status	2	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkReturnAgainstZero13	foreign, both parse	differ	status+files	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkReturnAgainstZero14	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkReturnAgainstZero15	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkReturnAgainstZero16	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkReturnAgainstZero17	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkReturnAgainstZero2	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkReturnAgainstZero21	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkReturnAgainstZero22	foreign, a shell cannot parse	differ	status	2	0	keyword '[['
+SC:Analytics.hs:prop_checkReturnAgainstZero3	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkReturnAgainstZero4	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkReturnAgainstZero5	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkReturnAgainstZero6	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkReturnAgainstZero7	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkReturnAgainstZero8	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkSetESuppressed18	foreign, both parse	differ	status	127	0	builtin 'shopt'
+SC:Analytics.hs:prop_checkSetESuppressed19	foreign, both parse	differ	status	2	0	unsupported 'set -o' form
+SC:Analytics.hs:prop_checkShorthandIf	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkShorthandIf2	foreign, both parse	differ	status+out	127	0	keyword '[['
+SC:Analytics.hs:prop_checkSingleQuotedVariables25	foreign, both parse	differ	status	127	0	unsupported 'exec' form
+SC:Analytics.hs:prop_checkSingleQuotedVariables5	work list	differ	out	0	0	trap action outside the subset
+SC:Analytics.hs:prop_checkSpacefulnessCfg11	foreign, both parse	differ	status+rec	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkSpacefulnessCfg12	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkSpacefulnessCfg13	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkSpacefulnessCfg16	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSpacefulnessCfg2	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkSpacefulnessCfg20	foreign, both parse	differ	status	127	0	'n+='
+SC:Analytics.hs:prop_checkSpacefulnessCfg21	foreign, a shell cannot parse	differ	status	2	0	keyword 'select'
+SC:Analytics.hs:prop_checkSpacefulnessCfg22	foreign, both parse	differ	out	0	0	bash-only $ form
+SC:Analytics.hs:prop_checkSpacefulnessCfg23	foreign, a shell cannot parse	differ	status+out	2	0	unexpected '('
+SC:Analytics.hs:prop_checkSpacefulnessCfg24	foreign, a shell cannot parse	differ	status+out+rec	2	0	here-document delimiter with an expansion
+SC:Analytics.hs:prop_checkSpacefulnessCfg26	foreign, both parse	differ	out	0	0	unquoted '{'
+SC:Analytics.hs:prop_checkSpacefulnessCfg28	foreign, both parse	differ	status+out	127	0	'{NAME}' before a redirection (bash: a named descriptor)
+SC:Analytics.hs:prop_checkSpacefulnessCfg29	foreign, both parse	differ	status	127	1	'{NAME}' before a redirection (bash: a named descriptor)
+SC:Analytics.hs:prop_checkSpacefulnessCfg34	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSpacefulnessCfg37	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkSpacefulnessCfg45	foreign, both parse	messages only		0	0	unsupported 'wait' argument
+SC:Analytics.hs:prop_checkSpacefulnessCfg46	foreign, both parse	differ	out	0	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkSpacefulnessCfg47	foreign, both parse	differ	out	0	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkSpacefulnessCfg48	foreign, both parse	differ	out	0	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkSpacefulnessCfg5	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkSpacefulnessCfg56	foreign, a shell cannot parse	differ	status+out+rec	2	0	process substitution (bash)
+SC:Analytics.hs:prop_checkSpacefulnessCfg57	foreign, both parse	differ	out	0	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSpacefulnessCfg58	foreign, both parse	messages only		0	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSpacefulnessCfg59	foreign, both parse	differ	out	0	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSpacefulnessCfg60	foreign, both parse	messages only		0	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSpacefulnessCfg61	foreign, both parse	messages only		0	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSpacefulnessCfg62	foreign, both parse	same		0	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSpacefulnessCfg63	foreign, both parse	messages only		0	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSpacefulnessCfg64	foreign, both parse	differ	out	0	0	builtin 'declare'
+SC:Analytics.hs:prop_checkSplittingInArrays1	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkSplittingInArrays2	foreign, a shell cannot parse	differ	status	2	127	unexpected '('
+SC:Analytics.hs:prop_checkSplittingInArrays3	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkSplittingInArrays4	foreign, a shell cannot parse	differ	status	2	127	unexpected '('
+SC:Analytics.hs:prop_checkSplittingInArrays5	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkSplittingInArrays6	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkSplittingInArrays7	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkSplittingInArrays8	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkSpuriousExec12	foreign, both parse	differ	status+out	127	1	builtin 'shopt'
+SC:Analytics.hs:prop_checkSpuriousExec13	foreign, both parse	differ	status+out	127	1	builtin 'shopt'
+SC:Analytics.hs:prop_checkSpuriousExec8	foreign, both parse	differ	status+files	2	127	'{NAME}' before a redirection (bash: a named descriptor)
+SC:Analytics.hs:prop_checkSpuriousExpansion4	foreign, both parse	differ	status	2	127	bad arithmetic expression
+SC:Analytics.hs:prop_checkStderrPipe1	foreign, a shell cannot parse	differ	status	2	127	unexpected '|'
+SC:Analytics.hs:prop_checkStderrPipe2	foreign, a shell cannot parse	differ	status	2	127	unexpected '|'
+SC:Analytics.hs:prop_checkStderrRedirect5	foreign, a shell cannot parse	differ	status+files	2	1	missing word
+SC:Analytics.hs:prop_checkSubshelledTests5	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkSubshelledTests6	foreign, both parse	differ	status	2	1	bad arithmetic expression
+SC:Analytics.hs:prop_checkSubshelledTests7	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkSubshelledTests8	foreign, both parse	same		0	0	keyword '[['
+SC:Analytics.hs:prop_checkSuspiciousIFS2	foreign, both parse	same		0	0	bash-only $ form
+SC:Analytics.hs:prop_checkTestArgumentSplitting11	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkTestArgumentSplitting14	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkTestArgumentSplitting15	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkTestArgumentSplitting16	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkTestArgumentSplitting19	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkTestArgumentSplitting2	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkTestArgumentSplitting3	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkTestArgumentSplitting4	foreign, both parse	differ	status	127	1	unquoted '{'
+SC:Analytics.hs:prop_checkTestArgumentSplitting5	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkTestArgumentSplitting8	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkTestArgumentSplitting9	foreign, both parse	differ	status	127	1	unquoted '{'
+SC:Analytics.hs:prop_checkTrailingBracket2	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkTranslatedStringVariable1	foreign, both parse	messages only		127	127	bash-only $ form
+SC:Analytics.hs:prop_checkTranslatedStringVariable2	foreign, both parse	messages only		127	127	bash-only $ form
+SC:Analytics.hs:prop_checkTranslatedStringVariable4	foreign, both parse	messages only		127	127	bash-only $ form
+SC:Analytics.hs:prop_checkTranslatedStringVariable5	foreign, both parse	messages only		127	127	bash-only $ form
+SC:Analytics.hs:prop_checkUnassignedReferences11	foreign, both parse	differ	status+out	2	0	builtin 'declare'
+SC:Analytics.hs:prop_checkUnassignedReferences12	foreign, both parse	differ	status+out	2	0	builtin 'typeset'
+SC:Analytics.hs:prop_checkUnassignedReferences13	subtle	same		0	0	'local NAME' without a value
+SC:Analytics.hs:prop_checkUnassignedReferences15	foreign, both parse	differ	status	2	0	unsupported 'export' argument
+SC:Analytics.hs:prop_checkUnassignedReferences16	foreign, a shell cannot parse	differ	status+out	2	0	builtin 'declare'
+SC:Analytics.hs:prop_checkUnassignedReferences22	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnassignedReferences23	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkUnassignedReferences24	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkUnassignedReferences25	foreign, a shell cannot parse	differ	status	2	0	builtin 'declare'
+SC:Analytics.hs:prop_checkUnassignedReferences26	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+SC:Analytics.hs:prop_checkUnassignedReferences28	work list	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkUnassignedReferences29	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkUnassignedReferences30	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkUnassignedReferences31	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkUnassignedReferences32	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkUnassignedReferences33	foreign, both parse	same		0	0	unsupported 'local' argument
+SC:Analytics.hs:prop_checkUnassignedReferences34	foreign, both parse	differ	status	127	1	builtin 'declare'
+SC:Analytics.hs:prop_checkUnassignedReferences35	foreign, both parse	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkUnassignedReferences36	foreign, a shell cannot parse	differ	status+out	2	0	here-string (bash)
+SC:Analytics.hs:prop_checkUnassignedReferences37	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnassignedReferences39	foreign, both parse	differ	out	0	0	builtin 'builtin'
+SC:Analytics.hs:prop_checkUnassignedReferences4	foreign, both parse	differ	out	0	0	shell-set variable 'RANDOM'
+SC:Analytics.hs:prop_checkUnassignedReferences41	foreign, both parse	differ	status+out	2	0	builtin 'mapfile'
+SC:Analytics.hs:prop_checkUnassignedReferences42	foreign, both parse	differ	status+out	2	0	builtin 'mapfile'
+SC:Analytics.hs:prop_checkUnassignedReferences43	foreign, both parse	differ	status+out	2	0	builtin 'mapfile'
+SC:Analytics.hs:prop_checkUnassignedReferences5	foreign, a shell cannot parse	differ	status+out	2	0	builtin 'declare'
+SC:Analytics.hs:prop_checkUnassignedReferences52	foreign, both parse	messages only		0	0	unsupported 'wait' argument
+SC:Analytics.hs:prop_checkUnassignedReferences53	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkUnassignedReferences54	foreign, both parse	same		0	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnassignedReferences55	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkUnassignedReferences57	foreign, both parse	same		0	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnassignedReferences8	foreign, both parse	differ	out	0	0	builtin 'let'
+SC:Analytics.hs:prop_checkUncheckedCd9	foreign, both parse	messages only		0	0	builtin 'builtin'
+SC:Analytics.hs:prop_checkUncheckedPopd1	foreign, both parse	messages only		0	0	builtin 'popd'
+SC:Analytics.hs:prop_checkUncheckedPopd2	foreign, both parse	differ	status	127	1	builtin 'popd'
+SC:Analytics.hs:prop_checkUncheckedPopd3	foreign, both parse	differ	status	127	1	builtin 'popd'
+SC:Analytics.hs:prop_checkUncheckedPopd4	foreign, both parse	messages only		0	0	builtin 'popd'
+SC:Analytics.hs:prop_checkUncheckedPopd5	foreign, both parse	differ	status	127	1	builtin 'popd'
+SC:Analytics.hs:prop_checkUncheckedPopd6	foreign, both parse	differ	status	127	1	builtin 'popd'
+SC:Analytics.hs:prop_checkUncheckedPopd7	foreign, both parse	messages only		0	0	builtin 'popd'
+SC:Analytics.hs:prop_checkUncheckedPopd8	foreign, both parse	differ	status	127	1	builtin 'popd'
+SC:Analytics.hs:prop_checkUncheckedPopd9	foreign, both parse	differ	status	127	2	builtin 'popd'
+SC:Analytics.hs:prop_checkUncheckedPushd1	foreign, both parse	messages only		0	0	builtin 'pushd'
+SC:Analytics.hs:prop_checkUncheckedPushd2	foreign, both parse	differ	status	127	1	builtin 'pushd'
+SC:Analytics.hs:prop_checkUncheckedPushd3	foreign, both parse	differ	status	127	1	builtin 'pushd'
+SC:Analytics.hs:prop_checkUncheckedPushd4	foreign, both parse	messages only		0	0	builtin 'pushd'
+SC:Analytics.hs:prop_checkUncheckedPushd5	foreign, both parse	differ	status	127	1	builtin 'pushd'
+SC:Analytics.hs:prop_checkUncheckedPushd6	foreign, both parse	differ	status+out	127	0	builtin 'pushd'
+SC:Analytics.hs:prop_checkUncheckedPushd7	foreign, both parse	messages only		0	0	builtin 'pushd'
+SC:Analytics.hs:prop_checkUncheckedPushd8	foreign, both parse	differ	status	127	1	builtin 'pushd'
+SC:Analytics.hs:prop_checkUncheckedPushd9	foreign, both parse	differ	status+out	127	0	builtin 'pushd'
+SC:Analytics.hs:prop_checkUnmatchableCases9	foreign, a shell cannot parse	differ	status	2	0	missing word
+SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest10	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest2	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest4	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest7	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest8	foreign, both parse	differ	status	0	1	keyword '[['
+SC:Analytics.hs:prop_checkUnnecessaryArithmeticExpansionIndex1	foreign, both parse	differ	status	127	0	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkUnnecessaryArithmeticExpansionIndex2	foreign, both parse	differ	status	127	0	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkUnnecessaryArithmeticExpansionIndex3	work list	differ	status	127	0	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkUnnecessaryArithmeticExpansionIndex4	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkUnnecessaryParens2	foreign, a shell cannot parse	differ	status	2	0	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkUnnecessaryParens3	foreign, a shell cannot parse	differ	status	2	0	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkUnnecessaryParens5	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Analytics.hs:prop_checkUnnecessaryParens6	foreign, a shell cannot parse	differ	status	2	0	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkUnnecessaryParens7	foreign, a shell cannot parse	differ	status	2	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkUnnecessaryParens8	foreign, a shell cannot parse	differ	status	2	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkUnpassedInFunctions12	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnquotedDollarAt1	foreign, both parse	same		2	2	unsupported parameter form
+SC:Analytics.hs:prop_checkUnquotedDollarAt2	foreign, both parse	differ	status+out+rec	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnquotedDollarAt3	foreign, both parse	differ	rec	2	2	unsupported parameter form
+SC:Analytics.hs:prop_checkUnquotedDollarAt5	foreign, both parse	differ	status+out+rec	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnquotedDollarAt6	subtle	same		0	0	'$@' where it is not split (dash joins with IFS, bash with blanks)
+SC:Analytics.hs:prop_checkUnquotedDollarAt7	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnquotedDollarAt8	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnquotedDollarAt9	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnquotedExpansions4	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkUnquotedN3	foreign, both parse	differ	status	127	1	keyword '[['
+SC:Analytics.hs:prop_checkUnquotedParameterExpansionPattern3	foreign, both parse	differ	status	2	1	unsupported parameter form
+SC:Analytics.hs:prop_checkUnsupported3	foreign, a shell cannot parse	differ	status	2	0	missing command
+SC:Analytics.hs:prop_checkUnsupported4	foreign, a shell cannot parse	differ	status	2	0	missing word
+SC:Analytics.hs:prop_checkUnsupported5	work list	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkUnsupported6	work list	differ	status	2	127	unsupported parameter form
+SC:Analytics.hs:prop_checkUnused10	foreign, both parse	differ	status	2	1	'read' without a variable name
+SC:Analytics.hs:prop_checkUnused11	work list	differ	status	2	1	unsupported 'export' argument
+SC:Analytics.hs:prop_checkUnused12	foreign, both parse	differ	status	2	1	unsupported parameter form
+SC:Analytics.hs:prop_checkUnused13	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkUnused14	foreign, a shell cannot parse	differ	status+out	2	0	unexpected '('
+SC:Analytics.hs:prop_checkUnused15	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkUnused16	foreign, both parse	differ	status	127	0	builtin 'declare'
+SC:Analytics.hs:prop_checkUnused16b	foreign, both parse	differ	status	2	127	unsupported 'local' argument
+SC:Analytics.hs:prop_checkUnused17	foreign, both parse	messages only		0	0	unsupported 'read' argument
+SC:Analytics.hs:prop_checkUnused18	foreign, a shell cannot parse	differ	status+out	2	0	unexpected '('
+SC:Analytics.hs:prop_checkUnused19	foreign, both parse	differ	out	0	0	builtin 'let'
+SC:Analytics.hs:prop_checkUnused24	foreign, both parse	differ	status+out	2	0	builtin 'mapfile'
+SC:Analytics.hs:prop_checkUnused25	foreign, both parse	differ	status+out	2	0	builtin 'readarray'
+SC:Analytics.hs:prop_checkUnused26	foreign, both parse	differ	status	127	1	builtin 'declare'
+SC:Analytics.hs:prop_checkUnused28	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkUnused29	foreign, a shell cannot parse	differ	status+out	2	0	unexpected '('
+SC:Analytics.hs:prop_checkUnused30	foreign, both parse	differ	status	127	0	builtin 'let'
+SC:Analytics.hs:prop_checkUnused31	foreign, both parse	differ	status	127	0	builtin 'let'
+SC:Analytics.hs:prop_checkUnused32	foreign, both parse	differ	out	0	0	builtin 'let'
+SC:Analytics.hs:prop_checkUnused33	foreign, both parse	differ	status	127	2	keyword '[['
+SC:Analytics.hs:prop_checkUnused34	foreign, both parse	differ	out	0	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkUnused35	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Analytics.hs:prop_checkUnused36	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_checkUnused37	foreign, both parse	differ	status	127	0	'{NAME}' before a redirection (bash: a named descriptor)
+SC:Analytics.hs:prop_checkUnused38	foreign, both parse	same		0	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkUnused39	foreign, both parse	differ	status	127	1	builtin 'declare'
+SC:Analytics.hs:prop_checkUnused40	foreign, a shell cannot parse	differ	status+out	2	0	unexpected '('
+SC:Analytics.hs:prop_checkUnused41	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkUnused46	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Analytics.hs:prop_checkUnused49	foreign, both parse	differ	status	127	1	builtin 'declare'
+SC:Analytics.hs:prop_checkUnused50	foreign, both parse	differ	status	127	0	builtin 'typeset'
+SC:Analytics.hs:prop_checkUnused51	foreign, both parse	differ	status+out	2	0	'NAME[' as a command (bash reads an array)
+SC:Analytics.hs:prop_checkUnused54	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkUnused57	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkUnused6	foreign, both parse	differ	status	127	0	'((' at the start of a command
+SC:Analytics.hs:prop_checkUnused9	work list	differ	status	2	1	unsupported 'read' argument
+SC:Analytics.hs:prop_checkUseBeforeDefinition10	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkUseBeforeDefinition11	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkUseBeforeDefinition8	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkUseBeforeDefinition9	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_checkUuoc3c	foreign, both parse	messages only		1	1	unsupported parameter form
+SC:Analytics.hs:prop_checkUuoeVar9	foreign, both parse	messages only		127	127	an input redirection without a command (bash: $(<file) reads the file)
+SC:Analytics.hs:prop_checkValidCondOps1	foreign, a shell cannot parse	differ	status	127	2	keyword '[['
+SC:Analytics.hs:prop_checkValidCondOps4	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Analytics.hs:prop_checkWhileReadPitfalls11	foreign, a shell cannot parse	differ	status	2	0	here-string (bash)
+SC:Analytics.hs:prop_checkWhileReadPitfalls2	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+SC:Analytics.hs:prop_subshellAssignmentCheck10	foreign, both parse	messages only		0	0	here-document in a '(' or '$(' that ends on its line
+SC:Analytics.hs:prop_subshellAssignmentCheck11	foreign, both parse	messages only		0	0	builtin 'let'
+SC:Analytics.hs:prop_subshellAssignmentCheck12	foreign, both parse	messages only		0	0	builtin 'let'
+SC:Analytics.hs:prop_subshellAssignmentCheck17	foreign, a shell cannot parse	messages only		2	2	unsupported parameter form
+SC:Analytics.hs:prop_subshellAssignmentCheck18	foreign, both parse	messages only		0	0	'{NAME}' before a redirection (bash: a named descriptor)
+SC:Analytics.hs:prop_subshellAssignmentCheck19	foreign, both parse	differ	out	0	0	builtin 'shopt'
+SC:Analytics.hs:prop_subshellAssignmentCheck20	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_subshellAssignmentCheck21	foreign, both parse	same		0	0	keyword '[['
+SC:Analytics.hs:prop_subshellAssignmentCheck22	foreign, both parse	messages only		0	0	keyword '[['
+SC:Analytics.hs:prop_subshellAssignmentCheck24	foreign, a shell cannot parse	differ	status+out	2	0	here-document in a '(' or '$(' that ends on its line
+SC:Analytics.hs:prop_subshellAssignmentCheck25	foreign, both parse	differ	out	0	0	shell-set variable '_'
+SC:Analytics.hs:prop_subshellAssignmentCheck27	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_subshellAssignmentCheck31	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_subshellAssignmentCheck32	foreign, both parse	differ	out	0	0	builtin 'declare'
+SC:Analytics.hs:prop_subshellAssignmentCheck33	foreign, both parse	differ	status	2	0	unsupported 'export' argument
+SC:Analytics.hs:prop_subshellAssignmentCheck35	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+SC:Analytics.hs:prop_subshellAssignmentCheck40	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+SC:Analytics.hs:prop_subshellAssignmentCheck42	foreign, a shell cannot parse	messages only		2	2	unexpected '}'
+SC:Analytics.hs:prop_subshellAssignmentCheck6a	foreign, both parse	messages only		0	0	builtin 'typeset'
+SC:Analytics.hs:prop_subshellAssignmentCheck7	foreign, both parse	messages only		0	0	'((' at the start of a command
+SC:Analytics.hs:prop_subshellAssignmentCheck8	foreign, both parse	differ	status+out	2	0	bad arithmetic expression
+SC:Checks/Commands.hs:prop_checkCatastrophicRm10	foreign, both parse	differ	rec	0	0	unquoted '{'
+SC:Checks/Commands.hs:prop_checkCatastrophicRm11	foreign, both parse	differ	rec	0	0	unquoted '{'
+SC:Checks/Commands.hs:prop_checkCatastrophicRm12	foreign, both parse	differ	rec	0	0	unquoted '{'
+SC:Checks/Commands.hs:prop_checkCatastrophicRm13	foreign, both parse	differ	rec	0	0	unquoted '{'
+SC:Checks/Commands.hs:prop_checkEgrepSendsPipefail1	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkEvalArray2	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Checks/Commands.hs:prop_checkEvalArray3	work list	differ	status	2	0	unsupported parameter form
+SC:Checks/Commands.hs:prop_checkEvalArray4	work list	differ	status	2	0	unsupported parameter form
+SC:Checks/Commands.hs:prop_checkExportedExpansions4	work list	differ	status	2	127	unsupported 'export' argument
+SC:Checks/Commands.hs:prop_checkFgrepSendsPipefail1	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkFindNameGlob2	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefail1	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefail2	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefail3	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefail4	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefail5	foreign, both parse	differ	status+rec	2	1	unsupported 'set' option '-euo'
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefail6	foreign, both parse	differ	status+rec	2	127	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefail7	foreign, both parse	differ	status+rec	2	127	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefailN10	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefailN2	foreign, both parse	differ	rec	2	2	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefailN3	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefailN4	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefailN6	foreign, both parse	differ	status+rec	2	127	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefailN7	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefailN8	foreign, both parse	differ	rec	2	2	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkGrepSendsPipefailN9	foreign, both parse	differ	status+rec	2	1	unsupported 'set -o' form
+SC:Checks/Commands.hs:prop_checkLetUsage2	foreign, both parse	same		0	0	'((' at the start of a command
+SC:Checks/Commands.hs:prop_checkMvArguments3	foreign, both parse	differ	rec	0	0	unquoted '{'
+SC:Checks/Commands.hs:prop_checkMvArguments9	foreign, both parse	differ	status	2	1	unsupported parameter form
+SC:Checks/Commands.hs:prop_checkNonportableSignals4	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+SC:Checks/Commands.hs:prop_checkPrintfVar16	foreign, both parse	differ	out	0	0	bash-only $ form
+SC:Checks/Commands.hs:prop_checkPrintfVar8	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Checks/Commands.hs:prop_checkReadExpansions3	foreign, both parse	messages only		2	2	'read' without a variable name
+SC:Checks/Commands.hs:prop_checkReadExpansions4	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+SC:Checks/Commands.hs:prop_checkReadExpansions6	foreign, both parse	messages only		2	2	unsupported 'read' argument
+SC:Checks/Commands.hs:prop_checkReadExpansions9	work list	differ	status	2	1	unsupported 'read' argument
+SC:Checks/Commands.hs:prop_checkSetAssignment6	subtle	differ	out	0	0	'set' without arguments (it lists)
+SC:Checks/Commands.hs:prop_checkSourceArgs1	foreign, both parse	differ	rec	0	0	'.' with other than one argument
+SC:Checks/Commands.hs:prop_checkSourceArgs3	foreign, both parse	differ	rec	0	0	'.' with other than one argument
+SC:Checks/Commands.hs:prop_checkSshCmdStr1	subtle	messages only		127	127	shell-set variable 'PS1'
+SC:Checks/Commands.hs:prop_checkTimedCommand2	foreign, a shell cannot parse	differ	status	2	127	unexpected '('
+SC:Checks/Commands.hs:prop_checkTrapQuotes3	foreign, both parse	differ	status+out	1	0	unsupported signal for 'trap'
+SC:Checks/Commands.hs:prop_checkUnsetGlobs1	foreign, both parse	differ	status	2	0	unsupported 'unset' argument
+SC:Checks/Commands.hs:prop_checkUnsetGlobs3	foreign, both parse	differ	status	2	0	unsupported 'unset' argument
+SC:Checks/Commands.hs:prop_checkUnsetGlobs4	foreign, both parse	differ	status	2	0	unsupported 'unset' argument
+SC:Checks/Commands.hs:prop_checkUnsetGlobs5	foreign, both parse	differ	status	2	0	unsupported 'unset' argument
+SC:Checks/Commands.hs:prop_checkUuoeCmd6	foreign, both parse	messages only		0	0	an input redirection without a command (bash: $(<file) reads the file)
+SC:Checks/ShellSupport.hs:prop_checkBangAfterPipe1	foreign, a shell cannot parse	messages only		2	2	keyword '!'
+SC:Checks/ShellSupport.hs:prop_checkBangAfterPipe3	foreign, a shell cannot parse	differ	status	2	0	'! !'
+SC:Checks/ShellSupport.hs:prop_checkBashisms	foreign, a shell cannot parse	differ	status	2	0	missing word
+SC:Checks/ShellSupport.hs:prop_checkBashisms10	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms100	foreign, both parse	differ	status	2	1	'read' without a variable name
+SC:Checks/ShellSupport.hs:prop_checkBashisms101	foreign, both parse	differ	status	2	1	'read' without a variable name
+SC:Checks/ShellSupport.hs:prop_checkBashisms105	foreign, both parse	differ	status	2	0	unsupported 'set -o' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms106	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Checks/ShellSupport.hs:prop_checkBashisms108	foreign, both parse	differ	out	0	0	'&>' (dash: '&', then a redirection; bash: both outputs)
+SC:Checks/ShellSupport.hs:prop_checkBashisms109	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+SC:Checks/ShellSupport.hs:prop_checkBashisms110	foreign, both parse	differ	status	127	0	builtin 'source'
+SC:Checks/ShellSupport.hs:prop_checkBashisms111	foreign, both parse	differ	status	2	127	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms112	foreign, both parse	differ	status	2	127	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms113	foreign, both parse	differ	status	2	127	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms114	foreign, both parse	differ	status	2	127	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms115	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms116	foreign, both parse	differ	status	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms117	foreign, both parse	differ	status	2	127	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms118	foreign, both parse	differ	status	2	127	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms119	foreign, both parse	differ	status	2	127	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms12	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms122	foreign, both parse	messages only		127	127	bash-only $ form
+SC:Checks/ShellSupport.hs:prop_checkBashisms123	foreign, both parse	messages only		127	127	bash-only $ form
+SC:Checks/ShellSupport.hs:prop_checkBashisms124	foreign, both parse	differ	status+out	127	0	unsupported 'type' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms125	foreign, both parse	differ	status+out	127	0	unsupported 'type' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms13	foreign, both parse	differ	status	127	0	unsupported 'exec' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms132	foreign, both parse	differ	out	0	0	bash-only $ form
+SC:Checks/ShellSupport.hs:prop_checkBashisms133	foreign, a shell cannot parse	differ	status	2	0	'for' needs a variable name
+SC:Checks/ShellSupport.hs:prop_checkBashisms134	foreign, both parse	differ	status	127	1	'((' at the start of a command
+SC:Checks/ShellSupport.hs:prop_checkBashisms135	foreign, both parse	differ	status	127	0	bash-only $ form
+SC:Checks/ShellSupport.hs:prop_checkBashisms136	foreign, a shell cannot parse	differ	status	2	0	keyword 'select'
+SC:Checks/ShellSupport.hs:prop_checkBashisms137a	foreign, both parse	differ	out	0	0	unquoted '{'
+SC:Checks/ShellSupport.hs:prop_checkBashisms137b	foreign, both parse	differ	out	0	0	unquoted '{'
+SC:Checks/ShellSupport.hs:prop_checkBashisms138	foreign, both parse	differ	status	127	0	keyword '[['
+SC:Checks/ShellSupport.hs:prop_checkBashisms139	foreign, a shell cannot parse	differ	status+out+rec	2	0	here-string (bash)
+SC:Checks/ShellSupport.hs:prop_checkBashisms141	foreign, both parse	differ	status+out	2	0	bad arithmetic expression
+SC:Checks/ShellSupport.hs:prop_checkBashisms142	foreign, a shell cannot parse	differ	status+rec	2	0	unexpected '|'
+SC:Checks/ShellSupport.hs:prop_checkBashisms143	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Checks/ShellSupport.hs:prop_checkBashisms144	foreign, a shell cannot parse	differ	status	2	0	keyword 'coproc'
+SC:Checks/ShellSupport.hs:prop_checkBashisms146	foreign, both parse	differ	status	2	1	builtin 'readarray'
+SC:Checks/ShellSupport.hs:prop_checkBashisms15	foreign, both parse	differ	status	127	1	builtin 'let'
+SC:Checks/ShellSupport.hs:prop_checkBashisms151	foreign, a shell cannot parse	differ	status+out+rec+files	2	0	process substitution (bash)
+SC:Checks/ShellSupport.hs:prop_checkBashisms16	foreign, both parse	differ	out	0	0	shell-set variable 'RANDOM'
+SC:Checks/ShellSupport.hs:prop_checkBashisms17	foreign, both parse	differ	out	0	0	shell-set variable 'RANDOM'
+SC:Checks/ShellSupport.hs:prop_checkBashisms18	foreign, both parse	differ	status	0	127	'&>' (dash: '&', then a redirection; bash: both outputs)
+SC:Checks/ShellSupport.hs:prop_checkBashisms20	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+SC:Checks/ShellSupport.hs:prop_checkBashisms23	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+SC:Checks/ShellSupport.hs:prop_checkBashisms25	foreign, both parse	differ	status	2	1	/dev/tcp or /dev/udp (bash opens a socket)
+SC:Checks/ShellSupport.hs:prop_checkBashisms26	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+SC:Checks/ShellSupport.hs:prop_checkBashisms28	foreign, both parse	differ	status	127	0	'{NAME}' before a redirection (bash: a named descriptor)
+SC:Checks/ShellSupport.hs:prop_checkBashisms29	foreign, both parse	differ	status	2	1	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms3	foreign, both parse	differ	status+out	2	0	bad arithmetic expression
+SC:Checks/ShellSupport.hs:prop_checkBashisms37	foreign, both parse	same		0	0	shell-set variable 'HOSTNAME'
+SC:Checks/ShellSupport.hs:prop_checkBashisms38	foreign, both parse	differ	out	0	0	shell-set variable 'RANDOM'
+SC:Checks/ShellSupport.hs:prop_checkBashisms39	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+SC:Checks/ShellSupport.hs:prop_checkBashisms4	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+SC:Checks/ShellSupport.hs:prop_checkBashisms40	foreign, both parse	messages only		0	0	an input redirection without a command (bash: $(<file) reads the file)
+SC:Checks/ShellSupport.hs:prop_checkBashisms41	foreign, both parse	messages only		0	0	an input redirection without a command (bash: $(<file) reads the file)
+SC:Checks/ShellSupport.hs:prop_checkBashisms43	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+SC:Checks/ShellSupport.hs:prop_checkBashisms46	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+SC:Checks/ShellSupport.hs:prop_checkBashisms49	foreign, both parse	differ	out	0	0	shell-set variable 'MACHTYPE'
+SC:Checks/ShellSupport.hs:prop_checkBashisms5	foreign, both parse	differ	status+rec	127	0	builtin 'source'
+SC:Checks/ShellSupport.hs:prop_checkBashisms50	foreign, both parse	differ	status+files	2	127	'>&' takes one digit or '-'
+SC:Checks/ShellSupport.hs:prop_checkBashisms52b	work list	differ	status	2	1	'>&' takes one digit or '-'
+SC:Checks/ShellSupport.hs:prop_checkBashisms52c	foreign, both parse	differ	status	2	1	'>&' takes one digit or '-'
+SC:Checks/ShellSupport.hs:prop_checkBashisms54	foreign, both parse	differ	status	127	0	'foo+='
+SC:Checks/ShellSupport.hs:prop_checkBashisms57	work list	same		0	0	unsupported 'ulimit' form (only reading a limit)
+SC:Checks/ShellSupport.hs:prop_checkBashisms58	work list	differ	status	2	0	unsupported 'ulimit' form (only reading a limit)
+SC:Checks/ShellSupport.hs:prop_checkBashisms59	foreign, both parse	differ	status	2	0	unsupported 'jobs' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms62	foreign, both parse	differ	status	2	1	unsupported 'export' argument
+SC:Checks/ShellSupport.hs:prop_checkBashisms63	subtle	differ	out	0	0	unsupported 'export' argument
+SC:Checks/ShellSupport.hs:prop_checkBashisms64	foreign, both parse	differ	status+out	2	0	unsupported 'readonly' argument
+SC:Checks/ShellSupport.hs:prop_checkBashisms65	subtle	differ	out	0	0	unsupported 'readonly' argument
+SC:Checks/ShellSupport.hs:prop_checkBashisms67	foreign, both parse	differ	status	2	0	unsupported cd form
+SC:Checks/ShellSupport.hs:prop_checkBashisms68	foreign, both parse	differ	status+out	2	0	unsupported 'umask' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms7	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms70	foreign, both parse	differ	status+out	2	0	'trap' with fewer than two arguments (it lists)
+SC:Checks/ShellSupport.hs:prop_checkBashisms71	foreign, both parse	differ	status+out	127	0	unsupported 'type' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms73	foreign, both parse	differ	status	2	0	unsupported 'unset' argument
+SC:Checks/ShellSupport.hs:prop_checkBashisms79	foreign, both parse	differ	status	2	0	unsupported 'hash' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms8	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms81	work list	messages only		2	2	unsupported 'hash' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms82	subtle	same		0	0	unsupported 'set' option '-v'
+SC:Checks/ShellSupport.hs:prop_checkBashisms84	foreign, both parse	differ	status	2	0	unsupported 'set -o' form
+SC:Checks/ShellSupport.hs:prop_checkBashisms85	foreign, both parse	differ	status	2	0	unsupported 'set' option '-B'
+SC:Checks/ShellSupport.hs:prop_checkBashisms89	subtle, open	differ	status	0	2	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms9	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms91	foreign, both parse	differ	status	2	127	unsupported 'wait' argument
+SC:Checks/ShellSupport.hs:prop_checkBashisms92	foreign, both parse	differ	status+out	2	0	bad arithmetic expression
+SC:Checks/ShellSupport.hs:prop_checkBashisms93	foreign, both parse	differ	status	2	127	bad arithmetic expression
+SC:Checks/ShellSupport.hs:prop_checkBashisms95	foreign, both parse	differ	out	0	0	shell-set variable '_'
+SC:Checks/ShellSupport.hs:prop_checkBashisms96	foreign, both parse	differ	out	0	0	shell-set variable '_'
+SC:Checks/ShellSupport.hs:prop_checkBashisms97	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBashisms98	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars1	foreign, both parse	same		0	0	unquoted '{'
+SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars2	foreign, both parse	differ	out	0	0	unquoted '{'
+SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars3	foreign, both parse	same		0	0	unquoted '{'
+SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars4	foreign, both parse	same		0	0	unquoted '{'
+SC:Checks/ShellSupport.hs:prop_checkEchoSed1b	foreign, a shell cannot parse	differ	status+rec	2	0	here-document delimiter with an expansion
+SC:Checks/ShellSupport.hs:prop_checkEchoSed2b	foreign, a shell cannot parse	differ	status+rec	2	0	here-document delimiter with an expansion
+SC:Checks/ShellSupport.hs:prop_checkMultiDimensionalArrays1	work list	messages only		127	127	'NAME[' as a command (bash reads an array)
+SC:Checks/ShellSupport.hs:prop_checkMultiDimensionalArrays2	foreign, both parse	differ	status	127	0	'NAME[' as a command (bash reads an array)
+SC:Checks/ShellSupport.hs:prop_checkMultiDimensionalArrays3	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Checks/ShellSupport.hs:prop_checkMultiDimensionalArrays4	foreign, a shell cannot parse	differ	status	2	0	unexpected '('
+SC:Checks/ShellSupport.hs:prop_checkMultiDimensionalArrays5	foreign, both parse	differ	status	2	127	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkMultiDimensionalArrays6	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+SC:Checks/ShellSupport.hs:prop_checkMultipleBangs1	foreign, a shell cannot parse	differ	status	2	0	'! !'
+SC:Checks/ShellSupport.hs:prop_checkNegatedUnaryOps3	foreign, both parse	differ	status	127	1	keyword '[['
+TL:common/$.md:20	foreign, both parse	differ	out	0	0	shell-set variable 'RANDOM'
+TL:common/$.md:36	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+TL:common/[[.md:13	foreign, both parse	differ	status	127	1	keyword '[['
+TL:common/[[.md:17	foreign, a shell cannot parse	differ	status	127	2	keyword '[['
+TL:common/[[.md:21	foreign, both parse	differ	status	127	1	keyword '[['
+TL:common/[[.md:25	foreign, both parse	differ	status	127	0	keyword '[['
+TL:common/[[.md:29	foreign, both parse	differ	status	127	1	keyword '[['
+TL:common/[[.md:33	foreign, both parse	differ	status	127	1	keyword '[['
+TL:common/[[.md:37	foreign, both parse	differ	status	127	1	keyword '[['
+TL:common/[[.md:9	foreign, both parse	differ	status	127	1	keyword '[['
+TL:common/autojump.md:10	foreign, both parse	messages only		127	127	builtin 'source'
+TL:common/autoload.md:21	foreign, a shell cannot parse	differ	status	2	127	unexpected '('
+TL:common/bashmarks.md:9	foreign, both parse	differ	status	127	1	builtin 'source'
+TL:common/builtin.md:8	foreign, both parse	differ	status	127	0	builtin 'builtin'
+TL:common/caller.md:12	foreign, both parse	differ	status	127	1	builtin 'caller'
+TL:common/caller.md:16	foreign, both parse	differ	status	127	1	builtin 'caller'
+TL:common/caller.md:8	foreign, both parse	differ	status	127	1	builtin 'caller'
+TL:common/case.md:16	foreign, a shell cannot parse	differ	status+out	2	0	missing word
+TL:common/case.md:20	foreign, a shell cannot parse	differ	status+out	2	0	missing command
+TL:common/comm.md:24	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+TL:common/compgen.md:10	foreign, both parse	differ	status+out	127	0	builtin 'compgen'
+TL:common/compgen.md:14	foreign, both parse	differ	status	127	2	builtin 'compgen'
+TL:common/compgen.md:18	foreign, both parse	differ	status+out	127	0	builtin 'compgen'
+TL:common/compgen.md:22	foreign, both parse	differ	status	127	1	builtin 'compgen'
+TL:common/compgen.md:26	foreign, both parse	differ	status	127	1	builtin 'compgen'
+TL:common/compgen.md:30	foreign, both parse	differ	status+out	127	0	builtin 'compgen'
+TL:common/compgen.md:34	foreign, both parse	differ	status+out	127	0	builtin 'compgen'
+TL:common/compgen.md:38	foreign, both parse	differ	status+out	127	0	builtin 'compgen'
+TL:common/complete.md:10	foreign, both parse	differ	status	127	0	builtin 'complete'
+TL:common/complete.md:14	foreign, both parse	differ	status	127	0	builtin 'complete'
+TL:common/complete.md:18	foreign, both parse	differ	status	127	0	builtin 'complete'
+TL:common/complete.md:22	foreign, both parse	differ	status	127	0	builtin 'complete'
+TL:common/complete.md:26	foreign, both parse	differ	status	127	0	builtin 'complete'
+TL:common/complete.md:30	foreign, both parse	differ	status	127	1	builtin 'complete'
+TL:common/continue.md:12	foreign, both parse	differ	out	0	0	unquoted '{'
+TL:common/coproc.md:12	foreign, a shell cannot parse	differ	status	2	0	keyword 'coproc'
+TL:common/coproc.md:16	foreign, both parse	differ	status	2	1	'>&' takes one digit or '-'
+TL:common/coproc.md:20	foreign, both parse	differ	status	2	1	'<&' takes one digit or '-'
+TL:common/coproc.md:24	foreign, a shell cannot parse	differ	status	2	0	keyword 'coproc'
+TL:common/coproc.md:28	foreign, a shell cannot parse	differ	status	2	0	keyword 'coproc'
+TL:common/coproc.md:32	foreign, a shell cannot parse	timeout		2	124	keyword 'coproc'
+TL:common/coproc.md:8	foreign, a shell cannot parse	differ	status	2	0	keyword 'coproc'
+TL:common/datashader_cli.md:8	foreign, a shell cannot parse	messages only		2	2	missing command
+TL:common/declare.md:12	foreign, both parse	differ	status	127	0	builtin 'declare'
+TL:common/declare.md:16	foreign, a shell cannot parse	differ	status	2	0	builtin 'declare'
+TL:common/declare.md:20	foreign, a shell cannot parse	differ	status	2	0	builtin 'declare'
+TL:common/declare.md:24	foreign, both parse	differ	status	127	0	builtin 'declare'
+TL:common/declare.md:28	foreign, both parse	differ	status	127	0	builtin 'declare'
+TL:common/declare.md:32	foreign, both parse	differ	status	127	1	builtin 'declare'
+TL:common/declare.md:36	foreign, both parse	differ	status	127	1	builtin 'declare'
+TL:common/declare.md:8	foreign, both parse	differ	status	127	0	builtin 'declare'
+TL:common/dirs.md:10	foreign, both parse	differ	status+out	127	0	builtin 'dirs'
+TL:common/dirs.md:14	foreign, both parse	differ	status+out	127	0	builtin 'dirs'
+TL:common/dirs.md:18	foreign, both parse	differ	status+out	127	0	builtin 'dirs'
+TL:common/dirs.md:22	foreign, both parse	differ	status+out	127	0	builtin 'dirs'
+TL:common/dirs.md:26	foreign, both parse	differ	status	127	2	builtin 'dirs'
+TL:common/dirs.md:30	foreign, both parse	differ	status	127	2	builtin 'dirs'
+TL:common/dirs.md:34	foreign, both parse	differ	status	127	0	builtin 'dirs'
+TL:common/disown.md:13	foreign, both parse	differ	status	127	1	builtin 'disown'
+TL:common/disown.md:17	foreign, both parse	differ	status	127	0	builtin 'disown'
+TL:common/disown.md:21	foreign, both parse	differ	status	127	1	builtin 'disown'
+TL:common/disown.md:9	foreign, both parse	differ	status	127	1	builtin 'disown'
+TL:common/dnsx.md:14	foreign, a shell cannot parse	differ	status	2	127	here-string (bash)
+TL:common/emulate.md:25	foreign, a shell cannot parse	messages only		2	2	unexpected end
+TL:common/enable.md:12	foreign, both parse	differ	status	127	0	builtin 'enable'
+TL:common/enable.md:16	foreign, both parse	differ	status	127	0	builtin 'enable'
+TL:common/enable.md:20	foreign, both parse	differ	status	127	1	builtin 'enable'
+TL:common/enable.md:8	foreign, both parse	differ	status+out	127	0	builtin 'enable'
+TL:common/exec.md:8	work list	same		127	127	unsupported 'exec' form
+TL:common/exo.md:25	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+TL:common/fdroidcl.md:32	foreign, both parse	messages only		127	127	builtin 'enable'
+TL:common/fish.md:36	work list	messages only		2	2	unsupported 'set' option '-U'
+TL:common/for.md:16	foreign, both parse	same		0	0	unquoted '{'
+TL:common/for.md:32	foreign, a shell cannot parse	differ	status+out	2	0	'for' needs a variable name
+TL:common/fping.md:8	foreign, both parse	messages only		127	127	unquoted '{'
+TL:common/function.md:9	foreign, a shell cannot parse	differ	status	2	0	keyword 'function'
+TL:common/getopts.md:25	foreign, a shell cannot parse	messages only		2	2	unexpected end
+TL:common/git-filter-repo.md:9	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+TL:common/greater-than.md:16	foreign, both parse	differ	status	2	1	'&>' (dash: '&', then a redirection; bash: both outputs)
+TL:common/hash.md:16	foreign, both parse	differ	status	2	0	unsupported 'hash' form
+TL:common/hash.md:20	foreign, both parse	differ	status	2	1	unsupported 'hash' form
+TL:common/hash.md:24	foreign, both parse	differ	out	2	2	unsupported 'hash' form
+TL:common/if.md:21	foreign, both parse	messages only		0	0	keyword '[['
+TL:common/if.md:25	foreign, both parse	messages only		0	0	keyword '[['
+TL:common/if.md:29	foreign, both parse	messages only		0	0	keyword '[['
+TL:common/if.md:33	foreign, both parse	messages only		0	0	keyword '[['
+TL:common/ifs.md:21	foreign, both parse	same		0	0	bash-only $ form
+TL:common/kubectl-completion.md:12	foreign, a shell cannot parse	differ	status	2	0	process substitution (bash)
+TL:common/kubectl-completion.md:20	foreign, both parse	differ	status	2	1	unsupported parameter form
+TL:common/kubectl-completion.md:24	foreign, both parse	differ	status	127	2	builtin 'source'
+TL:common/kubectl-patch.md:12	foreign, both parse	messages only		127	127	bash-only $ form
+TL:common/ledger.md:16	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+TL:common/less-than-more-than.md:12	foreign, both parse	differ	status	2	1	/dev/tcp or /dev/udp (bash opens a socket)
+TL:common/less-than.md:16	foreign, a shell cannot parse	differ	status	2	0	here-string (bash)
+TL:common/less-than.md:32	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+TL:common/let.md:12	foreign, both parse	differ	status	127	1	builtin 'let'
+TL:common/let.md:16	foreign, both parse	differ	status	127	1	builtin 'let'
+TL:common/let.md:20	foreign, both parse	differ	status+out	127	2	builtin 'let'
+TL:common/let.md:8	foreign, both parse	differ	status	127	1	builtin 'let'
+TL:common/local.md:13	foreign, both parse	differ	status	2	1	unsupported 'local' argument
+TL:common/local.md:17	foreign, a shell cannot parse	differ	status	2	1	'local' outside a function
+TL:common/local.md:21	foreign, a shell cannot parse	differ	status	2	1	unsupported 'local' argument
+TL:common/local.md:25	foreign, both parse	differ	status	2	1	unsupported 'local' argument
+TL:common/local.md:29	foreign, both parse	differ	out	2	2	unsupported 'local' argument
+TL:common/local.md:9	foreign, both parse	differ	status	2	1	'local' outside a function
+TL:common/lwp-request.md:17	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+TL:common/mail.md:17	foreign, both parse	differ	status	2	1	shell-set variable 'HOSTNAME'
+TL:common/md-to-clip.md:17	foreign, a shell cannot parse	differ	status	2	127	process substitution (bash)
+TL:common/mkdir.md:20	foreign, both parse	differ	rec+files	0	0	unquoted '{'
+TL:common/mu.md:28	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+TL:common/nb.md:25	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+TL:common/next.md:36	subtle	messages only		127	127	'export' without arguments, or quoted
+TL:common/ng-completion.md:16	foreign, a shell cannot parse	differ	status	2	0	process substitution (bash)
+TL:common/odpscmd-table.md:16	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+TL:common/odpscmd-table.md:20	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+TL:common/odpscmd-table.md:8	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+TL:common/odpscmd.md:29	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+TL:common/pnmnlfilt.md:16	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+TL:common/pokeget.md:28	foreign, both parse	messages only		127	127	'((' at the start of a command
+TL:common/popd.md:13	foreign, both parse	differ	status	127	2	builtin 'popd'
+TL:common/popd.md:17	foreign, both parse	differ	status	127	2	builtin 'popd'
+TL:common/popd.md:21	foreign, both parse	differ	status	127	1	builtin 'popd'
+TL:common/popd.md:9	foreign, both parse	differ	status	127	1	builtin 'popd'
+TL:common/pushd.md:13	foreign, both parse	differ	status	127	1	builtin 'pushd'
+TL:common/pushd.md:17	foreign, both parse	differ	status	127	1	builtin 'pushd'
+TL:common/pushd.md:21	foreign, both parse	differ	status	127	1	builtin 'pushd'
+TL:common/pushd.md:9	foreign, both parse	differ	status	127	1	builtin 'pushd'
+TL:common/pwd.md:16	work list	differ	out	2	2	unsupported 'pwd' option (both shells refuse it)
+TL:common/read.md:12	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+TL:common/read.md:16	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+TL:common/read.md:20	foreign, a shell cannot parse	differ	status	2	0	here-string (bash)
+TL:common/read.md:32	foreign, both parse	differ	status	2	1	unsupported 'read' argument
+TL:common/readarray.md:12	foreign, both parse	differ	status	2	1	builtin 'readarray'
+TL:common/readarray.md:16	foreign, both parse	differ	status	2	1	builtin 'readarray'
+TL:common/readarray.md:20	foreign, both parse	differ	status	2	1	builtin 'readarray'
+TL:common/readarray.md:24	foreign, both parse	differ	status	2	1	builtin 'readarray'
+TL:common/readarray.md:28	foreign, both parse	differ	status	2	1	builtin 'readarray'
+TL:common/readarray.md:8	foreign, both parse	differ	status	127	0	builtin 'readarray'
+TL:common/readonly.md:16	subtle	differ	out	0	0	unsupported 'readonly' argument
+TL:common/regex.md:10	work list	differ	status	0	2	'.' with other than one argument
+TL:common/rustup-init.sh.md:28	foreign, both parse	differ	status	127	0	builtin 'complete'
+TL:common/scim.md:13	foreign, a shell cannot parse	messages only		2	2	missing here-document delimiter
+TL:common/select.md:12	foreign, a shell cannot parse	differ	status	2	0	keyword 'select'
+TL:common/select.md:16	foreign, a shell cannot parse	differ	status+out	2	1	keyword 'select'
+TL:common/select.md:20	foreign, a shell cannot parse	differ	status+out	2	1	unexpected '('
+TL:common/select.md:8	foreign, a shell cannot parse	differ	status+out	2	1	keyword 'select'
+TL:common/set.md:28	work list	differ	out	0	0	unsupported 'set -o' form
+TL:common/set.md:8	subtle	differ	out	0	0	'set' without arguments (it lists)
+TL:common/shopt.md:13	foreign, both parse	differ	status	127	1	builtin 'shopt'
+TL:common/shopt.md:17	foreign, both parse	differ	status	127	1	builtin 'shopt'
+TL:common/shopt.md:21	foreign, both parse	differ	status+out	127	0	builtin 'shopt'
+TL:common/shopt.md:9	foreign, both parse	differ	status+out	127	0	builtin 'shopt'
+TL:common/sops.md:32	foreign, a shell cannot parse	differ	status+rec	2	0	process substitution (bash)
+TL:common/source.md:12	foreign, both parse	differ	status	127	1	builtin 'source'
+TL:common/source.md:16	foreign, both parse	differ	status+rec	127	0	builtin 'source'
+TL:common/source.md:20	foreign, both parse	differ	status	127	2	builtin 'source'
+TL:common/source.md:8	foreign, both parse	differ	status	127	1	builtin 'source'
+TL:common/suspend.md:16	foreign, both parse	timeout		127	124	builtin 'suspend'
+TL:common/tee.md:20	foreign, a shell cannot parse	differ	status+out+rec+files	2	0	process substitution (bash)
+TL:common/touch.md:28	foreign, both parse	differ	rec	1	1	unquoted '{'
+TL:common/touch.md:32	foreign, both parse	differ	rec	1	1	unquoted '{'
+TL:common/trap.md:8	subtle	same		0	0	'trap' with fewer than two arguments (it lists)
+TL:common/type.md:14	foreign, both parse	differ	status+out	127	0	unsupported 'type' form
+TL:common/type.md:18	foreign, both parse	differ	status+out	127	0	unsupported 'type' form
+TL:common/type.md:22	foreign, both parse	differ	status+out	127	0	unsupported 'type' form
+TL:common/ulimit.md:21	work list	differ	status	2	0	unsupported 'ulimit' form (only reading a limit)
+TL:common/ulimit.md:9	work list	differ	out	0	0	unsupported 'ulimit' form (only reading a limit)
+TL:common/vertical-bar.md:12	foreign, a shell cannot parse	differ	status	2	0	unexpected '|'
+TL:common/virsh.md:30	foreign, both parse	messages only		127	127	builtin 'suspend'
+TL:common/virtualenv.md:20	foreign, both parse	differ	status	127	1	builtin 'source'
+TL:common/wait.md:17	foreign, both parse	differ	status	2	127	unsupported 'wait' argument
+TL:common/wait.md:21	foreign, both parse	differ	status	2	127	unsupported 'wait' argument
+TL:common/wait.md:29	foreign, both parse	differ	out	2	2	unsupported 'wait' argument
+TL:common/yacas.md:12	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+TL:common/yacas.md:16	foreign, a shell cannot parse	messages only		2	2	function body not a compound command
+TL:common/{.md:12	foreign, both parse	differ	out	0	0	unquoted '{'
+TL:common/{.md:28	foreign, both parse	differ	status+out	2	0	unsupported parameter form
+TL:common/{.md:32	foreign, both parse	differ	status	2	1	unsupported parameter form
+TL:common/{.md:36	foreign, a shell cannot parse	messages only		2	2	unexpected end
+TL:common/~.md:16	work list	same		2	2	unsupported ~ form
+TL:linux/abbr.md:21	foreign, both parse	differ	status	127	2	builtin 'source'
+TL:linux/exec.md:12	foreign, both parse	messages only		127	127	unsupported 'exec' form
+TL:linux/exec.md:16	foreign, both parse	messages only		127	127	unsupported 'exec' form
+TL:linux/exec.md:20	foreign, both parse	messages only		127	127	unsupported 'exec' form
+TL:linux/export.md:12	foreign, both parse	differ	status	2	0	unsupported 'export' argument
+TL:linux/export.md:16	foreign, both parse	differ	status	2	1	unsupported 'export' argument
+TL:linux/export.md:24	subtle	differ	out	0	0	unsupported 'export' argument
+TL:linux/gcrane-completion.md:17	foreign, a shell cannot parse	differ	status	2	0	process substitution (bash)
+TL:linux/gcrane-completion.md:21	foreign, both parse	differ	status	127	2	builtin 'source'
+TL:linux/gcrane-completion.md:29	foreign, both parse	differ	status	2	1	unsupported parameter form
+TL:linux/jobs.md:18	foreign, both parse	differ	status	2	0	unsupported 'jobs' form
+TL:linux/jobs.md:26	foreign, both parse	differ	status	2	0	unsupported 'jobs' form
+TL:linux/jobs.md:30	foreign, both parse	differ	status	2	0	unsupported 'jobs' form
+TL:linux/loadkeys.md:17	foreign, a shell cannot parse	messages only		2	2	keyword 'fi'
+TL:linux/loadkeys.md:21	foreign, a shell cannot parse	messages only		2	2	keyword 'fi'
+TL:linux/loadkeys.md:25	foreign, a shell cannot parse	messages only		2	2	keyword 'fi'
+TL:linux/loadkeys.md:9	foreign, a shell cannot parse	messages only		2	2	keyword 'fi'
+TL:linux/logwatch.md:8	foreign, a shell cannot parse	messages only		2	2	unterminated quote
+TL:linux/parted.interactive.md:17	foreign, a shell cannot parse	differ	status	127	2	keyword 'select'
+TL:linux/plasmashell.md:12	foreign, both parse	differ	status	127	0	builtin 'disown'
+TL:linux/routel.md:13	foreign, both parse	messages only		127	127	'local' without arguments, or quoted
+TL:linux/salloc.md:16	foreign, a shell cannot parse	messages only		2	2	unexpected '('
+TL:linux/sport.md:32	foreign, both parse	messages only		0	0	an input redirection without a command (bash: $(<file) reads the file)
+TL:linux/timekpra.md:36	foreign, both parse	messages only		0	0	builtin 'suspend'
+TL:linux/torsocks.md:13	foreign, both parse	messages only		127	127	'.' with other than one argument
+TL:linux/trap.md:20	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+TL:linux/trap.md:32	foreign, both parse	differ	status	1	0	unsupported signal for 'trap'
+TL:linux/trap.md:8	foreign, both parse	differ	status+out	2	0	'trap' with fewer than two arguments (it lists)
+TL:linux/ttyplot.md:16	foreign, both parse	messages only		127	127	shell-set variable 'RANDOM'

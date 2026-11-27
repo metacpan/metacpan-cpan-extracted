@@ -687,6 +687,37 @@ subtest 'An iterator gives all, first or single (D59)' => sub {
     is $next->ended, 'stopped';
 };
 
+subtest "An iterator's next: a call to it (roadmap 2026-0056)" => sub {
+    my $next = $class->new(sub { $_ * 2 })->iterator(from_array(1 .. 3));
+    my @got;
+    while (my($value) = $next->next) { push @got, $value }
+    is \@got,         [2, 4, 6], 'in a while loop, every value, in order';
+    is $next->ended,  'done',    'read to its end';
+    is [$next->next], [],        'then an empty list, as a call gives';
+
+    $next = $class->new->iterator(from_array(1 .. 4));
+    is [$next->next], [1], 'mixed with calls: next';
+    is [$next->()],   [2], 'then a call';
+    is [$next->next], [3], 'then next again: the same run';
+    is [$next->all],  [4], 'and all, the rest';
+
+    $next = $class->new->iterator(from_array(undef, 0, ''));
+    @got  = ();
+    while (my($value) = $next->next) { push @got, $value }
+    is \@got, [undef, 0, ''],
+        "undef, 0 and '' handed out, not taken for the end";
+
+    $next = $class->new->iterator(from_array(7));
+    is scalar($next->next), 7,     'in scalar context, the next value';
+    is scalar($next->next), undef, 'then undef';
+
+    $next = $class->new(keep_all)->iterator(from_array(1 .. 3));
+    is [$next->next], [1], "a list sink's result, one at a time";
+    $next->finish;
+    is [$next->next], [], 'and nothing after finish';
+    is $next->ended, 'stopped';
+};
+
 subtest "An iterator's code reference, taken once (D63)" => sub {
     my $it   = $class->new->iterator(from_array(1, 2, 3));
     my $next = \&$it;

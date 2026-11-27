@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -33,9 +34,9 @@ use lib "$Bin/lib";
 #     hiding a real card, and an all-virtual host logs the same "skipping"
 #     line as an all-virtual lspci host, empty arrays;
 #   * other devices: PCI domains other than 0000: are reported, sorted after
-#     it; an AMD GPU decodes with compute 0; an AMD device at class 0380 is
-#     listed too, an NVIDIA one there and an ASPEED [1a03] VGA are silently
-#     ignored (card k75);
+#     it; an AMD GPU decodes with the device table's verdict (k1; was compute
+#     0); an AMD device at class 0380 is listed too, an NVIDIA one there and
+#     an ASPEED [1a03] VGA are silently ignored (card k75);
 #   * dies before anything is installed or changed -- never "no GPU found" --
 #     when the read exits non-zero, when a line has fewer than six fields,
 #     and when ANY device's class or vendor (a NIC included) is unreadable or
@@ -278,20 +279,27 @@ subtest 'other devices: domains, AMD, class 0380 and ASPEED ignored (today\'s be
     '0000: sorts first, then 0001:, then 10000: (string order on the PCI slot)');
 
   my ( $amd ) = sysfs_detect($DEV{amd});
+  # k1: slot/device_id/gfx_target/compute/integrated come from the AMD device
+  # table (1002:744c = Navi 31 = gfx1100); compute was a hard 0 before.
   is_deeply($amd->{amd}[0], {
-    name => 'AMD GPU [1002:744c]', vendor => 'amd', pci_class => '0300', compute => 0
-  }, 'AMD device decodes with compute 0');
+    name => 'AMD GPU [1002:744c]', vendor => 'amd', pci_class => '0300',
+    slot => '0000:0c:00.0', device_id => '744c', gfx_target => 'gfx1100',
+    compute => 1, integrated => 0
+  }, 'AMD device decodes with its table verdict: gfx1100, compute 1, discrete');
 
   # class 0380 counts for vendor 1002 only (karr k75): an NVIDIA-vendor
-  # device there is still dropped, an AMD Instinct is listed, compute 0.
+  # device there is still dropped, an AMD Instinct is listed (k1: with the
+  # table's verdict, no longer compute 0).
   my ( $c0380 ) = sysfs_detect($DEV{class_0380});
   is_deeply($c0380->{nvidia}, [], 'class 0380 NVIDIA-vendor device => ignored, not reported');
   is_deeply($c0380->{amd}, [], '... and not as amd either');
 
   my ( $mi ) = sysfs_detect($DEV{amd_instinct});
   is_deeply($mi->{amd}, [ {
-    name => 'AMD GPU [1002:74a1]', vendor => 'amd', pci_class => '0380', compute => 0
-  } ], 'AMD Instinct at class 0380 => listed under amd, compute 0');
+    name => 'AMD GPU [1002:74a1]', vendor => 'amd', pci_class => '0380',
+    slot => '0000:0f:00.0', device_id => '74a1', gfx_target => 'gfx942',
+    compute => 1, integrated => 0
+  } ], 'AMD Instinct at class 0380 => listed under amd: gfx942, compute 1');
   is_deeply($mi->{nvidia}, [], '... no nvidia');
 
   my ( $aspeed ) = sysfs_detect($DEV{aspeed});

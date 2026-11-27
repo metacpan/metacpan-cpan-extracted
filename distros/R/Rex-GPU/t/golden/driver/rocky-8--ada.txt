@@ -12,6 +12,7 @@ run: dnf clean expire-cache
 run: dnf module enable nvidia-driver:open-dkms -y 2>/dev/null || true
 run: dnf install -y kernel-devel-4.18.0-553.el8_10.x86_64 kernel-headers nvidia-open
 run: rpm -q nvidia-driver 2>&1
+run: rpm -q --qf '%{VERSION}' nvidia-driver 2>&1
 file: /etc/modprobe.d/blacklist-nouveau.conf
   | blacklist nouveau
   | options nouveau modeset=0

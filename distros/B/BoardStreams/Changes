@@ -1,5 +1,30 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.58 2026-11-26T13:50:09Z
+
+    - A graceful stop (QUIT, a hypnotoad hot deployment, a worker reaching
+      its accepts limit) no longer waits for graceful_timeout: the plugin
+      closes its WebSocket connections as soon as the stop begins, with
+      close code 1001. Clients reconnect by themselves and catch up. Under
+      Docker this showed as a container that took its whole
+      stop_grace_period to stop
+
+    - BoardStreams::Client: when no channel has been joined for 30 seconds
+      the client closes its connection (status "idle"), and the next join
+      opens one again. The idle_delay option changes that time, and undef
+      turns it off. The JavaScript client has the same change (idleDelay,
+      in milliseconds; null turns it off)
+
+v0.0.57 2026-11-26T11:03:22Z
+
+    - BoardStreams::Client: every call of join now returns a channel object
+      of its own. The objects for one channel share a single membership on
+      the server, and the client leaves the channel when the last of them
+      has left, so separate parts of a program no longer have to
+      coordinate their leave calls. Code that joined a channel twice and
+      left it once now stays joined until the second object leaves too.
+      The JavaScript client has the same change
+
 v0.0.56 2026-11-25T15:18:08Z
 
     - Server and clients now check a protocol version in place of the

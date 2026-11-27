@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Queue group workers — messages load-balanced across group members
+# Queue group workers -messages load-balanced across group members
 use strict;
 use warnings;
 use EV;
@@ -18,7 +18,7 @@ $nats = EV::Nats->new(
 
         my $received = 0;
 
-        # queue group subscription — only one worker in group gets each message
+        # queue group subscription -only one worker in group gets each message
         $nats->subscribe('jobs.>', sub {
             my ($subject, $payload) = @_;
             $received++;

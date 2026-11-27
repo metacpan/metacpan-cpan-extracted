@@ -14,7 +14,7 @@ return {
     },
     PREREQ_PM => {
         'Exporter' => '5.57',
-        'XSLoader' => 0,
+        'XSLoader' => '0.14',
         'warnings' => 0,
     },
     DEVELOP_REQUIRES => {

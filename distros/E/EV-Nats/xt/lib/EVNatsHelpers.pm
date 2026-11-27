@@ -5,6 +5,9 @@ use Exporter 'import';
 use IO::Socket::INET;
 use Test::More ();
 use EV;
+use File::Basename ();
+use lib File::Basename::dirname(__FILE__) . '/../../t/lib';
+use NatsLive ();
 
 our @EXPORT_OK = qw(
     nats_or_skip
@@ -14,19 +17,7 @@ our @EXPORT_OK = qw(
     spawn_nats
 );
 
-# Probe TEST_NATS_HOST:TEST_NATS_PORT (defaulting to 127.0.0.1:4222)
-# and skip the entire test plan if unreachable. Returns ($host, $port).
-sub nats_or_skip {
-    my $host = $ENV{TEST_NATS_HOST} || '127.0.0.1';
-    my $port = $ENV{TEST_NATS_PORT} || 4222;
-    my $sock = IO::Socket::INET->new(
-        PeerAddr => $host, PeerPort => $port, Timeout => 1,
-    );
-    Test::More::plan(skip_all => "NATS server not available at $host:$port")
-        unless $sock;
-    close $sock;
-    return ($host, $port);
-}
+sub nats_or_skip { NatsLive::nats_or_skip() }
 
 # Probe whether JetStream is enabled by attempting an idempotent op via
 # the supplied callback, which should call its own callback with $err.

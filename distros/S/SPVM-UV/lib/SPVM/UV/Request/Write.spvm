@@ -3,6 +3,8 @@
 
 class UV::Request::Write extends UV::Request {
   
+  version_from UV;
+  
   use UV::Request::Write;
   use UV::Callback::Write;
   

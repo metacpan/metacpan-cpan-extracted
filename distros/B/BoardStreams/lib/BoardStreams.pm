@@ -1,7 +1,7 @@
 package BoardStreams;
 use v5.44;
 
-our $VERSION = "v0.0.56";
+our $VERSION = "v0.0.58";
 
 # The version of the protocol spoken between server and client: the
 # messages that travel over the WebSocket and what they mean. A server and
@@ -160,6 +160,15 @@ being served, and C<< $ctx->user >> is that browser's identity.
 
 Neither is a ban: a browser can ask to join again or the user can reload
 the page, and it is the C<join> handler that decides whether to let them in.
+
+=head1 STOPPING
+
+When the server is stopped gracefully (the C<QUIT> signal, a hypnotoad hot
+deployment, a worker reaching its C<accepts> limit), the plugin closes its
+WebSocket connections at once, so that the process does not wait for them
+until C<graceful_timeout>. Clients treat this as an ordinary lost
+connection: they reconnect to whichever process answers and catch up. See
+"Stopping and deploying" in the tutorial, which has a note for Docker.
 
 =head1 UPGRADING
 

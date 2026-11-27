@@ -1,8 +1,8 @@
-# large-subset-provenance.tsv: every corpus sample the large parser accepts (40,410), one line each, by snippet ID.
+# large-subset-provenance.tsv: every corpus sample the large parser accepts, one line each, by snippet ID.
 # Columns (tab): ID CODE CALLS
 #   ID    where the text comes from: format in doc/parsers/shell-subset-test-provenance.md, section 2; the texts are
 #         remade from the pinned sources by doc/large-subset/tools/large-subset-extract.pl (doc/test-pools.md, 3).
-#   CODE  known issue X27: could the run-time comparison of dash, bash --posix and ours (large-subset-state.md,
+#   CODE  known issue X27: could the run-time comparison of dash, bash --posix and ShellSpawn (large-subset-state.md,
 #         section 7) come out otherwise in another environment?
 #           S                    strict: no; only how the shell is started is assumed
 #           H:a,b                held: no, under assumptions known to hold in every environment tested (devnull, heredoc)
@@ -16,7 +16,7 @@
 #         word of each command as written (builtins, functions and programs alike), after command or exec the name
 #         after its options, cd, export, readonly, local; ? where an expansion makes a command's name
 #         (large-subset-blocks.pl -e).  After the behaviour run, large-subset-calls.pl marks them shell by shell,
-#         NAME:DBO, a letter each for dash, bash and ours: p that shell's run started a program of that name (the
+#         NAME:DBO, a letter each for dash, bash and ShellSpawn: p that shell's run started a program of that name (the
 #         shell, or a program it ran: xargs, find -exec), ! that shell said it was not found, - neither; a name with
 #         neither in all three keeps no mark (a builtin, a function, or not reached); =NAME:DBO a program started, or
 #         a name not found, that the text does not write as a command (an expansion made it, or a program started it).
@@ -50,7 +50,7 @@ NB:1	A:program,pipeline	top:ppp sed:ppp
 NB:10	A:program,pipeline	top:ppp sed:ppp
 NB:1000	A:program,pipeline	find:ppp xargs:ppp sort:ppp =wc:ppp
 NB:1001	A:program,pipeline	find:ppp xargs:ppp =wc:ppp
-NB:10012	U:directory	cd
+NB:10012	U:directory,vars	cd
 NB:10013	A:program,pipeline	find:ppp xargs:ppp
 NB:10014	A:program,path-absent	find:ppp
 NB:10015	A:program,echo,passthrough(files,unquoted),splitglob	ln:ppp echo
@@ -4097,7 +4097,7 @@ NB:3341	A:program,pipeline,path-home	grep:ppp find:ppp
 NB:3343	A:program,path-absent	find:ppp
 NB:3344	A:program,path-absent	find:ppp
 NB:3345	A:program,path-absent	find:ppp
-NB:3346	U:tilde,name	? =/runcompare/w1/run/home/bin/find:!-!
+NB:3346	U:tilde,name	? =/runcompare/w0/run/home/bin/find:!-!
 NB:3347	A:program,path-absent	find:ppp
 NB:3348	A:program,path-absent	find:ppp
 NB:3349	A:program,passthrough(files),splitglob	find:ppp
@@ -4422,7 +4422,7 @@ NB:3686	A:program,pipeline	find:ppp xargs:ppp
 NB:3687	A:program	find:ppp
 NB:3688	A:program,pipeline	find:ppp sed:ppp xargs:ppp
 NB:3689	A:program,pipeline	find:ppp perl:ppp parallel:!!!
-NB:369	U:directory,unquoted,args,prog-output,tilde,name	cd ? =/runcompare/w0/run/home/marker.sh:!-!
+NB:369	U:directory,unquoted,args,prog-output,tilde,name	cd ? =/runcompare/w3/run/home/marker.sh:!-!
 NB:3690	A:program	find:ppp
 NB:3691	A:program	find:ppp
 NB:3692	A:program,pipeline,passthrough(vars)	cat:ppp grep:ppp cut:ppp
@@ -5106,7 +5106,7 @@ NB:4484	A:program	join:ppp
 NB:4485	A:program,pipeline	sed:ppp join:ppp
 NB:4489	A:program	join:ppp
 NB:4491	A:program	join:ppp
-NB:4494	A:program,pipeline,path-absent	crontab:-!! sed:ppp =not%20foundcrontab:!--
+NB:4494	A:program,pipeline,path-absent	crontab:!!! sed:ppp
 NB:4495	A:program,path-system	sudo:ppp
 NB:4496	A:program	ln:ppp
 NB:4497	A:program,path-home	ln:ppp
@@ -6262,7 +6262,7 @@ NB:576	A:program	find:ppp
 NB:5760	A:program	ping:!!!
 NB:5761	A:program,pipeline,echo	echo ssh-keygen:!!!
 NB:5762	A:program,pipeline	printf ssh-keygen:!!!
-NB:5763	U:vars,prog-output,name/program,pipeline	cat:ppp ? =:-!!
+NB:5763	U:vars,prog-output,name/program,pipeline	cat:ppp ? =:-!-
 NB:5764	A:program,pipeline	yes:ppp awk:ppp more:ppp
 NB:5766	U:prog-output/program,pipeline	ls:ppp read
 NB:5767	U:pid	bg
@@ -7135,7 +7135,7 @@ NB:6691	A:program	comm:ppp
 NB:6692	A:program,pipeline	who:ppp sort:ppp uniq:ppp column:!!!
 NB:6693	A:program,pipeline	who:ppp awk:ppp xargs:ppp =id:ppp
 NB:6694	A:program,pipeline,passthrough(vars),splitglob	yes:ppp head:ppp
-NB:6696	U:vars/program,pipeline,echo	echo column:!!! fold:ppp
+NB:6696	U:vars/program,pipeline,echo	echo column:-!! fold:ppp =not%20foundcolumn:!--
 NB:6698	U:vars/program,pipeline,echo	echo tr:ppp
 NB:6699	A:program,pipeline,passthrough(files),splitglob	ps:ppp grep:ppp tr:ppp cut:ppp
 NB:670	A:program,passthrough(vars)	ssh:!!!
@@ -10096,8 +10096,8 @@ PB:README.md:1522	A:locale,passthrough(files),splitglob	trap
 PB:README.md:1529	S	trap
 PB:README.md:1561	S	
 PB:README.md:1582	S	
-PB:README.md:1596	U:prog-output,name/program	command ? =:-!!
-PB:README.md:1646	U:vars,name	? =:-!! =vi:ppp
+PB:README.md:1596	U:prog-output,name/program	command ? =:-!-
+PB:README.md:1646	U:vars,name	? =:-!- =vi:ppp
 PB:README.md:1699	U:vars,name	?
 PB:README.md:1743	A:program	$:!!! 15:!!!
 PB:README.md:1766	A:program	$:!!! 1200x800:!!! x:!!!
@@ -10172,11 +10172,11 @@ PS:README.md:919	H:devnull	printf
 PS:README.md:928	A:program,passthrough(prog-status)	$:!!! echo
 PS:README.md:944	A:program,locale,passthrough(files),splitglob	trap =clean_up:!!!
 PS:README.md:955	S	trap
-PS:README.md:965	U:prog-output,name/program	command ? =:-!!
+PS:README.md:965	U:prog-output,name/program	command ? =:-!-
 PS:README.md:97	S	printf
-PS:README.md:980	U:vars,name	? =:-!! =vi:ppp
+PS:README.md:980	U:vars,name	? =:-!- =vi:ppp
 PS:README.md:991	U:vars,name	?
-PS:README.md:997	U:pid,name	? =3850:!-- =3937:-!- =4020:--!
+PS:README.md:997	U:pid,name	? =30184:!-- =30232:-!- =30286:--!
 SC:Analytics.hs:prop_CheckVariableBraces1	A:echo	echo
 SC:Analytics.hs:prop_CheckVariableBraces2	A:echo	echo
 SC:Analytics.hs:prop_CheckVariableBraces3	S	echo
@@ -10217,7 +10217,7 @@ SC:Analytics.hs:prop_checkAssignToSelf4	A:program,passthrough(vars)	mycmd:!!!
 SC:Analytics.hs:prop_checkBackticks1	U:unquoted,prog-output/program,echo	echo foo:!!!
 SC:Analytics.hs:prop_checkBackticks2	U:unquoted,prog-output/program,echo	echo foo:!!!
 SC:Analytics.hs:prop_checkBackticks3	U:unquoted/echo	echo
-SC:Analytics.hs:prop_checkBadParameterSubstitution3	U:pid,name	? =26404:!-- =26443:-!- =26495:--!
+SC:Analytics.hs:prop_checkBadParameterSubstitution3	U:pid,name	? =28799:!-- =28848:-!- =28900:--!
 SC:Analytics.hs:prop_checkBadParameterSubstitution5	U:vars,name	?
 SC:Analytics.hs:prop_checkBadParameterSubstitution9	U:args,pid,name	? =0:!!!
 SC:Analytics.hs:prop_checkBadTestAndOr1	U:race	[
@@ -10287,7 +10287,7 @@ SC:Analytics.hs:prop_checkDivBeforeMult	U:vars/echo	echo
 SC:Analytics.hs:prop_checkDivBeforeMult2	U:vars/echo	echo
 SC:Analytics.hs:prop_checkDivBeforeMult3	U:vars/echo	echo
 SC:Analytics.hs:prop_checkDollarBrackets2	A:echo	echo
-SC:Analytics.hs:prop_checkDollarQuoteParen3	U:prog-output,name/program	foo:!!! ? =:-!!
+SC:Analytics.hs:prop_checkDollarQuoteParen3	U:prog-output,name/program	foo:!!! ? =:-!-
 SC:Analytics.hs:prop_checkDollarStar	A:program,passthrough(args),splitglob	..
 SC:Analytics.hs:prop_checkDollarStar2	A:passthrough(args)	
 SC:Analytics.hs:prop_checkDollarStar7	A:program,passthrough(args),splitglob	ls:ppp
@@ -10403,7 +10403,7 @@ SC:Analytics.hs:prop_checkNumberComparisons15	U:vars,test-ops/locale	[
 SC:Analytics.hs:prop_checkNumberComparisons16	S	[
 SC:Analytics.hs:prop_checkNumberComparisons8	U:files	[
 SC:Analytics.hs:prop_checkNumberComparisons9	S	[
-SC:Analytics.hs:prop_checkOrNeq3	U:vars,name	[ ? =:-!!
+SC:Analytics.hs:prop_checkOrNeq3	U:vars,name	[ ? =:-!-
 SC:Analytics.hs:prop_checkOrNeq4	U:vars,test-ops/program	[ b:!!!
 SC:Analytics.hs:prop_checkOrNeq6	U:vars,test-ops	[
 SC:Analytics.hs:prop_checkOrNeq7	U:vars,test-ops	[ true
@@ -10698,7 +10698,7 @@ SC:Analytics.hs:prop_checkTildeInPath2	S
 SC:Analytics.hs:prop_checkTildeInPath3	U:tilde	
 SC:Analytics.hs:prop_checkTildeInQuotes1	S	
 SC:Analytics.hs:prop_checkTildeInQuotes2	U:files/program	foo
-SC:Analytics.hs:prop_checkTildeInQuotes4	U:tilde,name	? =/runcompare/w3/run/home/file:!-!
+SC:Analytics.hs:prop_checkTildeInQuotes4	U:tilde,name	? =/runcompare/w2/run/home/file:!-!
 SC:Analytics.hs:prop_checkTildeInQuotes5	S	echo
 SC:Analytics.hs:prop_checkTildeInQuotes6	A:program	awk:ppp
 SC:Analytics.hs:prop_checkTrailingBracket1	A:program,passthrough(prog-status)	-z:!!! true
@@ -11251,7 +11251,7 @@ TL:common/7za.md:21	A:program	7za:!!!
 TL:common/7za.md:25	A:program	7za:!!!
 TL:common/7za.md:29	A:program,pipeline	7za:!!! bzip2:ppp gzip:ppp lzip:!!! tar:ppp ...:!!!
 TL:common/7za.md:33	A:program	7za:!!!
-TL:common/7za.md:37	A:program,pipeline	7za:!!! 1:!!! 3:-!! 5:!!! 7:!!! 9:-!! =not%20found9:!--
+TL:common/7za.md:37	A:program,pipeline	7za:!!! 1:!!! 3:!!! 5:!!! 7:!!! 9:!!!
 TL:common/7za.md:9	A:program	7za:!!!
 TL:common/7zr.md:13	A:program	7zr:!!!
 TL:common/7zr.md:17	A:program	7zr:!!!
@@ -11541,7 +11541,7 @@ TL:common/amass-intel.md:8	A:program	amass:!!!
 TL:common/amass.md:13	A:program	amass:!!!
 TL:common/amass.md:17	A:program,pipeline	amass:!!! enum:!!!
 TL:common/amass.md:21	A:program	amass:!!!
-TL:common/amass.md:9	A:program,pipeline	amass:-!! enum:-!! =not%20foundenum:!--
+TL:common/amass.md:9	A:program,pipeline	amass:!!! enum:!!!
 TL:common/androguard.md:12	A:program	androguard:!!!
 TL:common/androguard.md:16	A:program	androguard:!!!
 TL:common/androguard.md:8	A:program	androguard:!!!
@@ -11572,7 +11572,7 @@ TL:common/ansible-doc.md:25	A:program	ansible-doc:!!!
 TL:common/ansible-doc.md:29	A:program	ansible-doc:!!!
 TL:common/ansible-doc.md:9	A:program	ansible-doc:!!!
 TL:common/ansible-galaxy.md:12	A:program	ansible-galaxy:!!!
-TL:common/ansible-galaxy.md:16	A:program,pipeline	ansible-galaxy:!!! remove:!!!
+TL:common/ansible-galaxy.md:16	A:program,pipeline	ansible-galaxy:-!! remove:-!! =not%20foundremove:!--
 TL:common/ansible-galaxy.md:20	A:program	ansible-galaxy:!!!
 TL:common/ansible-galaxy.md:24	A:program	ansible-galaxy:!!!
 TL:common/ansible-galaxy.md:28	A:program,pipeline	ansible-galaxy:!!! remove:!!!
@@ -11734,7 +11734,7 @@ TL:common/arthas-watch.md:13	A:program	watch:ppp
 TL:common/arthas-watch.md:17	A:program	watch:ppp
 TL:common/arthas-watch.md:9	A:program	watch:ppp
 TL:common/arthas.md:13	A:program	telnet:!!!
-TL:common/arthas.md:17	A:program,pipeline,passthrough(interactive)	exit quit:-!! logout q:!!! =not%20foundlogout:!--
+TL:common/arthas.md:17	A:program,pipeline,passthrough(interactive)	exit quit:!!! logout:!-- q:!!!
 TL:common/arthas.md:21	A:program	stop:!!!
 TL:common/arthas.md:9	A:program	java:ppp
 TL:common/asar.md:12	A:program	asar:!!!
@@ -12202,14 +12202,14 @@ TL:common/aws-s3api.md:20	A:program	aws:!!!
 TL:common/aws-s3api.md:24	A:program	aws:!!!
 TL:common/aws-s3api.md:28	A:program	aws:!!!
 TL:common/aws-s3api.md:32	A:program	aws:!!!
-TL:common/aws-s3api.md:36	U:files/program,pipeline	aws:!!! table:!!! text:!!! yaml:!!! yaml-stream
+TL:common/aws-s3api.md:36	U:files/program,pipeline	aws:!!! table:-!! text:-!! yaml:!!! yaml-stream =not%20foundtext:!--
 TL:common/aws-s3api.md:8	A:program	aws:!!!
 TL:common/aws-secretsmanager.md:12	A:program	aws:!!!
 TL:common/aws-secretsmanager.md:16	A:program	aws:!!!
 TL:common/aws-secretsmanager.md:20	A:program,pipeline	aws:!!! arn:!!!
 TL:common/aws-secretsmanager.md:24	A:program,pipeline	aws:!!! arn:!!!
 TL:common/aws-secretsmanager.md:28	A:program,pipeline	aws:!!! arn:!!!
-TL:common/aws-secretsmanager.md:32	A:program,pipeline	aws:-!! arn:!!!
+TL:common/aws-secretsmanager.md:32	A:program,pipeline	aws:!!! arn:!!!
 TL:common/aws-secretsmanager.md:36	A:program,pipeline	aws:!!! arn:!!!
 TL:common/aws-secretsmanager.md:8	A:program	aws:!!!
 TL:common/aws-ses.md:13	A:program	aws:!!!
@@ -12222,7 +12222,7 @@ TL:common/aws-ses.md:37	A:program	aws:!!!
 TL:common/aws-ses.md:9	A:program	aws:!!!
 TL:common/aws-sns.md:12	A:program	aws:!!!
 TL:common/aws-sns.md:16	A:program	aws:!!!
-TL:common/aws-sns.md:20	A:program,pipeline	aws:!!! --phone-number:!!!
+TL:common/aws-sns.md:20	A:program,pipeline	aws:-!! --phone-number:-!! =not%20found--phone-number:!--
 TL:common/aws-sns.md:24	A:program	aws:!!!
 TL:common/aws-sns.md:28	A:program	aws:!!!
 TL:common/aws-sns.md:32	A:program,pipeline	aws:!!! CreatePlatformApplication:!!! DeleteEndpoint:!!! GetDataProtectionPolicy:!!! GetEndpointAttributes:!!! Subscribe:!!! ...:!!!
@@ -12404,7 +12404,7 @@ TL:common/az-quantum.md:8	A:program	az:!!!
 TL:common/az-redis.md:13	A:program,pipeline	az:!!! Premium:!!! Standard:!!! c1:!!! c2:!!! c3:!!! c4:!!! c5:!!! c6:!!! p1:!!! p2:!!! p3:!!! p4:!!! p5:!!!
 TL:common/az-redis.md:17	A:program	az:!!!
 TL:common/az-redis.md:21	A:program	az:!!!
-TL:common/az-redis.md:9	A:program,pipeline	az:!!! Premium:!!! Standard:!!! c1:!!! c2:!!! c3:!!! c4:-!! c5:!!! c6:!!! p1:!!! p2:!!! p3:!!! p4:!!! p5:!!!
+TL:common/az-redis.md:9	A:program,pipeline	az:!!! Premium:!!! Standard:!!! c1:!!! c2:!!! c3:!!! c4:!!! c5:!!! c6:!!! p1:!!! p2:!!! p3:!!! p4:!!! p5:!!!
 TL:common/az-repos.md:13	A:program	az:!!!
 TL:common/az-repos.md:17	A:program	az:!!!
 TL:common/az-repos.md:21	A:program	az:!!!
@@ -12565,7 +12565,7 @@ TL:common/basenc.md:8	A:program	basenc:ppp
 TL:common/bash-it.md:12	A:program	bash-it:!!!
 TL:common/bash-it.md:16	A:program	bash-it:!!!
 TL:common/bash-it.md:20	A:program	bash-it:!!!
-TL:common/bash-it.md:24	A:program,pipeline	bash-it:!!! warnings:!!! all:!!!
+TL:common/bash-it.md:24	A:program,pipeline	bash-it:!!! warnings:-!! all:-!! =not%20foundall:!--
 TL:common/bash-it.md:28	A:program,pipeline	bash-it:!!! plugin:!!! completion:!!!
 TL:common/bash-it.md:32	A:program,pipeline	bash-it:!!! disable:!!! plugin:!!! completion:!!!
 TL:common/bash-it.md:8	A:program,pipeline	bash-it:!!! dev:!!!
@@ -12699,7 +12699,7 @@ TL:common/biber.md:9	A:program	biber:!!!
 TL:common/biff.md:12	A:program	biff:!!!
 TL:common/biff.md:16	A:program,pipeline	biff:!!!
 TL:common/biff.md:20	A:program	biff:!!!
-TL:common/biff.md:24	A:program,pipeline	biff:!!! 1d:!!! 1w:!!! -1m:!!! 1y:!!! ...:!!!
+TL:common/biff.md:24	A:program,pipeline	biff:-!! 1d:!!! 1w:-!! -1m:!!! 1y:!!! ...:!!! =not%20foundbiff:!--
 TL:common/biff.md:28	A:program	biff:!!!
 TL:common/biff.md:32	A:program	biff:!!!
 TL:common/biff.md:36	U:path-tmp/program,pipeline	biff:!!! head:ppp
@@ -12762,7 +12762,7 @@ TL:common/bitcoin-cli.md:33	A:program	bitcoin-cli:!!!
 TL:common/bitcoin-cli.md:37	A:program	bitcoin-cli:!!!
 TL:common/bitcoin-cli.md:9	A:program	bitcoin-cli:!!!
 TL:common/bitcoind.md:13	A:program	bitcoind:!!!
-TL:common/bitcoind.md:17	A:program,pipeline	bitcoind:-!! test signet:!!! regtest:-!! =not%20foundbitcoind:!--
+TL:common/bitcoind.md:17	A:program,pipeline	bitcoind:!!! test signet:!!! regtest:!!!
 TL:common/bitcoind.md:21	A:program	bitcoind:!!!
 TL:common/bitcoind.md:9	A:program	bitcoind:!!!
 TL:common/bk.md:12	A:program	bk:!!!
@@ -12858,8 +12858,8 @@ TL:common/boxes.md:12	A:program,pipeline	echo boxes:!!!
 TL:common/boxes.md:16	A:program,pipeline	echo boxes:!!!
 TL:common/boxes.md:20	A:program,pipeline	echo boxes:!!!
 TL:common/boxes.md:24	A:program,pipeline	echo boxes:!!! c:!!! r:!!!
-TL:common/boxes.md:28	A:program,pipeline	echo boxes:!!! c:!!! b:!!!
-TL:common/boxes.md:32	A:program,pipeline	echo boxes:!!! c:!!! rvt:!!!
+TL:common/boxes.md:28	A:program,pipeline	echo boxes:-!! c:-!! b:!!! =not%20foundc:!--
+TL:common/boxes.md:32	A:program,pipeline	echo boxes:-!! c:-!! rvt:!!! =not%20foundc:!--
 TL:common/boxes.md:8	A:program,pipeline	echo boxes:!!!
 TL:common/boxxy.md:12	A:program	boxxy:!!!
 TL:common/boxxy.md:16	A:program	boxxy:!!!
@@ -12903,7 +12903,7 @@ TL:common/brew-cleanup.md:12	A:program,pipeline	brew:!!! cask:!!!
 TL:common/brew-cleanup.md:16	A:program	brew:!!!
 TL:common/brew-cleanup.md:20	A:program	brew:!!!
 TL:common/brew-cleanup.md:8	A:program	brew:!!!
-TL:common/brew-info.md:12	A:program,pipeline	brew:!!! cask:!!!
+TL:common/brew-info.md:12	A:program,pipeline	brew:-!! cask:-!! =not%20foundbrew:!--
 TL:common/brew-info.md:16	A:program,pipeline	brew:!!! cask:!!!
 TL:common/brew-info.md:20	A:program,pipeline	brew:!!! cask:!!!
 TL:common/brew-info.md:24	A:program	brew:!!!
@@ -12949,7 +12949,7 @@ TL:common/brew-tap.md:8	A:program	brew:!!!
 TL:common/brew-uninstall.md:13	A:program	brew:!!!
 TL:common/brew-uninstall.md:9	A:program,pipeline	brew:!!! cask:!!!
 TL:common/brew-update.md:9	A:program	brew:!!!
-TL:common/brew-upgrade.md:12	A:program,pipeline	brew:!!! cask:!!!
+TL:common/brew-upgrade.md:12	A:program,pipeline	brew:-!! cask:-!! =not%20foundcask:!--
 TL:common/brew-upgrade.md:16	A:program	brew:!!!
 TL:common/brew-upgrade.md:20	A:program	brew:!!!
 TL:common/brew-upgrade.md:8	A:program	brew:!!!
@@ -13293,7 +13293,7 @@ TL:common/calligrasheets.md:13	A:program	calligrasheets:!!!
 TL:common/calligrasheets.md:17	A:program,pipeline	calligrasheets:!!! version:!!!
 TL:common/calligrasheets.md:9	A:program	calligrasheets:!!!
 TL:common/calligrastage.md:13	A:program	calligrastage:!!!
-TL:common/calligrastage.md:17	A:program,pipeline	calligrastage:-!! version:-!! =not%20foundversion:!--
+TL:common/calligrastage.md:17	A:program,pipeline	calligrastage:!!! version:!!!
 TL:common/calligrastage.md:9	A:program	calligrastage:!!!
 TL:common/calligrawords.md:13	A:program	calligrawords:!!!
 TL:common/calligrawords.md:17	A:program,pipeline	calligrawords:!!! version:!!!
@@ -13386,11 +13386,11 @@ TL:common/cargo-info.md:16	A:program	cargo:!!!
 TL:common/cargo-info.md:8	A:program	cargo:!!!
 TL:common/cargo-init.md:13	A:program	cargo:!!!
 TL:common/cargo-init.md:17	A:program	cargo:!!!
-TL:common/cargo-init.md:21	A:program,pipeline	cargo:!!! hg:!!! pijul:!!! fossil:!!! none:!!!
+TL:common/cargo-init.md:21	A:program,pipeline	cargo:-!! hg:-!! pijul:!!! fossil:!!! none:!!! =not%20foundhg:!--
 TL:common/cargo-init.md:25	A:program	cargo:!!!
 TL:common/cargo-init.md:9	A:program	cargo:!!!
 TL:common/cargo-install.md:12	A:program	cargo:!!!
-TL:common/cargo-install.md:16	A:program,pipeline	cargo:!!! tag:!!! rev:ppp commit_hash:!!!
+TL:common/cargo-install.md:16	A:program,pipeline	cargo:-!! tag:!!! rev:ppp commit_hash:!!! =not%20foundcargo:!--
 TL:common/cargo-install.md:20	A:program	cargo:!!!
 TL:common/cargo-install.md:24	A:program	cargo:!!!
 TL:common/cargo-install.md:8	A:program	cargo:!!!
@@ -13503,7 +13503,7 @@ TL:common/cat.md:24	U:files/program	cat
 TL:common/cat.md:8	A:program	cat:ppp
 TL:common/catimg.md:13	A:program	catimg:!!!
 TL:common/catimg.md:17	A:program	catimg:!!!
-TL:common/catimg.md:21	A:program,pipeline	catimg:!!! -H:!!!
+TL:common/catimg.md:21	A:program,pipeline	catimg:-!! -H:-!! =not%20found-H:!--
 TL:common/catimg.md:9	A:program	catimg:!!!
 TL:common/cava.md:12	A:program	cava:!!!
 TL:common/cava.md:8	A:program	cava:!!!
@@ -13781,9 +13781,9 @@ TL:common/clang-check.md:21	A:program	clang-check:!!!
 TL:common/clang-check.md:9	A:program	clang-check:!!!
 TL:common/clang-cpp.md:7	A:program	tldr:!!!
 TL:common/clang-format.md:12	A:program	clang-format:ppp
-TL:common/clang-format.md:16	A:program,pipeline	clang-format:ppp GNU:!!! Google:!!! Chromium:-!! Microsoft:!!! Mozilla:!!! WebKit:!!!
+TL:common/clang-format.md:16	A:program,pipeline	clang-format:ppp GNU:!!! Google:!!! Chromium:!!! Microsoft:!!! Mozilla:!!! WebKit:!!!
 TL:common/clang-format.md:20	A:program	clang-format:ppp
-TL:common/clang-format.md:24	U:files/program,pipeline	clang-format:ppp GNU:!!! Google:!!! Chromium:!!! Microsoft:-!! Mozilla:-!! WebKit:!!! =not%20foundMicrosoft:!--
+TL:common/clang-format.md:24	U:files/program,pipeline	clang-format:ppp GNU:!!! Google:!!! Chromium:!!! Microsoft:!!! Mozilla:!!! WebKit:!!!
 TL:common/clang-format.md:8	A:program	clang-format:ppp
 TL:common/clang-tidy.md:12	A:program,passthrough(files),splitglob	clang-tidy:ppp
 TL:common/clang-tidy.md:16	A:program,passthrough(files),splitglob	clang-tidy:ppp
@@ -13984,7 +13984,7 @@ TL:common/colab-run.md:28	A:program	colab:!!!
 TL:common/colab-run.md:8	A:program	colab:!!!
 TL:common/colab.md:13	A:program	colab:!!!
 TL:common/colab.md:17	A:program,pipeline	colab:!!! L4:!!! A100:!!! H100:!!!
-TL:common/colab.md:21	U:files/program,pipeline	colab:-!! path/to/notebook.ipynb:--! =not%20foundpath/to/notebook.ipynb:!--
+TL:common/colab.md:21	U:files/program,pipeline	colab:!!! path/to/notebook.ipynb:!-!
 TL:common/colab.md:25	A:program	colab:!!!
 TL:common/colab.md:29	A:program	colab:!!!
 TL:common/colab.md:33	A:program	colab:!!!
@@ -14036,7 +14036,7 @@ TL:common/command.md:16	U:lookup	command
 TL:common/command.md:8	A:program	command ls:ppp
 TL:common/compare.md:7	A:program	tldr:!!!
 TL:common/compopt.md:10	A:passthrough(interactive)	compopt:!--
-TL:common/compopt.md:14	A:program,pipeline,passthrough(interactive)	compopt %2Bo:!!! =not%20foundcompopt:!--
+TL:common/compopt.md:14	A:program,pipeline,passthrough(interactive)	compopt:!-- %2Bo:!!!
 TL:common/compopt.md:18	A:passthrough(interactive)	compopt:!--
 TL:common/composer-audit.md:12	A:program	composer:ppp
 TL:common/composer-audit.md:16	A:program,pipeline	composer:ppp plain:!!! json:!!! summary:!!!
@@ -14099,7 +14099,7 @@ TL:common/conda-env.md:28	A:program	conda:!!!
 TL:common/conda-env.md:32	A:program	conda:!!!
 TL:common/conda-env.md:8	A:program	conda:!!!
 TL:common/conda-export.md:12	A:program	conda:!!!
-TL:common/conda-export.md:16	A:program,pipeline	conda:!!! environment-yaml:!!! explicit:!!! json:!!! reqs:!!! requirements:!!! txt:-!! yaml:!!! yml:-!! =not%20foundtxt:!--
+TL:common/conda-export.md:16	A:program,pipeline	conda:!!! environment-yaml:!!! explicit:!!! json:!!! reqs:!!! requirements:!!! txt:!!! yaml:!!! yml:!!!
 TL:common/conda-export.md:20	A:program	conda:!!!
 TL:common/conda-export.md:24	A:program	conda:!!!
 TL:common/conda-export.md:28	A:program	conda:!!!
@@ -14444,7 +14444,7 @@ TL:common/croc.md:16	A:program	croc:!!!
 TL:common/croc.md:20	A:program	croc:!!!
 TL:common/croc.md:24	A:program	croc:!!!
 TL:common/croc.md:28	A:program	croc:!!!
-TL:common/croc.md:32	A:program,pipeline	croc:!!! relay:!!!
+TL:common/croc.md:32	A:program,pipeline	croc:-!! relay:!!!
 TL:common/croc.md:8	A:program	croc:!!!
 TL:common/cron.md:9	A:program	tldr:!!!
 TL:common/cronic.md:8	A:program	cronic:!!!
@@ -14785,7 +14785,7 @@ TL:common/decaffeinate.md:12	A:program	decaffeinate:!!!
 TL:common/decaffeinate.md:16	A:program	decaffeinate:!!!
 TL:common/decaffeinate.md:20	A:program	decaffeinate:!!!
 TL:common/decaffeinate.md:8	A:program	decaffeinate:!!!
-TL:common/deemix.md:13	A:program,pipeline	deemix:-!! MP3:-!! =not%20foundMP3:!--
+TL:common/deemix.md:13	A:program,pipeline	deemix:!!! MP3:!!!
 TL:common/deemix.md:17	A:program	deemix:!!!
 TL:common/deemix.md:21	A:program	deemix:!!!
 TL:common/deemix.md:9	A:program	deemix:!!!
@@ -14812,7 +14812,7 @@ TL:common/deluge-console.md:36	A:program	rm:ppp
 TL:common/deluge-console.md:8	A:program	deluge-console:!!!
 TL:common/deluge.md:12	U:files/program,pipeline	deluge:!!! magnet:!!! path/to/file:!-!
 TL:common/deluge.md:16	U:files/program,pipeline	deluge:!!! web:!!! console:!!! magnet:!!! path/to/file:!-!
-TL:common/deluge.md:20	U:files/program,pipeline	deluge:-!! magnet:-!! path/to/file:!-! =not%20founddeluge:!--
+TL:common/deluge.md:20	U:files/program,pipeline	deluge:!!! magnet:!!! path/to/file:!-!
 TL:common/deluge.md:8	U:files/program,pipeline	deluge:!!! magnet:!!! path/to/file:!-!
 TL:common/deluged.md:12	A:program	deluged:!!!
 TL:common/deluged.md:16	A:program	deluged:!!!
@@ -14921,9 +14921,9 @@ TL:common/diff.md:37	A:program	diff:ppp
 TL:common/diff.md:9	A:program	diff:ppp
 TL:common/diffimg.md:8	A:program	diffimg:!!!
 TL:common/diffoscope.md:12	A:program	diffoscope:!!!
-TL:common/diffoscope.md:16	A:program,pipeline	diffoscope:!!! -:!!!
+TL:common/diffoscope.md:16	A:program,pipeline	diffoscope:-!! -:-!! =not%20found-:!--
 TL:common/diffoscope.md:20	A:program	diffoscope:!!!
-TL:common/diffoscope.md:24	A:program,pipeline	diffoscope:!!! yes:ppp no:-!! recursive:!!!
+TL:common/diffoscope.md:24	A:program,pipeline	diffoscope:!!! yes:ppp no:!!! recursive:!!!
 TL:common/diffoscope.md:8	A:program	diffoscope:!!!
 TL:common/diffstat.md:12	A:program,pipeline	diff:ppp diffstat:!!!
 TL:common/diffstat.md:8	A:program,pipeline	diff:ppp diffstat:!!!
@@ -14936,7 +14936,7 @@ TL:common/difft.md:33	A:program	difft:!!!
 TL:common/difft.md:9	A:program	difft:!!!
 TL:common/dig.md:13	A:program	dig:!!!
 TL:common/dig.md:17	A:program,pipeline	dig:!!! MX:!!! TXT:!!! CNAME:!!! NS:!!!
-TL:common/dig.md:21	A:program,pipeline	dig:!!! 8.8.8.8:-!! 9.9.9.9:-!! ...:!!! =not%20found9.9.9.9:!--
+TL:common/dig.md:21	A:program,pipeline	dig:!!! 8.8.8.8:!!! 9.9.9.9:!!! ...:!!!
 TL:common/dig.md:25	A:program	dig:!!!
 TL:common/dig.md:29	A:program	dig:!!!
 TL:common/dig.md:33	A:program	dig:!!!
@@ -15008,7 +15008,7 @@ TL:common/dlv.md:28	A:program	dlv:!!!
 TL:common/dlv.md:8	A:program	dlv:!!!
 TL:common/dmd.md:12	A:program	dmd:!!!
 TL:common/dmd.md:16	A:program,pipeline	dmd:!!! safeonly:!!! off:!!!
-TL:common/dmd.md:20	U:files,name,interactive/program,pipeline	dmd:!!! help:!-- ? =%3F:!!!
+TL:common/dmd.md:20	U:files,name,interactive/program,pipeline	dmd:-!! help ? =%3F:!!! =not%20founddmd:!--
 TL:common/dmd.md:24	A:program	dmd:!!!
 TL:common/dmd.md:8	A:program	dmd:!!!
 TL:common/dmypy.md:13	A:program	dmypy:!!!
@@ -15616,7 +15616,7 @@ TL:common/dotnet-restore.md:8	A:program	dotnet:!!!
 TL:common/dotnet-run.md:12	A:program	dotnet:!!!
 TL:common/dotnet-run.md:16	A:program	dotnet:!!!
 TL:common/dotnet-run.md:20	A:program	dotnet:!!!
-TL:common/dotnet-run.md:24	A:program,pipeline	dotnet:!!! x64:-!! arm:!!! arm64:!!! win7:!!! osx:!!! linux:!!! ios:-!! android:!!! =not%20foundx64:!--
+TL:common/dotnet-run.md:24	A:program,pipeline	dotnet:!!! x64:!!! arm:!!! arm64:!!! win7:!!! osx:!!! linux:!!! ios:!!! android:!!!
 TL:common/dotnet-run.md:8	A:program	dotnet:!!!
 TL:common/dotnet-test.md:13	A:program	dotnet:!!!
 TL:common/dotnet-test.md:17	A:program	dotnet:!!!
@@ -15826,7 +15826,7 @@ TL:common/dvc.md:25	A:program	dvc:!!!
 TL:common/dvc.md:29	A:program	dvc:!!!
 TL:common/dvc.md:33	A:program	dvc:!!!
 TL:common/dvc.md:37	A:program	dvc:!!!
-TL:common/dwebp.md:13	A:program,pipeline	dwebp:!!! -tiff:!!! -pam:-!! -ppm:-!! -pgm:!!! -yuv:!!! =not%20found-pam:!--
+TL:common/dwebp.md:13	A:program,pipeline	dwebp:!!! -tiff:!!! -pam:!!! -ppm:!!! -pgm:!!! -yuv:!!!
 TL:common/dwebp.md:17	A:program	dwebp:!!!
 TL:common/dwebp.md:21	A:program	dwebp:!!!
 TL:common/dwebp.md:25	A:program	dwebp:!!!
@@ -15853,7 +15853,7 @@ TL:common/ecpg.md:12	A:program	ecpg:!!!
 TL:common/ecpg.md:16	A:program,pipeline	cat:ppp ecpg:!!!
 TL:common/ecpg.md:20	A:program	ecpg:!!!
 TL:common/ecpg.md:24	A:program	ecpg:!!!
-TL:common/ecpg.md:28	A:program,pipeline	ecpg:-!! INFORMIX_SE:!!! ORACLE:!!!
+TL:common/ecpg.md:28	A:program,pipeline	ecpg:!!! INFORMIX_SE:!!! ORACLE:!!!
 TL:common/ecpg.md:32	A:program	ecpg:!!!
 TL:common/ecpg.md:8	A:program	ecpg:!!!
 TL:common/ect.md:13	A:program	ect:!!!
@@ -16000,8 +16000,8 @@ TL:common/emulate.md:21	A:program	emulate:!!!
 TL:common/emulate.md:9	A:program	emulate:!!!
 TL:common/emulator.md:12	A:program	emulator:!!!
 TL:common/emulator.md:16	A:program,pipeline	emulator:!!! emulated:!!! webcamN:!!!
-TL:common/emulator.md:20	A:program,pipeline	emulator:!!! hscsd:!!! gprs:!!! edge:!!! hsdpa:!!! lte:!!! evdo:!!! full:!!!
-TL:common/emulator.md:24	A:program,pipeline	emulator:!!! hscsd:-!! gprs:!!! edge:!!! hsdpa:!!! lte:-!! evdo:!!! none:!!! =not%20foundhscsd:!--
+TL:common/emulator.md:20	A:program,pipeline	emulator:!!! hscsd:!!! gprs:!!! edge:!!! hsdpa:-!! lte:-!! evdo:!!! full:!!! =not%20foundhsdpa:!--
+TL:common/emulator.md:24	A:program,pipeline	emulator:!!! hscsd:!!! gprs:!!! edge:!!! hsdpa:!!! lte:!!! evdo:!!! none:!!!
 TL:common/emulator.md:28	A:program	emulator:!!!
 TL:common/emulator.md:32	A:program	emulator:!!!
 TL:common/emulator.md:36	A:program	emulator:!!!
@@ -16046,7 +16046,7 @@ TL:common/envsubst.md:21	U:files/program	envsubst
 TL:common/envsubst.md:9	A:program,pipeline	echo envsubst:!!!
 TL:common/eol.md:12	A:program	eol:!!!
 TL:common/eol.md:16	A:program	eol:!!!
-TL:common/eol.md:20	A:program,pipeline	eol:-!! json:!!! md:!!! markdown:!!! pretty:-!! rst:!!! csv:!!! tsv:!!! yaml:!!! =not%20foundeol:!--
+TL:common/eol.md:20	A:program,pipeline	eol:!!! json:-!! md:!!! markdown:!!! pretty:!!! rst:-!! csv:!!! tsv:!!! yaml:-!! =not%20foundyaml:!--
 TL:common/eol.md:24	U:files/program	eol:!!!
 TL:common/eol.md:28	A:program	eol:!!!
 TL:common/eol.md:8	A:program	eol:!!!
@@ -16135,7 +16135,6 @@ TL:common/exa.md:26	A:program	exa:!!!
 TL:common/exa.md:30	A:program	exa:!!!
 TL:common/exa.md:34	A:program	exa:!!!
 TL:common/exa.md:38	A:program	exa:!!!
-TL:common/exec.md:8	A:program	command:!--
 TL:common/exenv.md:12	A:program	exenv:!!!
 TL:common/exenv.md:16	A:program	exenv:!!!
 TL:common/exenv.md:20	A:program	exenv:!!!
@@ -16283,7 +16282,7 @@ TL:common/fakedata.md:16	A:program,pipeline	fakedata:!!! tab:!!! sql:!!!
 TL:common/fakedata.md:20	A:program	fakedata:!!!
 TL:common/fakedata.md:24	A:program,pipeline,echo	echo fakedata:!!!
 TL:common/fakedata.md:8	A:program	fakedata:!!!
-TL:common/faker.md:12	A:program,pipeline	faker:!!! address:!!! passport_full:!!! credit_card_full:!!! phone_number:!!! email:!!! company:!!! date_time:-!! user_name:!!! password:!!! job:!!! ...:!!!
+TL:common/faker.md:12	A:program,pipeline	faker:!!! address:!!! passport_full:-!! credit_card_full:!!! phone_number:-!! email:!!! company:!!! date_time:!!! user_name:!!! password:!!! job:!!! ...:!!! =not%20foundpassport_full:!--
 TL:common/faker.md:16	A:program,pipeline	faker:!!! de_CH:!!! ...:!!!
 TL:common/faker.md:20	A:program,pipeline	faker:!!! en_US:!!! ...:!!!
 TL:common/faker.md:24	A:program	faker:!!!
@@ -16577,7 +16576,7 @@ TL:common/fj.md:28	A:program	fj:!!!
 TL:common/fj.md:32	A:program	fj:!!!
 TL:common/fj.md:36	A:program	fj:!!!
 TL:common/fj.md:8	A:program	fj:!!!
-TL:common/fkill.md:12	A:program,pipeline	fkill:-!! process_name:!!! %3Aport
+TL:common/fkill.md:12	A:program,pipeline	fkill:!!! process_name:!!! %3Aport
 TL:common/fkill.md:8	A:program	fkill:!!!
 TL:common/flac.md:12	A:program	flac:!!!
 TL:common/flac.md:16	A:program	flac:!!!
@@ -16697,7 +16696,7 @@ TL:common/flux-uninstall.md:16	A:program	flux:!!!
 TL:common/flux-uninstall.md:20	A:program	flux:!!!
 TL:common/flux-uninstall.md:24	A:program	flux:!!!
 TL:common/flux-uninstall.md:8	A:program	flux:!!!
-TL:common/flux.md:12	A:program,pipeline	flux:-!! gitlab:-!! =not%20foundgitlab:!--
+TL:common/flux.md:12	A:program,pipeline	flux:!!! gitlab:!!!
 TL:common/flux.md:20	A:program	flux:!!!
 TL:common/flux.md:24	A:program	flux:!!!
 TL:common/flux.md:28	A:program	flux:!!!
@@ -16850,7 +16849,7 @@ TL:common/frpc.md:9	A:program	frpc:!!!
 TL:common/frps.md:13	A:program	frps:!!!
 TL:common/frps.md:17	A:program	frps:!!!
 TL:common/frps.md:21	A:program	frps:!!!
-TL:common/frps.md:25	A:program,pipeline	frps:!!! fish:!!! powershell:!!! zsh:!!!
+TL:common/frps.md:25	A:program,pipeline	frps:-!! fish:!!! powershell:-!! zsh:!!! =not%20foundfrps:!--
 TL:common/frps.md:29	A:program	frps:!!!
 TL:common/frps.md:9	A:program	frps:!!!
 TL:common/fselect.md:12	A:program	fselect:!!!
@@ -16949,7 +16948,7 @@ TL:common/gatsby.md:8	A:program	gatsby:!!!
 TL:common/gau.md:12	A:program	gau:!!!
 TL:common/gau.md:16	U:files/program	gau
 TL:common/gau.md:20	A:program	gau:!!!
-TL:common/gau.md:24	A:program,pipeline	gau:-!! commoncrawl:!!! otx:-!! urlscan:!!! =not%20foundotx:!--
+TL:common/gau.md:24	A:program,pipeline	gau:!!! commoncrawl:!!! otx:!!! urlscan:!!!
 TL:common/gau.md:28	A:program	gau:!!!
 TL:common/gau.md:32	A:program	gau:!!!
 TL:common/gau.md:8	A:program	gau:!!!
@@ -17173,7 +17172,7 @@ TL:common/gemini.md:16	A:program	gemini:!!!
 TL:common/gemini.md:20	A:program	gemini:!!!
 TL:common/gemini.md:24	A:program	gemini:!!!
 TL:common/gemini.md:28	A:program,pipeline	gemini:!!! auto_edit:!!! yolo:!!! plan:!!!
-TL:common/gemini.md:32	A:program,pipeline	gemini:-!! index:!!! session_id:-!! =not%20foundsession_id:!--
+TL:common/gemini.md:32	A:program,pipeline	gemini:!!! index:!!! session_id:!!!
 TL:common/gemini.md:8	A:program	gemini:!!!
 TL:common/gemtopbm.md:8	A:program	tldr:!!!
 TL:common/gemtopnm.md:12	A:program	gemtopnm:!!!
@@ -17497,7 +17496,7 @@ TL:common/gh-variable.md:36	A:program	gh:ppp
 TL:common/gh-variable.md:8	A:program	gh:ppp
 TL:common/gh-workflow.md:12	A:program,pipeline	gh:ppp workflow_name:!!! filename.yml:!!!
 TL:common/gh-workflow.md:16	A:program,pipeline	gh:ppp workflow_name:!!! filename.yml:!!!
-TL:common/gh-workflow.md:20	A:program,pipeline	gh:ppp workflow_name:!!! filename.yml:-!! tag_name:-!! =not%20foundfilename.yml:!--
+TL:common/gh-workflow.md:20	A:program,pipeline	gh:ppp workflow_name:!!! filename.yml:!!! tag_name:!!!
 TL:common/gh-workflow.md:24	A:program	gh:ppp
 TL:common/gh-workflow.md:28	A:program,pipeline	gh:ppp workflow_name:!!! filename.yml:!!!
 TL:common/gh-workflow.md:32	A:program,pipeline	echo gh:ppp workflow_name:!!! filename.yml:!!! tag_name:!!!
@@ -17855,7 +17854,7 @@ TL:common/git-extras.md:16	A:program	git:ppp
 TL:common/git-extras.md:8	A:program	git:ppp
 TL:common/git-fame.md:12	A:program	git:ppp
 TL:common/git-fame.md:16	A:program	git:ppp
-TL:common/git-fame.md:20	A:program,pipeline	git:ppp yaml:!!! json:!!! csv:!!! tsv:!!!
+TL:common/git-fame.md:20	A:program,pipeline	git:ppp yaml:!!! json:-!! csv:!!! tsv:-!! =not%20foundtsv:!--
 TL:common/git-fame.md:24	A:program	git:ppp
 TL:common/git-fame.md:28	A:program	git:ppp
 TL:common/git-fame.md:32	A:program	git:ppp
@@ -17939,7 +17938,7 @@ TL:common/git-guilt.md:25	A:program	git:ppp
 TL:common/git-guilt.md:29	A:program	git:ppp
 TL:common/git-guilt.md:9	A:program	git:ppp
 TL:common/git-hash-object.md:12	A:program	git:ppp
-TL:common/git-hash-object.md:16	A:program,pipeline	git:ppp commit:!!! tag:!!! tree:!!!
+TL:common/git-hash-object.md:16	A:program,pipeline	git:ppp commit:-!! tag:-!! tree:!!! =not%20foundcommit:!--
 TL:common/git-hash-object.md:20	A:program,pipeline	cat:ppp git:ppp
 TL:common/git-hash-object.md:8	A:program	git:ppp
 TL:common/git-help.md:12	A:program	git:ppp
@@ -18448,7 +18447,7 @@ TL:common/gitsome.md:21	A:program	gh:ppp
 TL:common/gitsome.md:25	A:program	gh:ppp
 TL:common/gitsome.md:29	A:program	gh:ppp
 TL:common/gitsome.md:9	A:program	gitsome:!!!
-TL:common/gitstats.md:12	A:program,pipeline	Invoke-Item:!!! open:!!! xdg-open:!!!
+TL:common/gitstats.md:12	A:program,pipeline	Invoke-Item:-!! open:-!! xdg-open:!!! =not%20foundInvoke-Item:!--
 TL:common/gitstats.md:16	A:program	gitstats:!!!
 TL:common/gitstats.md:8	A:program	gitstats:!!!
 TL:common/gitui.md:13	A:program	gitui:!!!
@@ -18760,7 +18759,7 @@ TL:common/gopass.md:20	A:program	gopass:!!!
 TL:common/gopass.md:24	A:program	gopass:!!!
 TL:common/gopass.md:28	A:program	gopass:!!!
 TL:common/gopass.md:32	A:program	gopass:!!!
-TL:common/gopass.md:36	U:files/program,pipeline	gopass:-!! path/to/directory:--! email@email.com:!!! =not%20foundpath/to/directory:!--
+TL:common/gopass.md:36	U:files/program,pipeline	gopass:!!! path/to/directory:!-! email@email.com:!!!
 TL:common/gopass.md:8	A:program	gopass:!!!
 TL:common/gopls.md:12	A:program	gopls:!!!
 TL:common/gopls.md:16	A:program	gopls:!!!
@@ -18955,7 +18954,7 @@ TL:common/gron.md:20	A:program,pipeline	gron:!!! url:!!!
 TL:common/gron.md:24	A:program,pipeline	gron:!!! url:!!!
 TL:common/gron.md:28	A:program,pipeline	gron:!!! url:!!!
 TL:common/gron.md:32	A:program,pipeline	gron:!!! url:!!!
-TL:common/gron.md:8	A:program,pipeline	gron:-!! url:-!! =not%20foundgron:!--
+TL:common/gron.md:8	A:program,pipeline	gron:!!! url:!!!
 TL:common/groups.md:13	A:program	groups:ppp
 TL:common/groups.md:9	A:program	groups:ppp
 TL:common/grpcurl.md:13	A:program,passthrough(vars)	grpcurl:!!!
@@ -18993,7 +18992,7 @@ TL:common/gst-inspect-1.0.md:32	A:program,pipeline	gst-inspect-1.0:!!! jpeg:!!! 
 TL:common/gst-inspect-1.0.md:36	A:program	gst-inspect-1.0:!!!
 TL:common/gst-inspect-1.0.md:8	A:program	gst-inspect-1.0:!!!
 TL:common/gst-launch-1.0-audiomixer.md:8	A:program	gst-launch-1.0:!!!
-TL:common/gst-launch-1.0-audiotestsrc.md:12	A:program,pipeline	gst-launch-1.0:!!! square:!!! saw:!!! white-noise:!!! pink-noise:!!! ticks:!!! ...:!!!
+TL:common/gst-launch-1.0-audiotestsrc.md:12	A:program,pipeline	gst-launch-1.0:-!! square:-!! saw:!!! white-noise:!!! pink-noise:!!! ticks:!!! ...:!!! =not%20foundgst-launch-1.0:!--
 TL:common/gst-launch-1.0-audiotestsrc.md:8	A:program	gst-launch-1.0:!!!
 TL:common/gst-launch-1.0-capsfilter.md:12	A:program	gst-launch-1.0:!!!
 TL:common/gst-launch-1.0-capsfilter.md:16	A:program	gst-launch-1.0:!!!
@@ -19036,7 +19035,7 @@ TL:common/gst-launch-1.0.md:25	A:program	gst-launch-1.0:!!!
 TL:common/gst-launch-1.0.md:29	A:program	gst-launch-1.0:!!!
 TL:common/gst-launch-1.0.md:33	A:program	gst-launch-1.0:!!!
 TL:common/gst-launch-1.0.md:37	A:program	gst-launch-1.0:!!!
-TL:common/gst-play-1.0.md:8	A:program,pipeline	gst-play-1.0:-!! directory1:!!! uri1:!!! directory2:!!! uri2:-!!
+TL:common/gst-play-1.0.md:8	A:program,pipeline	gst-play-1.0:!!! directory1:!!! uri1:!!! directory2:!!! uri2:!!!
 TL:common/gst-transcoder-1.0.md:12	A:program	gst-transcoder-1.0:!!!
 TL:common/gst-transcoder-1.0.md:8	A:program	gst-transcoder-1.0:!!!
 TL:common/gst-typefind-1.0.md:8	A:program	gst-typefind-1.0:!!!
@@ -19078,7 +19077,7 @@ TL:common/gulp.md:17	A:program	gulp:!!!
 TL:common/gulp.md:9	A:program	gulp:!!!
 TL:common/gum.md:13	A:program	gum:!!!
 TL:common/gum.md:17	A:program,passthrough(prog-status)	gum:!!! echo
-TL:common/gum.md:21	A:program,pipeline	gum:!!! line:!!! minidot:!!! jump:!!! pulse:!!! points:!!! globe:!!! moon:!!! monkey:!!! meter:!!! hamburger:!!!
+TL:common/gum.md:21	A:program,pipeline	gum:!!! line:!!! minidot:!!! jump:-!! pulse:!!! points:!!! globe:!!! moon:-!! monkey:!!! meter:!!! hamburger:!!! =not%20foundjump:!--
 TL:common/gum.md:25	A:program	gum:!!!
 TL:common/gum.md:29	U:files/program	gum
 TL:common/gum.md:9	A:program	gum:!!!
@@ -19103,7 +19102,7 @@ TL:common/gv2gml.md:9	A:program	gv2gml:!!!
 TL:common/gv2gxl.md:13	U:files/program,pipeline	cat:ppp gv2gxl:!!!
 TL:common/gv2gxl.md:17	A:program,passthrough(files),splitglob	gv2gxl:!!!
 TL:common/gv2gxl.md:9	A:program	gv2gxl:!!!
-TL:common/gvcolor.md:13	U:files/program,pipeline	dot:!!! gvcolor:-!!
+TL:common/gvcolor.md:13	U:files/program,pipeline	dot:-!! gvcolor:-!! =not%20foundgvcolor:!--
 TL:common/gvcolor.md:17	A:program,passthrough(files),splitglob	gvcolor:!!!
 TL:common/gvcolor.md:9	U:files/program	gvcolor
 TL:common/gvedit.md:12	A:program	gvedit:!!!
@@ -19146,7 +19145,7 @@ TL:common/gzip.md:32	U:files/program	gzip
 TL:common/gzip.md:36	A:program	gzip:ppp
 TL:common/gzip.md:8	A:program	gzip:ppp
 TL:common/hadolint.md:12	A:program	hadolint:!!!
-TL:common/hadolint.md:16	A:program,pipeline	hadolint:!!! json:!!! checkstyle:!!! codeclimate:!!! codacy:!!!
+TL:common/hadolint.md:16	A:program,pipeline	hadolint:-!! json:-!! checkstyle:!!! codeclimate:!!! codacy:!!! =not%20foundhadolint:!--
 TL:common/hadolint.md:20	A:program	hadolint:!!!
 TL:common/hadolint.md:24	A:program	hadolint:!!!
 TL:common/hadolint.md:8	A:program	hadolint:!!!
@@ -19421,7 +19420,7 @@ TL:common/hledger-print.md:24	A:program	hledger:!!!
 TL:common/hledger-print.md:28	A:program	hledger:!!!
 TL:common/hledger-print.md:32	A:program	hledger:!!!
 TL:common/hledger-print.md:8	A:program	hledger:!!!
-TL:common/hledger-ui.md:12	A:program,pipeline	hledger-ui:!!! greenterm:-!! dark:-!! =not%20foundgreenterm:!--
+TL:common/hledger-ui.md:12	A:program,pipeline	hledger-ui:!!! greenterm:!!! dark:!!!
 TL:common/hledger-ui.md:16	A:program	hledger-ui:!!!
 TL:common/hledger-ui.md:20	A:program	hledger-ui:!!!
 TL:common/hledger-ui.md:24	A:program	hledger-ui:!!!
@@ -19502,7 +19501,7 @@ TL:common/html5validator.md:12	A:program	html5validator:!!!
 TL:common/html5validator.md:16	A:program	html5validator:!!!
 TL:common/html5validator.md:20	A:program	html5validator:!!!
 TL:common/html5validator.md:24	A:program	html5validator:!!!
-TL:common/html5validator.md:28	A:program,pipeline	html5validator:-!! xml:!!! json:-!! text:!!! =not%20foundhtml5validator:!--
+TL:common/html5validator.md:28	A:program,pipeline	html5validator:!!! xml:!!! json:!!! text:!!!
 TL:common/html5validator.md:32	A:program,pipeline	html5validator:!!! info:!!! warning:!!!
 TL:common/html5validator.md:8	A:program	html5validator:!!!
 TL:common/htmlq.md:12	A:program,pipeline	cat:ppp htmlq:!!!
@@ -19561,7 +19560,7 @@ TL:common/httprobe.md:16	A:program,pipeline	cat:ppp httprobe:!!!
 TL:common/httprobe.md:20	A:program	httprobe:!!!
 TL:common/httprobe.md:8	A:program,pipeline	cat:ppp httprobe:!!!
 TL:common/httpry.md:13	A:program	httpry:!!!
-TL:common/httpry.md:17	A:program,pipeline	httpry:!!! post:!!! put:!!! head:ppp options:!!! delete:!!! trace:!!! connect:!!! patch:ppp
+TL:common/httpry.md:17	A:program,pipeline	httpry:!!! post:-!! put:-!! head:ppp options:!!! delete:!!! trace:!!! connect:!!! patch:ppp =not%20foundput:!--
 TL:common/httpry.md:21	A:program	httpry:!!!
 TL:common/httpry.md:25	A:program	httpry:!!!
 TL:common/httpry.md:9	A:program	httpry:!!!
@@ -20114,7 +20113,7 @@ TL:common/javap.md:20	A:program	javap:ppp
 TL:common/javap.md:8	A:program	javap:ppp
 TL:common/jbang.md:13	A:program	jbang:!!!
 TL:common/jbang.md:17	A:program	jbang:!!!
-TL:common/jbang.md:21	A:program,pipeline	jbang:!!! code:!!! eclipse:!!! idea:!!! netbeans:!!! gitpod:!!!
+TL:common/jbang.md:21	A:program,pipeline	jbang:!!! code:!!! eclipse:-!! idea:-!! netbeans:!!! gitpod:!!! =not%20foundidea:!--
 TL:common/jbang.md:25	A:program,pipeline	echo jbang:!!!
 TL:common/jbang.md:29	A:program	jbang:!!!
 TL:common/jbang.md:33	A:program	jbang:!!!
@@ -20800,7 +20799,7 @@ TL:common/kdenlive.md:24	A:program	kdenlive:!!!
 TL:common/kdenlive.md:28	A:program	kdenlive:!!!
 TL:common/kdenlive.md:8	A:program	kdenlive:!!!
 TL:common/kdig.md:12	A:program	kdig:!!!
-TL:common/kdig.md:16	A:program,pipeline	kdig:!!! AAAA:!!! NS:!!! SOA:!!! DNSKEY:!!! ANY:!!!
+TL:common/kdig.md:16	A:program,pipeline	kdig:-!! AAAA:!!! NS:!!! SOA:!!! DNSKEY:-!! ANY:!!! =not%20foundkdig:!--
 TL:common/kdig.md:20	A:program	kdig:!!!
 TL:common/kdig.md:24	A:program	kdig:!!!
 TL:common/kdig.md:8	A:program	kdig:!!!
@@ -21082,7 +21081,7 @@ TL:common/kubectl-config.md:14	A:program,pipeline	kubectl:!!! get-contexts:!!! g
 TL:common/kubectl-config.md:18	A:program	kubectl:!!!
 TL:common/kubectl-config.md:22	A:program	kubectl:!!!
 TL:common/kubectl-config.md:26	A:program	kubectl:!!!
-TL:common/kubectl-config.md:30	A:program,pipeline	kubectl:-!! delete-context:!!! delete-user:!!! context:!!! user:!!!
+TL:common/kubectl-config.md:30	A:program,pipeline	kubectl:!!! delete-context:!!! delete-user:!!! context:!!! user:!!!
 TL:common/kubectl-config.md:34	S	export
 TL:common/kubectl-cordon.md:13	A:program	kubectl:!!!
 TL:common/kubectl-cordon.md:17	A:program	kubectl:!!!
@@ -21212,7 +21211,7 @@ TL:common/kubectl-rollout.md:16	A:program	kubectl:!!!
 TL:common/kubectl-rollout.md:20	A:program	kubectl:!!!
 TL:common/kubectl-rollout.md:8	A:program	kubectl:!!!
 TL:common/kubectl-run.md:13	A:program	kubectl:!!!
-TL:common/kubectl-run.md:17	A:program,pipeline	kubectl:-!! server:-!! client:!!!
+TL:common/kubectl-run.md:17	A:program,pipeline	kubectl:!!! server:!!! client:!!!
 TL:common/kubectl-run.md:21	A:program,path-system	kubectl:!!!
 TL:common/kubectl-run.md:25	A:program	kubectl:!!!
 TL:common/kubectl-run.md:9	A:program	kubectl:!!!
@@ -21282,7 +21281,7 @@ TL:common/kubie.md:20	A:program	kubie:!!!
 TL:common/kubie.md:24	A:program	kubie:!!!
 TL:common/kubie.md:28	A:program	kubie:!!!
 TL:common/kubie.md:8	A:program	kubie:!!!
-TL:common/kustomize.md:12	A:program,pipeline	kustomize:-!! kubectl:-!! =not%20foundkubectl:!--
+TL:common/kustomize.md:12	A:program,pipeline	kustomize:!!! kubectl:!!!
 TL:common/kustomize.md:16	A:program	kustomize:!!!
 TL:common/kustomize.md:20	A:program	kustomize:!!!
 TL:common/kustomize.md:8	A:program	kustomize:!!!
@@ -21494,7 +21493,7 @@ TL:common/linode-cli-domains.md:12	A:program,pipeline	linode-cli:!!! slave:!!!
 TL:common/linode-cli-domains.md:16	A:program	linode-cli:!!!
 TL:common/linode-cli-domains.md:20	A:program	linode-cli:!!!
 TL:common/linode-cli-domains.md:24	A:program	linode-cli:!!!
-TL:common/linode-cli-domains.md:28	A:program,pipeline	linode-cli:!!! AAAA:!!! CNAME:!!! MX:!!! ...:!!!
+TL:common/linode-cli-domains.md:28	A:program,pipeline	linode-cli:!!! AAAA:-!! CNAME:-!! MX:!!! ...:!!! =not%20foundAAAA:!--
 TL:common/linode-cli-domains.md:32	A:program	linode-cli:!!!
 TL:common/linode-cli-domains.md:36	A:program	linode-cli:!!!
 TL:common/linode-cli-domains.md:8	A:program	linode-cli:!!!
@@ -21949,7 +21948,7 @@ TL:common/magick.md:30	A:program,passthrough(files),splitglob	magick:!!!
 TL:common/magick.md:34	A:program	magick:!!!
 TL:common/magick.md:38	A:program,passthrough(files),splitglob	magick:!!!
 TL:common/maigret.md:10	A:program	maigret:!!!
-TL:common/maigret.md:14	A:program,pipeline	maigret:!!! --csv:!!! --html:!!! --xmind:!!! --pdf:!!! --graph:!!! --json:!!!
+TL:common/maigret.md:14	A:program,pipeline	maigret:!!! --csv:-!! --html:!!! --xmind:-!! --pdf:!!! --graph:-!! --json:!!! =not%20found--graph:!-- =not%20found--json:!--
 TL:common/maigret.md:18	U:files/program,pipeline	maigret:!!! http%3A//127.0.0.1%3A8080
 TL:common/maigret.md:22	A:program	maigret:!!!
 TL:common/maigret.md:26	A:program	maigret:!!!
@@ -22033,7 +22032,7 @@ TL:common/marimo.md:13	A:program	marimo:!!!
 TL:common/marimo.md:17	A:program	marimo:!!!
 TL:common/marimo.md:21	A:program	marimo:!!!
 TL:common/marimo.md:25	A:program,pipeline	marimo:!!! components:!!! dataflow:!!! io:!!!
-TL:common/marimo.md:29	A:program,pipeline	marimo:!!! run:!!! tutorial:-!! config:-!! new:!!! ...:!!! =not%20foundtutorial:!--
+TL:common/marimo.md:29	A:program,pipeline	marimo:-!! run:!!! tutorial:!!! config:!!! new:!!! ...:-!! =not%20foundmarimo:!--
 TL:common/marimo.md:9	A:program	marimo:!!!
 TL:common/markdown2pdf.md:12	A:program	markdown2pdf:!!!
 TL:common/markdown2pdf.md:16	A:program	markdown2pdf:!!!
@@ -22087,7 +22086,7 @@ TL:common/mcfly.md:17	A:program	mcfly:!!!
 TL:common/mcfly.md:21	A:program	mcfly:!!!
 TL:common/mcfly.md:25	A:program	mcfly:!!!
 TL:common/mcfly.md:29	A:program	mcfly:!!!
-TL:common/mcfly.md:9	A:program,pipeline	mcfly:-!! fish:!!! zsh:-!! =not%20foundzsh:!--
+TL:common/mcfly.md:9	A:program,pipeline	mcfly:!!! fish:!!! zsh:!!!
 TL:common/mcopy.md:10	A:program	mcopy:!!!
 TL:common/mcopy.md:14	A:program	mcopy:!!!
 TL:common/mcopy.md:18	A:program	mcopy:!!!
@@ -22123,7 +22122,7 @@ TL:common/mdp.md:8	A:program	mdp:!!!
 TL:common/mediainfo.md:12	A:program	mediainfo:!!!
 TL:common/mediainfo.md:16	A:program	mediainfo:!!!
 TL:common/mediainfo.md:8	A:program	mediainfo:!!!
-TL:common/medusa.md:12	A:program,pipeline	medusa:!!! http:!!! web-form:!!! postgres:!!! ftp:!!! mysql:!!! ...:!!!
+TL:common/medusa.md:12	A:program,pipeline	medusa:-!! http:-!! web-form:-!! postgres:!!! ftp:!!! mysql:!!! ...:!!! =not%20foundhttp:!--
 TL:common/medusa.md:16	A:program	medusa:!!!
 TL:common/medusa.md:20	A:program	medusa:!!!
 TL:common/medusa.md:24	A:program	medusa:!!!
@@ -22191,7 +22190,7 @@ TL:common/mh_lint.md:9	A:program	mh_lint:!!!
 TL:common/mh_metric.md:12	A:program	mh_metric:!!!
 TL:common/mh_metric.md:16	A:program	mh_metric:!!!
 TL:common/mh_metric.md:20	A:program	mh_metric:!!!
-TL:common/mh_metric.md:24	A:program,pipeline	mh_metric:-!! json:-!!
+TL:common/mh_metric.md:24	A:program,pipeline	mh_metric:!!! json:!!!
 TL:common/mh_metric.md:8	A:program	mh_metric:!!!
 TL:common/micro.md:9	A:program	micro:!!!
 TL:common/micromamba.md:13	A:program,path-absent	micromamba:!!!
@@ -22299,7 +22298,7 @@ TL:common/mitmproxy.md:13	A:program	mitmproxy:!!!
 TL:common/mitmproxy.md:17	A:program	mitmproxy:!!!
 TL:common/mitmproxy.md:21	A:program	mitmproxy:!!!
 TL:common/mitmproxy.md:25	A:program,pipeline	mitmproxy:!!! transparent:!!! socks5:!!! ...:!!!
-TL:common/mitmproxy.md:29	A:program,pipeline	mitmproxy:!!! single:!!! vertical:!!!
+TL:common/mitmproxy.md:29	A:program,pipeline	mitmproxy:-!! single:-!! vertical:!!! =not%20foundmitmproxy:!--
 TL:common/mitmproxy.md:33	A:program	mitmproxy:!!!
 TL:common/mitmproxy.md:37	A:program	mitmproxy:!!!
 TL:common/mitmproxy.md:9	A:program	mitmproxy:!!!
@@ -22374,7 +22373,7 @@ TL:common/mmdblookup.md:16	A:program	mmdblookup:!!!
 TL:common/mmdblookup.md:20	A:program	mmdblookup:!!!
 TL:common/mmdblookup.md:24	A:program	mmdblookup:!!!
 TL:common/mmdblookup.md:8	A:program	mmdblookup:!!!
-TL:common/mmdc.md:13	A:program,pipeline	mmdc:!!! dark:!!! neutral:!!! default:!!!
+TL:common/mmdc.md:13	A:program,pipeline	mmdc:!!! dark:-!! neutral:-!! default:!!! =not%20foundneutral:!--
 TL:common/mmdc.md:17	A:program	mmdc:!!!
 TL:common/mmdc.md:9	A:program	mmdc:!!!
 TL:common/mmls.md:12	A:program	mmls:!!!
@@ -22549,8 +22548,8 @@ TL:common/mpd.md:21	A:program	mpd:!!!
 TL:common/mpd.md:9	A:program	mpd:!!!
 TL:common/mpg321.md:13	A:program	mpg321:!!!
 TL:common/mpg321.md:17	A:program,pipeline	mpg321:!!! url1:!!! url2:!!!
-TL:common/mpg321.md:21	A:program,pipeline	mpg321:-!! url1:!!! url2:-!! =not%20foundurl2:!--
-TL:common/mpg321.md:25	A:program,pipeline	mpg321:-!! url1:-!! url2:!!! =not%20foundurl1:!--
+TL:common/mpg321.md:21	A:program,pipeline	mpg321:!!! url1:!!! url2:!!!
+TL:common/mpg321.md:25	A:program,pipeline	mpg321:!!! url1:!!! url2:!!!
 TL:common/mpg321.md:29	A:program	mpg321:!!!
 TL:common/mpg321.md:9	A:program,pipeline	mpg321:!!! url1:!!! url2:!!!
 TL:common/mpic++.md:13	A:program	mpic%2B%2B:!!!
@@ -22976,7 +22975,7 @@ TL:common/netperf.md:21	A:program,pipeline	netperf:!!! 6:!!!
 TL:common/netperf.md:9	A:program	netperf:!!!
 TL:common/netserver.md:13	A:program	netserver:!!!
 TL:common/netserver.md:17	A:program	netserver:!!!
-TL:common/netserver.md:21	A:program,pipeline	netserver:-!! 6:-!! =not%20found6:!--
+TL:common/netserver.md:21	A:program,pipeline	netserver:!!! 6:!!!
 TL:common/netserver.md:9	A:program	netserver:!!!
 TL:common/netstat.md:13	A:program	netstat:!!!
 TL:common/netstat.md:17	A:program	netstat:!!!
@@ -23082,7 +23081,7 @@ TL:common/ng-new.md:12	A:program	ng:!!!
 TL:common/ng-new.md:16	A:program	ng:!!!
 TL:common/ng-new.md:20	A:program	ng:!!!
 TL:common/ng-new.md:24	A:program	ng:!!!
-TL:common/ng-new.md:28	A:program,pipeline	ng:!!! copilot:!!! cursor:!!! gemini:!!! jetbrains:!!! none:!!! windsurf:!!!
+TL:common/ng-new.md:28	A:program,pipeline	ng:!!! copilot:-!! cursor:!!! gemini:!!! jetbrains:!!! none:-!! windsurf:!!! =not%20foundnone:!--
 TL:common/ng-new.md:32	A:program	ng:!!!
 TL:common/ng-new.md:8	A:program	ng:!!!
 TL:common/ng-run.md:8	A:program,pipeline	ng:!!! serve:!!! test lint:!!! ...%3Adevelopment production:!!! ...:!!!
@@ -23381,7 +23380,7 @@ TL:common/nokogiri.md:12	U:files/program,pipeline	nokogiri:!!! path/to/file:!-! 
 TL:common/nokogiri.md:16	U:files/program,pipeline	nokogiri:!!! path/to/file:!-!
 TL:common/nokogiri.md:20	U:files/program,pipeline	nokogiri:!!! path/to/file:!-!
 TL:common/nokogiri.md:24	U:files/program,pipeline	nokogiri:!!! path/to/file:!-!
-TL:common/nokogiri.md:8	U:files/program,pipeline	nokogiri:-!! path/to/file:--! =not%20foundpath/to/file:!--
+TL:common/nokogiri.md:8	U:files/program,pipeline	nokogiri:!!! path/to/file:!-!
 TL:common/nomad.md:12	A:program	nomad:!!!
 TL:common/nomad.md:16	A:program	nomad:!!!
 TL:common/nomad.md:20	A:program	nomad:!!!
@@ -23570,7 +23569,7 @@ TL:common/npm-ls.md:28	A:program	npm:ppp
 TL:common/npm-ls.md:8	A:program	npm:ppp
 TL:common/npm-name.md:12	A:program	npm-name:!!!
 TL:common/npm-name.md:8	A:program	npm-name:!!!
-TL:common/npm-org.md:12	A:program,pipeline	npm:ppp admin:-!! owner:-!! =not%20foundowner:!--
+TL:common/npm-org.md:12	A:program,pipeline	npm:ppp admin:!!! owner:!!!
 TL:common/npm-org.md:16	A:program	npm:ppp
 TL:common/npm-org.md:20	A:program	npm:ppp
 TL:common/npm-org.md:24	A:program	npm:ppp
@@ -23874,10 +23873,10 @@ TL:common/nxc-wmi.md:12	A:program	nxc:!!!
 TL:common/nxc-wmi.md:16	A:program	nxc:!!!
 TL:common/nxc-wmi.md:20	A:program	nxc:!!!
 TL:common/nxc-wmi.md:8	A:program	nxc:!!!
-TL:common/nxc.md:13	A:program,pipeline	nxc:!!! ssh:!!! ldap:!!! ftp:!!! wmi:!!! winrm:!!! rdp:!!! vnc:!!! mssql:!!!
+TL:common/nxc.md:13	A:program,pipeline	nxc:!!! ssh:-!! ldap:!!! ftp:!!! wmi:!!! winrm:!!! rdp:!!! vnc:-!! mssql:!!! =not%20foundvnc:!--
 TL:common/nxc.md:17	A:program,pipeline	nxc:!!! ssh:!!! ldap:!!! ftp:!!! wmi:!!! winrm:!!! rdp:!!! vnc:!!! mssql:!!!
-TL:common/nxc.md:21	A:program,pipeline	nxc:!!! ssh:!!! ldap:-!! ftp:-!! wmi:!!! winrm:!!! rdp:!!! vnc:!!! mssql:!!! =not%20foundldap:!--
-TL:common/nxc.md:9	A:program,pipeline	nxc:!!! ssh:-!! ldap:!!! ftp:!!! wmi:!!! winrm:-!! rdp:!!! vnc:!!! mssql:!!! =not%20foundwinrm:!--
+TL:common/nxc.md:21	A:program,pipeline	nxc:!!! ssh:!!! ldap:!!! ftp:!!! wmi:!!! winrm:!!! rdp:!!! vnc:!!! mssql:!!!
+TL:common/nxc.md:9	A:program,pipeline	nxc:!!! ssh:!!! ldap:!!! ftp:!!! wmi:!!! winrm:!!! rdp:!!! vnc:!!! mssql:!!!
 TL:common/nxcdb.md:12	A:program	nxcdb:!!!
 TL:common/nxcdb.md:16	A:program	nxcdb:!!!
 TL:common/nxcdb.md:20	A:program	nxcdb:!!!
@@ -24017,7 +24016,7 @@ TL:common/ogrmerge.py.md:12	A:program	ogrmerge.py:!!!
 TL:common/ogrmerge.py.md:16	A:program	ogrmerge.py:!!!
 TL:common/ogrmerge.py.md:8	A:program	ogrmerge.py:!!!
 TL:common/oh-my-posh.md:12	U:prog-output,eval/program	eval oh-my-posh:!!!
-TL:common/oh-my-posh.md:16	A:program,pipeline	oh-my-posh:!!! Invoke-Expression:!!!
+TL:common/oh-my-posh.md:16	A:program,pipeline	oh-my-posh:-!! Invoke-Expression:-!! =not%20foundInvoke-Expression:!--
 TL:common/oh-my-posh.md:20	U:prog-output,eval/program	eval oh-my-posh:!!!
 TL:common/oh-my-posh.md:24	A:program	oh-my-posh:!!!
 TL:common/oh-my-posh.md:28	A:program	oh-my-posh:!!!
@@ -24180,7 +24179,7 @@ TL:common/opencode-models.md:16	A:program	opencode:!!!
 TL:common/opencode-models.md:20	A:program	opencode:!!!
 TL:common/opencode-models.md:24	A:program	opencode:!!!
 TL:common/opencode-models.md:8	A:program	opencode:!!!
-TL:common/opencode-session.md:12	A:program,pipeline	opencode:-!! json:-!! =not%20foundjson:!--
+TL:common/opencode-session.md:12	A:program,pipeline	opencode:!!! json:!!!
 TL:common/opencode-session.md:16	A:program	opencode:!!!
 TL:common/opencode-session.md:20	A:program	opencode:!!!
 TL:common/opencode-session.md:8	A:program	opencode:!!!
@@ -24291,10 +24290,10 @@ TL:common/openstack-help.md:12	A:program	openstack:!!!
 TL:common/openstack-help.md:16	A:program	openstack:!!!
 TL:common/openstack-help.md:8	A:program	openstack:!!!
 TL:common/openstack-image.md:12	A:program	openstack:!!!
-TL:common/openstack-image.md:16	A:program,pipeline	openstack:!!! --shared:!!! --all:!!!
+TL:common/openstack-image.md:16	A:program,pipeline	openstack:!!! --shared:-!! --all:-!! =not%20found--shared:!--
 TL:common/openstack-image.md:20	A:program	openstack:!!!
 TL:common/openstack-image.md:24	A:program	openstack:!!!
-TL:common/openstack-image.md:8	A:program,pipeline	openstack:!!! --shared:!!! --all:!!!
+TL:common/openstack-image.md:8	A:program,pipeline	openstack:-!! --shared:-!! --all:!!! =not%20foundopenstack:!--
 TL:common/openstack-network.md:12	A:program	openstack:!!!
 TL:common/openstack-network.md:16	A:program	openstack:!!!
 TL:common/openstack-network.md:20	A:program	openstack:!!!
@@ -24323,7 +24322,7 @@ TL:common/openstack-volume.md:13	A:program	openstack:!!!
 TL:common/openstack-volume.md:17	A:program,pipeline	openstack:!!! --non-bootable:!!!
 TL:common/openstack-volume.md:21	A:program	openstack:!!!
 TL:common/openstack-volume.md:25	A:program	openstack:!!!
-TL:common/openstack-volume.md:29	A:program,pipeline	openstack:-!! --detached:-!! --non-bootable:!!! =not%20found--detached:!--
+TL:common/openstack-volume.md:29	A:program,pipeline	openstack:!!! --detached:!!! --non-bootable:!!!
 TL:common/openstack-volume.md:9	A:program	openstack:!!!
 TL:common/openttd.md:12	A:program	openttd:!!!
 TL:common/openttd.md:16	A:program	openttd:!!!
@@ -24484,14 +24483,14 @@ TL:common/pamfile.md:12	A:program	pamfile:!!!
 TL:common/pamfile.md:16	A:program	pamfile:!!!
 TL:common/pamfile.md:8	A:program	pamfile:!!!
 TL:common/pamfix.md:13	U:files/program	pamfix
-TL:common/pamfix.md:17	U:files/program,pipeline	pamfix:-!! pbm:!!! pgm:!!! ppm:!!! =not%20foundpamfix:!--
+TL:common/pamfix.md:17	U:files/program,pipeline	pamfix:!!! pbm:!!! pgm:!!! ppm:!!!
 TL:common/pamfix.md:9	U:files/program	pamfix
 TL:common/pamfixtrunc.md:8	A:program	tldr:!!!
 TL:common/pamflip.md:12	U:files/program	pamflip
 TL:common/pamflip.md:16	U:files/program	pamflip
 TL:common/pamflip.md:20	U:files/program	pamflip
 TL:common/pamflip.md:8	U:files/program,pipeline	pamflip:!!! 180:!!! 270
-TL:common/pamfunc.md:12	U:files/program,pipeline	pamfunc:-!! ormask:!!! xormask:!!! shiftleft:-!! shiftright =not%20foundpamfunc:!--
+TL:common/pamfunc.md:12	U:files/program,pipeline	pamfunc:!!! ormask:!!! xormask:!!! shiftleft:!!! shiftright
 TL:common/pamfunc.md:8	U:files/program,pipeline	pamfunc:!!! divisor:!!! adder:!!! subtractor:!!! min:!!! max
 TL:common/pamixer.md:12	A:program	pamixer:!!!
 TL:common/pamixer.md:16	A:program	pamixer:!!!
@@ -24500,7 +24499,7 @@ TL:common/pamixer.md:24	A:program	pamixer:!!!
 TL:common/pamixer.md:28	A:program	pamixer:!!!
 TL:common/pamixer.md:32	A:program	pamixer:!!!
 TL:common/pamixer.md:8	A:program	pamixer:!!!
-TL:common/pammixinterlace.md:13	U:files/program,pipeline	pammixinterlace:-!! fir:-!! ffmpeg =not%20foundpammixinterlace:!--
+TL:common/pammixinterlace.md:13	U:files/program,pipeline	pammixinterlace:!!! fir:!!! ffmpeg
 TL:common/pammixinterlace.md:17	U:files/program	pammixinterlace
 TL:common/pammixinterlace.md:9	U:files/program	pammixinterlace
 TL:common/pamnoraw.md:7	A:program	tldr:!!!
@@ -24547,7 +24546,7 @@ TL:common/pamtotga.md:8	U:files/program	pamtotga
 TL:common/pamtotiff.md:12	U:files/program,pipeline	pamtotiff:!!! packbits:!!! lzw:!!! g3:!!! g4:!!! flate:!!! adobeflate
 TL:common/pamtotiff.md:16	U:files/program	pamtotiff
 TL:common/pamtotiff.md:8	U:files/program	pamtotiff
-TL:common/pamtouil.md:12	U:files/program,pipeline	pamtouil:-!! pam
+TL:common/pamtouil.md:12	U:files/program,pipeline	pamtouil:!!! pam
 TL:common/pamtouil.md:8	U:files/program,pipeline	pamtouil:!!! pam
 TL:common/pamtowinicon.md:12	U:files/program	pamtowinicon
 TL:common/pamtowinicon.md:16	U:files/program	pamtowinicon
@@ -24692,7 +24691,7 @@ TL:common/pbmclean.md:16	U:files/program	pbmclean
 TL:common/pbmclean.md:8	U:files/program	pbmclean
 TL:common/pbmlife.md:12	A:program	pbmlife:!!!
 TL:common/pbmlife.md:8	A:program	pbmlife:!!!
-TL:common/pbmmake.md:12	U:files/program,pipeline	pbmmake:!!! black:!!! grey
+TL:common/pbmmake.md:12	U:files/program,pipeline	pbmmake:-!! black:-!! grey =not%20foundblack:!--
 TL:common/pbmmake.md:8	U:files/program	pbmmake
 TL:common/pbmmask.md:13	U:files/program	pbmmask
 TL:common/pbmmask.md:9	U:files/program	pbmmask
@@ -24740,7 +24739,7 @@ TL:common/pbmtogem.md:9	U:files/program	pbmtogem
 TL:common/pbmtogo.md:8	U:files/program	pbmtogo
 TL:common/pbmtoicon.md:8	A:program	tldr:!!!
 TL:common/pbmtolj.md:12	U:files/program,pipeline	pbmtolj:!!! delta:!!! compress
-TL:common/pbmtolj.md:16	U:files/program,pipeline	pbmtolj:-!! 100:!!! 150:-!! 300:!!! 600 =not%20foundpbmtolj:!--
+TL:common/pbmtolj.md:16	U:files/program,pipeline	pbmtolj:-!! 100:-!! 150:!!! 300:!!! 600 =not%20foundpbmtolj:!--
 TL:common/pbmtolj.md:8	U:files/program	pbmtolj
 TL:common/pbmtomacp.md:13	U:files/program	pbmtomacp
 TL:common/pbmtomacp.md:9	U:files/program	pbmtomacp
@@ -25075,7 +25074,7 @@ TL:common/phan.md:12	A:program	phan:!!!
 TL:common/phan.md:16	A:program	phan:!!!
 TL:common/phan.md:20	A:program	phan:!!!
 TL:common/phan.md:24	A:program	phan:!!!
-TL:common/phan.md:28	A:program,pipeline	phan:!!! verbose:!!! json:!!! csv:!!! codeclimate:!!! checkstyle:!!! pylint:!!! html:!!!
+TL:common/phan.md:28	A:program,pipeline	phan:-!! verbose:!!! json:!!! csv:-!! codeclimate:!!! checkstyle:!!! pylint:!!! html:!!! =not%20foundcsv:!--
 TL:common/phan.md:32	A:program	phan:!!!
 TL:common/phan.md:8	A:program	phan:!!!
 TL:common/phing.md:12	A:program	phing:!!!
@@ -25087,7 +25086,7 @@ TL:common/phing.md:32	A:program	phing:!!!
 TL:common/phing.md:36	A:program	phing:!!!
 TL:common/phing.md:8	A:program	phing:!!!
 TL:common/phive.md:12	A:program,pipeline	phive:!!! url:!!!
-TL:common/phive.md:16	A:program,pipeline	phive:!!! url:!!!
+TL:common/phive.md:16	A:program,pipeline	phive:-!! url:-!! =not%20foundurl:!--
 TL:common/phive.md:20	A:program,pipeline	phive:!!! url:!!!
 TL:common/phive.md:24	A:program	phive:!!!
 TL:common/phive.md:28	A:program,pipeline	phive:!!! url:!!!
@@ -25202,7 +25201,7 @@ TL:common/pi1toppm.md:9	U:files/program	pi1toppm
 TL:common/pi3topbm.md:9	U:files/program	pi3topbm
 TL:common/piactl.md:12	A:program	piactl:!!!
 TL:common/piactl.md:16	A:program	piactl:!!!
-TL:common/piactl.md:20	A:program,pipeline	piactl:-!! disable:-!!
+TL:common/piactl.md:20	A:program,pipeline	piactl:!!! disable:!!!
 TL:common/piactl.md:24	A:program	piactl:!!!
 TL:common/piactl.md:28	A:program	piactl:!!!
 TL:common/piactl.md:32	A:program	piactl:!!!
@@ -25423,7 +25422,7 @@ TL:common/pip-check.md:8	A:program	pip:ppp
 TL:common/pip-config.md:12	A:program	pip:ppp
 TL:common/pip-config.md:16	A:program,pipeline	pip:ppp --user:!!! --site:!!!
 TL:common/pip-config.md:20	A:program,pipeline	pip:ppp --user:!!! --site:!!!
-TL:common/pip-config.md:24	A:program,pipeline	pip:ppp --user:-!! --site:-!! =not%20found--site:!--
+TL:common/pip-config.md:24	A:program,pipeline	pip:ppp --user:!!! --site:!!!
 TL:common/pip-config.md:28	A:program,pipeline	pip:ppp --user:!!! --site:!!!
 TL:common/pip-config.md:32	A:program,pipeline	pip:ppp --user:!!! --site:!!!
 TL:common/pip-config.md:8	A:program	pip:ppp
@@ -25558,7 +25557,7 @@ TL:common/pixterm.md:21	A:program	pixterm:!!!
 TL:common/pixterm.md:9	A:program	pixterm:!!!
 TL:common/pjtoppm.md:8	U:files/program	pjtoppm
 TL:common/pkcs11-tool.md:12	A:program	pkcs11-tool:!!!
-TL:common/pkcs11-tool.md:16	A:program,pipeline	pkcs11-tool:-!! privkey:!!! pubkey:!!! secrkey:!!! data:-!! ...:!!! =not%20founddata:!--
+TL:common/pkcs11-tool.md:16	A:program,pipeline	pkcs11-tool:!!! privkey:!!! pubkey:!!! secrkey:!!! data:!!! ...:!!!
 TL:common/pkcs11-tool.md:20	A:program,pipeline	pkcs11-tool:!!! privkey:!!! pubkey:!!! secrkey:!!! data:!!! ...:!!!
 TL:common/pkcs11-tool.md:8	A:program	pkcs11-tool:!!!
 TL:common/pkg-config.md:12	A:program	pkg-config:ppp
@@ -25743,7 +25742,7 @@ TL:common/pnmtojpeg.md:8	U:files/program	pnmtojpeg
 TL:common/pnmtopalm.md:12	U:files/program,pipeline	pnmtopalm:!!! 2:!!! 4:!!! 8:!!! 16
 TL:common/pnmtopalm.md:16	U:files/program,pipeline	pnmtopalm:!!! rle_compression:!!! packbits_compression
 TL:common/pnmtopalm.md:20	U:files/program	pnmtopalm
-TL:common/pnmtopalm.md:24	U:files/program,pipeline	pnmtopalm:!!! 108:-!! 144:!!! 216:!!! 288 =Directory%20nonexistent108:!--
+TL:common/pnmtopalm.md:24	U:files/program,pipeline	pnmtopalm:!!! 108:!!! 144:!!! 216:!!! 288
 TL:common/pnmtopalm.md:8	U:files/program	pnmtopalm
 TL:common/pnmtopclxl.md:12	U:files/program	pnmtopclxl
 TL:common/pnmtopclxl.md:16	U:files/program,pipeline	pnmtopclxl:!!! horizontal:!!! legal:!!! a3:!!! a4:!!! a5:!!! ...
@@ -25764,7 +25763,7 @@ TL:common/pnmtosgi.md:8	U:files/program	pnmtosgi
 TL:common/pnmtosir.md:8	U:files/program	pnmtosir
 TL:common/pnmtotiff.md:8	A:program	tldr:!!!
 TL:common/pnmtotiffcmyk.md:12	U:files/program,pipeline	pnmtotiffcmyk:!!! packbits:!!! lzw
-TL:common/pnmtotiffcmyk.md:16	U:files/program,pipeline	pnmtotiffcmyk:-!! lsb2msb
+TL:common/pnmtotiffcmyk.md:16	U:files/program,pipeline	pnmtotiffcmyk:!!! lsb2msb
 TL:common/pnmtotiffcmyk.md:8	U:files/program	pnmtotiffcmyk
 TL:common/pnmtoxwd.md:12	U:files/program	pnmtoxwd
 TL:common/pnmtoxwd.md:16	U:files/program	pnmtoxwd
@@ -25878,7 +25877,7 @@ TL:common/podman-run.md:36	A:program	podman:!!!
 TL:common/podman-run.md:8	A:program	podman:!!!
 TL:common/podman-save.md:13	U:files/program	podman
 TL:common/podman-save.md:17	U:files/program,pipeline	podman:!!! gzip:ppp bzip2:ppp xz:ppp zstd:!!! zstdchunked
-TL:common/podman-save.md:21	A:program,pipeline	podman:!!! zstd:!!! pv:!!! ssh:!!!
+TL:common/podman-save.md:21	A:program,pipeline	podman:-!! zstd:-!! pv:!!! ssh:!!! =not%20foundpodman:!--
 TL:common/podman-save.md:9	A:program	podman:!!!
 TL:common/podman.md:13	A:program	podman:!!!
 TL:common/podman.md:17	A:program,pipeline	podman:!!! stop:!!!
@@ -25945,7 +25944,7 @@ TL:common/poetry-new.md:12	A:program	poetry:!!!
 TL:common/poetry-new.md:16	A:program	poetry:!!!
 TL:common/poetry-new.md:20	A:program	poetry:!!!
 TL:common/poetry-new.md:24	A:program	poetry:!!!
-TL:common/poetry-new.md:28	A:program,pipeline	poetry:-!! rst:!!! txt:-!! ...:!!! =not%20foundpoetry:!--
+TL:common/poetry-new.md:28	A:program,pipeline	poetry:!!! rst:!!! txt:!!! ...:!!!
 TL:common/poetry-new.md:8	A:program	poetry:!!!
 TL:common/poetry-publish.md:12	A:program	poetry:!!!
 TL:common/poetry-publish.md:16	A:program	poetry:!!!
@@ -25993,7 +25992,7 @@ TL:common/poetry-source.md:9	A:program	poetry:!!!
 TL:common/poetry-sync.md:12	A:program,pipeline	poetry:!!! docs:!!! ...:!!!
 TL:common/poetry-sync.md:16	A:program,pipeline	poetry:!!! docs:!!! ...:!!!
 TL:common/poetry-sync.md:20	A:program	poetry:!!!
-TL:common/poetry-sync.md:24	A:program,pipeline	poetry:!!! docs:!!! ...:!!!
+TL:common/poetry-sync.md:24	A:program,pipeline	poetry:-!! docs:-!! ...:!!! =not%20founddocs:!--
 TL:common/poetry-sync.md:28	A:program	poetry:!!!
 TL:common/poetry-sync.md:32	A:program	poetry:!!!
 TL:common/poetry-sync.md:36	A:program	poetry:!!!
@@ -26065,7 +26064,7 @@ TL:common/ppmchange.md:12	U:files/program	ppmchange
 TL:common/ppmchange.md:16	U:files/program	ppmchange
 TL:common/ppmchange.md:8	U:files/program	ppmchange
 TL:common/ppmcie.md:12	U:files/program,pipeline	ppmcie:!!! ebu:!!! hdtv:!!! ntsc:!!! smpte
-TL:common/ppmcie.md:16	U:files/program,pipeline	ppmcie:!!! green:!!! blue
+TL:common/ppmcie.md:16	U:files/program,pipeline	ppmcie:-!! green:-!! blue
 TL:common/ppmcie.md:20	U:files/program	ppmcie
 TL:common/ppmcie.md:8	U:files/program	ppmcie
 TL:common/ppmcolormask.md:8	U:files/program	ppmcolormask
@@ -26077,8 +26076,8 @@ TL:common/ppmdither.md:16	U:files/program	ppmdither
 TL:common/ppmdither.md:8	U:files/program	ppmdither
 TL:common/ppmdraw.md:13	U:files/program	ppmdraw
 TL:common/ppmdraw.md:9	U:files/program	ppmdraw
-TL:common/ppmfade.md:12	U:args/program,pipeline	ppmfade:!!! spread:-!! shift relief:!!! oil:-!! ...:-!! =not%20foundoil:!--
-TL:common/ppmfade.md:16	U:args/program,pipeline	ppmfade:!!! spread:!!! shift relief:!!! oil:!!! ...:!!!
+TL:common/ppmfade.md:12	U:args/program,pipeline	ppmfade:!!! spread:!!! shift relief:!!! oil:!!! ...:!!!
+TL:common/ppmfade.md:16	U:args/program,pipeline	ppmfade:-!! spread:!!! shift relief:!!! oil:!!! ...:!!!
 TL:common/ppmfade.md:20	U:args/program,pipeline	ppmfade:!!! spread:!!! shift relief:!!! oil:!!! ...:!!!
 TL:common/ppmfade.md:8	U:args/program,pipeline	ppmfade:!!! spread:!!! shift relief:!!! oil:!!! ...:!!!
 TL:common/ppmflash.md:12	A:program	ppmflash:!!!
@@ -26146,7 +26145,7 @@ TL:common/ppmtolj.md:16	U:files/program,pipeline	ppmtolj:!!! 100:!!! 150:!!! 300
 TL:common/ppmtolj.md:8	U:files/program	ppmtolj
 TL:common/ppmtomap.md:8	A:program	tldr:!!!
 TL:common/ppmtomitsu.md:12	U:files/program,pipeline	ppmtomitsu:!!! 2:!!! 3:!!! 4
-TL:common/ppmtomitsu.md:16	U:files/program,pipeline	ppmtomitsu:!!! A4:-!! AS:-!! A4S =not%20foundAS:!--
+TL:common/ppmtomitsu.md:16	U:files/program,pipeline	ppmtomitsu:!!! A4:!!! AS:!!! A4S
 TL:common/ppmtomitsu.md:8	U:files/program	ppmtomitsu
 TL:common/ppmtompeg.md:12	A:program	ppmtompeg:!!!
 TL:common/ppmtompeg.md:16	A:program	ppmtompeg:!!!
@@ -26385,7 +26384,7 @@ TL:common/pssh.md:20	A:program	pssh:!!!
 TL:common/pssh.md:24	A:program	pssh:!!!
 TL:common/pssh.md:28	A:program	pssh:!!!
 TL:common/pssh.md:8	A:program	pssh:!!!
-TL:common/pstopnm.md:12	A:program,pipeline	pstopnm:!!! pgm:-!! ppm:!!!
+TL:common/pstopnm.md:12	A:program,pipeline	pstopnm:!!! pgm:!!! ppm:!!!
 TL:common/pstopnm.md:16	A:program	pstopnm:!!!
 TL:common/pstopnm.md:8	A:program	pstopnm:!!!
 TL:common/psysh.md:12	A:program	psysh:!!!
@@ -26633,7 +26632,7 @@ TL:common/putty.md:29	A:program	putty:!!!
 TL:common/putty.md:33	A:program	putty:!!!
 TL:common/putty.md:37	A:program	putty:!!!
 TL:common/putty.md:9	A:program	putty:!!!
-TL:common/pv.md:12	A:program,pipeline	command1:!!! pv:!!! command2:!!!
+TL:common/pv.md:12	A:program,pipeline	command1:-!! pv:!!! command2:-!! =not%20foundcommand2:!--
 TL:common/pv.md:16	U:files/program,pipeline	pv:!!! grep:ppp
 TL:common/pv.md:20	A:program	pv:!!!
 TL:common/pv.md:24	U:files/program	pv
@@ -26684,11 +26683,11 @@ TL:common/pycodestyle.md:8	A:program	pycodestyle:!!!
 TL:common/pydoc.md:12	A:program	pydoc:!!!
 TL:common/pydoc.md:16	A:program	pydoc:!!!
 TL:common/pydoc.md:8	A:program	pydoc:!!!
-TL:common/pydocstyle.md:12	U:files/program,pipeline	pydocstyle:-!! path/to/directory:--! =not%20foundpydocstyle:!--
+TL:common/pydocstyle.md:12	U:files/program,pipeline	pydocstyle:!!! path/to/directory:!-!
 TL:common/pydocstyle.md:16	U:files/program,pipeline	pydocstyle:!!! path/to/directory:!-!
-TL:common/pydocstyle.md:20	U:files/program,pipeline	pydocstyle:-!! path/to/directory:--! =not%20foundpath/to/directory:!--
-TL:common/pydocstyle.md:24	U:files/program,pipeline	pydocstyle:-!! path/to/directory:--! =not%20foundpath/to/directory:!--
-TL:common/pydocstyle.md:28	U:files/program,pipeline	pydocstyle:!!! path/to/directory:!-!
+TL:common/pydocstyle.md:20	U:files/program,pipeline	pydocstyle:!!! path/to/directory:!-!
+TL:common/pydocstyle.md:24	U:files/program,pipeline	pydocstyle:!!! path/to/directory:!-!
+TL:common/pydocstyle.md:28	U:files/program,pipeline	pydocstyle:-!! path/to/directory:--! =not%20foundpath/to/directory:!--
 TL:common/pydocstyle.md:32	U:files/program,pipeline	pydocstyle:!!! numpy:!!! google:!!! path/to/directory:!-!
 TL:common/pydocstyle.md:8	U:files/program,pipeline	pydocstyle:!!! path/to/directory:!-!
 TL:common/pyenv-virtualenv.md:12	A:program	pyenv:!!!
@@ -26826,7 +26825,7 @@ TL:common/qgis_process.md:21	A:program	qgis_process:!!!
 TL:common/qgis_process.md:25	A:program	qgis_process:!!!
 TL:common/qgis_process.md:29	A:program	qgis_process:!!!
 TL:common/qgis_process.md:33	A:program	qgis_process:!!!
-TL:common/qgis_process.md:37	A:program,pipeline	qgis_process:-!! disable:-!! =not%20foundqgis_process:!--
+TL:common/qgis_process.md:37	A:program,pipeline	qgis_process:!!! disable:!!!
 TL:common/qgis_process.md:9	A:program	qgis_process:!!!
 TL:common/qmake.md:12	A:program	qmake:!!!
 TL:common/qmake.md:16	A:program	qmake:!!!
@@ -26858,14 +26857,14 @@ TL:common/qpdf.md:20	A:program	qpdf:!!!
 TL:common/qpdf.md:24	A:program	qpdf:!!!
 TL:common/qpdf.md:28	A:program	qpdf:!!!
 TL:common/qpdf.md:8	A:program	qpdf:!!!
-TL:common/qr.md:13	A:program,pipeline	qr:-!! M:-!! Q:!!! H:!!! =not%20foundqr:!--
+TL:common/qr.md:13	A:program,pipeline	qr:!!! M:!!! Q:!!! H:!!!
 TL:common/qr.md:17	A:program,pipeline	command qr:!!!
 TL:common/qr.md:21	U:files/program	qr
 TL:common/qr.md:9	A:program	qr:!!!
 TL:common/qrencode.md:13	A:program	qrencode:!!!
 TL:common/qrencode.md:17	A:program	qrencode:!!!
 TL:common/qrencode.md:21	A:program	qrencode:!!!
-TL:common/qrencode.md:25	A:program,pipeline	qrencode:-!! m:-!! q:-!! h:-!! =not%20foundm:!-- =not%20foundq:!--
+TL:common/qrencode.md:25	A:program,pipeline	qrencode:!!! m:!!! q:!!! h:!!!
 TL:common/qrencode.md:29	A:program,pipeline	echo qrencode:!!!
 TL:common/qrencode.md:9	A:program	qrencode:!!!
 TL:common/qrttoppm.md:8	U:files/program	qrttoppm
@@ -27039,7 +27038,7 @@ TL:common/rails-new.md:20	A:program	rails:!!!
 TL:common/rails-new.md:24	A:program	rails:!!!
 TL:common/rails-new.md:8	A:program	rails:!!!
 TL:common/rails-routes.md:12	A:program	rails:!!!
-TL:common/rails-routes.md:16	A:program,pipeline,path-absent	rails:-!! GET:-!! /posts:!-! =not%20foundrails:!--
+TL:common/rails-routes.md:16	A:program,pipeline,path-absent	rails:!!! GET:!!! /posts:!-!
 TL:common/rails-routes.md:20	A:program,pipeline	rails:!!! Posts:!!! Blogs%3A%3APostsController
 TL:common/rails-routes.md:8	A:program	rails:!!!
 TL:common/rails-server.md:12	A:program	rails:!!!
@@ -27226,7 +27225,7 @@ TL:common/redis-cli.md:8	A:program	redis-cli:ppp
 TL:common/redis-server.md:12	A:program	redis-server:ppp
 TL:common/redis-server.md:16	A:program	redis-server:ppp
 TL:common/redis-server.md:20	A:program	redis-server:ppp
-TL:common/redis-server.md:24	A:program,pipeline	redis-server:ppp notice:!!! verbose:!!! debug:!!!
+TL:common/redis-server.md:24	A:program,pipeline	redis-server:ppp notice:-!! verbose:!!! debug:-!! =not%20foundnotice:!--
 TL:common/redis-server.md:8	A:program	redis-server:ppp
 TL:common/redshift.md:10	A:program	redshift:!!!
 TL:common/redshift.md:14	A:program	redshift:!!!
@@ -27291,7 +27290,7 @@ TL:common/repomix.md:24	A:program	repomix:!!!
 TL:common/repomix.md:28	A:program	repomix:!!!
 TL:common/repomix.md:32	A:program	repomix:!!!
 TL:common/repomix.md:36	A:program	repomix:!!!
-TL:common/repomix.md:8	A:program,pipeline	repomix:-!! markdown:-!! plain:!!! =not%20foundrepomix:!--
+TL:common/repomix.md:8	A:program,pipeline	repomix:!!! markdown:!!! plain:!!!
 TL:common/repren.md:12	A:program,passthrough(files),splitglob	repren:!!!
 TL:common/repren.md:16	A:program,passthrough(files),splitglob	repren:!!!
 TL:common/repren.md:20	A:program,passthrough(files),splitglob	repren:!!!
@@ -27312,7 +27311,7 @@ TL:common/resolvconf.md:26	A:program	resolvconf:!!!
 TL:common/resolvconf.md:30	A:program	resolvconf:!!!
 TL:common/restic.md:12	A:program	restic:!!!
 TL:common/restic.md:16	A:program	restic:!!!
-TL:common/restic.md:20	A:program,pipeline	restic:!!! snapshot_id:!!!
+TL:common/restic.md:20	A:program,pipeline	restic:-!! snapshot_id:-!! =not%20foundsnapshot_id:!--
 TL:common/restic.md:24	A:program	restic:!!!
 TL:common/restic.md:28	A:program	restic:!!!
 TL:common/restic.md:8	A:program	restic:!!!
@@ -27446,7 +27445,7 @@ TL:common/roll.md:24	A:program	roll:!!!
 TL:common/roll.md:28	A:program	roll:!!!
 TL:common/roll.md:8	A:program	roll:!!!
 TL:common/ropgadget.md:12	A:program	ROPgadget:!!!
-TL:common/ropgadget.md:16	A:program,pipeline	ROPgadget:!!! nojob:!!! nosys:!!!
+TL:common/ropgadget.md:16	A:program,pipeline	ROPgadget:-!! nojob:-!! nosys:!!! =not%20foundnojob:!--
 TL:common/ropgadget.md:20	A:program	ROPgadget:!!!
 TL:common/ropgadget.md:24	A:program	ROPgadget:!!!
 TL:common/ropgadget.md:8	A:program	ROPgadget:!!!
@@ -27724,7 +27723,7 @@ TL:common/samtools.md:29	A:program	samtools:!!!
 TL:common/samtools.md:33	A:program	samtools:!!!
 TL:common/samtools.md:37	A:program	samtools:!!!
 TL:common/samtools.md:9	U:files/program	samtools:!!!
-TL:common/sass.md:12	A:program,pipeline	sass:-!! =not%20foundsass:!--
+TL:common/sass.md:12	A:program,pipeline	sass:!!!
 TL:common/sass.md:16	A:program,pipeline	sass:!!!
 TL:common/sass.md:20	A:program,pipeline	sass:!!! sass%3Aoutputfile.css
 TL:common/sass.md:8	A:program,pipeline	sass:!!!
@@ -28186,7 +28185,7 @@ TL:common/shellcheck.md:20	A:program	shellcheck:!!!
 TL:common/shellcheck.md:24	A:program,pipeline	shellcheck:!!! checkstyle:!!! diff:ppp gcc:ppp json:!!! json1:!!! quiet:!!!
 TL:common/shellcheck.md:28	A:program	shellcheck:!!!
 TL:common/shellcheck.md:32	A:program	shellcheck:!!!
-TL:common/shellcheck.md:36	A:program,pipeline	shellcheck:!!! warning:-!! info:-!! style:!!! =not%20foundwarning:!--
+TL:common/shellcheck.md:36	A:program,pipeline	shellcheck:!!! warning:!!! info:!!! style:!!!
 TL:common/shellcheck.md:8	A:program	shellcheck:!!!
 TL:common/sherlock.md:13	A:program	sherlock:!!!
 TL:common/sherlock.md:17	A:program	sherlock:!!!
@@ -28915,7 +28914,7 @@ TL:common/supabase.md:20	A:program	supabase:!!!
 TL:common/supabase.md:24	A:program	supabase:!!!
 TL:common/supabase.md:28	A:program	supabase:!!!
 TL:common/supabase.md:32	A:program	supabase:!!!
-TL:common/supabase.md:36	A:program,pipeline	supabase:-!! fish:-!! zsh:!!! ...:!!! =not%20foundsupabase:!--
+TL:common/supabase.md:36	A:program,pipeline	supabase:!!! fish:!!! zsh:!!! ...:!!!
 TL:common/supabase.md:8	A:program	supabase:!!!
 TL:common/supervisorctl.md:13	A:program,pipeline	supervisorctl:!!! stop:!!! restart:!!!
 TL:common/supervisorctl.md:17	A:program,pipeline,passthrough(files),splitglob	supervisorctl:!!! stop:!!! restart:!!!
@@ -28979,7 +28978,7 @@ TL:common/svn.md:28	A:program	svn:!!!
 TL:common/svn.md:8	A:program	svn:!!!
 TL:common/swagger-codegen.md:12	A:program	swagger-codegen:!!!
 TL:common/swagger-codegen.md:16	A:program	swagger-codegen:!!!
-TL:common/swagger-codegen.md:20	A:program,pipeline	swagger-codegen:!!! config-help:-!! meta:!!! langs:!!! version:-!! =not%20foundconfig-help:!--
+TL:common/swagger-codegen.md:20	A:program,pipeline	swagger-codegen:!!! config-help:!!! meta:!!! langs:!!! version:!!!
 TL:common/swagger-codegen.md:8	A:program	swagger-codegen:!!!
 TL:common/sway.md:13	A:program	tldr:!!!
 TL:common/sway.md:9	A:program	sway:!!!
@@ -29244,7 +29243,7 @@ TL:common/terraform-get.md:8	A:program	terraform:!!!
 TL:common/terraform-graph.md:13	U:files/program,pipeline	terraform:!!! dot
 TL:common/terraform-graph.md:17	A:program	terraform:!!!
 TL:common/terraform-graph.md:21	A:program	terraform:!!!
-TL:common/terraform-graph.md:25	A:program,pipeline	terraform:-!! plan-refresh-only:!!! plan-destroy:-!! apply:!!! =not%20foundplan-destroy:!--
+TL:common/terraform-graph.md:25	A:program,pipeline	terraform:!!! plan-refresh-only:!!! plan-destroy:!!! apply:!!!
 TL:common/terraform-graph.md:9	A:program	terraform:!!!
 TL:common/terraform-import.md:12	A:program	terraform:!!!
 TL:common/terraform-import.md:16	A:program	terraform:!!!
@@ -29474,7 +29473,7 @@ TL:common/tldr-lint.md:9	A:program	tldr-lint:!!!
 TL:common/tldr.md:10	A:program	tldr:!!!
 TL:common/tldr.md:14	A:program	tldr:!!!
 TL:common/tldr.md:18	A:program	tldr:!!!
-TL:common/tldr.md:22	A:program,pipeline	tldr:!!! cisco-ios:!!! common:!!! dos:!!! freebsd:!!! linux:!!! netbsd:!!! openbsd:-!! osx:-!! sunos:!!! windows:!!! =not%20foundopenbsd:!--
+TL:common/tldr.md:22	A:program,pipeline	tldr:!!! cisco-ios:!!! common:!!! dos:!!! freebsd:!!! linux:!!! netbsd:!!! openbsd:-!! osx:!!! sunos:-!! windows:!!! =not%20foundsunos:!--
 TL:common/tldr.md:26	A:program	tldr:!!!
 TL:common/tldr.md:30	A:program	tldr:!!!
 TL:common/tldr.md:34	A:program	tldr:!!!
@@ -29496,7 +29495,7 @@ TL:common/tlmgr-check.md:8	A:program	tlmgr:!!!
 TL:common/tlmgr-conf.md:12	A:program,pipeline	tlmgr:!!! updmap:!!!
 TL:common/tlmgr-conf.md:16	A:program,pipeline	tlmgr:!!! updmap:!!!
 TL:common/tlmgr-conf.md:20	A:program,pipeline	tlmgr:!!! updmap:!!!
-TL:common/tlmgr-conf.md:24	A:program,pipeline	tlmgr:-!! updmap:!!! =not%20foundtlmgr:!--
+TL:common/tlmgr-conf.md:24	A:program,pipeline	tlmgr:!!! updmap:!!!
 TL:common/tlmgr-conf.md:28	A:program	tlmgr:!!!
 TL:common/tlmgr-conf.md:32	A:program	tlmgr:!!!
 TL:common/tlmgr-conf.md:8	A:program	tlmgr:!!!
@@ -29778,7 +29777,7 @@ TL:common/transfersh.md:20	A:program	transfersh:!!!
 TL:common/transfersh.md:24	A:program	transfersh:!!!
 TL:common/transfersh.md:28	A:program	transfersh:!!!
 TL:common/transfersh.md:8	A:program	transfersh:!!!
-TL:common/transmission-cli.md:13	U:files/program,pipeline	transmission-cli:!!! magnet:!!! path/to/file:!-!
+TL:common/transmission-cli.md:13	U:files/program,pipeline	transmission-cli:-!! magnet:-!! path/to/file:!-! =not%20foundmagnet:!--
 TL:common/transmission-cli.md:17	A:program	transmission-cli:!!!
 TL:common/transmission-cli.md:21	U:files/program,pipeline	transmission-cli:!!! magnet:!!! path/to/file:!-!
 TL:common/transmission-cli.md:25	U:files/program,pipeline	transmission-cli:!!! magnet:!!! path/to/file:!-!
@@ -29873,7 +29872,7 @@ TL:common/trivy.md:36	A:program	trivy:!!!
 TL:common/trivy.md:8	A:program	trivy:!!!
 TL:common/troff.md:13	U:files/program,pipeline	troff:!!! grops
 TL:common/troff.md:17	A:program,pipeline	troff:!!! grotty:!!!
-TL:common/troff.md:21	U:files/program,pipeline	troff:!!! gropdf
+TL:common/troff.md:21	U:files/program,pipeline	troff:-!! gropdf
 TL:common/troff.md:9	U:files/program,pipeline	troff:!!! grops
 TL:common/true.md:13	A:program,passthrough(prog-status)	command true
 TL:common/true.md:9	S	true
@@ -29926,7 +29925,7 @@ TL:common/ts.md:16	A:program,pipeline	command ts:!!!
 TL:common/ts.md:20	A:program,pipeline	cat:ppp ts:!!!
 TL:common/ts.md:8	A:program,pipeline	command ts:!!!
 TL:common/tsc.md:12	A:program	tsc:!!!
-TL:common/tsc.md:16	A:program,pipeline	tsc:-!! ES2015:!!! ES2016:!!! ES2017:-!! ES2018:!!! ESNEXT:!!! ...:!!!
+TL:common/tsc.md:16	A:program,pipeline	tsc:!!! ES2015:!!! ES2016:!!! ES2017:!!! ES2018:!!! ESNEXT:!!! ...:!!!
 TL:common/tsc.md:20	A:program	tsc:!!!
 TL:common/tsc.md:24	A:program	tsc:!!!
 TL:common/tsc.md:28	A:program	tsc:!!!
@@ -30221,7 +30220,7 @@ TL:common/upt.md:10	A:program	upt:!!!
 TL:common/upt.md:14	A:program	upt:!!!
 TL:common/upt.md:18	A:program	upt:!!!
 TL:common/upt.md:22	A:program	upt:!!!
-TL:common/upt.md:26	A:program,pipeline	upt:-!! uninstall:-!! =not%20founduninstall:!--
+TL:common/upt.md:26	A:program,pipeline	upt:!!! uninstall:!!!
 TL:common/upt.md:30	A:program	upt:!!!
 TL:common/upt.md:34	A:program	upt:!!!
 TL:common/upt.md:38	A:program	upt:!!!
@@ -30513,14 +30512,14 @@ TL:common/vboxmanage-cloud.md:28	A:program	VBoxManage:!!!
 TL:common/vboxmanage-cloud.md:32	A:program	VBoxManage:!!!
 TL:common/vboxmanage-cloud.md:36	A:program	VBoxManage:!!!
 TL:common/vboxmanage-cloud.md:8	A:program,pipeline	VBoxManage:!!! terminated:!!! paused:!!!
-TL:common/vboxmanage-controlvm.md:12	A:program,pipeline	VBoxManage:-!! vm_name:-!! =not%20foundvm_name:!--
+TL:common/vboxmanage-controlvm.md:12	A:program,pipeline	VBoxManage:!!! vm_name:!!!
 TL:common/vboxmanage-controlvm.md:16	A:program,pipeline	VBoxManage:!!! vm_name:!!!
 TL:common/vboxmanage-controlvm.md:20	A:program,pipeline	VBoxManage:!!! vm_name:!!!
 TL:common/vboxmanage-controlvm.md:24	A:program,pipeline	VBoxManage:!!! vm_name:!!!
 TL:common/vboxmanage-controlvm.md:28	A:program,pipeline	VBoxManage:!!! vm_name:!!!
 TL:common/vboxmanage-controlvm.md:32	A:program,pipeline	VBoxManage:!!! vm_name:!!!
 TL:common/vboxmanage-controlvm.md:36	A:program,pipeline	VBoxManage:!!! vm_name:!!!
-TL:common/vboxmanage-controlvm.md:8	A:program,pipeline	VBoxManage:-!! vm_name:-!! =not%20foundvm_name:!--
+TL:common/vboxmanage-controlvm.md:8	A:program,pipeline	VBoxManage:!!! vm_name:!!!
 TL:common/vboxmanage-createvm.md:12	A:program	VBoxManage:!!!
 TL:common/vboxmanage-createvm.md:16	A:program	VBoxManage:!!!
 TL:common/vboxmanage-createvm.md:20	A:program	VBoxManage:!!!
@@ -30554,7 +30553,7 @@ TL:common/vboxmanage-list.md:28	A:program	VBoxManage:!!!
 TL:common/vboxmanage-list.md:32	A:program	VBoxManage:!!!
 TL:common/vboxmanage-list.md:36	A:program	VBoxManage:!!!
 TL:common/vboxmanage-list.md:8	A:program	VBoxManage:!!!
-TL:common/vboxmanage-modifyvm.md:12	A:program,pipeline	VBoxManage:!!! vm_name:!!!
+TL:common/vboxmanage-modifyvm.md:12	A:program,pipeline	VBoxManage:-!! vm_name:-!! =not%20foundVBoxManage:!--
 TL:common/vboxmanage-modifyvm.md:16	A:program,pipeline	VBoxManage:!!! vm_name:!!!
 TL:common/vboxmanage-modifyvm.md:20	A:program,pipeline	VBoxManage:!!! vm_name:!!!
 TL:common/vboxmanage-modifyvm.md:8	A:program,pipeline	VBoxManage:!!! vm_name:!!!
@@ -30569,7 +30568,7 @@ TL:common/vboxmanage-showvminfo.md:20	A:program,pipeline	VBoxManage:!!! uuid:!!!
 TL:common/vboxmanage-showvminfo.md:24	A:program,pipeline	VBoxManage:!!! uuid:!!!
 TL:common/vboxmanage-showvminfo.md:28	A:program,pipeline	VBoxManage:!!! uuid:!!!
 TL:common/vboxmanage-showvminfo.md:8	A:program,pipeline	VBoxManage:!!! uuid:!!!
-TL:common/vboxmanage-startvm.md:12	A:program,pipeline	VBoxManage:!!! uuid:!!! gui:!!! sdl:!!! separate:!!!
+TL:common/vboxmanage-startvm.md:12	A:program,pipeline	VBoxManage:!!! uuid:-!! gui:!!! sdl:-!! separate:!!! =not%20founduuid:!--
 TL:common/vboxmanage-startvm.md:16	A:program,pipeline	VBoxManage:!!! uuid:!!!
 TL:common/vboxmanage-startvm.md:20	A:program,pipeline	VBoxManage:!!! uuid:!!!
 TL:common/vboxmanage-startvm.md:24	A:program,pipeline	VBoxManage:!!! uuid:!!!
@@ -30580,7 +30579,7 @@ TL:common/vboxmanage-unregistervm.md:8	A:program,pipeline	VBoxManage:!!! vm_name
 TL:common/vboxmanage.md:14	A:program,pipeline	VBoxManage:-!! uuid:-!! =not%20founduuid:!--
 TL:common/vboxmanage.md:18	A:program,pipeline	VBoxManage:!!! uuid:!!!
 TL:common/vboxmanage.md:22	A:program,pipeline	VBoxManage:!!! uuid:!!!
-TL:common/vboxmanage.md:26	A:program,pipeline	VBoxManage:-!! uuid:-!! =not%20founduuid:!--
+TL:common/vboxmanage.md:26	A:program,pipeline	VBoxManage:!!! uuid:!!!
 TL:common/vboxmanage.md:30	A:program,pipeline	VBoxManage:!!! uuid:!!!
 TL:common/vboxmanage.md:34	A:program	VBoxManage:!!!
 TL:common/vboxmanage.md:38	A:program	VBoxManage:!!!
@@ -30693,7 +30692,7 @@ TL:common/vinmap.md:20	A:program	vinmap:!!!
 TL:common/vinmap.md:24	A:program	vinmap:!!!
 TL:common/vinmap.md:8	A:program	vinmap:!!!
 TL:common/vipe.md:12	A:program,pipeline	command1:!!! vipe:!!! command2:!!!
-TL:common/vipe.md:16	A:program,pipeline	command1:-!! vipe:-!! command2:!!! =not%20foundcommand1:!--
+TL:common/vipe.md:16	A:program,pipeline	command1:!!! vipe:!!! command2:!!!
 TL:common/vipe.md:8	A:program,pipeline	command1:!!! vipe:!!! command2:!!!
 TL:common/virsh-connect.md:12	A:program	virsh:!!!
 TL:common/virsh-connect.md:16	A:program	virsh:!!!
@@ -30716,14 +30715,14 @@ TL:common/virsh-list.md:20	A:program,pipeline	virsh:!!! without-snapshot:!!!
 TL:common/virsh-list.md:8	A:program	virsh:!!!
 TL:common/virsh-pool-autostart.md:12	A:program,pipeline	virsh:!!! uuid:!!!
 TL:common/virsh-pool-autostart.md:8	A:program,pipeline	virsh:!!! uuid:!!!
-TL:common/virsh-pool-build.md:9	A:program,pipeline	virsh:-!! uuid:-!! =not%20founduuid:!--
+TL:common/virsh-pool-build.md:9	A:program,pipeline	virsh:!!! uuid:!!!
 TL:common/virsh-pool-define-as.md:9	A:program,path-var	virsh:!!!
 TL:common/virsh-pool-delete.md:9	A:program,pipeline	virsh:!!! uuid:!!!
 TL:common/virsh-pool-destroy.md:9	A:program,pipeline	virsh:!!! uuid:!!!
 TL:common/virsh-pool-info.md:8	A:program,pipeline	virsh:!!! uuid:!!!
 TL:common/virsh-pool-list.md:13	A:program,pipeline	virsh:-!! inactive:-!! =not%20foundinactive:!--
 TL:common/virsh-pool-list.md:17	A:program	virsh:!!!
-TL:common/virsh-pool-list.md:21	A:program,pipeline	virsh:!!! no-autostart:!!!
+TL:common/virsh-pool-list.md:21	A:program,pipeline	virsh:-!! no-autostart:-!! =not%20foundno-autostart:!--
 TL:common/virsh-pool-list.md:25	A:program,pipeline	virsh:!!! transient:!!!
 TL:common/virsh-pool-list.md:29	A:program	virsh:!!!
 TL:common/virsh-pool-list.md:9	A:program	virsh:!!!
@@ -30747,7 +30746,7 @@ TL:common/virsh.md:22	A:program	sudo:ppp
 TL:common/virsh.md:26	A:program	sudo:ppp
 TL:common/virsh.md:34	A:program	sudo:ppp
 TL:common/virsh.md:38	A:program	sudo:ppp
-TL:common/virt-viewer.md:10	U:files/program,pipeline	virt-viewer:!!! qemu%3A///session ...:!!!
+TL:common/virt-viewer.md:10	U:files/program,pipeline	virt-viewer:-!! qemu%3A///session ...:!!!
 TL:common/virt-viewer.md:14	A:program	virt-viewer:!!!
 TL:common/virt-viewer.md:18	A:program	virt-viewer:!!!
 TL:common/virt-viewer.md:22	A:program	virt-viewer:!!!
@@ -30845,7 +30844,7 @@ TL:common/vt.md:9	A:program	vt:!!!
 TL:common/vue-build.md:8	A:program	vue:!!!
 TL:common/vue-init.md:12	A:program	vue:!!!
 TL:common/vue-init.md:16	A:program	vue:!!!
-TL:common/vue-init.md:8	A:program,pipeline	vue:!!! webpack-simple:!!! browserify:!!! browserify-simple:!!! simple:!!!
+TL:common/vue-init.md:8	A:program,pipeline	vue:-!! webpack-simple:!!! browserify:-!! browserify-simple:!!! simple:!!! =not%20foundvue:!--
 TL:common/vue-serve.md:8	A:program	vue:!!!
 TL:common/vue.md:13	A:program	vue:!!!
 TL:common/vue.md:9	A:program	vue:!!!
@@ -30902,7 +30901,7 @@ TL:common/wacli.md:33	A:program	wacli:!!!
 TL:common/wacli.md:37	A:program	wacli:!!!
 TL:common/wafw00f.md:12	A:program	wafw00f:!!!
 TL:common/wafw00f.md:16	A:program	wafw00f:!!!
-TL:common/wafw00f.md:20	A:program,pipeline	wafw00f:!!! Cloudfront:!!! Fastly:!!! ZScaler:!!! ...:!!!
+TL:common/wafw00f.md:20	A:program,pipeline	wafw00f:-!! Cloudfront:!!! Fastly:-!! ZScaler:!!! ...:!!! =not%20foundFastly:!--
 TL:common/wafw00f.md:24	A:program	wafw00f:!!!
 TL:common/wafw00f.md:28	A:program	wafw00f:!!!
 TL:common/wafw00f.md:32	A:program	wafw00f:!!!
@@ -31067,7 +31066,7 @@ TL:common/weechat.md:16	A:program	weechat:!!!
 TL:common/weechat.md:20	A:program	weechat:!!!
 TL:common/weechat.md:24	A:program	weechat:!!!
 TL:common/weechat.md:8	A:program	weechat:!!!
-TL:common/wezterm-cli.md:12	A:program,pipeline	wezterm:-!! right:-!! top:ppp bottom:!!! percent:!!! =not%20foundright:!--
+TL:common/wezterm-cli.md:12	A:program,pipeline	wezterm:!!! right:!!! top:ppp bottom:-!! percent:!!!
 TL:common/wezterm-cli.md:16	A:program	wezterm:!!!
 TL:common/wezterm-cli.md:20	A:program	wezterm:!!!
 TL:common/wezterm-cli.md:8	A:program	wezterm:!!!
@@ -31085,7 +31084,7 @@ TL:common/wfuzz.md:20	A:program	wfuzz:!!!
 TL:common/wfuzz.md:24	A:program	wfuzz:!!!
 TL:common/wfuzz.md:28	A:program	wfuzz:!!!
 TL:common/wfuzz.md:32	A:program	wfuzz:!!!
-TL:common/wfuzz.md:36	A:program,pipeline	wfuzz:!!! payloads:!!! iterators:!!! printers:!!! scripts:!!!
+TL:common/wfuzz.md:36	A:program,pipeline	wfuzz:-!! payloads:!!! iterators:!!! printers:!!! scripts:-!! =not%20foundscripts:!--
 TL:common/wfuzz.md:8	A:program	wfuzz:!!!
 TL:common/wg-quick.md:12	A:program	sudo:ppp
 TL:common/wg-quick.md:16	A:program	sudo:ppp
@@ -31328,7 +31327,7 @@ TL:common/xe.md:12	A:program,pipeline	arguments_source:!!! xe:!!!
 TL:common/xe.md:16	A:program,pipeline,echo	echo xe:!!!
 TL:common/xe.md:20	A:program,pipeline	find:ppp xe:!!!
 TL:common/xe.md:24	A:program,pipeline	arguments_source:!!! xe:!!!
-TL:common/xe.md:8	A:program,pipeline	arguments_source:-!! xe:-!! =not%20foundxe:!--
+TL:common/xe.md:8	A:program,pipeline	arguments_source:!!! xe:!!!
 TL:common/xephyr.md:12	A:program	command_name:!!!
 TL:common/xephyr.md:8	A:program	Xephyr:!!!
 TL:common/xetex.md:12	A:program	xetex:!!!
@@ -31384,7 +31383,7 @@ TL:common/xml-c14n.md:7	A:program	tldr:!!!
 TL:common/xml-canonic.md:12	U:files/program,pipeline	xml:!!! uri
 TL:common/xml-canonic.md:16	A:program,pipeline	xml:!!! uri:!!!
 TL:common/xml-canonic.md:20	A:program	xml:!!!
-TL:common/xml-canonic.md:8	U:files/program,pipeline	xml:-!! uri
+TL:common/xml-canonic.md:8	U:files/program,pipeline	xml:!!! uri
 TL:common/xml-depyx.md:12	U:files/program,pipeline	cat:ppp xml
 TL:common/xml-depyx.md:16	A:program	xml:!!!
 TL:common/xml-depyx.md:8	U:files/program,pipeline	xml:!!! uri
@@ -31394,9 +31393,9 @@ TL:common/xml-edit.md:20	A:program,pipeline,path-absent	xml:!!! uri:!!!
 TL:common/xml-edit.md:24	A:program,pipeline	xml:!!! uri:!!!
 TL:common/xml-edit.md:28	A:program	xml:!!!
 TL:common/xml-edit.md:8	A:program,pipeline	xml:!!! uri:!!!
-TL:common/xml-elements.md:12	U:files/program,pipeline	xml:!!! uri
+TL:common/xml-elements.md:12	U:files/program,pipeline	xml:-!! uri
 TL:common/xml-elements.md:16	U:files/program,pipeline	xml:!!! uri
-TL:common/xml-elements.md:20	A:program,pipeline	xml:-!! uri:-!! =not%20founduri:!--
+TL:common/xml-elements.md:20	A:program,pipeline	xml:!!! uri:!!!
 TL:common/xml-elements.md:24	A:program,pipeline	xml:!!! uri:!!!
 TL:common/xml-elements.md:28	A:program	xml:!!!
 TL:common/xml-elements.md:8	U:files/program,pipeline	xml:!!! uri
@@ -31413,7 +31412,7 @@ TL:common/xml-list.md:8	U:files/program	xml
 TL:common/xml-p2x.md:7	A:program	tldr:!!!
 TL:common/xml-pyx.md:12	U:files/program,pipeline	cat:ppp xml
 TL:common/xml-pyx.md:16	A:program	xml:!!!
-TL:common/xml-pyx.md:8	U:files/program,pipeline	xml:!!! uri
+TL:common/xml-pyx.md:8	U:files/program,pipeline	xml:-!! uri
 TL:common/xml-select.md:13	A:program,pipeline	xml:!!! uri:!!!
 TL:common/xml-select.md:17	A:program,pipeline	xml:!!! uri:!!!
 TL:common/xml-select.md:21	A:program,pipeline	xml:!!! uri:!!!
@@ -31428,7 +31427,7 @@ TL:common/xml-validate.md:12	A:program,pipeline	xml:!!! uri1:!!! uri2:!!!
 TL:common/xml-validate.md:16	A:program,pipeline	xml:!!! uri1:!!! uri2:!!!
 TL:common/xml-validate.md:20	A:program,pipeline	xml:!!! uri1:!!! uri2:!!!
 TL:common/xml-validate.md:24	A:program	xml:!!!
-TL:common/xml-validate.md:8	A:program,pipeline	xml:-!! uri1:-!! uri2:!!! =not%20foundxml:!--
+TL:common/xml-validate.md:8	A:program,pipeline	xml:!!! uri1:!!! uri2:!!!
 TL:common/xml-xmln.md:7	A:program	tldr:!!!
 TL:common/xml.md:13	A:program,pipeline	xml:!!! uri:!!!
 TL:common/xml.md:17	A:program	xml:!!!
@@ -31535,7 +31534,7 @@ TL:common/xzdiff.md:25	A:program	xzdiff:ppp
 TL:common/xzdiff.md:9	A:program	xzdiff:ppp
 TL:common/xzgrep.md:13	A:program	xzgrep:ppp
 TL:common/xzgrep.md:17	A:program	xzgrep:ppp
-TL:common/xzgrep.md:21	A:program,pipeline	xzgrep:ppp --before-context:-!! --after-context:-!! =not%20found--after-context:!--
+TL:common/xzgrep.md:21	A:program,pipeline	xzgrep:ppp --before-context:!!! --after-context:!!!
 TL:common/xzgrep.md:25	A:program	xzgrep:ppp
 TL:common/xzgrep.md:29	A:program	xzgrep:ppp
 TL:common/xzgrep.md:33	A:program	xzgrep:ppp
@@ -31782,7 +31781,7 @@ TL:common/zabbix_server.md:32	A:program,pipeline	zabbix_server:!!! decrease:!!!
 TL:common/zabbix_server.md:36	A:program	zabbix_server:!!!
 TL:common/zabbix_server.md:8	A:program	zabbix_server:!!!
 TL:common/zapier-analytics.md:12	A:program,pipeline	zapier:!!! anonymous:!!! disabled:!!!
-TL:common/zapier-analytics.md:16	A:program,pipeline	zapier:-!! anonymous:-!! disabled:!!! =not%20foundzapier:!--
+TL:common/zapier-analytics.md:16	A:program,pipeline	zapier:!!! anonymous:!!! disabled:!!!
 TL:common/zapier-analytics.md:8	A:program	zapier:!!!
 TL:common/zapier-build.md:12	A:program	zapier:!!!
 TL:common/zapier-build.md:16	A:program	zapier:!!!
@@ -31817,7 +31816,7 @@ TL:common/zapier-validate.md:24	A:program,pipeline	zapier:!!! json:!!! raw:!!! r
 TL:common/zapier-validate.md:8	A:program	zapier:!!!
 TL:common/zapier-versions.md:12	A:program	zapier:!!!
 TL:common/zapier-versions.md:16	A:program	zapier:!!!
-TL:common/zapier-versions.md:20	A:program,pipeline	zapier:!!! json:!!! raw:!!! row:!!! table:!!!
+TL:common/zapier-versions.md:20	A:program,pipeline	zapier:-!! json:!!! raw:!!! row:!!! table:-!! =not%20foundtable:!--
 TL:common/zapier-versions.md:8	A:program	zapier:!!!
 TL:common/zapier.md:17	A:program,pipeline	zapier:!!! create:!!! search:!!! resource:!!!
 TL:common/zapier.md:29	A:program	zapier:!!!
@@ -31860,7 +31859,7 @@ TL:common/zeroclaw-agent.md:32	A:program	zeroclaw:!!!
 TL:common/zeroclaw-agent.md:8	A:program	zeroclaw:!!!
 TL:common/zeroclaw-channel.md:12	A:program	zeroclaw:!!!
 TL:common/zeroclaw-channel.md:16	A:program	zeroclaw:!!!
-TL:common/zeroclaw-channel.md:20	A:program,pipeline	zeroclaw:!!! discord:-!! whatsapp:!!! slack:!!! webhook:!!! ...:-!!
+TL:common/zeroclaw-channel.md:20	A:program,pipeline	zeroclaw:!!! discord:!!! whatsapp:!!! slack:!!! webhook:!!! ...:!!!
 TL:common/zeroclaw-channel.md:24	A:program	zeroclaw:!!!
 TL:common/zeroclaw-channel.md:28	A:program	zeroclaw:!!!
 TL:common/zeroclaw-channel.md:8	A:program	zeroclaw:!!!
@@ -32043,7 +32042,7 @@ TL:common/zoxide.md:13	A:program	zoxide:!!!
 TL:common/zoxide.md:17	A:program	zoxide:!!!
 TL:common/zoxide.md:21	A:program	zoxide:!!!
 TL:common/zoxide.md:25	A:program	zoxide:!!!
-TL:common/zoxide.md:29	A:program,pipeline	zoxide:!!! elvish:!!! fish:!!! nushell:!!! posix:!!! powershell:!!! tcsh:!!! xonsh:!!! zsh:!!!
+TL:common/zoxide.md:29	A:program,pipeline	zoxide:!!! elvish:-!! fish:!!! nushell:-!! posix:!!! powershell:!!! tcsh:!!! xonsh:!!! zsh:!!! =not%20foundnushell:!--
 TL:common/zoxide.md:9	A:program	zoxide:!!!
 TL:common/zpaq.md:12	A:program	zpaq:!!!
 TL:common/zpaq.md:16	A:program	zpaq:!!!
@@ -32413,7 +32412,7 @@ TL:linux/apptainer-run.md:26	A:program	apptainer:!!!
 TL:linux/apptainer-run.md:30	A:program	apptainer:!!!
 TL:linux/apptainer-run.md:34	A:program	apptainer:!!!
 TL:linux/apptainer-run.md:38	A:program	apptainer:!!!
-TL:linux/apptainer-search.md:12	A:program,pipeline	apptainer:!!! arm64:-!! 386:!!! ppc64le:!!! s390x:!!!
+TL:linux/apptainer-search.md:12	A:program,pipeline	apptainer:!!! arm64:!!! 386:!!! ppc64le:!!! s390x:!!!
 TL:linux/apptainer-search.md:16	A:program	apptainer:!!!
 TL:linux/apptainer-search.md:20	A:program	apptainer:!!!
 TL:linux/apptainer-search.md:24	A:program	apptainer:!!!
@@ -32540,12 +32539,12 @@ TL:linux/archlinux-java.md:20	A:program	archlinux-java:!!!
 TL:linux/archlinux-java.md:24	A:program	archlinux-java:!!!
 TL:linux/archlinux-java.md:8	A:program	archlinux-java:!!!
 TL:linux/arecord.md:12	A:program	arecord:!!!
-TL:linux/arecord.md:16	A:program,pipeline	arecord:-!! lame:-!! =not%20foundlame:!--
+TL:linux/arecord.md:16	A:program,pipeline	arecord:!!! lame:!!!
 TL:linux/arecord.md:20	A:program	arecord:!!!
 TL:linux/arecord.md:24	A:program	arecord:!!!
 TL:linux/arecord.md:28	A:program,passthrough(prog-status)	arecord:!!! aplay rm
 TL:linux/arecord.md:8	A:program	arecord:!!!
-TL:linux/arithmetic.md:12	U:path-root/program,pipeline	arithmetic:!!! -:!!! x:!!! /
+TL:linux/arithmetic.md:12	U:path-root/program,pipeline	arithmetic:-!! -:!!! x:-!! / =not%20foundx:!--
 TL:linux/arithmetic.md:16	A:program	arithmetic:!!!
 TL:linux/arithmetic.md:8	A:program	arithmetic:!!!
 TL:linux/ark-survival-ascended.md:12	U:files/program	path/to/ArkAscendedServer:!-!
@@ -32658,7 +32657,7 @@ TL:linux/aura.md:20	A:program	aura:!!!
 TL:linux/aura.md:24	A:program	aura:!!!
 TL:linux/aura.md:28	A:program	aura:!!!
 TL:linux/aura.md:32	A:program	aura:!!!
-TL:linux/aura.md:8	A:program,pipeline	aura:!!! regex:!!!
+TL:linux/aura.md:8	A:program,pipeline	aura:-!! regex:-!! =not%20foundaura:!--
 TL:linux/auracle.md:12	A:program	auracle:!!!
 TL:linux/auracle.md:16	A:program	auracle:!!!
 TL:linux/auracle.md:20	A:program	auracle:!!!
@@ -32870,7 +32869,7 @@ TL:linux/bluebuild.md:20	A:program	bluebuild:!!!
 TL:linux/bluebuild.md:24	A:program	bluebuild:!!!
 TL:linux/bluebuild.md:8	A:program	bluebuild:!!!
 TL:linux/bluetoothctl.md:13	A:program	bluetoothctl:!!!
-TL:linux/bluetoothctl.md:17	A:program,pipeline	bluetoothctl:!!! off:!!!
+TL:linux/bluetoothctl.md:17	A:program,pipeline	bluetoothctl:-!! off:-!! =not%20foundoff:!--
 TL:linux/bluetoothctl.md:21	A:program	bluetoothctl:!!!
 TL:linux/bluetoothctl.md:25	A:program	bluetoothctl:!!!
 TL:linux/bluetoothctl.md:29	A:program,pipeline	bluetoothctl:!!! disconnect:!!!
@@ -33071,7 +33070,7 @@ TL:linux/busctl.md:28	A:program	busctl:ppp
 TL:linux/busctl.md:32	A:program	busctl:ppp
 TL:linux/busctl.md:8	A:program	busctl:ppp
 TL:linux/bwa.md:13	U:files/program,pipeline	bwa:!!! gzip
-TL:linux/bwa.md:17	U:files/program,pipeline	bwa:!!! gzip
+TL:linux/bwa.md:17	U:files/program,pipeline	bwa:-!! gzip
 TL:linux/bwa.md:21	U:files/program,pipeline	bwa:!!! gzip
 TL:linux/bwa.md:25	U:files/program,pipeline	bwa:!!! gzip
 TL:linux/bwa.md:9	A:program	bwa:!!!
@@ -33269,7 +33268,7 @@ TL:linux/chpasswd.md:9	A:program,pipeline	printf sudo:ppp
 TL:linux/chrt.md:12	A:program	chrt:ppp
 TL:linux/chrt.md:16	A:program	chrt:ppp
 TL:linux/chrt.md:20	A:program	chrt:ppp
-TL:linux/chrt.md:24	A:program,pipeline	chrt:ppp idle:-!! batch:!!! rr:!!! fifo:-!! other:!!! =not%20foundfifo:!--
+TL:linux/chrt.md:24	A:program,pipeline	chrt:ppp idle:!!! batch:!!! rr:!!! fifo:!!! other:!!!
 TL:linux/chrt.md:8	A:program	chrt:ppp
 TL:linux/chsh.md:13	A:program	chsh:ppp
 TL:linux/chsh.md:17	A:program	chsh:ppp
@@ -33279,7 +33278,7 @@ TL:linux/chvt.md:9	A:program	sudo:ppp
 TL:linux/cliphist.md:13	A:program,pipeline	cliphist:!!! fzf:!!! wl-copy:!!!
 TL:linux/cliphist.md:17	A:program	cliphist:!!!
 TL:linux/cliphist.md:21	A:program,pipeline	echo cliphist:!!!
-TL:linux/cliphist.md:25	A:program,pipeline	wl-paste:!!! cliphist:!!!
+TL:linux/cliphist.md:25	A:program,pipeline	wl-paste:-!! cliphist:-!! =not%20foundcliphist:!--
 TL:linux/cliphist.md:9	A:program	cliphist:!!!
 TL:linux/cloud-init.md:12	A:program	cloud-init:!!!
 TL:linux/cloud-init.md:16	A:program	cloud-init:!!!
@@ -33416,7 +33415,7 @@ TL:linux/crond.md:8	A:program	crond:!!!
 TL:linux/cryptcat.md:12	A:program	cryptcat:!!!
 TL:linux/cryptcat.md:16	A:program	cryptcat:!!!
 TL:linux/cryptcat.md:20	A:program	cryptcat:!!!
-TL:linux/cryptcat.md:24	A:program,pipeline	cryptcat:-!! =not%20foundcryptcat:!--
+TL:linux/cryptcat.md:24	A:program,pipeline	cryptcat:!!!
 TL:linux/cryptcat.md:8	A:program	cryptcat:!!!
 TL:linux/cryptsetup-luksformat.md:13	A:program,path-dev	cryptsetup:!!!
 TL:linux/cryptsetup-luksformat.md:17	A:program,path-dev	cryptsetup:!!!
@@ -33936,7 +33935,7 @@ TL:linux/eject.md:20	A:program,path-dev	eject:!!!
 TL:linux/eject.md:24	A:program,path-dev	eject:!!!
 TL:linux/eject.md:28	A:program,path-mnt	eject:!!!
 TL:linux/eject.md:32	A:program,path-mnt	eject:!!!
-TL:linux/eject.md:36	A:program,pipeline	eject:-!! off:-!! =not%20foundoff:!--
+TL:linux/eject.md:36	A:program,pipeline	eject:!!! off:!!!
 TL:linux/eject.md:8	A:program	eject:!!!
 TL:linux/elink.md:13	A:program,pipeline	esearch:!!! elink:!!!
 TL:linux/elink.md:9	A:program,pipeline	esearch:!!! elink:!!!
@@ -34002,7 +34001,7 @@ TL:linux/eselect-profile.md:12	A:program,pipeline	eselect:!!! number:!!!
 TL:linux/eselect-profile.md:16	A:program	eselect:!!!
 TL:linux/eselect-profile.md:8	A:program	eselect:!!!
 TL:linux/eselect-repository.md:13	A:program	eselect:!!!
-TL:linux/eselect-repository.md:17	A:program,pipeline	eselect:-!! index:-!! =not%20foundindex:!--
+TL:linux/eselect-repository.md:17	A:program,pipeline	eselect:!!! index:!!!
 TL:linux/eselect-repository.md:21	A:program,pipeline	eselect:!!! git:ppp mercurial:!!! svn:!!! ...:!!!
 TL:linux/eselect-repository.md:25	A:program	eselect:!!!
 TL:linux/eselect-repository.md:29	A:program	eselect:!!!
@@ -34020,7 +34019,7 @@ TL:linux/ethtool.md:12	A:program	ethtool:!!!
 TL:linux/ethtool.md:16	A:program	ethtool:!!!
 TL:linux/ethtool.md:20	A:program	ethtool:!!!
 TL:linux/ethtool.md:24	A:program	ethtool:!!!
-TL:linux/ethtool.md:28	A:program,pipeline	ethtool:!!! 100:-!! 1000:!!! full:!!! off:-!! =not%20found100:!--
+TL:linux/ethtool.md:28	A:program,pipeline	ethtool:!!! 100:!!! 1000:!!! full:!!! off:!!!
 TL:linux/ethtool.md:8	A:program	ethtool:!!!
 TL:linux/eu-readelf.md:12	A:program	eu-readelf:!!!
 TL:linux/eu-readelf.md:8	A:program	eu-readelf:!!!
@@ -34276,7 +34275,7 @@ TL:linux/foremost.md:20	A:program	foremost:!!!
 TL:linux/foremost.md:24	A:program	foremost:!!!
 TL:linux/foremost.md:28	A:program	foremost:!!!
 TL:linux/foremost.md:8	A:program	foremost:!!!
-TL:linux/fprintd-delete.md:12	A:program,pipeline	fprintd-delete:!!! left-index-finger:!!! left-middle-finger:!!! left-ring-finger:!!! left-little-finger:!!! right-thumb:!!! ...:!!!
+TL:linux/fprintd-delete.md:12	A:program,pipeline	fprintd-delete:-!! left-index-finger:!!! left-middle-finger:!!! left-ring-finger:-!! left-little-finger:!!! right-thumb:!!! ...:!!! =not%20foundfprintd-delete:!--
 TL:linux/fprintd-delete.md:16	A:program	fprintd-delete:!!!
 TL:linux/fprintd-delete.md:8	A:program	fprintd-delete:!!!
 TL:linux/fprintd-enroll.md:12	A:program,pipeline	fprintd-enroll:!!! left-index-finger:!!! left-middle-finger:!!! left-ring-finger:!!! left-little-finger:!!! right-thumb:!!! ...:!!!
@@ -34287,7 +34286,7 @@ TL:linux/fprintd-enroll.md:8	A:program	fprintd-enroll:!!!
 TL:linux/fprintd-list.md:12	A:program	fprintd-list:!!!
 TL:linux/fprintd-list.md:16	A:program	fprintd-list:!!!
 TL:linux/fprintd-list.md:8	A:program	fprintd-list:!!!
-TL:linux/fprintd-verify.md:12	A:program,pipeline	fprintd-verify:!!! left-index-finger:-!! left-middle-finger:-!! left-ring-finger:!!! left-little-finger:!!! right-thumb:!!! ...:!!! =not%20foundleft-middle-finger:!--
+TL:linux/fprintd-verify.md:12	A:program,pipeline	fprintd-verify:!!! left-index-finger:!!! left-middle-finger:!!! left-ring-finger:-!! left-little-finger:-!! right-thumb:!!! ...:!!! =not%20foundleft-little-finger:!--
 TL:linux/fprintd-verify.md:16	A:program	fprintd-verify:!!!
 TL:linux/fprintd-verify.md:20	A:program	fprintd-verify:!!!
 TL:linux/fprintd-verify.md:24	A:program	fprintd-verify:!!!
@@ -34637,7 +34636,7 @@ TL:linux/grabc.md:24	A:program	grabc:!!!
 TL:linux/grabc.md:28	A:program	grabc:!!!
 TL:linux/grabc.md:32	A:program	grabc:!!!
 TL:linux/grabc.md:8	A:program	grabc:!!!
-TL:linux/grdctl.md:12	A:program,pipeline	grdctl:!!! vnc:!!!
+TL:linux/grdctl.md:12	A:program,pipeline	grdctl:-!! vnc:-!! =not%20foundvnc:!--
 TL:linux/grdctl.md:16	A:program	grdctl:!!!
 TL:linux/grdctl.md:20	A:program	grdctl:!!!
 TL:linux/grdctl.md:24	A:program,pipeline	grdctl:!!! vnc:!!!
@@ -34648,7 +34647,7 @@ TL:linux/grim.md:10	A:program	grim:!!!
 TL:linux/grim.md:14	A:program	grim:!!!
 TL:linux/grim.md:18	A:program,passthrough(prog-output)	grim:!!! slurp:!!!
 TL:linux/grim.md:22	A:program,pipeline	grim:!!! clipboard_manager:!!!
-TL:linux/grim.md:26	A:program,pipeline	grim:!!! ppm:!!! jpeg:!!!
+TL:linux/grim.md:26	A:program,pipeline	grim:-!! ppm:-!! jpeg:!!! =not%20foundgrim:!--
 TL:linux/grim.md:30	A:program	grim:!!!
 TL:linux/grim.md:34	A:program	grim:!!!
 TL:linux/grim.md:38	A:program	grim:!!!
@@ -35089,7 +35088,7 @@ TL:linux/ip-maddress.md:16	A:program	sudo:ppp
 TL:linux/ip-maddress.md:20	A:program	sudo:ppp
 TL:linux/ip-maddress.md:24	A:program	ip:!!!
 TL:linux/ip-maddress.md:8	A:program	ip:!!!
-TL:linux/ip-monitor.md:12	A:program,pipeline	ip:!!! address:!!! route:!!! neigh:-!! rule:!!! maddress:!!! ...:-!! =not%20found...:!--
+TL:linux/ip-monitor.md:12	A:program,pipeline	ip:!!! address:!!! route:!!! neigh:!!! rule:!!! maddress:!!! ...:!!!
 TL:linux/ip-monitor.md:16	A:program	ip:!!!
 TL:linux/ip-monitor.md:8	A:program	ip:!!!
 TL:linux/ip-neighbor.md:13	A:program	sudo:ppp
@@ -35229,7 +35228,7 @@ TL:linux/iw.md:25	A:program	iw:!!!
 TL:linux/iw.md:9	A:program	iw:!!!
 TL:linux/iwconfig.md:12	A:program	iwconfig:!!!
 TL:linux/iwconfig.md:16	A:program	iwconfig:!!!
-TL:linux/iwconfig.md:20	A:program,pipeline	iwconfig:!!! Managed:!!! Master:!!! Repeater:!!! Secondary:!!! Monitor:!!! Auto:!!!
+TL:linux/iwconfig.md:20	A:program,pipeline	iwconfig:-!! Managed:!!! Master:-!! Repeater:!!! Secondary:!!! Monitor:!!! Auto:!!! =not%20foundiwconfig:!--
 TL:linux/iwconfig.md:8	A:program	iwconfig:!!!
 TL:linux/iwctl.md:13	A:program	iwctl:!!!
 TL:linux/iwctl.md:17	A:program	iwctl:!!!
@@ -35267,7 +35266,7 @@ TL:linux/journalctl.md:29	A:program	journalctl:ppp
 TL:linux/journalctl.md:33	A:program	journalctl:ppp
 TL:linux/journalctl.md:37	A:program	journalctl:ppp
 TL:linux/journalctl.md:9	A:program	journalctl:ppp
-TL:linux/jpegtran.md:12	U:files/program,pipeline	jpegtran:!!! 180:!!! 270
+TL:linux/jpegtran.md:12	U:files/program,pipeline	jpegtran:-!! 180:!!! 270
 TL:linux/jpegtran.md:16	U:files/program	jpegtran
 TL:linux/jpegtran.md:20	U:files/program	jpegtran
 TL:linux/jpegtran.md:24	U:files/program	jpegtran
@@ -35342,7 +35341,7 @@ TL:linux/keyd.md:20	A:program	keyd:!!!
 TL:linux/keyd.md:24	A:program	keyd:!!!
 TL:linux/keyd.md:28	A:program	sudo:ppp
 TL:linux/keyd.md:8	A:program	systemctl:ppp
-TL:linux/kill.md:13	A:program,pipeline	kill -L:!!! --table:!!!
+TL:linux/kill.md:13	A:program,pipeline	kill -L:-!! --table:-!! =not%20found--table:!--
 TL:linux/kill.md:17	U:pid	kill
 TL:linux/kill.md:33	U:pid	kill
 TL:linux/kill.md:37	U:pid	kill
@@ -35389,7 +35388,7 @@ TL:linux/koji-cancel.md:16	A:program	koji:!!!
 TL:linux/koji-cancel.md:20	A:program	koji:!!!
 TL:linux/koji-cancel.md:8	A:program	koji:!!!
 TL:linux/koji-download-build.md:12	A:program,pipeline	koji:!!! RPM:!!! NVR:!!!
-TL:linux/koji-download-build.md:16	A:program,pipeline	koji:!!! RPM:!!! NVR:!!!
+TL:linux/koji-download-build.md:16	A:program,pipeline	koji:-!! RPM:-!! NVR:!!! =not%20foundRPM:!--
 TL:linux/koji-download-build.md:20	A:program	koji:!!!
 TL:linux/koji-download-build.md:24	A:program	koji:!!!
 TL:linux/koji-download-build.md:8	A:program,pipeline	koji:!!! RPM:!!! NVR:!!!
@@ -35619,7 +35618,7 @@ TL:linux/limine.md:29	A:program	limine-scan:!!!
 TL:linux/limine.md:9	A:program,path-dev	limine:!!!
 TL:linux/line.md:8	A:program	line:!!!
 TL:linux/links.md:13	A:program	links:!!!
-TL:linux/links.md:17	A:program,pipeline	links:-!! 1:-!! =not%20found1:!--
+TL:linux/links.md:17	A:program,pipeline	links:!!! 1:!!!
 TL:linux/links.md:9	A:program	links:!!!
 TL:linux/links2.md:9	A:program	links2:!!!
 TL:linux/linux-boot-prober.md:8	A:program,path-dev	sudo:ppp
@@ -35685,7 +35684,7 @@ TL:linux/logsave.md:12	A:program	logsave:ppp
 TL:linux/logsave.md:16	A:program	logsave:ppp
 TL:linux/logsave.md:20	A:program	logsave:ppp
 TL:linux/logsave.md:8	A:program	logsave:ppp
-TL:linux/logwatch.md:12	A:program,pipeline	logwatch:!!! pam_unix:!!! ...:!!!
+TL:linux/logwatch.md:12	A:program,pipeline	logwatch:-!! pam_unix:-!! ...:!!! =not%20foundpam_unix:!--
 TL:linux/look.md:26	A:program	look:!!!
 TL:linux/lookandfeeltool.md:7	A:program	tldr:!!!
 TL:linux/losetup.md:12	A:program,path-dev,path-absent	sudo:ppp
@@ -35773,7 +35772,7 @@ TL:linux/lsmem.md:8	A:program	lsmem:ppp
 TL:linux/lsmod.md:9	A:program	lsmod:!!!
 TL:linux/lsns.md:12	A:program	lsns:ppp
 TL:linux/lsns.md:16	A:program	lsns:ppp
-TL:linux/lsns.md:20	U:time/program,pipeline	lsns:ppp net:!!! ipc:!!! user:!!! pid:!!! uts:!!! cgroup:!!! time:-!!
+TL:linux/lsns.md:20	U:time/program,pipeline	lsns:ppp net:!!! ipc:!!! user:!!! pid:!!! uts:!!! cgroup:!!! time:!!!
 TL:linux/lsns.md:24	A:program	lsns:ppp
 TL:linux/lsns.md:8	A:program	lsns:ppp
 TL:linux/lspci.md:12	A:program	lspci:!!!
@@ -36316,7 +36315,7 @@ TL:linux/namcap.md:12	A:program	namcap:!!!
 TL:linux/namcap.md:16	A:program	namcap:!!!
 TL:linux/namcap.md:8	A:program	namcap:!!!
 TL:linux/named.md:12	A:program	named:!!!
-TL:linux/named.md:16	A:program,pipeline	named:-!! -6:-!! =not%20found-6:!--
+TL:linux/named.md:16	A:program,pipeline	named:!!! -6:!!!
 TL:linux/named.md:20	A:program	named:!!!
 TL:linux/named.md:24	A:program	named:!!!
 TL:linux/named.md:8	A:program	named:!!!
@@ -36359,7 +36358,7 @@ TL:linux/ndctl.md:28	A:program	ndctl:!!!
 TL:linux/ndctl.md:32	A:program	ndctl:!!!
 TL:linux/ndctl.md:8	A:program	ndctl:!!!
 TL:linux/needrestart.md:12	A:program	sudo:ppp
-TL:linux/needrestart.md:16	A:program,pipeline	needrestart:-!! -q:-!! =not%20found-q:!--
+TL:linux/needrestart.md:16	A:program,pipeline	needrestart:!!! -q:!!!
 TL:linux/needrestart.md:20	A:program	needrestart:!!!
 TL:linux/needrestart.md:24	A:program	needrestart:!!!
 TL:linux/needrestart.md:28	A:program	needrestart:!!!
@@ -36378,7 +36377,7 @@ TL:linux/neo.md:25	A:program,pipeline	neo:!!! greek:!!! cyrillic:!!! arabic:!!! 
 TL:linux/neo.md:37	A:program	neo:!!!
 TL:linux/neo.md:9	A:program	neo:!!!
 TL:linux/nerdctl.md:12	A:program	nerdctl:!!!
-TL:linux/nerdctl.md:16	A:program,pipeline	nerdctl:-!! stop:-!! =not%20foundstop:!--
+TL:linux/nerdctl.md:16	A:program,pipeline	nerdctl:!!! stop:!!!
 TL:linux/nerdctl.md:20	A:program	nerdctl:!!!
 TL:linux/nerdctl.md:24	A:program	nerdctl:!!!
 TL:linux/nerdctl.md:28	A:program	nerdctl:!!!
@@ -36837,12 +36836,12 @@ TL:linux/pamac.md:21	A:program	pamac:!!!
 TL:linux/pamac.md:25	A:program	pamac:!!!
 TL:linux/pamac.md:29	A:program	pamac:!!!
 TL:linux/pamac.md:9	A:program	pamac:!!!
-TL:linux/partclone.md:12	A:program,pipeline,path-dev	sudo:ppp btrfs:!!! fat32:!!! xfs:!!! ...:!!!
-TL:linux/partclone.md:16	A:program,pipeline	partclone.ext4:!!! btrfs:-!! fat32:!!! xfs:!!! ...:-!! =not%20foundbtrfs:!--
+TL:linux/partclone.md:12	A:program,pipeline,path-dev	sudo:ppp btrfs:-!! fat32:!!! xfs:-!! ...:!!! =not%20foundbtrfs:!--
+TL:linux/partclone.md:16	A:program,pipeline	partclone.ext4:!!! btrfs:!!! fat32:!!! xfs:!!! ...:!!!
 TL:linux/partclone.md:8	A:program,pipeline,path-dev	sudo:ppp btrfs:!!! fat32:!!! xfs:!!! ...:!!!
 TL:linux/parted.interactive.md:13	A:program	print:!!!
-TL:linux/parted.interactive.md:21	A:program,pipeline	mkpart:!!! ext2:!!! ext3:!!! ext4:!!! fat16:!!! fat32:!!! hfs:!!! hfs%2B:!!! linux-swap:!!! ntfs:!!! reiserfs:!!! udf:!!! xfs:!!!
-TL:linux/parted.interactive.md:25	A:program,pipeline	mkpart:!!! logical:!!! extended:!!! ext2:!!! ext3:!!! ext4:!!! fat16:!!! fat32:!!! hfs:!!! hfs%2B:!!! linux-swap:!!! ntfs:!!! reiserfs:-!! udf:!!! xfs:-!! =not%20foundxfs:!--
+TL:linux/parted.interactive.md:21	A:program,pipeline	mkpart:!!! ext2:-!! ext3:!!! ext4:-!! fat16:!!! fat32:!!! hfs:!!! hfs%2B:!!! linux-swap:!!! ntfs:!!! reiserfs:!!! udf:!!! xfs:!!! =not%20foundext4:!--
+TL:linux/parted.interactive.md:25	A:program,pipeline	mkpart:!!! logical:!!! extended:!!! ext2:!!! ext3:!!! ext4:!!! fat16:-!! fat32:!!! hfs:!!! hfs%2B:!!! linux-swap:!!! ntfs:-!! reiserfs:!!! udf:!!! xfs:!!! =not%20foundntfs:!--
 TL:linux/parted.interactive.md:29	A:program,path-dev	resizepart:ppp
 TL:linux/parted.interactive.md:33	A:program,path-dev	rm:ppp
 TL:linux/parted.interactive.md:9	A:program,path-dev	sudo:ppp
@@ -37016,7 +37015,7 @@ TL:linux/pidstat.md:20	A:program	pidstat:!!!
 TL:linux/pidstat.md:24	A:program	pidstat:!!!
 TL:linux/pidstat.md:8	A:program	pidstat:!!!
 TL:linux/pihole.md:12	A:program	sudo:ppp
-TL:linux/pihole.md:16	A:program,pipeline	pihole:-!! disable:-!! =not%20founddisable:!--
+TL:linux/pihole.md:16	A:program,pipeline	pihole:!!! disable:!!!
 TL:linux/pihole.md:20	A:program	pihole:!!!
 TL:linux/pihole.md:24	A:program	pihole:!!!
 TL:linux/pihole.md:28	A:program,pipeline	pihole:!!! deny:!!!
@@ -37071,8 +37070,8 @@ TL:linux/pkgctl-build.md:8	A:program	pkgctl:!!!
 TL:linux/pkgctl-db-update.md:8	A:program	pkgctl:!!!
 TL:linux/pkgctl-diff.md:12	A:program,pipeline	pkgctl:!!! pkgname:!!!
 TL:linux/pkgctl-diff.md:16	A:program,pipeline	pkgctl:!!! pkgname:!!!
-TL:linux/pkgctl-diff.md:20	A:program,pipeline	pkgctl:-!! pkgname:-!! =not%20foundpkgname:!--
-TL:linux/pkgctl-diff.md:8	A:program,pipeline	pkgctl:-!! pkgname:-!! =not%20foundpkgname:!--
+TL:linux/pkgctl-diff.md:20	A:program,pipeline	pkgctl:!!! pkgname:!!!
+TL:linux/pkgctl-diff.md:8	A:program,pipeline	pkgctl:!!! pkgname:!!!
 TL:linux/pkgctl-release.md:8	A:program	pkgctl:!!!
 TL:linux/pkgctl-repo.md:12	A:program	pkgctl:!!!
 TL:linux/pkgctl-repo.md:16	A:program	pkgctl:!!!
@@ -37180,20 +37179,20 @@ TL:linux/pokego.md:21	A:program	pokego:!!!
 TL:linux/pokego.md:25	A:program	pokego:!!!
 TL:linux/pokego.md:9	A:program	pokego:!!!
 TL:linux/portablectl.md:12	A:program	portablectl:!!!
-TL:linux/portablectl.md:16	A:program,pipeline	portablectl:-!! image_name:-!! =not%20foundimage_name:!--
+TL:linux/portablectl.md:16	A:program,pipeline	portablectl:!!! image_name:!!!
 TL:linux/portablectl.md:20	A:program	portablectl:!!!
 TL:linux/portablectl.md:24	A:program,pipeline	portablectl:!!! image_name:!!!
 TL:linux/portablectl.md:8	A:program	portablectl:!!!
 TL:linux/portageq.md:13	U:path-root/program	portageq:!!!
 TL:linux/portageq.md:17	U:path-root/program	portageq:!!!
-TL:linux/portageq.md:21	U:path-root/program,pipeline	portageq:!!! porttree:!!! binary:!!! ...:!!! DEFINED_PHASES:!!! DEPEND:!!!
+TL:linux/portageq.md:21	U:path-root/program,pipeline	portageq:!!! porttree:-!! binary:!!! ...:!!! DEFINED_PHASES:-!! DEPEND:!!! =not%20foundporttree:!--
 TL:linux/portageq.md:9	A:program	portageq:!!!
 TL:linux/ports.md:12	A:program	ports:!!!
 TL:linux/ports.md:16	A:program	ports:!!!
 TL:linux/ports.md:8	A:program	ports:!!!
 TL:linux/postconf.md:13	A:program	postconf:!!!
 TL:linux/postconf.md:17	A:program	postconf:!!!
-TL:linux/postconf.md:21	A:program,pipeline	postconf:!!! service:ppp user:!!! all:!!!
+TL:linux/postconf.md:21	A:program,pipeline	postconf:-!! service:ppp user:-!! all:!!! =not%20foundpostconf:!--
 TL:linux/postconf.md:25	A:program	postconf:!!!
 TL:linux/postconf.md:29	A:program	postconf:!!!
 TL:linux/postconf.md:9	A:program	postconf:!!!
@@ -37411,7 +37410,7 @@ TL:linux/pw-cli.md:13	A:program	pw-cli:!!!
 TL:linux/pw-cli.md:17	A:program	pw-cli:!!!
 TL:linux/pw-cli.md:21	A:program	pw-cli:!!!
 TL:linux/pw-cli.md:25	A:program	pw-cli:!!!
-TL:linux/pw-cli.md:9	A:program,pipeline	pw-cli:!!! Link:!!! Port:-!! Client:!!! Device:-!! Metadata:-!! Factory:-!! Module:!!! Profiler:!!! SecurityContext:!!! Core:!!! =not%20foundFactory:!-- =not%20foundPort:!--
+TL:linux/pw-cli.md:9	A:program,pipeline	pw-cli:!!! Link:!!! Port:!!! Client:!!! Device:!!! Metadata:!!! Factory:!!! Module:!!! Profiler:!!! SecurityContext:!!! Core:!!!
 TL:linux/pw-config.md:12	A:program	pw-config:!!!
 TL:linux/pw-config.md:16	A:program	pw-config:!!!
 TL:linux/pw-config.md:20	A:program	pw-config:!!!
@@ -37464,7 +37463,7 @@ TL:linux/pw-metadata.md:29	A:program	pw-metadata:!!!
 TL:linux/pw-metadata.md:33	A:program	pw-metadata:!!!
 TL:linux/pw-metadata.md:9	A:program	pw-metadata:!!!
 TL:linux/pw-midi2play.md:10	A:program	pw-midi2play:!!!
-TL:linux/pw-midi2play.md:14	A:program,pipeline	pw-midi2play:-!! ump:-!! =not%20foundump:!--
+TL:linux/pw-midi2play.md:14	A:program,pipeline	pw-midi2play:!!! ump:!!!
 TL:linux/pw-midi2play.md:18	A:program	pw-midi2play:!!!
 TL:linux/pw-midi2record.md:10	A:program	pw-midi2record:!!!
 TL:linux/pw-midi2record.md:14	A:program,pipeline	pw-midi2record:!!! ump:!!!
@@ -37501,7 +37500,7 @@ TL:linux/pwn.md:36	A:program	pwn:!!!
 TL:linux/pwn.md:8	A:program	pwn:!!!
 TL:linux/pyrit.md:12	A:program	pyrit:!!!
 TL:linux/pyrit.md:16	A:program	pyrit:!!!
-TL:linux/pyrit.md:20	A:program,pipeline	pyrit:-!! pcap:-!! =not%20foundpcap:!--
+TL:linux/pyrit.md:20	A:program,pipeline	pyrit:!!! pcap:!!!
 TL:linux/pyrit.md:24	A:program,pipeline	pyrit:!!! unique_passwords:!!! import_passwords:!!!
 TL:linux/pyrit.md:28	A:program	pyrit:!!!
 TL:linux/pyrit.md:32	A:program	pyrit:!!!
@@ -37589,7 +37588,7 @@ TL:linux/qm-resume.md:8	A:program	qm:!!!
 TL:linux/qm-rollback.md:8	A:program	qm:!!!
 TL:linux/qm-sendkey.md:12	A:program	qm:!!!
 TL:linux/qm-sendkey.md:8	A:program	qm:!!!
-TL:linux/qm-set.md:12	A:program,pipeline	qm:!!! 1:!!!
+TL:linux/qm-set.md:12	A:program,pipeline	qm:-!! 1:-!! =not%20found1:!--
 TL:linux/qm-set.md:16	A:program	qm:!!!
 TL:linux/qm-set.md:20	A:program	qm:!!!
 TL:linux/qm-set.md:24	A:program,pipeline	qm:!!! e1000:!!! rtl8139:!!! vmxnet3,bridge%3Dvmbr0:!!!
@@ -37634,9 +37633,9 @@ TL:linux/qmrestore.md:20	A:program	qmrestore:!!!
 TL:linux/qmrestore.md:8	A:program	qmrestore:!!!
 TL:linux/qrcp.md:12	A:program	qrcp:!!!
 TL:linux/qrcp.md:16	A:program	qrcp:!!!
-TL:linux/qrcp.md:20	A:program,pipeline	qrcp:-!! receive:-!! =not%20foundreceive:!--
+TL:linux/qrcp.md:20	A:program,pipeline	qrcp:!!! receive:!!!
 TL:linux/qrcp.md:24	A:program,pipeline	qrcp:!!! receive:!!!
-TL:linux/qrcp.md:28	A:program,pipeline	qrcp:!!! receive:!!!
+TL:linux/qrcp.md:28	A:program,pipeline	qrcp:-!! receive:-!! =not%20foundreceive:!--
 TL:linux/qrcp.md:8	A:program	qrcp:!!!
 TL:linux/qsub.md:12	A:program	qsub:!!!
 TL:linux/qsub.md:16	A:program	qsub:!!!
@@ -37835,11 +37834,11 @@ TL:linux/rexec.md:17	A:program	rexec:!!!
 TL:linux/rexec.md:21	A:program	rexec:!!!
 TL:linux/rexec.md:9	A:program	rexec:!!!
 TL:linux/rfkill.md:12	A:program	rfkill:!!!
-TL:linux/rfkill.md:16	A:program,pipeline	rfkill:-!! wifi:!!! gps:!!! nfc:-!! ...:!!! =not%20foundnfc:!--
+TL:linux/rfkill.md:16	A:program,pipeline	rfkill:!!! wifi:!!! gps:!!! nfc:!!! ...:!!!
 TL:linux/rfkill.md:20	A:program,pipeline	rfkill:!!! wifi:!!! gps:!!! nfc:!!! ...:!!!
 TL:linux/rfkill.md:24	A:program	rfkill:!!!
 TL:linux/rfkill.md:8	A:program	rfkill:!!!
-TL:linux/rig.md:12	A:program,pipeline	rig:!!! -f:!!!
+TL:linux/rig.md:12	A:program,pipeline	rig:-!! -f:-!! =not%20found-f:!--
 TL:linux/rig.md:16	A:program	rig:!!!
 TL:linux/rig.md:20	A:program	rig:!!!
 TL:linux/rig.md:24	A:program	rig:!!!
@@ -37864,7 +37863,7 @@ TL:linux/rmpc.md:13	A:program	rmpc:!!!
 TL:linux/rmpc.md:17	A:program	rmpc:!!!
 TL:linux/rmpc.md:21	A:program	rmpc:!!!
 TL:linux/rmpc.md:25	A:program	rmpc:!!!
-TL:linux/rmpc.md:29	A:program,pipeline	rmpc:-!! prev:-!! stop:!!! consume:!!! togglerepeat:!!! pause:!!! unpause:!!! =not%20foundrmpc:!--
+TL:linux/rmpc.md:29	A:program,pipeline	rmpc:!!! prev:!!! stop:!!! consume:!!! togglerepeat:!!! pause:!!! unpause:!!!
 TL:linux/rmpc.md:33	A:program	rmpc:!!!
 TL:linux/rmpc.md:9	A:program	rmpc:!!!
 TL:linux/rnm.md:12	A:program	rnm:!!!
@@ -37891,7 +37890,7 @@ TL:linux/rpcclient.md:16	A:program	rpcclient:!!!
 TL:linux/rpcclient.md:20	A:program	rpcclient:!!!
 TL:linux/rpcclient.md:24	A:program	enumdomusers:!!!
 TL:linux/rpcclient.md:28	A:program	enumprivs:!!!
-TL:linux/rpcclient.md:32	A:program,pipeline	queryuser:!!! rid:!!!
+TL:linux/rpcclient.md:32	A:program,pipeline	queryuser:-!! rid:-!! =not%20foundrid:!--
 TL:linux/rpcclient.md:36	A:program	createdomuser:!!!
 TL:linux/rpcclient.md:8	A:program	rpcclient:!!!
 TL:linux/rpcinfo.md:12	A:program	rpcinfo:!!!
@@ -37969,7 +37968,7 @@ TL:linux/run-mailcap.md:32	A:program	run-mailcap:!!!
 TL:linux/run-mailcap.md:36	A:program	run-mailcap:!!!
 TL:linux/run-mailcap.md:8	A:program	run-mailcap:!!!
 TL:linux/run0.md:10	A:program	run0:!!!
-TL:linux/run0.md:14	A:program,pipeline	run0:-!! user_id:-!! group_id:!!! =not%20foundrun0:!--
+TL:linux/run0.md:14	A:program,pipeline	run0:!!! user_id:!!! group_id:!!!
 TL:linux/run_init.md:10	A:program	sudo:ppp
 TL:linux/run_init.md:14	A:program,pipeline	sudo:ppp stop:!!! restart:!!!
 TL:linux/run_init.md:18	A:program	sudo:ppp
@@ -38116,7 +38115,7 @@ TL:linux/scrun.md:16	A:program	scrun:!!!
 TL:linux/scrun.md:20	A:program	scrun:!!!
 TL:linux/scrun.md:24	A:program	scrun:!!!
 TL:linux/scrun.md:28	A:program	scrun:!!!
-TL:linux/scrun.md:32	U:pid/program,pipeline	scrun:!!! start:!!! kill delete:!!!
+TL:linux/scrun.md:32	U:pid/program,pipeline	scrun:-!! start:!!! kill delete:!!!
 TL:linux/scrun.md:36	A:program	scrun:!!!
 TL:linux/scrun.md:8	A:program	scrun:!!!
 TL:linux/sdiag.md:12	A:program	sdiag:!!!
@@ -38244,7 +38243,7 @@ TL:linux/setfont.md:12	A:program,path-system	setfont:!!!
 TL:linux/setfont.md:16	A:program	setfont:!!!
 TL:linux/setfont.md:20	A:program	setfont:!!!
 TL:linux/setfont.md:8	A:program	setfont:!!!
-TL:linux/setleds.md:12	A:program,pipeline	setleds:!!! caps:!!! scroll:!!!
+TL:linux/setleds.md:12	A:program,pipeline	setleds:-!! caps:!!! scroll:-!! =not%20foundscroll:!--
 TL:linux/setleds.md:16	A:program,pipeline	setleds:!!! caps:!!! scroll:!!!
 TL:linux/setleds.md:20	A:program	setleds:!!!
 TL:linux/setleds.md:24	A:program	setleds:!!!
@@ -38263,7 +38262,7 @@ TL:linux/setsid.md:25	A:program	setsid:ppp
 TL:linux/setsid.md:9	A:program	setsid:ppp
 TL:linux/setterm.md:13	A:program,pipeline	setterm:ppp off:!!!
 TL:linux/setterm.md:17	A:program,pipeline	setterm:ppp off:!!!
-TL:linux/setterm.md:21	A:program,pipeline	setterm:ppp black:!!! blue:!!! red:!!! ...:!!!
+TL:linux/setterm.md:21	A:program,pipeline	setterm:ppp black:-!! blue:!!! red:-!! ...:!!! =not%20foundblack:!--
 TL:linux/setterm.md:25	A:program,pipeline	setterm:ppp black:!!! blue:!!! red:!!! ...:!!!
 TL:linux/setterm.md:29	A:program	setterm:ppp
 TL:linux/setterm.md:33	A:program	setterm:ppp
@@ -38287,8 +38286,8 @@ TL:linux/sfill.md:20	A:program,path-absent	sfill:!!!
 TL:linux/sfill.md:24	A:program,path-absent	sfill:!!!
 TL:linux/sfill.md:8	A:program,path-absent	sfill:!!!
 TL:linux/sh5util.md:12	A:program,pipeline	sh5util:!!! job_id.step_id:!!! Filesystem:!!! Network:!!! Task:!!!
-TL:linux/sh5util.md:16	A:program,pipeline	sh5util:!!! job_id.step_id:!!! Filesystem:!!! Network:!!! Task:!!!
-TL:linux/sh5util.md:8	A:program,pipeline	sh5util:!!! job_id.step_id:!!!
+TL:linux/sh5util.md:16	A:program,pipeline	sh5util:-!! job_id.step_id:-!! Filesystem:!!! Network:!!! Task:-!! =not%20foundTask:!--
+TL:linux/sh5util.md:8	A:program,pipeline	sh5util:-!! job_id.step_id:-!! =not%20foundjob_id.step_id:!--
 TL:linux/shar.md:12	U:files/program	shar
 TL:linux/shar.md:16	U:files/program	shar
 TL:linux/shar.md:20	U:files/program	shar
@@ -38441,7 +38440,7 @@ TL:linux/snapper.md:8	A:program	snapper:!!!
 TL:linux/sockstat.md:13	A:program,pipeline	sockstat:!!! 6:!!! udp:!!! raw:!!! unix:!!!
 TL:linux/sockstat.md:17	A:program	sockstat:!!!
 TL:linux/sockstat.md:21	A:program,pipeline	sockstat:!!! process_name:!!!
-TL:linux/sockstat.md:25	A:program,pipeline	sockstat:!!! username:!!!
+TL:linux/sockstat.md:25	A:program,pipeline	sockstat:-!! username:-!! =not%20foundsockstat:!--
 TL:linux/sockstat.md:29	A:program,pipeline	sockstat:!!! group_name:!!!
 TL:linux/sockstat.md:9	A:program	sockstat:!!!
 TL:linux/sos.md:13	A:program	sudo:ppp
@@ -38509,7 +38508,7 @@ TL:linux/sprof.md:9	A:program	sprof:!!!
 TL:linux/sqfscat.md:8	A:program	sqfscat:!!!
 TL:linux/sqfstar.md:12	A:program,pipeline	zcat:ppp sqfstar:!!! lzo:!!! lz4:!!! xz:ppp zstd:!!! lzma:ppp
 TL:linux/sqfstar.md:16	A:program,pipeline	xzcat:ppp sqfstar:!!!
-TL:linux/sqfstar.md:20	A:program,pipeline	zstdcat:!!! sqfstar:!!!
+TL:linux/sqfstar.md:20	A:program,pipeline	zstdcat:-!! sqfstar:-!! =not%20foundsqfstar:!--
 TL:linux/sqfstar.md:24	A:program,pipeline	lz4cat:!!! sqfstar:!!!
 TL:linux/sqfstar.md:8	U:files/program	sqfstar
 TL:linux/squeue.md:12	A:program	squeue:!!!
@@ -38522,7 +38521,7 @@ TL:linux/sreport.md:8	A:program	sreport:!!!
 TL:linux/srun.md:12	A:program,path-system	srun:!!!
 TL:linux/srun.md:16	A:program,path-system	srun:!!!
 TL:linux/srun.md:8	A:program,path-system	srun:!!!
-TL:linux/ss.md:12	A:program,pipeline	ss:!!! exclude:!!! big:!!! connected:!!! synchronized:!!! ...:!!!
+TL:linux/ss.md:12	A:program,pipeline	ss:!!! exclude:-!! big:!!! connected:!!! synchronized:!!! ...:-!!
 TL:linux/ss.md:16	A:program	ss:!!!
 TL:linux/ss.md:20	A:program	ss:!!!
 TL:linux/ss.md:24	A:program	ss:!!!
@@ -38808,7 +38807,7 @@ TL:linux/systemctl-kill.md:8	A:program	systemctl:ppp
 TL:linux/systemctl-link.md:13	A:program	systemctl:ppp
 TL:linux/systemctl-link.md:9	A:program	systemctl:ppp
 TL:linux/systemctl-list-automounts.md:13	A:program	systemctl:ppp
-TL:linux/systemctl-list-automounts.md:17	A:program,pipeline	systemctl:ppp inactive:-!! failed:!!! ...:-!! =not%20found...:!--
+TL:linux/systemctl-list-automounts.md:17	A:program,pipeline	systemctl:ppp inactive:!!! failed:!!! ...:!!!
 TL:linux/systemctl-list-automounts.md:21	A:program	systemctl:ppp
 TL:linux/systemctl-list-automounts.md:9	A:program	systemctl:ppp
 TL:linux/systemctl-list-dependencies.md:13	A:program	systemctl:ppp
@@ -38851,7 +38850,7 @@ TL:linux/systemctl-list-units.md:25	A:program	systemctl:ppp
 TL:linux/systemctl-list-units.md:29	A:program	systemctl:ppp
 TL:linux/systemctl-list-units.md:33	A:program	systemctl:ppp
 TL:linux/systemctl-list-units.md:9	A:program	systemctl:ppp
-TL:linux/systemctl-log-level.md:12	A:program,pipeline	systemctl:ppp alert:!!! crit:!!! err:!!! warning:!!! notice:!!! info:!!! debug:!!!
+TL:linux/systemctl-log-level.md:12	A:program,pipeline	systemctl:ppp alert:-!! crit:!!! err:-!! warning:!!! notice:!!! info:!!! debug:!!! =not%20foundalert:!--
 TL:linux/systemctl-log-level.md:8	A:program	systemctl:ppp
 TL:linux/systemctl-log-target.md:12	A:program,pipeline	systemctl:ppp journal:!!! kmsg:!!! console:!!! syslog:!!! null:!!! auto:!!!
 TL:linux/systemctl-log-target.md:8	A:program	systemctl:ppp
@@ -38937,7 +38936,7 @@ TL:linux/systemctl-status.md:20	A:program	systemctl:ppp
 TL:linux/systemctl-status.md:24	A:program,pipeline	systemctl:ppp timer:!!! socket:!!! target:!!! ...:!!!
 TL:linux/systemctl-status.md:28	A:program,pipeline	systemctl:ppp inactive:!!! failed:!!!
 TL:linux/systemctl-status.md:32	A:program	systemctl:ppp
-TL:linux/systemctl-status.md:8	A:program,pipeline	systemctl:ppp timer:-!! socket:!!! target:!!! ...:-!! =not%20found...:!--
+TL:linux/systemctl-status.md:8	A:program,pipeline	systemctl:ppp timer:!!! socket:-!! target:!!! ...:-!! =not%20foundsocket:!--
 TL:linux/systemctl-stop.md:12	A:program	systemctl:ppp
 TL:linux/systemctl-stop.md:16	A:program	systemctl:ppp
 TL:linux/systemctl-stop.md:8	A:program	systemctl:ppp
@@ -38968,7 +38967,7 @@ TL:linux/systemctl-whoami.md:17	A:program	systemctl:ppp
 TL:linux/systemctl-whoami.md:21	A:program	systemctl:ppp
 TL:linux/systemctl-whoami.md:9	A:program	systemctl:ppp
 TL:linux/systemctl.md:13	A:program	systemctl:ppp
-TL:linux/systemctl.md:17	A:program,pipeline	systemctl:ppp stop:!!! restart:!!! reload:!!! status:!!!
+TL:linux/systemctl.md:17	A:program,pipeline	systemctl:ppp stop:!!! restart:!!! reload:-!! status:-!! =not%20foundreload:!--
 TL:linux/systemctl.md:21	A:program,pipeline	systemctl:ppp disable:!!!
 TL:linux/systemctl.md:29	A:program,pipeline	systemctl:ppp is-enabled:!!! is-failed:!!!
 TL:linux/systemctl.md:33	A:program,pipeline	systemctl:ppp socket:!!! automount:!!! ...:!!! running:!!!
@@ -39204,7 +39203,7 @@ TL:linux/timekpra.md:16	A:program	timekpra:!!!
 TL:linux/timekpra.md:20	A:program	timekpra:!!!
 TL:linux/timekpra.md:24	A:program	timekpra:!!!
 TL:linux/timekpra.md:28	A:program	timekpra:!!!
-TL:linux/timekpra.md:32	A:program,pipeline	timekpra:!!! -:!!! %3D:!!!
+TL:linux/timekpra.md:32	A:program,pipeline	timekpra:-!! -:-!! %3D:!!! =not%20found-:!--
 TL:linux/timekpra.md:8	A:program	timekpra:!!!
 TL:linux/timeshift.md:12	A:program	sudo:ppp
 TL:linux/timeshift.md:16	A:program	sudo:ppp
@@ -39343,7 +39342,7 @@ TL:linux/trace-cmd-record.md:29	A:program	sudo:ppp
 TL:linux/trace-cmd-record.md:9	A:program	sudo:ppp
 TL:linux/trace-cmd-report.md:13	A:program	sudo:ppp
 TL:linux/trace-cmd-report.md:9	A:program	sudo:ppp
-TL:linux/trace-cmd.md:17	A:program,pipeline	sudo:ppp function_graph:-!! preemptirqsoff:!!! irqsoff:!!! preemptoff:!!! wakeup:-!! ...:!!! =not%20foundfunction_graph:!--
+TL:linux/trace-cmd.md:17	A:program,pipeline	sudo:ppp function_graph:!!! preemptirqsoff:!!! irqsoff:!!! preemptoff:!!! wakeup:!!! ...:!!!
 TL:linux/trace-cmd.md:21	A:program	sudo:ppp
 TL:linux/trace-cmd.md:25	A:program	sudo:ppp
 TL:linux/trace-cmd.md:29	A:program	sudo:ppp
@@ -39372,7 +39371,7 @@ TL:linux/trashy.md:20	A:program	trash:!!!
 TL:linux/trashy.md:24	A:program	trash:!!!
 TL:linux/trashy.md:28	A:program	trash:!!!
 TL:linux/trashy.md:32	A:program	trash:!!!
-TL:linux/trayer.md:12	A:program,pipeline	trayer:-!! right:-!! top:ppp bottom:!!! =not%20foundtrayer:!--
+TL:linux/trayer.md:12	A:program,pipeline	trayer:!!! right:!!! top:ppp bottom:!!!
 TL:linux/trayer.md:16	A:program	trayer:!!!
 TL:linux/trayer.md:20	A:program,pipeline	trayer:!!! percent:!!!
 TL:linux/trayer.md:24	A:program,pipeline	trayer:!!! center:!!! right:!!!
@@ -39398,7 +39397,7 @@ TL:linux/tshark.md:12	A:program	tshark:!!!
 TL:linux/tshark.md:16	A:program	tshark:!!!
 TL:linux/tshark.md:20	A:program	tshark:!!!
 TL:linux/tshark.md:24	A:program,pipeline	tshark:!!! text:!!! ps:ppp ...:!!!
-TL:linux/tshark.md:28	A:program,pipeline	tshark:!!! ek:!!! json:!!! pdml:!!!
+TL:linux/tshark.md:28	A:program,pipeline	tshark:-!! ek:!!! json:-!! pdml:!!! =not%20foundjson:!--
 TL:linux/tshark.md:32	A:program	tshark:!!!
 TL:linux/tshark.md:36	A:program	tshark:!!!
 TL:linux/tshark.md:8	A:program	tshark:!!!
@@ -39724,7 +39723,7 @@ TL:linux/uuid.md:13	A:program	uuid:!!!
 TL:linux/uuid.md:17	A:program	uuid:!!!
 TL:linux/uuid.md:21	A:program,pipeline	uuid:!!! STR:!!! SIV:!!!
 TL:linux/uuid.md:25	A:program	uuid:!!!
-TL:linux/uuid.md:29	A:program,pipeline	uuid:-!! URL:-!! OID:!!! X500:!!! =not%20founduuid:!--
+TL:linux/uuid.md:29	A:program,pipeline	uuid:!!! URL:!!! OID:!!! X500:!!!
 TL:linux/uuid.md:33	A:program	uuid:!!!
 TL:linux/uuid.md:9	A:program	uuid:!!!
 TL:linux/uuidd.md:12	A:program	uuidd:!!!
@@ -39921,7 +39920,7 @@ TL:linux/wal-telegram.md:20	A:program	wal-telegram:!!!
 TL:linux/wal-telegram.md:24	A:program	wal-telegram:!!!
 TL:linux/wal-telegram.md:28	A:program	wal-telegram:!!!
 TL:linux/wal-telegram.md:8	A:program	wal-telegram:!!!
-TL:linux/walker.md:13	A:program,pipeline	walker:-!! calc:-!! clipboard:-!! runner:!!! ...:!!! =not%20foundwalker:!--
+TL:linux/walker.md:13	A:program,pipeline	walker:!!! calc:!!! clipboard:!!! runner:!!! ...:!!!
 TL:linux/walker.md:17	A:program,pipeline	printf walker:!!!
 TL:linux/walker.md:21	A:program	walker:!!!
 TL:linux/walker.md:9	A:program	walker:!!!
@@ -40039,7 +40038,7 @@ TL:linux/wine.md:20	A:program,pipeline	wine:!!! notepad:!!! write:!!!
 TL:linux/wine.md:24	A:program,pipeline	wine:!!! control:!!! taskmgr:!!!
 TL:linux/wine.md:28	A:program,path-absent	wine:!!!
 TL:linux/wine.md:32	A:program	wine:!!!
-TL:linux/wine.md:36	A:program,pipeline,path-absent	wine:!!! REG_BINARY:!!! REG_DWORD:!!! ...:!!!
+TL:linux/wine.md:36	A:program,pipeline,path-absent	wine:-!! REG_BINARY:-!! REG_DWORD:!!! ...:!!!
 TL:linux/wine.md:8	A:program	wine:!!!
 TL:linux/wineboot.md:12	A:program	wineboot:!!!
 TL:linux/wineboot.md:16	A:program	wineboot:!!!
@@ -40136,7 +40135,7 @@ TL:linux/wpctl.md:14	A:program	wpctl:!!!
 TL:linux/wpctl.md:18	A:program	wpctl:!!!
 TL:linux/wpctl.md:22	A:program	wpctl:!!!
 TL:linux/wpctl.md:26	A:program,pipeline	wpctl:!!! n%25%2B:!!! n%25-:!!!
-TL:linux/wpctl.md:30	A:program,pipeline	wpctl:-!! video:-!! sinks:!!! sources:!!! =not%20foundvideo:!--
+TL:linux/wpctl.md:30	A:program,pipeline	wpctl:!!! video:!!! sinks:!!! sources:!!!
 TL:linux/wpctl.md:34	A:program	wpctl:!!!
 TL:linux/wpctl.md:38	A:program,pipeline	wpctl:!!! SOURCE@:!!! 0:!!! toggle:!!!
 TL:linux/wpexec.md:13	A:program	wpexec:!!!
@@ -40144,7 +40143,7 @@ TL:linux/wpexec.md:9	A:program	wpexec:!!!
 TL:linux/wtf.md:12	A:program	wtf:!!!
 TL:linux/wtf.md:8	A:program	wtf:!!!
 TL:linux/wtype.md:13	A:program	wtype:!!!
-TL:linux/wtype.md:17	A:program,pipeline	wtype:-!! ctrl:-!! ...:!!! =not%20foundctrl:!--
+TL:linux/wtype.md:17	A:program,pipeline	wtype:!!! ctrl:!!! ...:!!!
 TL:linux/wtype.md:21	A:program	wtype:!!!
 TL:linux/wtype.md:25	A:program	wtype:!!!
 TL:linux/wtype.md:29	A:program,pipeline	echo wtype:!!!
@@ -40229,7 +40228,7 @@ TL:linux/xdg-settings.md:8	A:program	xdg-settings:!!!
 TL:linux/xdg-terminal-exec.md:12	A:program	xdg-terminal-exec:!!!
 TL:linux/xdg-terminal-exec.md:16	A:program	xdg-terminal-exec:!!!
 TL:linux/xdg-terminal-exec.md:8	A:program	xdg-terminal-exec:!!!
-TL:linux/xdg-user-dir.md:13	A:program,pipeline	xdg-user-dir:!!! DOWNLOAD:!!! TEMPLATES:!!! PUBLICSHARE:!!! DOCUMENTS:-!! MUSIC:!!! PICTURES:!!! VIDEOS:!!! ...:-!! =not%20found...:!--
+TL:linux/xdg-user-dir.md:13	A:program,pipeline	xdg-user-dir:!!! DOWNLOAD:!!! TEMPLATES:!!! PUBLICSHARE:!!! DOCUMENTS:!!! MUSIC:!!! PICTURES:!!! VIDEOS:!!! ...:!!!
 TL:linux/xdg-user-dir.md:9	A:program	xdg-user-dir:!!!
 TL:linux/xdg-user-dirs-update.md:13	A:program	xdg-user-dirs-update:!!!
 TL:linux/xdg-user-dirs-update.md:17	A:program,path-absent	xdg-user-dirs-update:!!!

@@ -82,7 +82,7 @@ $nats = EV::Nats->new(
         if ($connected_count == 1) {
             pass "connected to node0 (port $ports[0])";
 
-            # Subscribe — should survive failover
+            # Subscribe -should survive failover
             $nats->subscribe('cluster.test', sub {
                 my ($subj, $payload) = @_;
                 $received_after++ if $payload eq 'after-failover';

@@ -9,9 +9,12 @@
 # OUTDIR gets run-K.jsonl per worker (one line per sample); a rerun skips the samples already there, so it can be
 # stopped and started again.  -only @FILE: the IDs one per line (the first field of a line; '#' lines skipped).
 #
-# Isolation (no sample can harm the machine or another sample):
+# Isolation (no sample can harm the machine or another sample; it can change its own run's record, X79):
 # - each worker K runs as its own unprivileged user rcK (made if missing), with no network (unshare -n), CPU,
 #   file-size and process limits (prlimit), a 5-second timeout, and every process of rcK killed after each run;
+#   rcK has no capabilities (setpriv), so every command of a sample, kill and rm among them, reaches only what rcK
+#   owns or may write: its run directory BASE/wK, record files included (log, blog, out, err: known issue X79), and
+#   its own files in the sticky directories /tmp, /var/tmp, /dev/shm;
 # - each run starts in a fresh copy of the same small directory (FIXTURE below), with HOME inside it;
 # - PATH is the programs of %QUIET (run, not logged), then one directory of recorders: one for every program name on the system's PATH.  A recorder appends
 #   its name and arguments to the run's log; for the names in %REAL (the programs we run in place of builtins,
@@ -21,7 +24,7 @@
 #   input (A24 (b): it would take what the program only inherits and another command reads, as in a while-read loop
 #   around mv; the list, and rm, mv, cp, ln with -i, which do read: the recorder).
 # So the three shells see the same files, the same environment and the same "programs", and only the shells differ.
-# Ours runs from a copy of lib/, blib/ and t/try.pl made at the start (BASE/dist), so lib/ may be edited during a run.
+# ShellSpawn runs from a copy of lib/, blib/ and t/try.pl made at the start (BASE/dist), so lib/ may be edited during a run.
 #
 # -env V,...: the run's environment changed for every run of the three shells (known issue X27: tries the other case of
 # an assumption, or fixes what the runs would otherwise share; large-subset-environment.md, section 9).  The variants
@@ -32,10 +35,10 @@
 # (default 1), output STANDIN_OUTPUT (default "one  two\n*\n\nlast"), mtime FIXTURE_MTIME (seconds since 1970, default
 # 1577836800, 2020-01-01 00:00:00 UTC).  So  STANDIN_STATUS=2 perl large-subset-runcompare.pl -env fail ...  tries
 # status 2.  The values used are written to OUTDIR/env.txt.
-# -run DIR (post-0.09): ours goes through Run (DIR: Run's blib/lib, or the directory of Run.pm), as where there is neither
+# -run DIR (post-0.09): ShellSpawn goes through Run (DIR: Run's blib/lib, or the directory of Run.pm), as where there is neither
 # posix_spawn nor fork (M2, Proc::Spawner's primitive 'system1'): PROC_SPAWNER_MISSING="posix_spawn fork", which t/try.pl
 # takes out of the environment once the modules are loaded (TRY_HIDE), so that the samples do not see it.
-# -shells LIST (post-0.10): run only these of dash, bash, ours (for instance ours alone, after a change of ours, to be
+# -shells LIST (post-0.10): run only these of dash, bash, ours (for instance ShellSpawn alone, after a change of ours, to be
 # joined with an earlier run's dash and bash; unlike -q, nothing more is logged).
 # -setup FILE (X27, step 2; 2026-11-10): one example setup per sample, from large-subset-setups.pl (PREFIX-K.jsonl):
 # before each run of the three shells, the files it names are made (a file with its text and mode, a directory) or
@@ -50,30 +53,41 @@
 # timeout): after the shell ends, its background jobs still running get up to SECONDS (default 5, as the shell's own
 # timeout) to end, so that their effects count whichever shell started them; then the rest is killed and the run
 # records "after": "killed".  -after 0: killed at once, as before (the shells' jobs then often died before they did
-# anything, while ours finishes its jobs before it ends).  With -env pidns, process 1 of the namespace waits for all.
-# -end MODE (post-0.12, K5): ours' wait at exit for its background jobs, PROC_SHELLSPAWN_END (shell, the default; all;
+# anything, while ShellSpawn finishes its jobs before it ends).  With -env pidns, process 1 of the namespace waits for all.
+# -end MODE (post-0.12, K5): ShellSpawn's wait at exit for its background jobs, PROC_SHELLSPAWN_END (shell, the default; all;
 # none; each with :SECONDS), hidden from the samples as -run's setting is (TRY_HIDE); OUTDIR/end.txt names it.
 # -programs FILE|system (post-0.12, A23 (b), the user, 2026-11-15): the program names that get recorders, one a line
 # ('#' lines skipped): by default large-subset-programs.txt beside this script, every name there whether installed or not
 # and no other, so that what the samples meet is the same in every container; 'system': every name on the system's
 # PATH (as before).  OUTDIR/programs.txt names the list and its SHA-256.
+# -calls FILE (post-0.13, X84): large-subset-provenance.tsv, whose column CALLS names the commands each sample's text
+# calls (large-subset-blocks.pl -e; names that a run marked with =, an expansion's ? and the marks themselves are not
+# taken).  Each name there, and each of a setup's "standin", that has no recorder (not on the list of -programs) and is
+# no builtin of dash, bash --posix or ShellSpawn (asked once, at the start; a keyword is no builtin: time), gets a stand-in for the runs of
+# that sample alone: made in BASE/wK.standin before them, removed after them; each run sees it in the recorders'
+# directory, by a read-only overlay in a mount namespace of the run's own (with -env cowroot: written into the run's
+# root), so that PATH stays the same and the runs of other workers do not see it.  The sample's record names them
+# ("standin_added").  Without -calls only a setup's "standin" names are taken.  OUTDIR/calls.txt names FILE.
 # -workers-from DIR (post-0.10): each sample runs in the worker K (directory BASE/wK, user rcK) that ran it in the earlier
 # run DIR (its run-K.jsonl), so that paths, $PWD and $USER are those of that run; samples not there are spread as usual.
 use strict; use warnings; use JSON::PP; use File::Path qw(make_path remove_tree); use Cwd 'abs_path'; use Getopt::Long;
 use POSIX ();
-my ($J, $MAX, $ONLY, $Q, $ENVL, $BASE, $RUNLIB, $SHELLS, $WFROM, $SETUPF, $STANDIN, $AFTER, $ENDW) = (4, 0, '', 0, '', '/var/tmp/runcompare', '', 'dash,bash,ours', '', '', '', 5, '');
-my $PROGS = do { (my $d = abs_path($0)) =~ s{/[^/]*\z}{}; "$d/large-subset-programs.txt" };   # -q: run ours only, and log the programs of %QUIET too, each line headed by its caller's name and \035 (for large-subset-threeway.pl),
+my ($J, $MAX, $ONLY, $Q, $ENVL, $BASE, $RUNLIB, $SHELLS, $WFROM, $SETUPF, $STANDIN, $AFTER, $ENDW) = (4, 0, '', 0, '', '/var/tmp/runcompare', '', 'dash,bash,shellspawn', '', '', '', 5, '');
+my $CALLSF = '';   # -calls
+my $PROGS = do { (my $d = abs_path($0)) =~ s{/[^/]*\z}{}; "$d/large-subset-programs.txt" };   # -q: run ShellSpawn only, and log the programs of %QUIET too, each line headed by its caller's name and \035 (for large-subset-threeway.pl),
 #     and every builtin call (t/try.pl, RECBUILTIN; for large-subset-builtins.pl)
-GetOptions('j=i' => \$J, 'n=i' => \$MAX, 'only=s' => \$ONLY, 'q' => \$Q, 'env=s' => \$ENVL, 'base=s' => \$BASE, 'run=s' => \$RUNLIB, 'shells=s' => \$SHELLS, 'workers-from=s' => \$WFROM, 'standin=s' => \$STANDIN, 'setup=s' => \$SETUPF, 'after=f' => \$AFTER, 'end=s' => \$ENDW, 'programs=s' => \$PROGS) && @ARGV == 3
-  or die "usage: $0 [-j N] [-n MAX] [-only IDS|\@FILE] [-q] [-env V,...] [-base DIR] [-run RUNLIB] [-shells LIST] [-workers-from DIR] [-standin LIST] [-setup FILE] [-after SECONDS] [-end MODE] [-programs FILE|system] samples.jsonl samples.tsv OUTDIR\n";
+GetOptions('j=i' => \$J, 'n=i' => \$MAX, 'only=s' => \$ONLY, 'q' => \$Q, 'env=s' => \$ENVL, 'base=s' => \$BASE, 'run=s' => \$RUNLIB, 'shells=s' => \$SHELLS, 'workers-from=s' => \$WFROM, 'standin=s' => \$STANDIN, 'setup=s' => \$SETUPF, 'after=f' => \$AFTER, 'end=s' => \$ENDW, 'programs=s' => \$PROGS, 'calls=s' => \$CALLSF) && @ARGV == 3
+  or die "usage: $0 [-j N] [-n MAX] [-only IDS|\@FILE] [-q] [-env V,...] [-base DIR] [-run RUNLIB] [-shells LIST] [-workers-from DIR] [-standin LIST] [-setup FILE] [-after SECONDS] [-end MODE] [-programs FILE|system] [-calls FILE] samples.jsonl samples.tsv OUTDIR\n";
 my %SETUP;   # -setup: sample id => its setup
 if (length $SETUPF) { open my $in, '<', $SETUPF or die "$SETUPF: $!"; while (<$in>) { my $s = decode_json($_); $SETUP{$s->{id}} = $s }
   %SETUP or die "-setup $SETUPF: no setups\n" }
 our $CURSETUP;   # the setup of the sample being run
 our $ARG0;       # its $0 when the setup gives arguments
+our $CUREXTRA;   # X84: the stand-ins added for it (-calls, its setup's standin), or undef
 !length $RUNLIB or -e "$RUNLIB/Run.pm" or die "-run $RUNLIB: no Run.pm there\n";
-my %SH = map +($_ => 1), split /,/, $SHELLS; /^(?:dash|bash|ours)\z/ or die "-shells: dash, bash, ours\n" for keys %SH;
-%SH or die "-shells: none\n"; %SH = (ours => 1) if $Q;
+my %SH = map +(($_ eq 'ours' ? 'shellspawn' : $_) => 1), split /,/, $SHELLS;   # ours: ShellSpawn's name before post-0.13's rename
+/^(?:dash|bash|shellspawn)\z/ or die "-shells: dash, bash, shellspawn\n" for keys %SH;
+%SH or die "-shells: none\n"; %SH = (shellspawn => 1) if $Q;
 # The variants of -env: what each does, and the code of large-subset-provenance.tsv it is for.
 my %ENVV = (
   posix   => 'POSIXLY_CORRECT=1 in the environment (code echo: the other case)',
@@ -109,7 +123,7 @@ for my $m (($ENV_ON{tmp} || $ENV_ON{private} ? qw(/tmp /var/tmp /dev/shm) : ()),
            ($ENV_ON{dev} ? '/dev' : ()), ($ENV_ON{noproc} ? '/proc' : ())) {
   "$BASE/" =~ m{^\Q$m\E/} and die "-base $BASE lies under $m, which -env $ENVL hides: choose another (-base /runcompare)\n" }
 make_path($BASE); chmod 0755, $BASE;
-my $COPY = "$BASE/dist"; remove_tree($COPY); make_path("$COPY/t");   # ours runs from this copy
+my $COPY = "$BASE/dist"; remove_tree($COPY); make_path("$COPY/t");   # ShellSpawn runs from this copy
 system('cp', '-a', "$DIST/lib", "$DIST/blib", $COPY) == 0 && system('cp', '-a', "$DIST/t/try.pl", "$COPY/t/") == 0 or die "copy to $COPY failed\n";
 if (length $RUNLIB) { make_path("$COPY/run"); system('cp', '-a', "$RUNLIB/Run.pm", "$COPY/run/") == 0 or die "copy of Run.pm failed\n" }
 system('chmod', '-R', 'a+rX', $COPY) == 0 or die;
@@ -119,8 +133,9 @@ if ($ENV_ON{random}) { require Digest::SHA; open my $o, '>:raw', $RANDOM or die 
 my $LIMIT = 4000;   # characters of each output kept
 
 # %QUIET: the programs Proc::ShellSpawn runs in place of the shells' builtins (R-program): run, not logged, since the
-# shells' builtins leave no log either.  %REAL: logged, then run (they only read, print or make files; rm, mv, cp,
-# ln are only logged, to keep a sample from removing what it did not make).
+# shells' builtins leave no log either.  %REAL: logged, then run (they only read, print or make files).  rm, mv, cp,
+# ln are only logged: a choice for the measurement, not for safety, since run as rcK they could reach no more than
+# the shells' own redirections already can (the isolation above; the run's record is within reach of both: X79).
 my %QUIET = map +($_ => 1), qw(echo printf test [ true false pwd kill);
 my %REAL = (%QUIET, map +($_ => 1), qw(cat grep egrep fgrep sed awk sort head tail wc tr cut uniq seq expr basename
   dirname printenv env xargs tee ls mkdir touch cmp diff od rev nl paste join fold comm tac realpath readlink stat
@@ -197,14 +212,40 @@ my @todo; { open my $in, '<', $SJ or die "$SJ: $!";
     push @todo, $s; last if $MAX && @todo >= $MAX } }
 print STDERR scalar(@todo), " samples to run, ", scalar(keys %done), " done before", (%ENV_ON ? ", -env " . join(',', sort keys %ENV_ON) : ''), "\n";
 if (length $RUNLIB) { require Digest::SHA; open my $e, '>', "$OUT/run.txt" or die;
-  print $e "ours through Run: PROC_SPAWNER_MISSING=\"posix_spawn fork\"; Run.pm sha256 ", Digest::SHA->new(256)->addfile("$COPY/run/Run.pm")->hexdigest, "\n"; close $e }
-if (length $ENDW) { open my $e, '>', "$OUT/end.txt" or die; print $e "ours at exit: PROC_SHELLSPAWN_END=$ENDW\n"; close $e }
+  print $e "ShellSpawn through Run: PROC_SPAWNER_MISSING=\"posix_spawn fork\"; Run.pm sha256 ", Digest::SHA->new(256)->addfile("$COPY/run/Run.pm")->hexdigest, "\n"; close $e }
+if (length $ENDW) { open my $e, '>', "$OUT/end.txt" or die; print $e "ShellSpawn at exit: PROC_SHELLSPAWN_END=$ENDW\n"; close $e }
 { open my $e, '>', "$OUT/programs.txt" or die; require Digest::SHA;   # (A23: which program names the run saw)
   print $e $PROGS eq 'system' ? "programs: every name on the system's PATH\n"
     : "programs: $PROGS, SHA-256 " . Digest::SHA->new(256)->addfile($PROGS)->hexdigest . "\n"; close $e }
 
-my %OURSENV = ((length $RUNLIB ? (PROC_SPAWNER_MISSING => 'posix_spawn fork') : ()), (length $ENDW ? (PROC_SHELLSPAWN_END => $ENDW) : ()));
-$OURSENV{TRY_HIDE} = join ' ', sort keys %OURSENV if %OURSENV;
+my %EXTRA;   # X84: sample id => [the programs it calls, or its setup stands in, that get a stand-in for its runs alone]
+{ my %calls;   # -calls: id => [the names its text calls, as the classifier wrote them]
+  if (length $CALLSF) { open my $in, '<', $CALLSF or die "-calls $CALLSF: $!";
+    while (<$in>) { next if /^#/; chomp; my ($id, undef, $c) = split /\t/; next unless defined $c;
+      $calls{$id} = [map { s/:[p!-]{3}\z//r =~ s/%([0-9A-Fa-f]{2})/chr hex $1/ger } grep !/^=/ && $_ ne '?', split / /, $c] }
+    %calls or die "-calls $CALLSF: no column CALLS\n";
+    open my $e, '>', "$OUT/calls.txt" or die; require Digest::SHA;
+    print $e "stand-ins for the programs each sample calls (X84): ", abs_path($CALLSF), ", SHA-256 ", Digest::SHA->new(256)->addfile($CALLSF)->hexdigest, "\n"; close $e }
+  my %want;
+  for my $s (@todo) { my $id = $s->{id};
+    $want{$id} = [grep { length && !m{[/\x00-\x1f]} && !/^\.\.?\z/ && !$QUIET{$_} && !-e "$REC/$_" && !-l "$REC/$_" }
+                  do { my %u; grep !$u{$_}++, @{$calls{$id} // []}, map @{$_->{standin} // []}, grep defined, $SETUP{$id} }] }
+  my %cand = map +($_ => 1), map @$_, values %want;
+  if (%cand) {   # a builtin of any of the three shells keeps no stand-in (bind, fc, help, ...: bash's and ShellSpawn's, which dash
+    # does not have, are not programs); a keyword does (time: a utility, which \time and command time call in bash too)
+    my %bi; my $E = "$BASE/empty"; remove_tree($E); make_path($E);
+    for my $sh (['/usr/bin/dash', 'case $(command -V -- "$n" 2> /dev/null) in *" is a shell builtin"|*" is a special shell builtin")'],
+                ['/usr/bin/bash', '--posix', 'case $(type -t -- "$n") in builtin)']) { my $case = pop @$sh;
+      open my $p, '-|', '/usr/bin/env', '-i', "PATH=$E", @$sh, '-c', "for n; do $case printf '%s\\n' \"\$n\";; esac; done", 'sh', sort keys %cand
+        or die "$sh->[0]: $!"; while (<$p>) { chomp; $bi{$_} = 1 } close $p }
+    open my $p, '-|', $^X, "-I$COPY/blib/lib", "-I$COPY/blib/arch", '-MProc::ShellSpawn', '-e',
+      'Proc::ShellSpawn::a4(); print map "$_\n", map keys %$_, @Proc::ShellSpawn::CMDS' or die "ShellSpawn's builtins: $!";
+    while (<$p>) { chomp; $bi{$_} = 1 } close $p or die "ShellSpawn's builtins: failed\n";
+    for my $id (keys %want) { my @n = grep !$bi{$_}, @{$want{$id}}; $EXTRA{$id} = \@n if @n } }
+  printf STDERR "stand-ins added (X84): %d samples, %d names\n", scalar(keys %EXTRA), scalar(do { my %u = map +($_ => 1), map @$_, values %EXTRA; keys %u }) if %EXTRA }
+
+my %SSENV = ((length $RUNLIB ? (PROC_SPAWNER_MISSING => 'posix_spawn fork') : ()), (length $ENDW ? (PROC_SHELLSPAWN_END => $ENDW) : ()));
+$SSENV{TRY_HIDE} = join ' ', sort keys %SSENV if %SSENV;
 if (%SETUP) { open my $e, '>', "$OUT/setup.txt" or die; print $e "setups from ", abs_path($SETUPF), "\n"; close $e }
 if (%ENV_ON) { open my $e, '>', "$OUT/env.txt" or die; print $e map "$_: $ENVV{$_}\n", sort keys %ENV_ON;
   my %used = (fail => 'STANDIN_STATUS', output => 'STANDIN_OUTPUT', mtime => 'FIXTURE_MTIME');
@@ -229,13 +270,17 @@ sub worker {
   for my $s (@$list) {
     my %rec = (id => $s->{id}, src => $s->{src}, text => $s->{text}, verdict => $acc{$s->{id}}[0], features => $acc{$s->{id}}[1]);
     local $CURSETUP = $SETUP{$s->{id}} && { %{$SETUP{$s->{id}}}, failed => [] }; $rec{setup} = $CURSETUP->{k} if $CURSETUP;
+    local $CUREXTRA = $EXTRA{$s->{id}}; remove_tree("$W.standin");   # X84: its stand-ins, for its runs alone
+    if ($CUREXTRA) { make_path("$W.standin"); chmod 0755, "$W.standin"; symlink "$BASE/rec", "$W.standin/$_" or die "$W.standin/$_: $!" for @$CUREXTRA;
+      $rec{standin_added} = [sort @$CUREXTRA] }
     for my $sh (($Q ? () : ([dash => {}, '/usr/bin/dash', '-c'], [bash => {}, '/usr/bin/bash', '--posix', '-c'])),
-                [ours => {%OURSENV},
+                [shellspawn => {%SSENV},
                  $^X, "-I$COPY/blib/lib", "-I$COPY/blib/arch", (length $RUNLIB ? "-I$COPY/run" : ()), "$COPY/t/try.pl"]) {
       my ($name, $xenv, @cmd) = @$sh; next unless $SH{$name};
-      local $ARG0 = $name eq 'ours' ? 'sh' : $cmd[0];   # -setup with arguments: $0 as each shell has it without (so its messages' prefix)
+      local $ARG0 = $name eq 'shellspawn' ? 'sh' : $cmd[0];   # -setup with arguments: $0 as each shell has it without (so its messages' prefix)
       $rec{$name} = run1($W, $u, $s->{text}, $xenv, @cmd) }
     $rec{setup_failed} = [do { my %u; grep !$u{$_}++, @{$CURSETUP->{failed}} }] if $CURSETUP && @{$CURSETUP->{failed}};
+    remove_tree("$W.standin");
     print $out $j->encode(\%rec), "\n"; $n++ }
   close $out }
 
@@ -266,7 +311,7 @@ sub run1 {   # one shell, one sample, in a fresh copy of the fixture
   delete $env{$_} for grep !defined $env{$_}, keys %env;   # -setup: a variable given as null is unset
   my $pid = fork // die;
   unless ($pid) {
-    if (%ENV_ON && !eval { environment($W, $u); 1 }) { open my $f, '>', "$W/envfail"; print $f $@; close $f; require POSIX; POSIX::_exit(125) }
+    if ((%ENV_ON || $CUREXTRA) && !eval { environment($W, $u) if %ENV_ON; standins($W) if $CUREXTRA; 1 }) { open my $f, '>', "$W/envfail"; print $f $@; close $f; require POSIX; POSIX::_exit(125) }
     chdir "$W/run" or die; %ENV = %env;
     $SIG{PIPE} = 'IGNORE' if $ENV_ON{sigpipe};   # inherited through exec by prlimit, setpriv, timeout and the shell
     open STDIN, '<', $CURSETUP && defined $CURSETUP->{stdin} ? "$W/stdin" : '/dev/null'; open STDOUT, '>', "$W/out"; open STDERR, '>', "$W/err";
@@ -278,17 +323,19 @@ sub run1 {   # one shell, one sample, in a fresh copy of the fixture
          @cmd, $text, ($ENV_ON{samearg0} ? ('sh', @{$CURSETUP && $CURSETUP->{args} || []})
            : $CURSETUP && $CURSETUP->{args} ? ($ARG0, @{$CURSETUP->{args}}) : ());   # -setup: $0, $1 ...
     exit 127 }
-  waitpid $pid, 0;
+  my $hung;   # X85 (post-0.13): a sample that stops its own process group (bash's suspend -f) stops timeout with it, which
+  { local $SIG{ALRM} = sub { $hung = 1; system('pkill', '-KILL', '-u', $u) };   # then never ends the run: after 15 s every
+    alarm 15; waitpid $pid, 0; alarm 0 }                                        # process of the run is killed (status 124)
   if (-e "$W/envfail") {   # (a setup that cannot be made there: recorded, the run goes on)
     die "-env failed in the run's child: ", slurp("$W/envfail") unless $CURSETUP; push @{$CURSETUP->{failed}}, 'env: ' . slurp("$W/envfail") }
-  my $st = $? >> 8; $st = 'signal ' . ($? & 127) if $? & 127;
+  my $st = $? >> 8; $st = 'signal ' . ($? & 127) if $? & 127; $st = 124 if $hung;   # (as timeout reports its own end)
   my $after;   # -after: the run's processes still there when the shell ended get up to $AFTER seconds (A18)
   if ($ENV_ON{pidns}) { $after = 'killed' if unlink "$W/killed" }   # (process 1 of the namespace waited, and says so)
   elsif ($AFTER > 0) { require Time::HiRes; my $end = Time::HiRes::time() + $AFTER;
     while (system("pgrep -u $u > /dev/null") == 0) { if (Time::HiRes::time() >= $end) { $after = 'killed'; last } Time::HiRes::sleep(0.05) } }
   system('pkill', '-9', '-u', $u);
   my %r = (status => $st, out => slurp("$W/out"), err => slurp("$W/err"), rec => slurp("$W/log"), $Q ? (builtins => slurp("$W/blog")) : (),
-           $after ? (after => $after) : ());
+           $after ? (after => $after) : (), $hung ? (hung => 'killed after 15 s') : ());
   my (@files, @nomsg); my $walk; $walk = sub { no warnings "recursion"; my ($d, $p) = @_; opendir my $dh, $d or return;
     for my $n (sort grep !/^\.\.?\z/, readdir $dh) { my $f = "$d/$n";
       if (-l $f) { push @files, "$p$n -> " . readlink $f; push @nomsg, $files[-1] }
@@ -297,6 +344,14 @@ sub run1 {   # one shell, one sample, in a fresh copy of the fixture
         push @nomsg, "$p$n " . substr(Digest_sha_nomsg($f), 0, 12) } } };   # post-0.11: also without the shells' messages
   $walk->("$W/run", ''); $r{files} = join "\n", @files; $r{files_nomsg} = join "\n", @nomsg;
   \%r }
+
+sub standins {   # X84, in the run's child, as root, after environment(): the sample's stand-ins join the recorders' directory
+  my ($W) = @_;
+  if ($ENV_ON{cowroot}) { symlink "$BASE/rec", "$REC/$_" or die "$REC/$_: $!\n" for @$CUREXTRA; return }   # (the run's own root)
+  unless (grep $ENV_ON{$_}, qw(private dev tmp random noproc pidns)) {   # (else environment() made the namespace)
+    syscall(272, 0x00020000) == 0 or die "unshare(CLONE_NEWNS): $!\n";
+    system('mount', '--make-rprivate', '/') == 0 or die "mount --make-rprivate /: failed\n" }
+  system('mount', '-t', 'overlay', '-o', "lowerdir=$W.standin:$REC", 'overlay', $REC) == 0 or die "overlay on $REC: failed\n" }
 
 sub environment {   # -env, in the run's child, as root: a mount namespace of its own, then the variants' mounts
   my ($W, $u) = @_;

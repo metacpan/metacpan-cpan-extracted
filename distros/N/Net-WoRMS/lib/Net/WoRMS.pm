@@ -5,11 +5,12 @@ package Net::WoRMS;
 # ======================================================================
 # ABSTRACT: Service object to query the "World Register of Marine Species" WoRMS.
 # ======================================================================
-=head1 NAME - query the "World Register of Marine Species" WoRMS
 
-=head1 VERSION
+=encoding utf8
 
-version 1.9
+=head1 NAME
+
+Net::WoRMS - query the "World Register of Marine Species" WoRMS
 
 =head1 SYNOPSIS
 
@@ -57,7 +58,7 @@ use warnings;
 use utf8;
 use open qw(:std :utf8);
 
-our $VERSION = 1.9;
+our $VERSION = 1.901;
 
 # ----------------------------------------------------------------------
 
@@ -107,15 +108,15 @@ no warnings 'experimental::signatures';
 
 # ---------------------------------------------------------------------
 
-=head1 CONFIGURATION
+=head1 DEFAULT SETTINGS
 
 =over
 
-=item $END_POINT = 'http://www.marinespecies.org/aphia.php?p=soap'
+=item $END_POINT = 'https://www.marinespecies.org/aphia.php?p=soap'
 
 The access point to retrieve data via the Simple Object Access Protocol.
 
-=item $APHIA_NS = 'http://aphia/v1.0'
+=item $APHIA_NS = 'https://aphia/v1.0'
 
 Namespace and corresponding URI. In the development context these
 variables are considered as a constants. There are methods to change
@@ -137,53 +138,57 @@ The array holds field names for TEXT and CSV related output.
 
 The format hash mostly for validation.
 
-=item %ORDER_HASH
+=item %ORDER HASH
 
-Dictionary to sort and translate the retrieved field names from the
+Dictionary to sort, parse and translate the retrieved field names from the
 WoRMS database and bring them into a consistent form.
-
-=item @TYPE
-
-Type array corresponding to C<@ORDER_SCORE/@ORDER_DOT> and the
-C<%ORDER_HASH> to handle quotes and C<NULL> values.
 
 =back
 
 =cut
 
 # GLOBALS ==============================================================
-my $END_POINT = 'http://www.marinespecies.org/aphia.php?p=soap';
-my $APHIA_NS  = 'http://aphia/v1.0';
+
+my $END_POINT = 'https://www.marinespecies.org/aphia.php?p=soap';
+my $APHIA_NS  = 'https://aphia/v1.0';
 my $APHIA_URI = $APHIA_NS;
 my $FORMAT    = 'TEXT';
 
-# Field name dump output
-my @ORDER_SCORE =
-    qw/APHIA_ID NAME AUTHOR RANK STATUS VALID_APHIA_ID VALID_NAME
-       VALID_AUTHOR RNK_KINGDOM RNK_PHYLUM RNK_CLASS RNK_ORDER
-       RNK_FAMILY RNK_GENUS CITATION/;
+my $RI = qr/^\d+$/;
+my $RS = qr/^(\(?[\w-]+\)?\.?(?:\s+\(?[\w-]+\)?\.?){0,4})$/;
+# my $RA = qr/^\(?\[?([\w.&'-]+(?:\s+[\w.&'-]+){0,20})(?:,?\s*(\d+))?\)?\]?$/;
+my $RA = qr/^(?=.*\p{L}).{1,250}$/s;
+my $RW = qr/^[\w+\-\.\s+]+$/;
 
-# Field names SQL / CSV
-my @ORDER_DOT = qw/APHIA.ID NAME AUTHOR RANK STATUS VALID.APHIA.ID VALID.NAME
-       VALID.AUTHOR KINGDOM PHYLUM CLASS ORDER
-       FAMILY GENUS CITATION/;
+my %TYPES = ($RI => 'APHIA.ID', $RS => 'TAXON',
+             $RA => 'AUTHOR',   $RW => 'WORDS');
+
+# Field name dump output
+my %ORDER = (
+   # WoRMS.KEY       ORDER   TEXT|CSV         SQL               REX  SUBS
+  'AphiaID'         => [ 0, 'APHIA.ID',       'APHIA_ID',       $RI,  0],
+  'scientificname'  => [ 1, 'NAME',           'NAME',           $RS,  1],
+  'authority'       => [ 2, 'AUTHOR',         'AUTHOR',         $RA,  2],
+  'rank'            => [ 3, 'RANK',           'RANK',           $RW,  1],
+  'status'          => [ 4, 'STATUS',         'STATUS',         $RW,  1],
+  'valid_AphiaID'   => [ 5, 'VALID.APHIA.ID', 'VALID_APHIA_ID', $RI,  0],
+  'valid_name'      => [ 6, 'VALID.NAME',     'VALID_NAME',     $RS,  1],
+  'valid_authority' => [ 7, 'VALID.AUTHOR',   'VALID_AUTHOR',   $RA,  2],
+  'kingdom'         => [ 8, 'KINGDOM',        'RNK_KINGDOM',    $RW,  1],
+  'phylum'          => [ 9, 'PHYLUM',         'RNK_PHYLUM',     $RW,  1],
+  'class'           => [10, 'CLASS' ,         'RNK_CLASS',      $RW,  1],
+  'order'           => [11, 'ORDER',          'RNK_ORDER',      $RW,  1],
+  'family'          => [12, 'FAMILY',         'RNK_FAMILY',     $RW,  1],
+  'genus'           => [13, 'GENUS',          'RNK_GENUS',      $RW,  1],
+  'citation'        => [14, 'CITATION',       'CITATION',     undef,  3],
+);
 
 my %FORMATS = ( TEXT => 1, SQL  => 2,  CSV  => 3);
 
-# SOAP entry mapping to field names - WoRMS keys are a mess
-my %ORDER_HASH = (
-  "AphiaID"       =>  0, "scientificname"  =>  1, "authority"  =>  2,
-  "rank"          =>  3, "status"        =>  4,
-  "valid_AphiaID" =>  5, "valid_name" =>  6, "valid_authority" =>  7,
-  "kingdom"       =>  8, "phylum"     =>  9, "class"           => 10,
-  "order"         => 11, "family"     => 12, "genus"           => 13,
-  "citation"      => 14,);
-
-# Data types of the fields
-# Index         0   1   2   3   4   5   6   7   8   9
-my @TYPE = qw (INT STR STR STR STR INT STR STR STR STR
-               STR STR STR STR STR);
-
+my @CTRL = qw(
+    NUL SOH STX ETX EOT ENQ ACK BEL BS  TAB LF  VT  FF  CR  SO  SI
+    DLE DC1 DC2 DC3 DC4 NAK SYN ETB CAN EM  SUB ESC FS  GS  RS  US
+);
 # ----------------------------------------------------------------------
 
 =head1 FIELDS
@@ -471,27 +476,24 @@ sub searchFuzzy($self, $name, $offs, $fuzzy) {
 
 sub getChildrenByID($self, $sid) {
     my $offs=0; my $total = 0; my $num=1;
-    print "\nWORMS.CHILDREN ID $sid \n" if $FORMAT eq "TEXT";
+    print "\nWORMS.CHILDREN ID $sid \n" if $self->Format eq "TEXT";
     while ($num > 0) {
         my $found = $self->getBlockChildrenByID($sid, $offs);
         last if not $found;
         my @recs = @$found;
         if (@recs) {
           $num  = @recs;
-          foreach my $rec (@recs) {
+          for my $ix (0..$#recs) {
               $total++;
-              $self->printRecord($rec, $total==1, 1,"  ");
+              my %rec = %{ $recs[$ix] };
+              $self->printRecord(\%rec, ($ix==0), ($ix==$#recs) ,"  ");
           }
           $offs +=$num+1;
         } else { $num=0; }
         # print "---- $num $offs $total -----\n";
     }
-    match($self->Format: eq) {
-      case('TEXT') { print "EOF\n" }
-      case('SQL' ) { print ";\n" if $total >0; }
-    }
-    print "\n# WORMS.CHILDREN ID $sid TOTAL: $total\n"
-        if $FORMAT eq "TEXT";
+    print "\nEOF\n# WORMS.CHILDREN ID $sid TOTAL: $total\n"
+        if $self->Format eq "TEXT";
     $total;
 }
 
@@ -500,6 +502,35 @@ sub getChildrenByID($self, $sid) {
 =head2 OUTPUT
 
 =over
+
+=item quoteAuthor($author)
+
+The function will translate abbrevation in names like <D'Alambert>
+to the UTF8 form <D’Alambert> to avoid qouting in SQL fields.
+
+=item quoteString($str, $fmt)
+
+The function will quote $str to prevent SQL injection problems with:
+
+=over
+
+=item undef
+
+    $str = $fmt eq 'SQL' ? 'NULL' : 'NA';
+
+=item backspaced control sequences
+
+    $str = '\r'; # becomes '\\r'
+
+=item control sequences
+
+    $str = "\r"; # becomes '<CR>'
+
+=item embedded single quotes
+
+    $str = "'"; # becomes "''"
+
+=back
 
 =item printRecord($record, $first, $last, $spc)
 
@@ -515,96 +546,107 @@ indentation by C<$spc>.
 
 =cut
 
-# @TODO this is a mess rewrite
-sub printRecord($self, $record, $first, $last, $spc) {
-    # asign header section
-    my @head = ($self->Format eq 'TEXT')
-             ? @ORDER_DOT : @ORDER_SCORE;
-
-    my $num_fields = $#head;
-    my @data = (); my @quote = ();
-    # NULL and quotation
-    for my $i (0..$num_fields) {
-      # Handle empty fields
-      $data[$i]  = ( $self->Format eq 'SQL') ? 'NULL' : 'NA';
-      $quote[$i] = ( $TYPE[$i] eq 'STR' ) ? "'" : '';
+sub quoteString($self, $str, $fmt) {
+    unless  (defined $str) {
+        $str = $fmt eq 'SQL' ? 'NULL' : 'NA';
+        return $str;
     }
 
-    my %rechash = %$record;
-    my $id = $rechash{AphiaID};
+    # Remove control sequences
+    # $str =~ s/\x00/<NUL>/g;
+    # $str =~ s/\r/<CR>/g;
+    # $str =~ s/\n/<NL>/g;
+
+    # Mask backslashes
+    $str =~ s/\\/\\\\/g;
+
+    # Remove control sequences
+    $str =~ s/([\x00-\x1f\x7f])/ '<'.($CTRL[ord($1)] \/\/ 'DEL').'>' /ge;
+
+    # Single Quotes
+    $str =~ s/'/''/g;
+    return "'$str'";
+}
+
+sub quoteAuthor($self, $author) {
+    return unless defined $author;
+    $author =~ s/'/\x{2019}/g;
+    $author;
+}
+
+sub printRecord($self, $record, $first, $last, $spc) {
+    my @fields; my @data; my @type; my $fmt = $self->Format;
+    my $id = $record->{AphiaID};
+    my $nm = $record->{scientificname};
+    for my $field (keys %ORDER) {
+
+        # Get the pasing and substitution rules
+        my ($order, $txtField, $sqlField, $rex, $subs) = @{ $ORDER{$field} };
+        print("F: $field: O: $order FT: $txtField FS: $sqlField RX:  $rex SB: $subs \n")
+            if $self->Debug;
+        # check, escape and pack the data content
+        # the worms field xsd is not very expressive here
+        my $value = $record->{$field};
+        if (defined $value and defined $rex) {
+            if ($value !~ /$rex/) {
+                print STDERR "ERROR ID: $id NAME: '$nm' parsing ".
+                    "FIELD: '$field' VALUE: '$value' is not a valid ".
+                    $TYPES{$rex}." descriptor!\n" ;
+                return 0;
+           }
+        }
+        # Replace ' by ’ in Author stuff like D'Alambert
+        $value = $self->quoteAuthor($value)
+            if (defined $value) and ($subs == 2);
+
+        # Add, NULL/NA and sanitize and quote strings
+        if ($subs != 0) {
+            $value = $self->quoteString($value, $fmt);
+        } else {
+           # Nulling integers
+           $value //= $fmt eq 'SQL' ? 'NULL' : 'NA';
+        }
+        # Pack it in the predefined order
+        $data[$order] = $value;
+        $fields[$order] = ($fmt eq 'SQL') ? $sqlField : $txtField;
+
+        # The WoRMS xsd makes no deeper differentiation here
+        $type[$order] = $subs ? 'STR' : 'INT';
+    }
+    return 0 if not @data;
 
     # return if $record{status} =~ "deleted";
-    # print %rechash, "\n";
-
-    print "\n", $spc, "WORMS ID $id \n" if $self->Format eq 'TEXT';
-    if ($first && $self->Format eq "SQL") {
-      print "INSERT INTO WORMS_TABLE\n(";
-      print join(",",@head), ") VALUES\n(";
+    
+    # header section ---------------------------------------------------
+    if ($first) {
+      print join(",",@fields), "\n"       if $fmt eq "CSV";
+      print "INSERT INTO WORMS_TABLE\n(",join(",",@fields),") ",
+            "VALUES\n" if $fmt eq "SQL";
     }
-    if (!$first && $self->Format eq "SQL") {
-       print ",\n(";
-    }
-    if ($first && $self->Format eq "CSV") {
-      print join(",",@head), "\n";
-    }
-
-    foreach my $k (keys %rechash)  {
-        my $value =  $rechash{$k};
-        $value //= '';
-        $value =~ s/'/\\'/g;
-        my $i = $ORDER_HASH{$k};
-        if (! defined($i)) {
-            print "NO MATCH ",$k,"\n" if $self->Debug > 2;
-            next;
+    # data section -----------------------------------------------------
+    print     join(",", @data),"\n" if $fmt eq "CSV";
+    print "(",join(",", @data),")"  if $fmt eq "SQL";
+    if ($self->Format eq "TEXT") {
+        print "\n", $spc, "WORMS ID $id \n" if $fmt eq 'TEXT';
+        for my $ix (0..$#fields) {
+            printf "%s\t%s\t%-16s\t%s\n",
+                $spc, $type[$ix], $fields[$ix], $data[$ix];
         }
-        if ($i>=0) {
-          # $data[i] = sprintf("%16s %d %8s %16s %s%s%s",
-          #    $k, $i, $TYPE[$i],$head[$i],$quote[$i], $value, $quote[$i])
-           $data[$i] = sprintf("%s%8s %16s %s%s%s",
-             $spc, $TYPE[$i],$head[$i],$quote[$i], $value, $quote[$i])
-          if $self->Format eq "TEXT";
-
-          $data[$i] = $quote[$i].$value.$quote[$i]
-          if $self->Format eq "SQL";
-
-          $data[$i] = $quote[$i].$value.$quote[$i]
-          if $self->Format eq "CSV";
-        }
+       print $spc,"EOF\n";
     }
-    print join(",", @data), "\n" if $self->Format eq "CSV";
-    print join(",", @data), ")"  if !$last && $self->Format eq "SQL";
-    print join(",", @data), ");\n" if  $last && $self->Format eq "SQL";
-    print join("\n", @data)      if $self->Format eq "TEXT";
-    print "\n", $spc,"EOF\n"     if  $last && $self->Format eq "TEXT";
+    # footer section ---------------------------------------------------
+    if ($last) {
+        print "\n", if $self->Format eq "TEXT";
+        print ";\n" if $self->Format eq "SQL";
+     } else {
+        print ",\n" if $self->Format eq "SQL";
+    }
+    1
 }
 
 # WORMS dump Data ------------------------------------------------------
 sub printRecordDef($self, $record, $spc) {
-    my %rechash = %$record;
-    my $id = $rechash{AphiaID};
-    # return if $record{status} =~ "deleted";
-    # print %rechash, "\n";
-    print "\n", $spc, "WORMS ID $id \n";
-    foreach my $k (keys %rechash)  {
-        my $value =  $rechash{$k};
-        $value =~ s/'/\`\'/g if $value; # Franzoesische Authoren unerwuenscht
-	print $spc, "  INT  APHIA.ID       ", $value, "\n"  if $k =~ m/^AphiaID/;
-        print $spc, "  STR  AUTHOR         '",$value, "'\n" if $k =~ m/^authority/;
-        print $spc, "  STR  NAME           '",$value, "'\n" if $k =~ m/^scientificname/;
-        print $spc, "  STR  RANK           '",$value, "'\n" if $k =~ m/^rank/;
-        print $spc, "  STR  STATUS         '",$value, "'\n" if $k =~ m/^status/;
-        print $spc, "  STR  CITE           '",$value, "'\n" if $k =~ m/^citation/;
-	print $spc, "  INT  VALID.APHIA.ID ", $value, "\n"  if $k =~ m/^valid_AphiaID/;
-	print $spc, "  STR  VALID.NAME     '",$value, "'\n" if $k =~ m/^valid_name/;
-	print $spc, "  STR  VALID.AUTHOR   '",$value, "'\n" if $k =~ m/^valid_authority/;
-	print $spc, "  STR  KINGDOM        '",$value, "'\n" if $k =~ m/^kingdom/;
-	print $spc, "  STR  PHYLUM         '",$value, "'\n" if $k =~ m/^phylum/;
-	print $spc, "  STR  CLASS          '",$value, "'\n" if $k =~ m/^class/;
-	print $spc, "  STR  ORDER          '",$value, "'\n" if $k =~ m/^order/;
-	print $spc, "  STR  FAMILY         '",$value, "'\n" if $k =~ m/^family/;
-        print $spc, "  STR  GENUS          '",$value, "'\n" if $k =~ m/^genus/;
-    }
-    print $spc, "EOF \n";
+    $self->printRecord($record, 1, 1, $spc);
     1
 }
 

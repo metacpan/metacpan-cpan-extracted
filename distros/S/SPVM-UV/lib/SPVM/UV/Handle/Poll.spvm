@@ -3,6 +3,8 @@
 
 class UV::Handle::Poll extends UV::Handle {
   
+  version_from UV;
+  
   use UV::Callback::Poll;
   use Resource::UV;
   use UV::Resource::UV;

@@ -54,7 +54,7 @@ use strict; use warnings;
 use POSIX (); use File::Spec ();
 use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL F_SETFL O_NONBLOCK);
 use Config;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 require XSLoader; XSLoader::load(__PACKAGE__, $VERSION);   # __posix_spawn, fpe_at_exec, chld_to_fd, chld_restore
 our %UNSUPPORTED = ('*' => 'fail');   # the defaults for spawn's UNSUPPORTED (EXPERIMENTAL: '*' => 'fail')
 
@@ -65,7 +65,11 @@ our %UNSUPPORTED = ('*' => 'fail');   # the defaults for spawn's UNSUPPORTED (EX
 # does the missing ones in this process, around the call, and undoes them after (bullet-proof only with one thread):
 #   chdir, fchdir            this process changes directory, then comes back
 #   dup2, close, open,       this process arranges its own fds as the child should have them (close: close-on-exec),
-#   closefrom                then puts them back; one missing means all four, and chdir and fchdir too (the order)
+#   closefrom                then puts them back; where a call asks for one of a missing kind, all four, and chdir and
+#                            fchdir too, are done so (the order; X67, post-0.13: per call, no longer for every call).
+#                            Where closefrom is the only missing kind (glibc before 2.34, musl), it becomes a close of
+#                            each fd from N up that the child has then, and posix_spawn does all of it (post-0.13;
+#                            closefrom_as_closes; an fd that another thread opens meanwhile stays open, unlike closefrom's)
 #   sigmask                  this process's mask, set around the call (the child inherits it)
 #   sigdefault               an ignored signal's action set back to the default around the call
 #   pgroup => PGID (> 0)     this process joins the group around the call (the child inherits it)
@@ -146,7 +150,7 @@ sub spawn {   # the raw call: the primitive (__posix_spawn, or __spawn_nowait), 
   # file actions sorted into those done here and those left to the primitive, then the call with the changes around it
   my ($file, $argv, $envp, $acts, $attr, $uns) = @_;
   return __posix_spawn(@_) if spawn_args(@_);
-  my %m = %MISSING;   # (a copy: below, one missing fd action makes the other fd actions missing too)
+  my %m = %MISSING;   # (a copy: below, an fd action of a missing kind in this call makes the other fd actions missing too)
   my %at = %{$attr // {}}; my @acts = @$acts;
   my $refuse = sub {   # an unsupported setting: true (and $! = ENOTSUP) to fail, false to drop it
     my $n = shift; my $v = ($uns && $uns->{$n}) // $UNSUPPORTED{$n} // $UNSUPPORTED{'*'} // 'fail';
@@ -256,7 +260,11 @@ sub spawn_unsupported {   # spawn, step 3: the settings and file actions the pri
     @acts = @k }
   if (ref $at{sigignore} eq 'ARRAY' && ref $at{sigdefault} eq 'ARRAY') {   # ignored and set to the default: which?
     my %d = map +($_ => 1), @{$at{sigdefault}}; if (grep $d{$_}, @{$at{sigignore}}) { $! = POSIX::EINVAL(); return } }
-  if (grep $m{$_}, qw(dup2 close open closefrom)) { $m{$_} = 1 for qw(dup2 close open closefrom chdir fchdir) }
+  @acts = closefrom_as_closes(@acts)   # closefrom alone is missing (glibc before 2.34, musl): as closes, which posix_spawn
+    if !$WIN && $m{closefrom} && !grep $m{$_}, qw(dup2 close open);   # does itself with the other fd actions, in the child
+  my %fdop = map +($_ => 1), qw(dup2 close open closefrom);   # an fd action of a missing kind asked for: all of them, and
+  if (grep ref eq 'ARRAY' && $fdop{$_->[0] // ''} && $m{$_->[0]}, @acts) {   # chdir and fchdir, done here, in order (X67,
+    $m{$_} = 1 for qw(dup2 close open closefrom chdir fchdir) }              # post-0.13: per call; until then per build)
   my %given = (setsid => sub { $at{setsid} }, nice => sub { $at{nice} },
                sigignore => sub { ref $at{sigignore} eq 'ARRAY' && @{$at{sigignore}} });
   for my $n (qw(setsid sched cgroup rlimit sigignore nice)) {
@@ -336,23 +344,45 @@ sub dir_change {   # JH5 (a, post-0.12): chdir or fchdir in this process; the fi
 sub dir_back { my $here = shift; return unless defined $here;   # back to the directory dir_change kept
   if ($WIN) { chdir $here } else { __fchdir($here); POSIX::close($here) } }
 
+sub inheritable_from {   # this process's fds from $n up that a child would inherit (open, no close-on-exec flag), in order.
+  my $n = shift;         # Where /proc lists the open fds they are read there: the limit on open files, which the other way
+  if (opendir my $d, '/proc/self/fd') {   # walks to its end with one fcntl each, may be 1,048,576
+    my @fd = grep /^[0-9]+\z/ && $_ >= $n, readdir $d; closedir $d;   # (the directory's own fd is closed by now: not open below)
+    return sort { $a <=> $b } grep __fd_cloexec($_) == 0, @fd }
+  grep __fd_cloexec($_) == 0, $n .. __fd_limit() - 1 }
+sub closefrom_as_closes {   # file actions with each [closefrom => N] replaced by a close of every fd from N up that the child
+  my (@r, %given);          # has at that point: ours that it inherits, and the targets of the earlier dup2 and open, less
+  for my $x (@_) {          # what the earlier actions closed (%given: 1 given to the child, 0 taken away); as X68 for system1
+    my ($op, @a) = ref $x eq 'ARRAY' ? @$x : ('');
+    if ($op eq 'closefrom') {
+      my %c = map +($_ => 1), inheritable_from($a[0]), grep $given{$_} && $_ >= $a[0], keys %given;
+      my @c = sort { $a <=> $b } grep $given{$_} // 1, keys %c;
+      push @r, map [close => $_], @c; $given{$_} = 0 for @c; next }
+    $given{$a[1]} = 1 if $op eq 'dup2'; $given{$a[0]} = 1 if $op eq 'open'; $given{$a[0]} = 0 if $op eq 'close';
+    push @r, $x }
+  @r }
 sub run_redirs {   # system1 (M2): the fd actions as Run's redirections (Run::start applies them around the call and puts
   # our fds back); chdir and fchdir done here, in order, so that an open's relative path is taken from the directory then;
   # the way back pushed on @$undo
   my ($acts, $undo) = @_;
   my (@r, $here, @opened);
+  my %given;   # an fd the actions so far give the child (1: a dup2 or open target) or take away (0: closed)
   my $die = sub { die "Proc::Spawner: errno " . (0 + $!) . "\n" };
   unshift @$undo, sub {
     close $_ for @opened; dir_back($here) };
   for my $x (@$acts) {
     my ($op, @a) = @$x;
     if ($op eq 'chdir' || $op eq 'fchdir') { dir_change($op, $a[0], \$here, $die) }
-    elsif ($op eq 'dup2') { push @r, $a[1] => { fd => $a[0] } }
-    elsif ($op eq 'close') { push @r, $a[0] => { close => 1 } }
+    elsif ($op eq 'dup2') { push @r, $a[1] => { fd => $a[0] }; $given{$a[1]} = 1 }
+    elsif ($op eq 'close') { push @r, $a[0] => { close => 1 }; $given{$a[0]} = 0 }
     elsif ($op eq 'open') {
       sysopen my $fh, $a[1], $a[2], $a[3] // 0666 or $die->(); push @opened, $fh;
-      push @r, $a[0] => { filehandle => $fh, pin => 1 } }
-    elsif ($op eq 'closefrom') { push @r, map +($_ => { close => 1 }), grep __fd_cloexec($_) == 0, $a[0] .. __fd_limit() - 1 }
+      push @r, $a[0] => { filehandle => $fh, pin => 1 }; $given{$a[0]} = 1 }
+    elsif ($op eq 'closefrom') {   # every fd from N up the child would have now: ours inheritable, and the earlier actions'
+      my %c = map +($_ => 1), inheritable_from($a[0]),                      # targets (X68, post-0.13: these
+                              grep $given{$_} && $_ >= $a[0], keys %given;  # were left open), less the closed
+      my @c = sort { $a <=> $b } grep $given{$_} // 1, keys %c;
+      push @r, map +($_ => { close => 1 }), @c; $given{$_} = 0 for @c }
     else { $! = POSIX::EINVAL(); $die->() } }
   \@r }
 
@@ -383,7 +413,7 @@ sub emulate_actions {   # the file actions, done on this process's own fds in or
                                                                        # spawn passes the standard handles, inheritable or not)
     elsif ($op eq 'close') { $flag_touch->($a[0]); __set_cloexec($a[0], 1) if __fd_cloexec($a[0]) >= 0 }
     elsif ($op eq 'closefrom') {
-      for my $fd ($a[0] .. __fd_limit() - 1) { next if $ours{$fd} || __fd_cloexec($fd) < 0;
+      for my $fd (inheritable_from($a[0])) { next if $ours{$fd};   # (one with the flag already is closed in the child anyway)
         $flag_touch->($fd); __set_cloexec($fd, 1) } }
     elsif ($op eq 'open') {
       my ($fd, $path, $fl, $mode) = @a; $content_touch->($fd);

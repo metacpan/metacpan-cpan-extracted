@@ -2,22 +2,39 @@ CHANGES
 
 OVERVIEW
 
-  ------------ ----- ----- -------------------------------------------------
-  WHEN         WHO   VER   WHAT
-  2026-11-26   I4W   1.9   POD synopsis and some CPAN dzil adjustments
-  2026-11-25   I4W   1.8   POD corrections and improve test coverage
-  2026-11-24   I4W   1.7   POD corrections and basic tests
-  2026-11-24   I4W   1.6   Expressive library description towards WoRMS
-  2026-08-07   I4W   1.5   POD formatting and typo's
-  2026-07-28   I4W   1.4   Adding the Changelog
-  2026-07-27   I4W   1.3   Sustantial CPAN depolyment corrections
-  2026-07-27   I4W   1.2   Technical CPAN depolyment corrections
-  2026-07-27   I4W   1.1   Refactoring towards PERL CPAN first Deployment
-  2017-08-05   I4W   1.0   Generate a published version for githup.com
-  2012-03-12   AWE   0.1   Initial script retrieve taxa for IfAÖ Bentos DB
-  ------------ ----- ----- -------------------------------------------------
+  ------------ ----- ------- ---------------------------------------------------
+  WHEN         WHO   VER     WHAT
+  2026-11-26   I4W   1.901   Print routine, SQL sanitation and POD corrections
+  2026-11-26   I4W   1.900   POD synopsis and some CPAN dzil adjustments
+  2026-11-25   I4W   1.800   POD corrections and improve test coverage
+  2026-11-24   I4W   1.700   POD corrections and basic tests
+  2026-11-24   I4W   1.600   Expressive library description towards WoRMS
+  2026-08-07   I4W   1.500   POD formatting and typo's
+  2026-07-28   I4W   1.400   Adding the Changelog
+  2026-07-27   I4W   1.300   Sustantial CPAN depolyment corrections
+  2026-07-27   I4W   1.200   Technical CPAN depolyment corrections
+  2026-07-27   I4W   1.100   Refactoring towards PERL CPAN first Deployment
+  2017-08-05   I4W   1.000   Generate a published version for githup.com
+  2012-03-12   AWE   0.100   Initial script retrieve taxa for IfAÖ Bentos DB
+  ------------ ----- ------- ---------------------------------------------------
 
 DETAILS
+
+1.901 2026-11-26 Print routine, SQL sanitation, and some POD corrections
+
+-   Changed version in schema to 1.XXX
+-   Changed Getopt::Long endpoint parameter to endpoint=s the
+    END_(POINT) and APHIA_(NS) setting in the tool will be removed
+-   Changed the endpoint protocol from http to https.
+-   Changed the CVS & SQL quoting mechanism to prevent SQL injection.
+-   ADVISE: The program produces SQL output and has no DBI connection.
+    Asserting propper field within the WoRMS DB in terms of QA is not
+    provided!
+-   The print routine for SQL, CSV and plain TEXT output was reviewed.
+-   The AI gives none conform POD formatting advises for =head1 standard
+    entries. Never trust the reformatted crap the machine produces.
+-   Version removed from the POD because shipped by dzil
+-   POD default variables collected in section DEFAULT SETTINGS
 
 1.9 2026-11-26 POD synopsis and some CPAN dzil adjustments
 

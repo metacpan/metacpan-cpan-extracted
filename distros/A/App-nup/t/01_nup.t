@@ -221,7 +221,7 @@ subtest 'NUP_OPTS' => sub {
 };
 
 subtest 'pdf options' => sub {
-    like nup(q(-o out.pdf --pdf-opts="-m 15 -l 80" date)),
+    like nup('-o out.pdf --pdf-opts="-m 15 -l 80" date'),
         qr/--pdf-opts -m 15 -l 80 /, 'pdf-opts';
     isnt system("$script -n --pdf date >/dev/null 2>&1"), 0, '--pdf is gone';
 };
@@ -365,6 +365,33 @@ subtest 'highlight' => sub {
         like $out, qr/-- ansicolumn script\/nup$/, 'as it was without the highlighter';
         unlike $out, qr/highlight/, 'no --highlight';
     }
+};
+
+subtest 'width option' => sub {
+    like nup('-w 100 cpanfile'), qr/-Mup .*-w 100 .*-- ansicolumn cpanfile$/, '-w';
+    like nup('--width=100 cpanfile'), qr/--width 100 /, '--width';
+    like nup('-w 100 man nup'), qr/-w 100 .*-- man nup$/, 'command mode';
+    like nup('-T a4 -w 300 --geometry'), qr/-T a4 -w 300 --geometry /, 'with --geometry';
+};
+
+subtest 'column-opts option' => sub {
+    like nup('--column-opts -w 100 -s : -- cpanfile'),
+        qr/-Mup .* -w 100 -s : .*-- ansicolumn cpanfile$/, 'given to up.pm';
+    like nup('--column-opts -w 100 -- -C2 cpanfile'),
+        qr/-C 2 .*-w 100 .*-- ansicolumn cpanfile$/, 'options after its --';
+    like nup('--column-opts -w 100 -- -- -C2'),
+        qr/-w 100 .*-- ansicolumn -C2$/, 'another -- ends the options';
+    like nup('--column-opts -w 100 -- date -C2'),
+        qr/-w 100 .*-- date -C2$/, 'command mode';
+    like nup('--column-opts=-w100 cpanfile'),
+        qr/ -w100 .*-- ansicolumn cpanfile$/, 'a value with =';
+    like nup('--column-opts -w 100 cpanfile'), qr/terminating --/, '-- is required';
+    like nup('--ac -w 100 -- -C2 cpanfile'),
+        qr/-C 2 .* -w 100 -- ansicolumn cpanfile$/, '--ac is --column-opts';
+    like nup('-L --column-opts --mark LEFT=x -- cpanfile'),
+        qr/--mark LEFT_END=.* --mark LEFT=x -- ansicolumn cpanfile$/, 'after the marks of nup';
+    unlike nup('--column-opts -L -- cpanfile'), qr/--label NW/, '-L in it is not --lateral of nup';
+    like nup('cpanfile -w 100'), qr/-- ansicolumn cpanfile -w 100$/, 'options after the files as before';
 };
 
 done_testing;

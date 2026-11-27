@@ -1,12 +1,35 @@
 # ABSTRACT: NVIDIA driver setup for Debian (experimental)
 
 package Rex::GPU::NVIDIA::Setup::Debian;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use Moo;
 use Rex::Logger ();
 use namespace::autoclean;
 
 extends 'Rex::GPU::NVIDIA::Setup::Apt';
+
+# Proxmox VE 9.2 (read-only on a live host, 2026-11-05, k88): os-release
+#   ID=debian VERSION_ID=13, kernel 7.0.14-20-pve, pve-firmware 3.18-6
+#   (candidate 3.18-9). apt-get -s install from the sources as this class
+#   writes them, none removed by either: debian-nonfree (nvidia-driver
+#   nvidia-smi libcuda1 linux-headers-$K, Debian 13 main contrib non-free
+#   non-free-firmware) 167 new, with firmware-nvidia-gsp 550.163.01-2;
+#   nvidia-cuda-repo debian13/x86_64 (nvidia-driver-cuda
+#   nvidia-kernel-open-dkms linux-headers-$K) 73 new, with
+#   firmware-nvidia-gsp 620.70.06-1.
+#   linux-headers-7.0.14-20-pve is no package; proxmox-headers-7.0.14-20-pve
+#     Provides it, and apt takes that.
+#   pve-firmware 3.18-6 to 3.18-9 Conflicts and Replaces
+#     firmware-amd-graphics, firmware-misc-nonfree, from 3.18-9 also
+#     firmware-nvidia-graphics -- never firmware-nvidia-gsp, whose files lie
+#     under lib/firmware/nvidia/<driver version>/; none of pve-firmware's
+#     588 files under nvidia/ is in such a directory.
+#   Debian 13 and CUDA debian13/x86_64 indexes (2026-11-05): neither source
+#     pulls firmware-nvidia-graphics (in Debian only firmware-misc-nonfree
+#     depends on it); the only firmware either pulls is firmware-nvidia-gsp.
+#   Not checked: whether the DKMS module builds against the Proxmox kernel
+#     (nor against any kernel that is not Debian's).
+#   So Proxmox VE is not refused here, unlike the AMD driver paths (k81).
 
 
 # nvidia-graphics-drivers per suite, sources.debian.org/api/src/
@@ -50,6 +73,11 @@ sub sources {
       # (via libnvidia-encode1 -> libnvcuvid1), and already_installed needs it
       packages      => [ 'nvidia-driver', 'nvidia-smi', 'libcuda1' ],
       verify        => [ 'nvidia-driver', 'libcuda1' ],
+      # k100: nvidia-driver Depends on nvidia-kernel-dkms (= its own version)
+      # | nvidia-kernel-VERSION | nvidia-open-kernel-VERSION (bookworm
+      # 535.309.01-0+deb12u1, trixie 550.163.01-2; packages.debian.org and
+      # apt-cache show, 2026-11-26), so its version is the kernel module's
+      driver_version_from => 'nvidia-driver',
       nonfree       => 1
     },
     $self->_cuda_repo_source($major)
@@ -85,7 +113,9 @@ sub _cuda_repo_source {
     packages             => $packages,
     verify               => [ @$packages ],
     fabric_manager       => 'nvidia-fabricmanager',
-    fabric_manager_match => 'nvidia-kernel-open-dkms'
+    fabric_manager_match => 'nvidia-kernel-open-dkms',
+    # k100: the open kernel module itself; a held older one passes verify
+    driver_version_from  => 'nvidia-kernel-open-dkms'
   );
   my $release = $self->release // '';
   my $arch    = $self->arch // '';
@@ -139,7 +169,8 @@ sub add_nvidia_cuda_apt_repo {
     . $repo->{keyring_url}
     . q{ && DEBIAN_FRONTEND=noninteractive }.$self->apt_get.q{ install -y "$t/cuda-keyring.deb"; rm -rf "$t"},
     auto_die => 0);
-  my $check = $self->run_cmd("dpkg -l cuda-keyring 2>/dev/null | grep -q '^ii'", auto_die => 0);
+  # k94: a held (hi) cuda-keyring counts, as in Apt's verify_packages
+  my $check = $self->run_cmd("dpkg -l cuda-keyring 2>/dev/null | grep -q '^[hi]i'", auto_die => 0);
   die "cuda-keyring not installed — cannot add NVIDIA's CUDA repo ($repo->{keyring_url})\n"
     if $? != 0;
 }
@@ -372,15 +403,28 @@ Rex::GPU::NVIDIA::Setup::Debian - NVIDIA driver setup for Debian (experimental)
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
 B<Experimental>, like L<Rex::GPU::NVIDIA::Setup>. The NVIDIA driver install
 for Debian (and every C<is_debian> host that is not Ubuntu): C<nvidia-driver>
-from Debian C<non-free>, or where that cannot drive the GPUs (Blackwell) the
+from Debian C<non-free>, or where that cannot drive the GPUs (Blackwell, or
+a GPU that needs a newer branch than the release's C<non-free> one) the
 open-module set from NVIDIA's CUDA repository (L</sources>), on the apt
 layer L<Rex::GPU::NVIDIA::Setup::Apt>.
+
+Proxmox VE (C<pve-firmware> installed), which reports itself as Debian, is
+not refused here, unlike the AMD driver
+(L<Rex::GPU::AMD::Setup::Debian/host_unsupported>). On Proxmox VE 9.2
+(Debian 13) neither source conflicts with C<pve-firmware>: the only
+firmware they pull in, C<firmware-nvidia-gsp>, is not among its conflicts,
+and they share no file; Proxmox VE 8 (Debian 12) was not checked. The
+C<linux-headers-$(uname -r)> of
+L<Rex::GPU::NVIDIA::Setup::Apt/kernel_packages> is no package for a
+Proxmox kernel; apt installs C<proxmox-headers-$(uname -r)>, which provides
+it, and the DKMS module is then built against the Proxmox kernel. Whether
+it builds there is not tested.
 
 =head2 sources
 
@@ -408,7 +452,28 @@ carries, at least 590. Unavailable on any other release or architecture.
 
 So a Blackwell or GH200 GPU (open module only: no Debian-packaged driver
 fits) gets the CUDA repository on Debian 12/13 and dies before the host is
-changed anywhere else; every other GPU gets C<non-free>.
+changed anywhere else. So does a GPU whose branch floor is above the
+release's C<non-free> branch (see
+L<Rex::GPU::NVIDIA::Requirement/generations>): on 12 (535) and 13 (550) a
+Turing to Hopper ID that NVIDIA listed first in a later branch gets the
+CUDA repository (on 12 e.g. the RTX 4070 SUPER or the H200), and on 11 (470)
+and a release L</nonfree_branch> does not know every Ada and Hopper (520 or
+newer) and every such ID dies before the host is changed. Every other GPU
+gets C<non-free>.
+
+Neither package name carries the branch, so both sources name the package
+whose version is the driver's in C<driver_version_from>: C<nvidia-driver>
+(it depends on the kernel module of exactly its own version) and
+C<nvidia-kernel-open-dkms>. Where the GPUs need a branch bound (a
+C<min_branch>/C<max_branch> -- e.g. Ada, Hopper, Blackwell,
+Maxwell/Pascal/Volta -- or a C<requirement> with one),
+L<Rex::GPU::NVIDIA::Setup/verify_driver_branch> reads its installed version
+with C<dpkg-query> after the install and dies, the packages installed,
+before Fabric Manager, the nouveau blacklist and the initramfs when the
+branch does not fit -- e.g. a C<nvidia-kernel-open-dkms> held at 550 for a
+Blackwell, or a C<nvidia-driver> 590 from a configured CUDA repository for a
+V100. A C<nvidia-driver> held at an older branch that still fits (535 for a
+V100) passes.
 
 A host with NVSwitches (L<Rex::GPU::NVIDIA::Setup/nvswitches>) needs NVIDIA
 Fabric Manager, which Debian does not package: C<non-free> is rejected for
@@ -440,7 +505,7 @@ A reason unless the chosen driver source is NVIDIA's CUDA repository
 
 The driver branch of Debian's own C<nvidia-driver> in a release: 11 (470),
 12 (535), 13 (550); C<undef> for any other. A fixed table (maintainer
-decision, epic karr #25): looking it up with C<apt-cache> would need
+decision): looking it up with C<apt-cache> would need
 C<non-free> enabled first, a host change before the plan can fail.
 Override it for a release this table does not know.
 
@@ -467,9 +532,9 @@ On the CUDA-repo path registers NVIDIA's repository
   $self->add_nvidia_cuda_apt_repo($repo);
 
 Installs the C<cuda-keyring> package of C<$repo> (signing key plus the
-sources.list.d entry) with C<apt-get>, and dies unless it is C<ii>
-afterwards -- without it the driver install could only fail with a misleading
-"unable to locate package".
+sources.list.d entry) with C<apt-get>, and dies unless it is C<ii> or C<hi>
+(held) afterwards, not half configured -- without it the driver install could
+only fail with a misleading "unable to locate package".
 
 =head2 enable_nonfree
 
@@ -487,7 +552,7 @@ C<deb-src>) whose components include C<main>, and
 =item * it has a C<signed-by> option (C<Signed-By:> in deb822) that names
 only keyrings L</is_debian_archive_keyring> accepts -- whatever its URI: a
 repository signed with Debian's archive key is Debian's archive or a mirror
-of it (karr #41). Any other C<signed-by> (a foreign keyring, an inline key)
+of it. Any other C<signed-by> (a foreign keyring, an inline key)
 makes it a third-party entry, even on a Debian URI;
 
 =item * or it has no C<signed-by>, and L</is_debian_archive_uri> accepts
@@ -550,7 +615,7 @@ L<Rex::GPU::NVIDIA::Setup>, L<Rex::GPU::NVIDIA/install_driver>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

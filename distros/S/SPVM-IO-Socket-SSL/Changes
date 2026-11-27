@@ -1,3 +1,7 @@
+0.027 2026-11-27
+  [Requirement Changes]
+    * Require SPVM::Go 0.055.
+
 0.026 2026-11-18
   [Incompatible Changes]
     * Remove write_deadline and read_dealine logic from connect/accept/read/write codes.

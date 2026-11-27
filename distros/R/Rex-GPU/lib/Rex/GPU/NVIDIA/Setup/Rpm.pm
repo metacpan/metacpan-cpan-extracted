@@ -1,7 +1,7 @@
 # ABSTRACT: rpm packaging layer of the NVIDIA driver setups (experimental)
 
 package Rex::GPU::NVIDIA::Setup::Rpm;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use Moo;
 use Rex::Logger ();
 use namespace::autoclean;
@@ -43,11 +43,8 @@ sub verify_packages {
 
 
 sub installed_driver_version {
-  my ( $self, $source ) = @_;
-  my $pkg = $self->_with_branch($source->{fabric_manager_match}, $source);
-  die "The driver source names no package to read the driver version from "
-    ."(fabric_manager_match); the driver is installed, Fabric Manager is not\n"
-    unless defined $pkg;
+  my ( $self, $source, $key ) = @_;
+  my $pkg = $self->_driver_version_package($source, $key);
   return $self->_rpm_version($pkg);
 }
 
@@ -109,7 +106,7 @@ Rex::GPU::NVIDIA::Setup::Rpm - rpm packaging layer of the NVIDIA driver setups (
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -155,8 +152,10 @@ C<rpm -q --whatprovides> instead, so its entries can be capabilities.
 
 =head2 installed_driver_version
 
-C<rpm -q --qf '%{VERSION}'> of the source's C<fabric_manager_match>
-package (C<nvidia-driver>): C<580.95.05>.
+C<rpm -q --qf '%{VERSION}'> of the package the source's
+C<fabric_manager_match> (or the key passed, see
+L<Rex::GPU::NVIDIA::Setup/installed_driver_version>) names
+(C<nvidia-driver>): C<580.95.05>. C<undef> when C<rpm -q> fails.
 
 =head2 install_versioned_package
 
@@ -185,7 +184,7 @@ L<Rex::GPU::NVIDIA::Setup>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

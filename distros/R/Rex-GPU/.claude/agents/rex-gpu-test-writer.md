@@ -2,11 +2,10 @@
 name: rex-gpu-test-writer
 description: "Write and extend Rex::GPU tests — new coverage, regression tests for a ticket, failure-path tests from a coverage audit, and the golden harness in t/lib/Test/RexGPU/Golden.pm. Tests run offline against a scripted host and never touch a real one; goldens under t/golden/ are regenerated only on purpose and every changed line is explained. Owns test mechanics, not test intent, and never edits lib/ — a red test that exposes a bug is reported, not fixed."
 model: sonnet
-briefing:
-  skills:
-    - rex-gpu-core
-    - getty-perl-core
-    - kanban-issues-karr-ticket
+skills:
+  - rex-gpu-core
+  - getty-perl-core
+  - kanban-issues-karr-ticket
 ---
 
 You are the rex-gpu-test-writer for **Rex::GPU**, the Rex distribution that makes an

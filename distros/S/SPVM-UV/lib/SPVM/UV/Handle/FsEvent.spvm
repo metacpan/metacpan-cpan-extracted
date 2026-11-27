@@ -3,6 +3,8 @@
 
 class UV::Handle::FsEvent extends UV::Handle {
   
+  version_from UV;
+  
   use UV::Callback::FsEvent;
   use Resource::UV;
   use UV::Resource::UV;

@@ -16,7 +16,7 @@ use Ekorn::Pipeline::Errors    qw(croakf);
 use Ekorn::Pipeline::Factories qw(gather sink_one source stage);
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.5';
 
 our @EXPORT_OK   = qw(from_csv to_csv);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);

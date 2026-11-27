@@ -9,7 +9,7 @@
 # 0.07 or later, found in @INC: on Windows copied into blib/lib) is skipped, and said so, where Run is not there.
 # Proc::Spawner does a missing setting around the call where it can, and reports the rest as unsupported; the tests
 # skip what is unsupported.  Not run by make test (about a minute per entry on Linux).  The long version of
-# t/flavors.pl, which takes the spawn primitive's levels.
+# t/flavors.pl, which takes the spawn primitive's approaches.
 # Usage, after make:  perl t/missing-matrix.pl [-n] [-o FILE] [ENTRY ...] [-- TEST FILE ...]
 #   ENTRY: names separated by commas, run as given (default: all, as above); TEST FILE: default t/ (under Wine, the
 #   Windows files, see CLAUDE.md of the repository: run from cmd /c with Windows' own standard handles); -n: list the

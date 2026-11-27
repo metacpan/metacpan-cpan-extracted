@@ -1,0 +1,979 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use IO::Socket::UNIX;
+use Socket qw(SOCK_STREAM);
+
+use Class::Shared ();
+use Class::Shared::Protocol ();
+
+our $VERSION = $Class::Shared::VERSION;
+
+my $program = 'class-shared';
+
+my %opt = (
+	dir        => undef,
+	socket     => undef,
+	listen     => undef,
+	host       => undef,
+	port       => undef,
+	token_file => undef,
+	tls_cert   => undef,
+	tls_key    => undef,
+	tls_ca     => undef,
+	tls_fingerprint => undef,
+	log        => undef,
+	foreground => 0,
+	max_memory => undef,
+	help       => 0,
+	version    => 0,
+);
+
+# Kept for start --max-memory, which runs the command again with the same words.
+my @command_line = @ARGV;
+
+my $options_ok = GetOptions(
+	'dir=s'        => \$opt{dir},
+	'socket=s'     => \$opt{socket},
+	'listen=s'     => \$opt{listen},
+	'host=s'       => \$opt{host},
+	'port=i'       => \$opt{port},
+	'token-file=s' => \$opt{token_file},
+	'tls-cert=s'   => \$opt{tls_cert},
+	'tls-key=s'    => \$opt{tls_key},
+	'tls-ca=s'     => \$opt{tls_ca},
+	'tls-fingerprint=s' => \$opt{tls_fingerprint},
+	'log=s'        => \$opt{log},
+	'foreground|f' => \$opt{foreground},
+	'max-memory=i' => \$opt{max_memory},
+	'help|h'       => \$opt{help},
+	'version|V'    => \$opt{version},
+);
+
+usage(2) unless $options_ok;
+
+if ($opt{version}) {
+	out("$program $VERSION\n");
+	exit 0;
+}
+
+my $command = shift(@ARGV) || 'help';
+
+if ($opt{help} || $command eq 'help') {
+	usage(0);
+}
+
+if ($command eq 'start') {
+	start();
+} elsif ($command eq 'status') {
+	status();
+} elsif ($command eq 'stop') {
+	stop();
+} elsif ($command eq 'path') {
+	show_path();
+} else {
+	# The exit status is the report if standard error is gone.
+	print STDERR "$program: unknown command '$command'\n";
+	usage(2);
+}
+
+exit 0;
+
+# ---------------------------------------------------------------- commands
+
+sub start {
+	my ($host, $port) = tcp_endpoint();
+
+	limit_memory() if defined $opt{max_memory};
+
+	eval { require Class::Shared::Backend; 1 }
+		or fatal("cannot load Class::Shared::Backend: $@");
+
+	my $backend = eval {
+		Class::Shared::Backend->new(
+			socket    => defined $host ? undef : socket_path_for(),
+			host      => $host,
+			port      => $port,
+			token     => token(),
+			tls_options($host, 'server'),
+			dir       => $opt{dir},
+			log       => $opt{log},
+			daemonize => $opt{foreground} ? 0 : 1,
+		);
+	};
+
+	if (!$backend) {
+		my $error = $@ || 'unknown error';
+		$error =~ s/\s+\z//;
+		$error =~ s/\AClass::Shared::Backend->new: //;
+		fatal($error);
+	}
+
+	my $ok = eval { $backend->run; 1 };
+	if (!$ok) {
+		my $error = $@ || 'unknown error';
+		$error =~ s/\s+\z//;
+		fatal($error);
+	}
+
+	return;
+}
+
+sub status {
+	my ($response, $error) = talk({ op => 'ping' });
+	fatal($error) unless $response;
+	fatal($response->{error} || 'the backend refused the request') unless $response->{ok};
+
+	out(sprintf "pid %d, version %s, protocol %d, %d object(s), %d call(s), up %d second(s)\n",
+		$response->{pid},
+		$response->{version},
+		$response->{proto},
+		$response->{objects},
+		$response->{calls},
+		$response->{uptime});
+
+	my $classes = $response->{classes};
+	$classes = [] unless ref($classes) eq 'ARRAY';
+
+	out(sprintf "classes: %s\n", (@{$classes} ? join(', ', @{$classes}) : 'none'));
+	out(sprintf "address: %s\n", $response->{address});
+	out(sprintf "clients: %d\n", $response->{clients});
+
+	# What the memory bound is holding: the bytes waiting to be written to all
+	# clients, against the ceiling that decides when a reply is refused.
+	out(sprintf "queued:  %d of %d byte(s)\n", $response->{queued}, $response->{max_queued_total});
+
+	out(sprintf "log:     %s\n", log_path_for());
+
+	return;
+}
+
+sub stop {
+	my ($response, $error) = talk({ op => 'shutdown' });
+	fatal($error) unless $response;
+	fatal($response->{error} || 'the backend refused to shut down') unless $response->{ok};
+
+	wait_for_exit();
+
+	out("stopped\n");
+
+	return;
+}
+
+sub show_path {
+	fatal('path only makes sense for a unix socket; use --host/--port for TCP')
+		if defined $opt{listen} || defined $opt{host} || defined $opt{port};
+
+	out(socket_path_for() . "\n");
+
+	return;
+}
+
+# ---------------------------------------------------------------- plumbing
+
+# Cap the memory of this process, and so of the backend it becomes, by running
+# the command again under the shell's ulimit.  Perl has no call of its own for
+# this, and the cap keeps a target class that allocates without end from taking
+# the machine with it.  Every word is passed as an argument, never as shell text.
+sub limit_memory {
+	my $mib = $opt{max_memory};
+	fatal("--max-memory wants a number of MiB above 0, not '$mib'") unless $mib > 0;
+
+	# The second time round the cap is in place.  The mark is removed so that
+	# nothing the backend starts believes it is capped.
+	return if delete $ENV{CLASS_SHARED_MEMORY_CAPPED};
+
+	# Elsewhere ulimit -v is accepted and ignored, which would be worse than
+	# saying so.
+	fatal("--max-memory is not enforced on this system ($^O)")
+		unless $^O eq 'linux' || $^O eq 'freebsd';
+
+	local $ENV{CLASS_SHARED_MEMORY_CAPPED} = 1;
+	exec('/bin/sh', '-c', 'ulimit -v "$1" && shift && exec "$@"', 'sh',
+		$mib * 1024, $^X, (map { "-I$_" } grep { !ref } @INC), $0, @command_line)
+		or fatal("cannot limit memory: $!");
+
+	return;
+}
+
+# --listen tcp:HOST:PORT, or --host and --port; otherwise a unix socket.
+sub tcp_endpoint {
+	my ($host, $port) = ($opt{host}, $opt{port});
+
+	if (defined $opt{listen}) {
+		fatal("--listen and --host/--port are alternatives; give one")
+			if defined $host || defined $port;
+
+		# /a: a port is ASCII digits; without it \d takes digits of other scripts
+		# when the argument has been decoded (perl -CA).
+		if ($opt{listen} =~ /\Atcp:(.+):(\d+)\z/a) {
+			($host, $port) = ($1, $2);
+		} elsif ($opt{listen} =~ /\Aunix:(.+)\z/) {
+			$opt{socket} = $1;
+		} else {
+			fatal("--listen wants tcp:HOST:PORT or unix:PATH, not '$opt{listen}'");
+		}
+	}
+
+	fatal('a TCP listener needs both --host and --port')
+		if defined $host xor defined $port;
+
+	fatal('use either --socket or --host/--port, not both')
+		if defined $host && defined $opt{socket} && length $opt{socket};
+
+	return ($host, $port);
+}
+
+sub socket_path_for {
+	# Both can die (a path too long for a socket, a perl without unix sockets);
+	# say so the way every other command-line error is said, not with a raw die
+	# whose exit status is whatever errno happened to hold.
+	my $path = eval {
+		defined $opt{socket} && length $opt{socket}
+			? Class::Shared::check_socket_path($opt{socket})
+			: Class::Shared::socket_path($opt{dir});
+	};
+	fatal($@ || 'cannot work out the socket path') unless defined $path;
+
+	return $path;
+}
+
+sub log_path_for {
+	return $opt{log} if defined $opt{log} && length $opt{log};
+
+	return socket_path_for() . '.log';
+}
+
+sub token {
+	return undef unless defined $opt{token_file} && length $opt{token_file};
+
+	# A unix socket is mode 0600 in a directory only its owner can write to, so
+	# the kernel has already decided who may connect.
+	my ($host) = tcp_endpoint();
+	fatal("a unix socket needs no token: $Class::Shared::UNIX_TRUST_REASON")
+		unless defined $host;
+
+	return or_fatal(sub { Class::Shared::read_secret($opt{token_file}) });
+}
+
+sub tls_options {
+	my ($host, $role) = @_;
+
+	my %tls = map { $_ => $opt{$_} } qw(tls_cert tls_key tls_ca tls_fingerprint);
+
+	if (!defined $host) {
+		fatal("a unix socket needs no TLS: $Class::Shared::UNIX_TRUST_REASON")
+			if grep { defined $tls{$_} && length $tls{$_} } keys %tls;
+		return ();
+	}
+
+	if ($role eq 'server') {
+		fatal('--tls-fingerprint is for clients: a listener verifies its clients '
+			. 'with --tls-ca')
+			if defined $tls{tls_fingerprint} && length $tls{tls_fingerprint};
+
+		fatal('a TCP listener needs --tls-cert, --tls-key and --tls-ca: without them '
+			. 'the traffic would be readable to anyone who can route to it')
+			if grep { !defined $tls{$_} || !length $tls{$_} } qw(tls_cert tls_key tls_ca);
+
+		delete $tls{tls_fingerprint};
+
+		return %tls;
+	}
+
+	fatal('a TCP client needs --tls-cert and --tls-key: the backend verifies its '
+		. 'clients and will not accept one it cannot verify')
+		if grep { !defined $tls{$_} || !length $tls{$_} } qw(tls_cert tls_key);
+
+	my $has_ca  = defined $tls{tls_ca} && length $tls{tls_ca};
+	my $has_pin = defined $tls{tls_fingerprint} && length $tls{tls_fingerprint};
+
+	fatal('a TCP client needs --tls-ca or --tls-fingerprint: without one it cannot '
+		. 'verify the backend')
+		unless $has_ca || $has_pin;
+
+	fatal('give --tls-ca or --tls-fingerprint, not both: a CA and a pin are '
+		. 'alternatives')
+		if $has_ca && $has_pin;
+
+	if ($has_pin) {
+		$tls{tls_fingerprint} = or_fatal(
+			sub { Class::Shared::normalise_fingerprint($tls{tls_fingerprint}) });
+	} else {
+		delete $tls{tls_fingerprint};
+	}
+
+	return %tls;
+}
+
+# A helper that dies is reported like every other error, with exit status 1: a
+# raw die would exit with whatever errno held, which can look like a usage error.
+sub or_fatal {
+	my ($code) = @_;
+
+	my $value = eval { $code->() };
+	fatal($@) unless defined $value;
+
+	return $value;
+}
+
+sub talk {
+	my ($request) = @_;
+
+	my ($host, $port) = tcp_endpoint();
+	my $secret = token();
+	my %tls = tls_options($host, 'client');
+
+	my ($sock, $where);
+
+	if (defined $host) {
+		require IO::Socket::SSL;
+
+		$where = "$host:$port";
+		$sock = IO::Socket::SSL->new(
+			PeerAddr => $host,
+			PeerPort => $port,
+			Proto    => 'tcp',
+			Timeout  => 5,
+			Class::Shared::client_tls_options(
+				cert        => $tls{tls_cert},
+				key         => $tls{tls_key},
+				ca          => $tls{tls_ca},
+				fingerprint => $tls{tls_fingerprint},
+			),
+		);
+
+		if (!$sock) {
+			my $why = IO::Socket::SSL::errstr();
+			$why = "$!" unless defined $why && length $why;
+			return (undef, "no backend at $where: TLS failed: $why");
+		}
+	} else {
+		$where = socket_path_for();
+
+		# What the backend sends back is thawed, so it has to be ours.  A
+		# missing socket is left to the connect below to describe.
+		if (-e $where) {
+			my ($safe, $why) = Class::Shared::_check_endpoint($where);
+			return (undef, "no backend at $where: will not connect: $why") unless $safe;
+		}
+
+		$sock = IO::Socket::UNIX->new(Type => SOCK_STREAM, Peer => $where);
+		return (undef, "no backend at $where: $!") unless $sock;
+	}
+
+	my ($hello, $hello_error) = exchange($sock, {
+		op    => 'hello',
+		proto => $Class::Shared::PROTOCOL_VERSION,
+		pid   => $$,
+	}, $secret);
+
+	if (!$hello) {
+		close_connection($sock);
+
+		# Over TLS a backend that will not accept this certificate drops the
+		# connection during the handshake: the stream closes before a reply,
+		# which says nothing about certificates unless we name it.
+		if (defined $host && defined $hello_error
+			&& $hello_error =~ /closed by peer|read failed|write failed/)
+		{
+			return (undef,
+				"handshake failed: the backend refused this client's certificate: "
+				. 'check that --tls-cert and --tls-key are a certificate it accepts, '
+				. "and that --tls-ca is the CA it trusts for clients (detail: $hello_error)");
+		}
+
+		# A backend with a token will not let a frame it cannot authenticate
+		# through, and it signs its replies too, so a caller with no token
+		# cannot read them: all it sees is a Storable complaint about bytes
+		# that are not an image.  Lead with the likely reason and keep the
+		# complaint underneath, for when the cause was something else.
+		if (!defined $secret) {
+			return (undef,
+				'handshake failed: this backend may require a token; '
+				. "pass --token-file with its secret\n"
+				. "detail: $hello_error");
+		}
+
+		return (undef, "handshake failed: $hello_error");
+	}
+
+	if (!$hello->{ok}) {
+		close_connection($sock);
+		return (undef, $hello->{error} || 'the backend refused the handshake');
+	}
+
+	my ($response, $error) = exchange($sock, $request, $secret);
+	close_connection($sock);
+
+	return (undef, $error) unless $response;
+
+	return ($response);
+}
+
+sub exchange {
+	my ($sock, $request, $secret) = @_;
+
+	my ($bytes, $encode_error) = Class::Shared::Protocol::encode_frame($request, $secret);
+	return (undef, "cannot encode the request: $encode_error") unless defined $bytes;
+
+	my ($ok, $write_error) = Class::Shared::Protocol::write_all($sock, $bytes);
+	return (undef, "cannot send the request: $write_error") unless $ok;
+
+	my ($response, $read_error) = Class::Shared::Protocol::read_frame($sock, undef, $secret);
+	return (undef, "cannot read the response: $read_error") unless defined $response;
+
+	return ($response);
+}
+
+sub wait_for_exit {
+	my ($host) = tcp_endpoint();
+	return if defined $host;
+
+	my $socket = socket_path_for();
+	my $deadline = time + 5;
+
+	while (-e $socket && time < $deadline) {
+		Class::Shared::poll_pause();
+	}
+
+	fatal("the backend asked to shut down but $socket is still there") if -e $socket;
+
+	return;
+}
+
+# Write to standard output and stop if that fails: a status report that went
+# nowhere, because the pipe it was sent down has closed, must not look like
+# success.
+sub out {
+	my ($text) = @_;
+
+	# Flushed here, because a buffered print only reports a full disk or a
+	# closed pipe when the buffer is finally written, which is after the
+	# program has decided it succeeded.
+	(print {*STDOUT} $text and STDOUT->flush)
+		or do { print STDERR "$program: cannot write to standard output: $!\n"; exit 1 };
+
+	return;
+}
+
+# A connection that will not close cleanly is worth a warning, but is never a
+# reason to lose the answer already in hand.
+sub close_connection {
+	my ($sock) = @_;
+
+	close($sock) or print STDERR "$program: warning: cannot close the connection: $!\n";
+
+	return;
+}
+
+sub fatal {
+	my ($message) = @_;
+	$message = '' unless defined $message;
+	$message =~ s/\s+\z//;
+	# If standard error is gone there is nowhere left to say so, and the exit
+	# status is the report.
+	print STDERR "$program: $message\n";
+	exit 1;
+}
+
+sub usage {
+	my ($status) = @_;
+
+	# As in fatal(): the exit status is the report if standard error is gone.
+	print STDERR <<"USAGE";
+usage: $program <command> [options]
+
+Commands:
+  start     run the backend (in the background unless -f)
+  status    ask a running backend what it is doing
+  stop      ask a running backend to shut down, destroying its objects
+  path      print the unix socket path
+
+Options:
+  --dir DIR        directory for the socket, lock and log (default:
+                   \$CLASS_SHARED_DIR, then \$XDG_RUNTIME_DIR/class-shared, then
+                   /run/user/\$uid/class-shared, then the system temp directory)
+  --socket PATH    use an explicit unix socket path
+  --listen ADDR    tcp:HOST:PORT to serve remote clients
+  --host HOST      TCP address, with --port
+  --port PORT      TCP port, with --host
+  --token-file F   the shared secret; TCP only, and required there
+  --tls-cert FILE  this side's certificate; TCP only, and required there
+  --tls-key FILE   the private key for --tls-cert; TCP only
+  --tls-ca FILE    the CA that signs the other side's certificate; TCP only
+  --tls-fingerprint HEX
+                   pin the backend's SHA-256 fingerprint instead of a CA; the
+                   client commands only
+  --log PATH       backend log file (default: SOCKET.log)
+  -f, --foreground stay in the foreground (start)
+  --max-memory MIB cap the backend's memory (start; Linux and FreeBSD)
+  -h, --help       this message
+  -V, --version    print the version
+
+Examples:
+  $program start  -f
+  $program status
+  $program start  --listen tcp:0.0.0.0:7000 \\
+                  --token-file /etc/class-shared/token \\
+                  --tls-cert /etc/class-shared/server.pem \\
+                  --tls-key /etc/class-shared/server-key.pem \\
+                  --tls-ca /etc/class-shared/clients-ca.pem
+USAGE
+
+	exit $status;
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+class-shared - start, inspect and stop a Class::Shared backend
+
+=head1 SYNOPSIS
+
+    class-shared start  [-f] [--dir DIR | --socket PATH]
+    class-shared start  --listen tcp:HOST:PORT \
+                        --token-file FILE --tls-cert CERT --tls-key KEY \
+                        --tls-ca CA
+    class-shared status [--dir DIR | --socket PATH]
+    class-shared stop   [--dir DIR | --socket PATH]
+    class-shared path   [--dir DIR | --socket PATH]
+    class-shared help
+
+Real-world patterns:
+
+    # 1. Start a backend for this user, then look at it, then stop it.
+    class-shared start
+    class-shared status
+    class-shared stop
+
+    # 2. Run it in the foreground under a supervisor (systemd, runit, ...).
+    class-shared start -f --dir /run/myapp
+
+    # 3. Serve other machines over TLS, with a token.
+    class-shared start --listen tcp:0.0.0.0:7000 \
+                       --token-file /etc/class-shared/token \
+                       --tls-cert server.pem --tls-key server-key.pem \
+                       --tls-ca clients-ca.pem
+
+    # 4. Ask that remote backend how it is, checking it against a CA.
+    class-shared status --host classhost.example.com --port 7000 \
+                        --token-file /etc/class-shared/token \
+                        --tls-cert client.pem --tls-key client-key.pem \
+                        --tls-ca ca.pem
+
+    # 5. Ask it again, trusting exactly one certificate by its fingerprint.
+    class-shared status --host 192.0.2.10 --port 7000 \
+                        --token-file /etc/class-shared/token \
+                        --tls-cert client.pem --tls-key client-key.pem \
+                        --tls-fingerprint AB:CD:...:EF
+
+    # 6. Find out where the socket would be.
+    class-shared path
+
+=head1 DESCRIPTION
+
+C<class-shared> is the command line face of L<Class::Shared>: it starts the
+singleton L<Class::Shared::Backend>, asks a running backend what it is doing,
+and asks it to stop.
+
+The backend it starts has no class of its own: a client names the class it wants
+in the handshake and the backend loads that module then, so one backend serves
+whatever its clients ask for.
+
+A L<Class::Shared::Frontend> starts a backend of its own over a unix socket and
+never needs this program.  Reach for it when the backend should be started by
+something else, such as an init system, or when it listens on TCP, which no
+frontend will start for you.
+
+=head1 COMMANDS
+
+=over 4
+
+=item start
+
+Starts the backend and does not return until it stops.  Unless
+C<--foreground> is given it forks into the background first, so the command
+returns once the backend is running.  Whatever the backend has to say goes to
+its log file, C<--log> or the socket path with C<.log> appended, in the
+foreground as well.
+
+The transport is a unix socket unless C<--listen>, C<--host> or C<--port> asks
+for TCP.  A TCP listener is a TLS listener with client certificates: it needs
+C<--tls-cert>, C<--tls-key>, C<--tls-ca> and C<--token-file>, and refuses to
+start without any of them.  A unix socket takes none of them, because its mode
+0600 file already decides who may connect.
+
+=item status
+
+Pings the backend and prints what it reports: the pid, version, protocol,
+number of objects, number of calls, uptime, the classes it has loaded, the
+address it is listening on, the number of clients, the bytes queued against the
+ceiling they are bounded by, and the log path.  Prints nothing and exits
+non-zero if no backend answers.
+
+=item stop
+
+Asks the backend to shut down, which destroys its objects and runs their
+C<DESTROY> methods in the backend.  Over a unix socket it waits for the socket
+to disappear afterwards; over TCP there is nothing to wait for.  Prints
+C<stopped>.
+
+=item path
+
+Prints the unix socket path that a backend here would listen on, after
+C<--dir> and C<--socket>.  Refuses the TCP options, which have no socket path.
+
+=item help
+
+Prints a short usage message and exits successfully.  C<--help> does the same.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item --dir DIR
+
+The directory holding the socket, lock and log.  Defaults to what
+L<Class::Shared/default_dir> picks: C<$CLASS_SHARED_DIR>, then
+C<$XDG_RUNTIME_DIR/class-shared>, then F</run/user/$uid/class-shared>, then a
+per-user directory under the system temporary directory.
+
+=item --socket PATH
+
+An explicit unix socket path, overriding C<--dir>.  Not with the TCP options.
+
+=item --listen ADDR
+
+C<tcp:HOST:PORT> to accept clients over TCP, or C<unix:PATH> to name the unix
+socket.  An alternative to C<--host> and C<--port>, not something to combine
+with them.
+
+=item --host HOST, --port PORT
+
+The TCP address to listen on, or, for C<status> and C<stop>, the address of the
+backend to talk to.  Give both or neither; C<127.0.0.1> keeps it on this
+machine.
+
+=item --token-file FILE
+
+The shared secret for a TCP listener, read from C<FILE>.  Every frame in both
+directions then carries the secret's HMAC, and the backend checks that digest
+before it thaws anything, so a peer without the secret cannot have the backend
+run code of its choosing.  It is a second check, on top of TLS.
+
+A TCP listener requires it, and C<status> and C<stop> must be given the same
+file or they cannot authenticate to a backend that has one; see L</TOKENS>.  A
+unix socket takes none -- its mode 0600 file already decides who may connect --
+and this command refuses the option for one.
+
+=item --tls-cert FILE, --tls-key FILE
+
+The certificate this side presents and its private key: the backend's for
+C<start>, this client's for C<status> and C<stop>.  Both are required for TCP.
+The backend's certificate must name the address clients use, because they check
+the name as well as the chain.  See L</TLS>.
+
+=item --tls-ca FILE
+
+PEM file of the CA the other side's certificate must chain to.  For C<start>
+that is the CA that signs clients' certificates, and a client signed by any
+other CA is dropped during the handshake; for C<status> and C<stop> it is the CA
+that signed the backend's certificate.  Required for a TCP listener, and for the
+client commands unless C<--tls-fingerprint> pins the backend instead.
+
+=item --tls-fingerprint HEX
+
+The SHA-256 fingerprint of the backend's certificate, as
+C<openssl x509 -in server.pem -noout -fingerprint -sha256> prints it: colons are
+optional, as is a C<sha256$> prefix, and the case does not matter.  It replaces
+C<--tls-ca> in C<status> and C<stop>, and accepts that exact certificate
+whatever its name or signer.  A listener cannot use it: clients are verified
+with C<--tls-ca>, not pinned.
+
+=item --log PATH
+
+Where the backend writes its log.  Defaults to the socket path with C<.log>
+appended.
+
+=item --max-memory MIB
+
+For C<start>, on Linux and FreeBSD: the most memory, in MiB, the backend process
+may use.  It guards the machine against a target class that allocates without
+end.  When the backend reaches the limit Perl says C<Out of memory!> and exits,
+and its objects are lost with it.  Without this option the backend has the
+limits of the shell that started it; so does a backend that a program starts for
+itself.
+
+=item -f, --foreground
+
+Stay in the foreground instead of forking into the background (C<start> only).
+Useful under a supervisor that does not want a daemon.
+
+=item -h, --help
+
+Print the usage message and exit.
+
+=item -V, --version
+
+Print the version and exit.
+
+=back
+
+=head1 TOKENS
+
+C<status> and C<stop> verify the backend -- against C<--tls-ca> or the pinned
+C<--tls-fingerprint> -- and present their own certificate before any of this, so
+over TCP the TLS handshake comes first and a failure
+there is reported as such: the command never sends a frame to a backend it could
+not verify, and a backend that rejects its certificate gives it nothing.
+
+Once connected, they sign their requests when C<--token-file> is given, the way
+a frontend does, and a backend with a token refuses any frame it cannot
+authenticate: the wrong secret is reported as a frame that failed
+authentication, and no C<--token-file> at all leaves the request unsigned, so
+the backend refuses it and drops the connection.
+
+That last case leaves nothing readable: the backend signs its refusal too, so
+all the caller holds is a L<Storable> complaint about bytes that are not an
+image.  That makes a poor first line for an error, so the message leads with
+
+    handshake failed: this backend may require a token; pass --token-file ...
+
+and keeps the complaint on a C<detail:> line, for when the cause was something
+else.  L<Class::Shared::Frontend> makes the same guess when it has no token.
+
+=head1 TLS
+
+TCP has no unencrypted mode.  C<start> needs a certificate and key of its own
+and the CA that signs its clients, and it verifies those clients mandatorily: a
+connection that presents nothing, or a certificate from another CA, is dropped
+during the handshake and logged, and never gets as far as a frame.
+
+C<status> and C<stop> need the same three options from the client's side: the
+certificate and key the backend is configured to accept, and either the
+backend's CA or its pinned fingerprint.  Verification is not optional; with a
+CA it includes the certificate's name, so connect with the address or hostname
+the backend's certificate is for, while a pin identifies the certificate itself
+and asks for nothing else.
+
+=head1 EXIT STATUS
+
+0 when the command succeeded, 1 when it failed (no backend, a refused request,
+a secret that does not authenticate, a socket path that is too long, standard
+output that cannot be written) and 2 for a usage error.  A background C<start>
+exits 0 before it knows whether the backend started; see L</COMMON PITFALLS>.
+
+=head1 SEE ALSO
+
+L<Class::Shared>, L<Class::Shared::Frontend>, L<Class::Shared::Backend>,
+L<Class::Shared::Protocol>
+
+=head1 AUTHOR
+
+Nigel Horne
+
+=head1 ENCODING
+
+=over 4
+
+=item Everything you type is passed on as bytes.
+
+The command line, the file names and the options are handed on exactly as the
+shell gives them.  Nothing is decoded or re-encoded.
+
+=item The token file: ASCII only.
+
+The secret is read from the file as bytes and trimmed at the end.  Use only ASCII
+characters, because a program that holds the same secret as a Perl string may not
+get the same bytes for a non-ASCII character, and the two sides would then
+disagree.  See L<Class::Shared/ENCODING>.
+
+=item The fingerprint: hexadecimal digits.
+
+Case does not matter; colons and a C<sha256$> prefix are optional.
+
+=item Paths: ASCII is safest.
+
+A socket path is limited to 100 characters, counted as characters and not bytes.
+
+=item What the program prints.
+
+Its own messages are plain English (ASCII).  C<status> prints class names, which
+are ASCII, and the paths and addresses exactly as they were given.  The backend's
+log may hold text in more than one encoding; see
+L<Class::Shared::Backend/ENCODING>.
+
+=back
+
+=head1 COMMON PITFALLS
+
+=over 4
+
+=item C<start> returns before the backend is ready.
+
+In the background (the default) the command exits with status 0 as soon as the
+background copy has been started.  The socket may not exist for a moment.  A
+script that runs C<class-shared start> and then at once C<class-shared status>
+can fail the first time.  Try C<status> again, or use C<--foreground> under a
+supervisor.
+
+=item A failed C<start> can still exit 0.
+
+The background copy reports its problems to the log, after the command has
+returned.  If another backend is already serving, the new one waits about two
+seconds for the lock and then writes C<fatal: another backend is already serving>
+to the log and exits.  The shell has already seen status 0.  After starting a
+backend, run C<class-shared status> and read the log if it says nothing.
+
+=item Give the same location to every command.
+
+C<status>, C<stop> and C<path> look in the default directory unless you give the
+same C<--dir>, C<--socket> or C<--listen> that C<start> used.  For TCP they also
+need the matching C<--tls-*> options and C<--token-file>.
+
+=item C<stop> stops it for everybody.
+
+It destroys every client's objects, not just yours.
+
+=item A unix socket takes no token and no TLS.
+
+C<--token-file> and the C<--tls-*> options are refused without C<--listen
+tcp:...> (or C<--host> and C<--port>), on purpose.
+
+=item C<--tls-fingerprint> is for clients.
+
+C<start> refuses it.  A listener checks its clients with C<--tls-ca>.
+
+=item The backend finds classes in the C<@INC> it was started with.
+
+Start it with the C<PERL5LIB> or C<perl -I> that your clients need.
+
+=item Old log lines are thrown away.
+
+At 10 MiB the log is copied to F<LOG.1> and emptied; only that one copy is kept.
+
+=back
+
+=head1 FORMAL SPECIFICATION
+
+This section describes what each command does in the Z notation, a way of
+writing exactly what a program promises using sets and logic.  You do not need
+it to use the program.
+
+Z uses mathematical symbols, so this is the only part of the file that is not
+plain ASCII.
+
+=head2 State
+
+    ┌─ Host ──────────────────────────────────────────────────
+    │ backends : LOCATION ⇸ BACKEND         at most one backend per location
+    │ log      : LOCATION → seq STRING      what each location's log holds
+    └─────────────────────────────────────────────────────────
+
+=head2 start
+
+    ┌─ Start ─────────────────────────────────────────────────
+    │ ΔHost ; loc? : LOCATION ; fg? : 𝔹 ; status! : {0, 1, 2}
+    ├─────────────────────────────────────────────────────────
+    │ options invalid ⇒ ΞHost ∧ status! = 1
+    │ fg? = false ⇒ status! = 0                  whatever happens next
+    │     ∧ (loc? ∉ dom backends  ⇒ eventually loc? ∈ dom backends')
+    │     ∧ (loc? ∈ dom backends  ⇒ log' loc? ends with "fatal: another backend is already serving"
+    │                                after start_timeout, unless that backend stopped first)
+    │ fg? = true ∧ loc? ∉ dom backends ⇒ loc? ∈ dom backends' until it stops, then status! = 0
+    │ fg? = true ∧ loc? ∈ dom backends (after start_timeout) ⇒ status! = 1
+    └─────────────────────────────────────────────────────────
+
+=head2 status
+
+    ┌─ Status ────────────────────────────────────────────────
+    │ ΞHost ; loc? : LOCATION ; text! : seq STRING ; status! : {0, 1}
+    ├─────────────────────────────────────────────────────────
+    │ loc? ∈ dom backends ∧ handshake succeeds ⇒ status! = 0 ∧ text! = report(backends loc?)
+    │ otherwise ⇒ text! = ⟨⟩ ∧ status! = 1 ∧ a reason is printed on standard error
+    └─────────────────────────────────────────────────────────
+
+=head2 stop
+
+    ┌─ Stop ──────────────────────────────────────────────────
+    │ ΔHost ; loc? : LOCATION ; status! : {0, 1}
+    ├─────────────────────────────────────────────────────────
+    │ loc? ∈ dom backends ∧ request succeeds ⇒ loc? ∉ dom backends' ∧ status! = 0 ∧ prints "stopped"
+    │ loc? ∉ dom backends ⇒ ΞHost ∧ status! = 1
+    │ unix ∧ the socket is still there after 5 seconds ⇒ status! = 1
+    └─────────────────────────────────────────────────────────
+
+=head2 path
+
+    ┌─ Path ──────────────────────────────────────────────────
+    │ ΞHost ; text! : STRING ; status! : {0, 1}
+    ├─────────────────────────────────────────────────────────
+    │ TCP options given ⇒ status! = 1
+    │ path too long ⇒ status! = 1
+    │ otherwise ⇒ text! = socket path ∧ status! = 0
+    └─────────────────────────────────────────────────────────
+
+=head1 STATE DIAGRAM
+
+The program has no state of its own.  The state that matters is the backend's,
+and each command moves it like this.
+
+                 start                                   stop
+        (exits 0 at once; the backend       (objects destroyed, socket
+         starts a moment later)              and pid file removed)
+
+    +------------+  ------------------>  +---------+  ------------------>  +------------+
+    | NO BACKEND |                        | RUNNING |                       | NO BACKEND |
+    +------------+                        +---------+                       +------------+
+                                            |     ^
+                                            +-----+
+                          status, path, or a second start: no change.
+                          (The second start's copy waits about 2 seconds,
+                          logs "another backend is already serving" and
+                          exits 1.  The shell has already seen 0.)
+
+=over 4
+
+=item NO BACKEND to RUNNING
+
+Trigger: C<start>.  Action: the command forks, the first process exits 0, and the
+background copy takes the lock, opens the socket and starts serving.
+
+=item RUNNING to NO BACKEND
+
+Trigger: C<stop>.  Action: the backend replies, destroys every object, removes
+its socket and pid file and exits.  C<stop> waits up to 5 seconds for the socket
+to disappear.
+
+=item RUNNING to RUNNING
+
+Trigger: C<status> or C<path> (they change nothing), or a second C<start>
+(which fails in the background and changes nothing).
+
+=item NO BACKEND, a command that needs one
+
+Trigger: C<status> or C<stop> with nothing listening.  Action: a message on
+standard error and exit status 1.
+
+=back
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by the
+Free Software Foundation.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the F<LICENSE> file for the full text.
+
+=cut

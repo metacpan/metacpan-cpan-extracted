@@ -316,7 +316,7 @@ histo_status_t histo2d_fill_n(histo2d_t *h, size_t n,
 
     bool had_nan = false;
 
-    if (h->x_axis.bin_type == HISTO_BIN_UNIFORM && h->y_axis.bin_type == HISTO_BIN_UNIFORM &&
+    if (n >= 8 && h->x_axis.bin_type == HISTO_BIN_UNIFORM && h->y_axis.bin_type == HISTO_BIN_UNIFORM &&
         !(h->flags & HISTO_FLAG_EXACT_MOMENTS)) {
         if (weights) {
 #ifdef LIBHISTO_ENABLE_AVX512

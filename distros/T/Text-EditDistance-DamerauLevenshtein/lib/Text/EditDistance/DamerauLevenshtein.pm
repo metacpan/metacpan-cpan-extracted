@@ -1,4 +1,4 @@
-package Text::EditDistance::DamerauLevenshtein 0.03;
+package Text::EditDistance::DamerauLevenshtein 0.04;
 use v5.12;
 use warnings;
 use XSLoader ();

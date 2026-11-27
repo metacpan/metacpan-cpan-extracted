@@ -18,139 +18,86 @@ print "  host=$host:$port msgs=$n_msgs payload=${payload_sz}B\n\n";
 
 my $nats;
 
+# $setup gets a $done->() to call when the last message is through
 sub run_bench {
     my ($name, $setup, $count, $psz) = @_;
     $count //= $n_msgs;
     $psz   //= $payload_sz;
 
-    my $done = 0;
     my ($t0, $elapsed);
-
+    my $done = sub {
+        $elapsed = time - $t0;
+        $nats->disconnect;
+        EV::break;
+    };
     $nats = EV::Nats->new(
         host       => $host,
         port       => $port,
         on_error   => sub { die "nats error: @_\n" },
-        on_connect => sub {
-            $setup->(\$done, \$t0, \$elapsed);
-        },
+        on_connect => sub { $setup->(sub { $t0 = time }, $done) },
     );
-
     EV::run;
 
     if ($elapsed && $elapsed > 0) {
-        my $ops = $count / $elapsed;
-        my $mbps = ($count * $psz) / $elapsed / 1024 / 1024;
         printf "  %-30s %8.0f msgs/sec  %6.1f MB/s  (%.3fs)\n",
-               $name, $ops, $mbps, $elapsed;
+               $name, $count / $elapsed, ($count * $psz) / $elapsed / 1024 / 1024, $elapsed;
     }
 }
 
-# 1. Fire-and-forget publish (no subscriber).
-# Uses flush() so timing reflects when the server has confirmed receipt
-# of every PUB, not just when the local write buffer was scheduled.
+# the subscriber is in place before the clock starts
+sub pubsub_bench {
+    my ($name, $subject, $body) = @_;
+    run_bench($name, sub {
+        my ($start, $done) = @_;
+        my $received = 0;
+        $nats->subscribe($subject, sub { $done->() if ++$received >= $n_msgs });
+        my $go; $go = EV::timer 0.05, 0, sub {
+            undef $go;
+            $start->();
+            $nats->publish($subject, $body) for 1 .. $n_msgs;
+        };
+    }, $n_msgs, length $body);
+}
+
+# flush() so the time covers the server confirming every PUB
 run_bench("PUB fire-and-forget", sub {
-    my ($done, $t0, $elapsed) = @_;
-
-    $$t0 = time;
-    for my $i (1 .. $n_msgs) {
-        $nats->publish('bench.pub', $payload);
-    }
-    $nats->flush(sub {
-        $$elapsed = time - $$t0;
-        $nats->disconnect;
-        EV::break;
-    });
+    my ($start, $done) = @_;
+    $start->();
+    $nats->publish('bench.pub', $payload) for 1 .. $n_msgs;
+    $nats->flush($done);
 });
 
-# 2. PUB with subscriber receiving
-run_bench("PUB + SUB (loopback)", sub {
-    my ($done, $t0, $elapsed) = @_;
+pubsub_bench("PUB + SUB (loopback)", 'bench.echo', $payload);
 
-    my $received = 0;
-    $nats->subscribe('bench.echo', sub {
-        $received++;
-        if ($received >= $n_msgs) {
-            $$elapsed = time - $$t0;
-            $nats->disconnect;
-            EV::break;
-        }
-    });
-
-    my $go; $go = EV::timer 0.05, 0, sub {
-        undef $go;
-        $$t0 = time;
-        for my $i (1 .. $n_msgs) {
-            $nats->publish('bench.echo', $payload);
-        }
-    };
-});
-
-# 3. Request/reply throughput
 my $req_msgs = $n_msgs > 10000 ? 10000 : $n_msgs;
-run_bench("REQ/REP (${req_msgs} msgs)", sub {
-    my ($done, $t0, $elapsed) = @_;
-
-    # responder
+run_bench("REQ/REP (64 in flight)", sub {
+    my ($start, $done) = @_;
     $nats->subscribe('bench.req', sub {
-        my ($subject, $payload, $reply) = @_;
-        $nats->publish($reply, $payload) if $reply;
+        my ($subject, $body, $reply) = @_;
+        $nats->publish($reply, $body) if $reply;
     });
 
-    my $completed = 0;
-    my $inflight  = 0;
-    my $sent      = 0;
-    my $max_inflight = 64;
-
+    my ($completed, $inflight, $sent) = (0, 0, 0);
     my $send_batch;
     $send_batch = sub {
-        while ($sent < $req_msgs && $inflight < $max_inflight) {
+        while ($sent < $req_msgs && $inflight < 64) {
             $sent++;
             $inflight++;
             $nats->request('bench.req', $payload, sub {
                 $inflight--;
-                $completed++;
-                if ($completed >= $req_msgs) {
-                    $$elapsed = time - $$t0;
-                    $nats->disconnect;
-                    EV::break;
-                } else {
-                    $send_batch->();
-                }
+                return $send_batch->() if ++$completed < $req_msgs;
+                undef $send_batch;
+                $done->();
             }, 10000);
         }
     };
-
     my $go; $go = EV::timer 0.05, 0, sub {
         undef $go;
-        $$t0 = time;
+        $start->();
         $send_batch->();
     };
 }, $req_msgs);
 
-# 4. Small message throughput (8 bytes)
-{
-    my $small = 'x' x 8;
-    run_bench("PUB + SUB (8B payload)", sub {
-        my ($done, $t0, $elapsed) = @_;
-
-        my $received = 0;
-        $nats->subscribe('bench.small', sub {
-            $received++;
-            if ($received >= $n_msgs) {
-                $$elapsed = time - $$t0;
-                $nats->disconnect;
-                EV::break;
-            }
-        });
-
-        my $go; $go = EV::timer 0.05, 0, sub {
-            undef $go;
-            $$t0 = time;
-            for my $i (1 .. $n_msgs) {
-                $nats->publish('bench.small', $small);
-            }
-        };
-    }, $n_msgs, 8);
-}
+pubsub_bench("PUB + SUB (8B payload)", 'bench.small', 'x' x 8);
 
 print "\ndone.\n";

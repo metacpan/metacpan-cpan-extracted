@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Health checker — periodically pings services, reports status
+# Health checker -periodically pings services, reports status
 # Run services: perl eg/health_checker.pl service <name>
 # Run checker:  perl eg/health_checker.pl monitor
 use strict;

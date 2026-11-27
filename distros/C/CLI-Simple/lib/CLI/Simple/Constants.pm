@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Exporter);
 
-our $VERSION = '2.4.0';
+our $VERSION = '2.6.0';
 
 use Readonly;
 
@@ -134,6 +134,9 @@ Readonly::Array our @VALID_OPTIONS => qw(
   extra_options
   manifest_commands
   option_specs
+  options
+  temp_dir
+  temp_file
   validate_command
   help_sections
 );

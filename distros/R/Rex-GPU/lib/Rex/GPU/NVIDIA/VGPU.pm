@@ -1,7 +1,7 @@
 # ABSTRACT: Which PCI subsystem IDs mark an NVIDIA vGPU guest device
 
 package Rex::GPU::NVIDIA::VGPU;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use v5.14.4;
 use warnings;
 
@@ -1208,7 +1208,7 @@ Rex::GPU::NVIDIA::VGPU - Which PCI subsystem IDs mark an NVIDIA vGPU guest devic
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -1300,7 +1300,7 @@ L<https://github.com/NVIDIA/open-gpu-kernel-modules>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

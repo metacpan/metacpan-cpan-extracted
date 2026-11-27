@@ -12,8 +12,9 @@ README.md is the user-facing overview; POD in `lib/` is the API reference.
 
 ## Delegation
 
-Delegate behavior-relevant code to the right agent instead of touching it yourself —
-principle and lane are in `.claude/rules/rex-gpu-rules.md`.
+Delegate behavior-relevant code to the right agent instead of touching it yourself — the
+principle is a shared house rule (skilletor bundle `getty-cpan-dist@getty`); lanes and
+hazards are in `.claude/rules/rex-gpu-rules.md`.
 
 | Task | Agent |
 |---|---|
@@ -22,9 +23,9 @@ principle and lane are in `.claude/rules/rex-gpu-rules.md`.
 | New GPU / driver branch / NVIDIA support list: generation rows, name rules, NVSwitch/NVLink IDs, vGPU table | `rex-gpu-hardware-curator` |
 | Commits, `Changes`, card → done, pre-release audit | `rex-gpu-release-manager` |
 
-The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main agent
+The agents carry their skills via `skills:` (see `.claude/agents/`); the main agent
 delegates rather than loading them. Skill sources live under `.claude/skills/` —
-`rex-gpu-core` is owned here, the rest are hardlinks (`manage-skills sync` after a clone).
+`rex-gpu-core` is owned here, the rest are installed by skilletor from `.claude/skilletor.json`.
 
 ## Build and test
 

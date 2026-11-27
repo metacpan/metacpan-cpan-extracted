@@ -1,0 +1,22 @@
+Revision history for Class-Shared
+
+0.001.0	Thu Nov 26 09:16:20 PM EST 2026
+	First release.
+
+	- One backend process holds one object per client connection, so a class
+	  is loaded once and every process calls the same instance.  A frontend
+	  forwards method calls and keeps calling context without loading the
+	  class.
+	- Transports: a unix domain socket, mode 0600 inside a directory only its
+	  owner can write to; or TCP over TLS 1.2 or later, with a client
+	  certificate at each end and an HMAC-SHA-256 token on every frame.
+	- A connection accepts one hello.  A second is refused rather than
+	  changing the class under objects it already holds.
+	- Bounded resources: frame size, per-client and total queued data, buffer
+	  memory, log size, and call, read, write, handshake and idle timeouts.
+	  Large or deeply nested requests are thawed in a child first.
+	- class-shared start, status, stop and path, including --max-memory.
+	- Requires perl 5.026.  The backend is Unix-only; Class::Shared::Protocol
+	  is portable and can talk to a backend elsewhere.
+	- Test suite: 1274 tests, including state-transition, TLS, queueing,
+	  security, first-time-user and real-class integration tests.

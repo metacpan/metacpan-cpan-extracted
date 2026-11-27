@@ -1,7 +1,7 @@
 # ABSTRACT: NVIDIA GPU driver and container toolkit management
 
 package Rex::GPU::NVIDIA;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use v5.14.4;
 use warnings;
 
@@ -549,7 +549,7 @@ sub _install_toolkit_debian {
 
   # The driver path's apt layer (karr #37): the apt timers stopped before the
   # first apt-get, DPkg::Lock::Timeout on every one, install run directly and
-  # dpkg -l ^ii as the only evidence. After the first-deploy reboot
+  # dpkg -l ii/hi as the only evidence. After the first-deploy reboot
   # apt-daily/cloud-init hold the dpkg lock; Rex::Pkg (pkg) has no lock
   # timeout and stopping the timers does not release a lock cloud-init holds,
   # so curl/gnupg go through apt-get too. --no-upgrade keeps pkg's
@@ -1079,7 +1079,8 @@ sub _reboot_and_wait {
   # Wait long enough for the system to actually go down
   sleep 20;
 
-  # Poll until SSH comes back (up to 5 minutes)
+  # Poll until the new boot answers: up to 60 tries 5 s apart (with the 20 s
+  # above, over 5 minutes in all)
   my $conn = Rex::get_current_connection()->{conn};
   my $back = 0;
   for my $i (1..60) {
@@ -1134,7 +1135,7 @@ Rex::GPU::NVIDIA - NVIDIA GPU driver and container toolkit management
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -1218,7 +1219,11 @@ below.
 =over
 
 =item * B<Turing, Ampere, Ada, Hopper> (GH200 excepted) and unknown IDs: the
-default per-distro selection.
+default per-distro selection. Ada, Hopper and the few Turing/Ampere IDs
+NVIDIA listed first after branch 470 need a branch at least that new: on
+Debian 11 (C<non-free> 470) they die before any driver package is installed,
+and on Debian 12/13 an ID newer than the C<non-free> branch takes the open
+module set from NVIDIA's CUDA repository instead.
 
 =item * B<Blackwell> (B200/GB200/B300, GeForce RTX 50xx, RTX PRO Blackwell,
 GB10), on any CPU architecture: it has no proprietary kernel module. Ubuntu
@@ -1347,12 +1352,12 @@ Options:
 
 =item C<reboot>
 
-If true, the host is rebooted immediately after driver installation.
-The function waits up to 5 minutes for the host to come back (polling
-every 5 seconds via SSH reconnect; the host counts as back once
-C<echo ok> run over the new connection prints C<ok>), then continues with
-verification.
-Default: C<0>.
+If true, the host is rebooted immediately after driver installation and
+waited for: 20 seconds, then up to 60 SSH reconnects 5 seconds apart (over
+5 minutes in all) until C<echo ok> run over the new connection prints
+C<ok> from the new boot (a changed C<boot_id>, where it was readable
+before); then verification goes on. If the host does not come back,
+C<install_driver> dies. Default: C<0>.
 
 Rebooting is required on the first deployment when the C<nouveau>
 open-source driver was previously loaded, because nouveau must be
@@ -1372,7 +1377,7 @@ just the first two; a GPU without C<vgpu> is not a vGPU:
 L<Rex::GPU::Detect::Sysfs> finds them without C<lspci> in the full shape,
 vGPU keys and C<nvswitch> included.
 
-B<NVIDIA vGPU guest> (karr #24; C<vgpu =E<gt> 1>, see
+B<NVIDIA vGPU guest> (C<vgpu =E<gt> 1>, see
 L<Rex::GPU::Detect/NVIDIA vGPU guests>): such a device needs NVIDIA's
 licensed vGPU guest (GRID) driver, which none of the package sources
 Rex::GPU installs from carries, and the open C<nvidia.ko> of the datacenter packages
@@ -1497,7 +1502,7 @@ Then, as after an install, it warns if the unit is not active. Omitted or empty
 (the default, and every caller that finds its GPUs without C<lspci>): no
 Fabric Manager, nothing changes.
 
-B<HGX B200/B300> (karr #56): their NVSwitches are not PCI devices on the
+B<HGX B200/B300>: their NVSwitches are not PCI devices on the
 host, so there are no C<nvswitches>; they are recognised by the GPUs'
 device IDs instead (B200 C<2901>/C<2909>, B300 C<3182>;
 L<Rex::GPU::NVIDIA::Setup/nvlink_platforms>, from C<gpus>, so also for a
@@ -1565,10 +1570,20 @@ source and why it was rejected. What the requirement picks:
 
 =over
 
-=item * B<No constraint> (Turing, Ampere, Ada, Hopper except GH200, and
-every GPU the table does not know; no GPU): the first source -- Ubuntu the newest
-C<-server>, Debian C<non-free> C<nvidia-driver>, RHEL C<open-dkms>,
-openSUSE open C<G06>/C<G07>.
+=item * B<No constraint> (Turing and Ampere except the IDs NVIDIA listed
+first after branch 470, and every GPU the table does not know; no GPU): the
+first source -- Ubuntu the newest C<-server>, Debian C<non-free>
+C<nvidia-driver>, RHEL C<open-dkms>, openSUSE open C<G06>/C<G07>.
+
+=item * B<A branch floor only> (Ada and Hopper except GH200: 520 or newer;
+single Turing, Ampere, Ada and Hopper IDs NVIDIA listed first in a later
+branch: 510 to 580, see L<Rex::GPU::NVIDIA::Requirement/generations>): the
+same first source where its branch reaches the floor -- always on Ubuntu,
+RHEL and openSUSE, on Debian 12 (non-free 535) and 13 (550) for most. On
+Debian 12/13 an ID floored above the non-free branch (on 12 e.g. RTX 4070
+SUPER, H200) gets NVIDIA's CUDA repository, as Blackwell does; Debian 11
+(470) and a Debian release without a known branch die before any driver
+package is installed.
 
 =item * B<Blackwell> and B<Grace Hopper GH200> (open kernel module only;
 Blackwell branch 570 or newer, GB10 and Blackwell Ultra 580 or newer, GH200
@@ -1600,7 +1615,7 @@ host is changed. A host whose driver was installed by hand (C<nvidia-smi -L>
 lists the GPU and C<libcuda.so.1> is in the linker cache) passes the
 already-installed check above instead. L<Rex::GPU/gpu_setup> passes only
 compute GPUs, and detection never counts a Kepler as compute, at any PCI
-class (karr #55): a Kepler display card and a class-C<0302> Tesla
+class: a Kepler display card and a class-C<0302> Tesla
 K80/K40/K20 are skipped there with a warning and never reach
 C<install_driver>. The refusal here is for a caller that passes one
 directly.
@@ -1610,6 +1625,25 @@ directly.
 A mixed host gets what the combination needs: an Ada next to a B200 gets
 the open driver (Ubuntu C<-server-open>), an Ada next to a V100 the
 proprietary 580 one (Ubuntu C<nvidia-driver-580-server>).
+
+Where the package name does not carry the branch -- Debian (C<nvidia-driver>
+from C<non-free>, on 12/13 C<nvidia-kernel-open-dkms> from the CUDA
+repository) and the RHEL family's open driver (C<nvidia-driver>) -- the
+branch that B<got> installed is checked too, for GPUs that need a branch
+bound (a C<min_branch>/C<max_branch> from their row in
+L<Rex::GPU::NVIDIA::Requirement/generations> or a C<requirement> option:
+Ada and Hopper 520 or newer, Blackwell 570 or newer, Maxwell/Pascal/Volta
+580 or older, a single ID with a row of its own that row's floor): its
+version is read with C<dpkg-query> / C<rpm -q> after the packages are
+verified (see L<Rex::GPU::NVIDIA::Setup/verify_driver_branch>). A branch
+that does not fit -- a package held at an older one, a version another
+repository, module stream or lock left there -- makes C<install_driver>
+B<die> with the driver packages B<installed>, before Fabric Manager, the
+nouveau blacklist, the initramfs and the reboot. An older branch that still
+fits passes and is not upgraded. Turing and Ampere GPUs without a row of
+their own, GPUs the table does not know and a host without GPUs read
+nothing more; neither do Ubuntu (its package names carry the branch) and
+openSUSE (it removes every NVIDIA package first).
 
   install_driver();              # install only, load module without reboot
   install_driver(reboot => 1);   # install, reboot, verify
@@ -1772,7 +1806,8 @@ to 120 seconds for the zypp lock (L<Rex::GPU::NVIDIA::Setup::SUSE/zypper>).
 
 The package is installed with C<apt-get>/C<dnf>/C<zypper> directly, never
 through L<Rex::Commands::Pkg/pkg>, and the result is checked with C<dpkg -l>
-(C<ii>) or C<rpm -q> on every distro, openSUSE included.
+(C<ii> or C<hi>, not half configured) or C<rpm -q> on every distro, openSUSE
+included.
 
 Dies if the OS is not supported or if installation fails, and, before
 anything is asked of the host, on an option other than C<binaries_suffice>
@@ -2018,7 +2053,7 @@ L<https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

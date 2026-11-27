@@ -19,6 +19,32 @@ karr sync --accept-foreign-board   # accept a pull whose remote presents a diffe
 mailbox, design documents) after the board, in the same run; mutating commands
 sync the board only. Deletions travel: a pruned run log does not come back.
 
+`--local-only` (on every command that syncs) writes the local refs and skips both
+fetch and push. It exists for a configured remote that is unreachable or silent,
+where the inline fetch and push would run into the caller's timeout; with no
+remote configured it changes nothing. Never use it to dodge the push. Run
+`karr sync` once the remote answers: it publishes what was written.
+
+## A clone that cannot write
+
+A push the remote denies write access (no credentials over HTTPS, a read-only
+SSH key) is not retried. The command's change is taken back (what cannot be
+is named in the message and stays here until `karr sync` publishes it) and the
+clone becomes read-only for the board; a rate limit or a ref the remote refuses
+for its own reason (a hook) does not do that; the state lives in this clone's git config,
+not on the board.
+
+```bash
+karr readonly         # off, denied (since when, why, which push URL) or on; --json too
+karr readonly on      # this clone is only for reading: writes refused, sync only pulls
+karr readonly off     # try writing again; learns "denied" again if still not allowed
+```
+
+Every writing command is then refused after its pull and before it writes,
+`--local-only` included; reads and pulls work. The state lifts when the
+remote's push URL changes, when `karr sync` lands a push, or with
+`karr readonly off`. `readonly on` is the owner's decision, not an agent's.
+
 **A fresh clone fetches the board by itself.** `git clone` does not carry
 `refs/karr/*`. Where nothing exists under `refs/karr/` and the remote has a
 board, the read commands (`board`, `list`, `show`, `log`, `context`,

@@ -75,7 +75,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.29
+Version 1.30
 
 =cut
 
@@ -382,7 +382,7 @@ pane=${BASH_REMATCH[1]} _rows=${BASH_REMATCH[3]}
 
 # --lateral (-L) puts all the pages in one row, as wide as the screen
 # shows: explicit option > config default.  nup refuses it with rows
-# and PDF, and -w after the file name would make rows of it
+# and PDF, and -w would make rows of it
 # again, so the config default is left out with them, and -w is an
 # error with the option given.
 if [[ $lateral == _ ]]; then
@@ -668,21 +668,22 @@ run_greple() {
         "$@"
 }
 
-# Options for ansicolumn, given after the file name "-" (see nup(1))
-declare -a column_opts=()
-(( width > 0 )) && column_opts+=(-w "$width")
-# --intact is for ansicolumn only, and does not change the pane count
+# The output width, an option of nup (see nup(1))
+declare -a width_opts=()
+(( width > 0 )) && width_opts+=(-w "$width")
+# --intact is for ansicolumn only, and does not change the pane count;
+# it is given to nup by --column-opts ... --, as --pages
 declare -a intact_opts=()
 [[ $_intact ]] && intact_opts=(--intact)
 run_nup() {
     if [[ ${parallel:-} ]]; then
         # one \f separated page per file; ansicolumn -V shows pages side by side
-        invoke nup "${pass_nup[@]}" -V --pane=$_cols${_rows:+,$_rows} - --pages ${column_opts[@]+"${column_opts[@]}"} ${intact_opts[@]+"${intact_opts[@]}"}
-    elif (( ${#column_opts[@]} > 0 )); then
+        invoke nup "${pass_nup[@]}" -V --pane=$_cols${_rows:+,$_rows} ${width_opts[@]+"${width_opts[@]}"} --column-opts --pages ${intact_opts[@]+"${intact_opts[@]}"} --
+    elif (( ${#width_opts[@]} > 0 )); then
         # fix the pane count so that nup agrees with the fold width
-        invoke nup "${pass_nup[@]}" --pane=$_cols${_rows:+,$_rows} - "${column_opts[@]}" ${intact_opts[@]+"${intact_opts[@]}"}
+        invoke nup "${pass_nup[@]}" --pane=$_cols${_rows:+,$_rows} "${width_opts[@]}" ${intact_opts[@]+--column-opts "${intact_opts[@]}" --}
     elif (( ${#intact_opts[@]} > 0 )); then
-        invoke nup "${pass_nup[@]}" - "${intact_opts[@]}"
+        invoke nup "${pass_nup[@]}" --column-opts "${intact_opts[@]}" --
     else
         invoke nup "${pass_nup[@]}"
     fi
@@ -691,7 +692,7 @@ run_nup() {
 run_column() {
     local -a _pane=()
     (( pane == 0 )) && _pane=(--pane=1)
-    invoke nup "${pass_nup[@]}" --no-pager --no-paginate ${_pane[@]+"${_pane[@]}"} - --pages ${column_opts[@]+"${column_opts[@]}"} ${intact_opts[@]+"${intact_opts[@]}"}
+    invoke nup "${pass_nup[@]}" --no-pager --no-paginate ${_pane[@]+"${_pane[@]}"} ${width_opts[@]+"${width_opts[@]}"} --column-opts --pages ${intact_opts[@]+"${intact_opts[@]}"} --
 }
 run_cat_v()  { invoke cat-v --nl=0; }
 run_pager()  { invoke ${PAGER:-less}; }
@@ -792,9 +793,13 @@ if [[ -v image ]]; then
         esac
     done
 fi
+# The standard output is a pipe: bash stats /dev/stdout as a file
+# where the system has one, which is the pipe itself on Linux but a
+# device of its own on BSD and Solaris, so perl looks at the fd
+stdout_pipe() { perl -e 'exit !-p STDOUT'; }
 _image= _image_params=()
-if [[ $_image_types && ( -t 1 || -p /dev/stdout ) && ! $output && ! $_paper && ! ${cat_v:-} ]] \
-    && image_terminal && image_pagers; then
+if [[ $_image_types && ! $output && ! $_paper && ! ${cat_v:-} ]] \
+    && { [[ -t 1 ]] || stdout_pipe; } && image_terminal && image_pagers; then
     _image=${_image_types//,/:}
     export LESSUTFCHARDEF="${LESSUTFCHARDEF:+$LESSUTFCHARDEF,}10EEEE:p"
 elif [[ $_image_types && $_paper && ! ${cat_v:-} ]]; then

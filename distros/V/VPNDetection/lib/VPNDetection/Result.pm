@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.19.1';
+our $VERSION = '3.20.0';
 
 our @FLAGS = qw(
     is_vpn is_hosting is_relay is_tor is_cdn is_bot is_resproxy is_dcproxy is_mobproxy
@@ -19,12 +19,12 @@ our @DETAILS = qw(
     smtp web dns_resolver bittorrent
 );
 # Where the address is and the AS announcing it, on every answer, with or without
-# a key, each with every member present: an empty string, or AS 0, where nothing
-# is known. The reverse DNS hostname is on every answer too, and company and abuse
-# on a paid plan's.
+# a key, each with every member present bar the ones a plan leaves out: an empty
+# string, or AS 0, where nothing is known. The reverse DNS hostname is on every
+# answer too, and company and abuse on a paid plan's.
 our @OBJECTS = qw(location asn company hostname abuse);
-# The members of each object. Those after flag_unicode in location, and after
-# prefix in asn, are absent from an answer whose plan leaves them out.
+# The members of each object. Those after flag_unicode in location, and an asn's
+# type, are absent from an answer whose plan leaves them out.
 our @LOCATION = qw(
     continent continent_name country country_name timezone currency_code currency_name
     currency_symbol flag_emoji flag_unicode region region_code city postal_code latitude
@@ -120,7 +120,7 @@ VPNDetection::Result - what a lookup answers
     $result->asn->{name};           # who runs the announcing network
     $result->hostname;              # the reverse DNS name, '' where it has none
 
-    $result->is_bot;                # 1 when an automated client uses the address
+    $result->is_bot;                # 1 when an automated client uses the address, on a paid plan
     $result->bot->{provider_name};  # whose bot, on a paid plan
     $result->is_hosting;            # 1, 0, or undef when your plan omits it
     $result->is_hosting // 0;       # read an absent field as false
@@ -165,10 +165,10 @@ its traffic out from it.
 
 =head2 is_bot
 
-On every answer, with or without a key: C<1> when an automated client uses the
-address, such as a search engine's or an AI company's crawler, an uptime monitor,
-an internet scanner or a webhook sender, C<0> when none does, and C<undef> on an
-answer that does not carry it.
+On a paid plan or the trial: C<1> when an automated client uses the address, such
+as a search engine's or an AI company's crawler, an uptime monitor, an internet
+scanner or a webhook sender, C<0> when none does, and C<undef> on Unlimited's
+answer, which does not carry it.
 
 =head2 bot
 
@@ -223,9 +223,12 @@ Where the address is and the AS announcing it, as plain hash references, on ever
 answer, with or without a key. C<location> carries C<continent>,
 C<continent_name>, C<country>, C<country_name>, C<timezone>, C<currency_code>,
 C<currency_name>, C<currency_symbol>, C<flag_emoji> and C<flag_unicode>; C<asn>
-carries C<asn>, C<name>, C<domain>, C<type>, C<prefix>, C<country> and
-C<rpki_status>. Every key is present whenever the object is: an empty string,
-and C<asn> 0, where nothing is known. A paid plan's C<location> also carries
+carries C<asn>, C<name>, C<domain>, C<prefix>, C<country> and C<rpki_status>,
+and on a paid plan or the trial C<type>, the kind of network the AS runs
+(C<isp>, C<hosting>, C<education>, C<government> or C<business>). Every key but
+C<type> is present whenever the object is: an empty string, and C<asn> 0, where
+nothing is known, and C<type> is absent from Unlimited's answer, so
+C<< $result->asn->{type} >> is C<undef> there. A paid plan's C<location> also carries
 C<region>, C<region_code>, C<city>, C<postal_code>, C<latitude>, C<longitude>,
 C<accuracy_radius>, C<geoname_id>, C<dma_code> and C<last_changed>, which are
 absent on a plan without them.

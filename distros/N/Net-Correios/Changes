@@ -1,5 +1,10 @@
 Revision history for Net-Correios
 
+0.005   2026-11-26
+    - renew access tokens automatically before they expire, and retry the
+      request once when the API rejects an expired token;
+    - new constructor options: token_ttl and token_renew_before;
+
 0.004   2026-06-05
     - fix Manifestacao issue;
 

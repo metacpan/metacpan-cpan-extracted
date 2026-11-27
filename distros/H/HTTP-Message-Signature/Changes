@@ -1,5 +1,19 @@
 Revision history for HTTP-Message-Signature:
 
+v0.0.3    2026-11-26 16:53:57+00:00 Europe/London
+  [Enhancements]
+  - Changed the internals to use HTTP::libsfparse (via HTTP::StructuredField) for parsing structured fields.
+
+  - Added support for the rsa-pss-sha512 algorithm.
+
+  - The public key is checked if it corresponds to the algorithm.
+
+  [Bug Fixes]
+  - Fixed the regex used to match dictionary keys.
+
+  [Documentation]
+  - Added a section to KNOWN ISSUES about Content-Digests.
+
 v0.0.2    2026-11-19 18:00:54+00:00 Europe/London
   [Bug Fixes]
   - Removed use of "equ" operator and state hash variables that caused problems with older Perl versions.

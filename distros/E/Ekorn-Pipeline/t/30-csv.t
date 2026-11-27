@@ -7,6 +7,12 @@ use Test2::Plugin::NoWarnings;
 # 2026-0049). Each is run with Text::CSV's parser, made from options,
 # and with Text::CSV_PP's, given as an object.
 
+# Text::CSV is only recommended, so this is skipped without it, as on
+# CPAN Testers' smokers that don't install what's recommended;
+# t/31-csv-without-text-csv.t tests that case. Text::CSV_PP comes with
+# it.
+use Test2::Require::Module 'Text::CSV';
+
 use File::Temp qw(tempdir);
 
 # A close that fails when asked, as one does on a full disk, and counts

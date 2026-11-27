@@ -26,6 +26,12 @@ take down the editor, so follow these rules:
   `Module::Build->can('ACTION_install')`. `Module::Build` inherits its actions
   from `Module::Build::Base`, so `\&Module::Build::ACTION_install` is a stub
   that resolves to your wrapper and recurses without bound.
+- A script that runs `./Build install` without `--destdir` must delete
+  `PERL_MB_OPT` and set `MODULEBUILDRC=NONE`. Module::Build applies both on
+  every `./Build` run, so an install base from local::lib overrides the one
+  passed to `Build.PL` and installs the fixture into the user's real tree.
+  To test this, run the script with `PERL_MB_OPT='--install_base DIR'` and
+  check that `DIR` stays empty.
 - When changing a test harness, run it under limits first, for example:
 
   ```sh

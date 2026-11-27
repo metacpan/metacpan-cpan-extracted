@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -17,7 +18,7 @@ use Test::More;
 #     fixtures; a real card may emit a name format the regexes do not expect).
 #   * install_driver on each distro family — Debian, Ubuntu, RHEL/Rocky/Alma,
 #     openSUSE — including the per-family package lists and version branches.
-#   * the Rex::Pkg-bypass verify seam (dpkg -l '^ii' / rpm -q) against a
+#   * the Rex::Pkg-bypass verify seam (dpkg -l '^[hi]i' / rpm -q) against a
 #     partial/failed DKMS build.
 #   * the nouveau blacklist + initramfs regeneration (Setup post_install:
 #     update-initramfs / dracut).
@@ -167,7 +168,13 @@ subtest '_parse_amd_line — standard lspci format' => sub {
   );
   is($gpu->{vendor},    'amd',  'vendor amd');
   is($gpu->{pci_class}, '0300', 'pci_class 0300');
-  is($gpu->{compute},   0,      'compute 0 (AMD never compute by decision)');
+  # k1: compute is no longer hard 0 -- it is the verdict of the device table
+  # (1002:744c = Navi 31 = gfx1100, ROCm-capable, discrete), see t/14-amd-detect.t
+  is($gpu->{compute},   1,      'compute 1 (1002:744c = gfx1100 in the AMD device table, k1)');
+  is($gpu->{gfx_target}, 'gfx1100', '... gfx_target from the table');
+  is($gpu->{integrated}, 0,     '... discrete');
+  is($gpu->{device_id}, '744c', '... device_id');
+  is($gpu->{slot},      '0000:0a:00.0', '... slot with its domain');
   # karr #5: same form as _parse_nvidia_line -- vendor prefix stripped,
   # codename + bracketed marketing name kept verbatim, up to the [1002:xxxx]
   # id. Was 'Unknown AMD GPU' on every real card before this fix (the old
@@ -208,7 +215,12 @@ subtest '_parse_amd_line — unresolved name (pci.ids lacks the device id)' => s
   my $gpu = Rex::GPU::Detect->_parse_amd_line(
     '0a:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Device [1002:7550] (rev c1)'
   );
-  is($gpu->{name}, 'Device', 'name = "Device" (pci.ids cannot resolve 1002:7550)');
+  # k1: the bare placeholder names no GPU in a message any more -- it becomes
+  # the synthetic name the sysfs path uses. The verdict is the table's.
+  is($gpu->{name}, 'AMD GPU [1002:7550]', 'name = "AMD GPU [1002:7550]" (pci.ids cannot resolve 1002:7550; k1, was "Device")');
+  is($gpu->{gfx_target}, 'gfx1201', '... 1002:7550 = gfx1201');
+  is($gpu->{compute}, 1, '... compute 1');
+  is($gpu->{integrated}, 0, '... integrated 0');
 };
 
 subtest '_parse_amd_line — unrecognised vendor text => fallback' => sub {
@@ -307,11 +319,15 @@ subtest 'unresolved name at class 0300 — every Blackwell ID => compute' => sub
     'upper-case device id matches too');
 
   # Range edges: the Blackwell block is 2900-2FFF; 28ff just below is the end
-  # of the Turing..Hopper row (compute since karr #54), 3000 just above and
-  # the neighbours of the Blackwell Ultra IDs are in no row at all.
+  # of the Ada block (compute since karr #54, its own block since k107),
+  # 3000 just above and the neighbours of the Blackwell Ultra IDs are in no
+  # row at all. The Turing/Ampere | Hopper | Turing/Ampere | Ada edges
+  # (k107) are compute on both sides.
   is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '2900'), 1, '2900 (block start) => compute');
   is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '2fff'), 1, '2fff (block end) => compute');
-  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '28ff'), 1, '28ff (Turing..Hopper row end) => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '28ff'), 1, '28ff (Ada block end) => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', $_), 1, $_.' (Turing..Ada block edge) => compute')
+    for qw( 22ff 2300 23ff 2400 25ff 2600 );
   {
     no warnings 'redefine';
     local *Rex::Logger::info = sub { };
@@ -516,7 +532,7 @@ subtest 'resolved names: RTX laptop parts are compute by name' => sub {
   is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GB202M [GeForce RTX 5090 Laptop GPU]', '2c18'), 1,
     'resolved "RTX 5090 Laptop GPU" => compute (range and name agree)');
   is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'AD103M / AD104M [GeForce RTX 4090 Laptop GPU]', '2717'), 1,
-    'Ada "RTX 4090 Laptop GPU" => compute (Turing..Hopper row since karr #54, RTX name rule before)');
+    'Ada "RTX 4090 Laptop GPU" => compute (generation row since karr #54, RTX name rule before)');
   is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GB202 [GeForce RTX 5090]', '2b85'), 1,
     'resolved RTX 5090 => compute');
   no warnings 'redefine';
@@ -532,7 +548,7 @@ subtest 'detect — AMD only' => sub {
   is(scalar @{$r->{nvidia}}, 0,     'no nvidia gpu');
   is(scalar @{$r->{amd}},    1,     'one amd gpu');
   is($r->{amd}[0]{vendor},  'amd',  'element vendor amd');
-  is($r->{amd}[0]{compute}, 0,      'element compute 0');
+  is($r->{amd}[0]{compute}, 1,      'element compute 1 (gfx1100, k1; was 0 by decision)');
   is($r->{amd}[0]{name}, 'Navi 31 [Radeon RX 7900 XTX]', 'element name (karr #5)');
 };
 
@@ -542,7 +558,8 @@ subtest 'detect — class 0380: AMD Instinct listed, NVIDIA there is not (karr k
   );
   is(scalar @{$r->{amd}}, 1, 'one amd device');
   is($r->{amd}[0]{pci_class}, '0380', 'pci_class 0380');
-  is($r->{amd}[0]{compute}, 0, 'compute 0');
+  is($r->{amd}[0]{compute}, 1, 'compute 1 (1002:740c = MI250X = gfx90a, k1; was 0)');
+  is($r->{amd}[0]{gfx_target}, 'gfx90a', '... gfx90a');
   is($r->{amd}[0]{name}, 'Aldebaran/MI200 [Instinct MI250X]', 'name');
   is(scalar @{$r->{nvidia}}, 0, 'no nvidia');
 

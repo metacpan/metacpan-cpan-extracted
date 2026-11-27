@@ -22,7 +22,7 @@ use utf8;
 use open qw(:std :encoding(UTF-8));
 
 package App::PDFLibrarian::BibTeX;
-$App::PDFLibrarian::BibTeX::VERSION = '6.3.3';
+$App::PDFLibrarian::BibTeX::VERSION = '6.3.4';
 use parent 'Exporter';
 
 use Capture::Tiny;
@@ -270,13 +270,15 @@ sub format_bib {
       }
     }
 
-    # remove wrapping braces
+    # remove wrapping braces from title fields
     foreach my $bibfield ($bibentry->fieldlist()) {
-      my $bibfieldvalue = $bibentry->get($bibfield);
-      while ($bibfieldvalue =~ /^(\{(?:[^{}]++|(?1))*\})$/) {
-        $bibfieldvalue = substr($1, 1, -1);
-      };
-      $bibentry->set($bibfield, $bibfieldvalue);
+      if ($bibfield =~ /title$/) {
+        my $bibfieldvalue = $bibentry->get($bibfield);
+        while ($bibfieldvalue =~ /^(\{(?:[^{}]++|(?1))*\})$/) {
+          $bibfieldvalue = substr($1, 1, -1);
+        };
+        $bibentry->set($bibfield, $bibfieldvalue);
+      }
     }
 
     # replace accented characters with LaTeX accents

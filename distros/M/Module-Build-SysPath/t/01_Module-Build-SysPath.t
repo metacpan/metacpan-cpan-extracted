@@ -19,6 +19,12 @@ use FindBin qw($Bin);
 use lib File::Spec->catfile($Bin, 'lib');
 use lib File::Spec->catfile($Bin, '..', 'lib');
 
+# Module::Build rereads PERL_MB_OPT (set by local::lib) and .modulebuildrc on
+# every ./Build run; they would override --install_base and install the
+# fixture distribution into the user's real install base.
+delete $ENV{PERL_MB_OPT};
+$ENV{MODULEBUILDRC} = 'NONE';
+
 BEGIN {
     use_ok ( 'Module::Build::SysPath' ) or exit;
 }

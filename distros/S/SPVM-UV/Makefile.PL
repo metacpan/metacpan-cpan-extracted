@@ -151,6 +151,7 @@ package MY {
         'UV::Handle::Process',
         'UV::Handle::Signal',
         'UV::Handle::FsEvent',
+        'UV::Handle::TCP',
       ];
       
       $options->{precompile_classes} = [

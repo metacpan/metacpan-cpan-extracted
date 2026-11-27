@@ -520,3 +520,45 @@ int32_t SPVM__UV__Loop__fs_event_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;
 }
+
+int32_t SPVM__UV__Loop__alive(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  
+  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
+  assert(uv_loop);
+  
+  int32_t is_alive = uv_loop_alive(uv_loop);
+  
+  stack[0].ival = is_alive;
+  
+  return 0;
+}
+
+int32_t SPVM__UV__Loop__tcp_init(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_tcp = stack[1].oval;
+  
+  if (!obj_uv_tcp) {
+    return env->die(env, stack, "$uv_tcp must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
+  uv_tcp_t* uv_tcp = env->get_pointer(env, stack, obj_uv_tcp);
+  
+  int32_t status = uv_tcp_init(uv_loop, uv_tcp);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_tcp_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  stack[0].oval = obj_uv_loop;
+  stack[1].oval = obj_uv_tcp;
+  env->call_instance_method_by_name(env, stack, "set_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  return 0;
+}

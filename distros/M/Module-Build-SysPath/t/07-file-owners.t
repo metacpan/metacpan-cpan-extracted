@@ -10,6 +10,12 @@ use FindBin '$Bin';
 use Path::Tiny 'path';
 use POSIX ();
 
+# Module::Build rereads PERL_MB_OPT (set by local::lib) and .modulebuildrc on
+# every ./Build run; they would override --install_base and install the
+# fixture distribution into the user's real install base.
+delete $ENV{PERL_MB_OPT};
+$ENV{MODULEBUILDRC} = 'NONE';
+
 my $temporary = Path::Tiny->tempdir('syspath-owners-XXXXXXXX');
 
 # A non-root user can only chgrp to its own groups, so the test needs one

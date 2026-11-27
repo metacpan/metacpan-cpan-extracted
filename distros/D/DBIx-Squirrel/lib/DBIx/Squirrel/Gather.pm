@@ -6,7 +6,7 @@ use Exporter qw(import);
 
 use Ekorn::Pipeline::Gather qw(gather);
 
-our $VERSION = 'v4.1.1';
+our $VERSION = 'v4.2.0';
 
 # A plain re-export of Ekorn::Pipeline::Gather's function, from
 # DBIx::Squirrel's own list of them, imported from it by name, so a name

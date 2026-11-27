@@ -66,6 +66,28 @@ subtest 'dump_to' => sub {
     is $err, "1\n", 'to STDERR by default';
 };
 
+subtest "\$DumpSecrets is Ekorn::Pipeline's, by our name" => sub {
+    no warnings 'once';
+    my($ours, $theirs) = (
+        \$DBIx::Squirrel::Stages::Taps::DumpSecrets,
+        \$Ekorn::Pipeline::Stages::Taps::DumpSecrets,
+    );
+    ok !$$theirs, 'not set to begin with';
+    $$ours = 1;
+    is $$theirs, 1, 'set by ours';
+    $$ours = undef;
+    ok !$$theirs, 'and unset';
+    {
+        local $DBIx::Squirrel::Stages::Taps::DumpSecrets = 1;
+        is $$theirs, 1, 'set with local on ours';
+    }
+    ok !$$theirs, 'and put back as the scope ends';
+    {
+        local $Ekorn::Pipeline::Stages::Taps::DumpSecrets = 1;
+        is $DBIx::Squirrel::Stages::Taps::DumpSecrets, 1, 'and ours reads theirs';
+    }
+};
+
 subtest 'mistakes' => sub {
     my $peek_line = __LINE__ + 1;
     is dies { &DBIx::Squirrel::Stages::Taps::peek('x') },    # past the prototype

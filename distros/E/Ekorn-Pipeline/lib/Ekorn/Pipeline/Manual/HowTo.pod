@@ -51,6 +51,10 @@ L<Import everything from one place|/"Import everything from one place">
 
 =item *
 
+L<Coming from DBIx::Squirrel|/"Coming from DBIx::Squirrel">
+
+=item *
+
 L<1. Stages: one value at a time|/"1. Stages: one value at a time">
 
 =item *
@@ -317,6 +321,81 @@ what's for extending Ekorn rather than using it, such as C<is_stage>
 and C<croakf>, which you import from their own modules when chapters 9
 and 10 need them; and C<|>, which only C<use Ekorn::Pipeline::Operators>
 puts in force, in its own scope, as chapter 8 explains.
+
+=head1 Coming from DBIx::Squirrel
+
+This is for readers who know DBIx::Squirrel, whose user guide sends
+them here; anyone else can skip to chapter 1. DBIx::Squirrel uses
+Ekorn::Pipeline as any package can, so much of what you know is here,
+under the same names. What differs is where the values come from: in
+DBIx::Squirrel, a statement's rows; here, any source.
+
+=over 4
+
+=item C<< $dbh->iterate(...) >>: a statement as a source of rows
+
+B<Here:> C<< Ekorn::Pipeline->new(@stages)->iterator($source) >>, for any source
+
+B<Chapter:> 2, 5
+
+=item an iterator's C<next>, C<all>, C<all_arrayref>, C<first>, C<single> and C<ended>
+
+B<Here:> the same methods, and C<finish>, to end a run early, but no C<reset>: an iterator here is one run, so make another with C<iterator>
+
+B<Chapter:> 2
+
+=item stages, C<Stop>, C<gather>, and the canned stages, such as C<take>, C<batch> and C<peek>
+
+B<Here:> the same subs: DBIx::Squirrel imports them from here
+
+B<Chapter:> 1, 3, 4
+
+=item C<result_number> and C<result_original>
+
+B<Here:> the same, from Ekorn::Pipeline::Context; the original is the value as the source gave it
+
+B<Chapter:> 5
+
+=item DBIx::Squirrel::Tooling
+
+B<Here:> Ekorn::Pipeline::Tooling, whose tags have the same names, without C<:rows>; each holds its own list, as the table above shows
+
+B<Chapter:> above
+
+=item C<$DBIx::Squirrel::Stages::Taps::DumpSecrets>
+
+B<Here:> C<$Ekorn::Pipeline::Stages::Taps::DumpSecrets>, tied to it, so C<local> on either sets both
+
+B<Chapter:> 11
+
+=item Part 2's sinks, sources, feeds, C<tee>, C<|> and names
+
+B<Here:> the same, made here
+
+B<Chapter:> 2, 5 to 8
+
+=back
+
+C<pluck> and C<as_hash> need a statement's column names, so they're
+DBIx::Squirrel's alone, as is C<is_stop>. The loop you'd write over a
+statement's rows reads the tracks the same way (C<next> from v0.4.3;
+before it, call the iterator, C<< $next->() >>):
+
+    my $next = Ekorn::Pipeline->new(take_if { $_->{artist} eq 'Blur' })
+        ->iterator(from_array(@tracks));
+    while (my($track) = $next->next) {
+        say $track->{title};
+    }
+    # Girls & Boys
+    # Parklife
+    # Country House
+
+What's new is everything without a database in it: sources of your
+own, made with C<source> and C<generator> (chapter 5), functions of
+your own that take stages for any values (chapter 9), and parts made
+for others to use (chapter 10). Start with chapter 2, where a pipeline
+is made and run with no statement behind it, then chapter 9, which is
+why the package exists.
 
 =head1 1. Stages: one value at a time
 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # large-subset-builtins.pl (post4-0.04, 2026-11-05): the atomic calls without coreutils where no program runs.  Every
 # such command that Proc::ShellSpawn runs in the corpus samples, with its words as expanded there, run alone in dash,
-# bash --posix and ours: the builtins (cd, read, set, export, readonly, local, shift, trap, unset, umask, jobs, wait,
+# bash --posix and ShellSpawn: the builtins (cd, read, set, export, readonly, local, shift, trap, unset, umask, jobs, wait,
 # eval, ., exit, return, getopts, command, type, ...), also inside function bodies; settings alone (x=1); and a
 # command that is not found (or not allowed to run).  (The calls to external programs need no such run: large-subset-runcompare.pl's logs already
 # compare them, call by call; the calls to echo, printf, test, [, kill, pwd: large-subset-threeway.pl.)
@@ -10,7 +10,7 @@
 # list, so the name may well be installed here (wine, shellcheck, ...), while what bash's time runs must still be found.
 #
 # Usage (as root, with no network):
-#   unshare -n perl large-subset-runcompare.pl -q samples.jsonl samples.tsv QDIR     # ours only; builtins logged
+#   unshare -n perl large-subset-runcompare.pl -q samples.jsonl samples.tsv QDIR     # ShellSpawn only; builtins logged
 #   unshare -n perl large-subset-builtins.pl [-l LIST.tsv] [-db DB.jsonl] QDIR
 # Each distinct call (NAME=VALUE settings before it, the name, the arguments) becomes a text: the settings and
 # arguments single-quoted (a plain name stays bare).  It runs as the user rc9, in a fresh copy of large-subset-runcompare.pl's directory, stdin
@@ -20,6 +20,7 @@
 # taken one by one); a name a function may have (b_late) is taken where it runs: as the builtin, or as the function.
 # A side effect inside an expansion (: $((z=3))) is not in the expanded words, so it is lost when the call runs alone.
 use strict; use warnings; use JSON::PP; use File::Path qw(make_path remove_tree); use Cwd 'abs_path'; use Getopt::Long;
+sub ss { my $s = shift; $s->{shellspawn} //= delete $s->{ours} if ref $s eq 'HASH' && exists $s->{ours}; $s }   # records made before post-0.13's rename: ShellSpawn's result under the key ours
 my ($LIST, $DB, $REUSE); GetOptions('l=s' => \$LIST, 'db=s' => \$DB, 'reuse=s' => \$REUSE) && @ARGV == 1
   or die "usage: $0 [-l LIST.tsv] [-db DB.jsonl] [-reuse OLD-DB.jsonl] QDIR\n";   # -reuse: the answers of calls an earlier run has
 $> == 0 or die "run as root\n";
@@ -30,8 +31,8 @@ my %TOOL = map +($_ => 1), qw(echo printf test [ kill pwd true false);   # coreu
 my (%calls, %samples, %skipped, %kind);   # TEXT => number of samples; examples
 sub q1 { my $s = shift; $s =~ s/'/'\\''/g; "'$s'" }
 for my $f (glob "$ARGV[0]/run-*.jsonl") { open my $in, '<', $f or die;
-  while (<$in>) { my $s = eval { decode_json($_) } or next; my %seen;
-    for my $l (split /\n/, $s->{ours}{builtins} // '') {
+  while (<$in>) { my $s = eval { ss(decode_json($_)) } or next; my %seen;
+    for my $l (split /\n/, $s->{shellspawn}{builtins} // '') {
       my ($h, $env, $argv) = split /\035/, $l, -1; next unless defined $argv;
       if ($SKIP{$h}) { $skipped{$h eq 'Proc::ShellSpawn::Large::call' ? 'function calls' : $h}++; next }
       my @a = split /\037/, $argv, -1; my @e = grep length, split /\036/, $env;
@@ -62,13 +63,13 @@ sub run1 { my ($path, @cmd) = @_;   # $path: the run's PATH (the run's list of p
     for my $n (sort grep !/^\.\.?\z/, readdir $dh) { my $f = "$d/$n"; push @files, -d $f ? "$p$n/" : "$p$n " . (-s $f // '?');
       $walk->($f, "$p$n/") if -d $f && !-l $f } };
   $walk->("$W/run", ''); $r{files} = join "\n", @files; \%r }
-my %PFX = (dash => qr/(?:\S*\/)?dash: \d+: /, bash => qr/(?:\S*\/)?bash: (?:line \d+: )?/, ours => qr/(?:^|(?<=\n))sh: /);
+my %PFX = (dash => qr/(?:\/\S*\/)?dash: \d+: /, bash => qr/(?:\/\S*\/)?bash: (?:line \d+: )?/, shellspawn => qr/(?:^|(?<=\n))sh: /);
 sub msgs { my ($e, $sh) = @_; $e =~ s/$PFX{$sh}//g; join '', sort split //, $e =~ s/\n//gr }
 
 my (%cls, %name, @list); my $j = JSON::PP->new->utf8->canonical; my $db;
 open $db, '>', $DB or die "$DB: $!" if $DB;
 my %old; if ($REUSE) { open my $in, '<', $REUSE or die "$REUSE: $!\n";
-  while (<$in>) { my $x = decode_json($_); $old{$x->{text}} = { map +($_ => $x->{$_}), qw(dash bash ours) } } }
+  while (<$in>) { my $x = ss(decode_json($_)); $old{$x->{text}} = { map +($_ => $x->{$_}), qw(dash bash shellspawn) } } }
 my $NOPATH = '/usr/bin:/bin';   # the run's programs: as before A23, or the installed ones of its list
 if (open my $pf, '<', "$ARGV[0]/programs.txt") { my $l = <$pf> // ''; if ($l =~ /^programs: (\S+), SHA-256/) { my $list = $1;
   $NOPATH = "$W.listpath"; remove_tree($NOPATH); make_path($NOPATH); chmod 0755, $NOPATH;
@@ -79,23 +80,29 @@ if (open my $pf, '<', "$ARGV[0]/programs.txt") { my $l = <$pf> // ''; if ($l =~ 
 for my $t (sort keys %calls) {
   my $path = $kind{$t} eq 'not found' ? $NOPATH : '/usr/bin:/bin';
   my %r = %{ $old{$t} // { dash => run1($path, '/usr/bin/dash', '-c', $t), bash => run1($path, '/usr/bin/bash', '--posix', '-c', $t),
-           ours => run1($path, $^X, "-I$DIST/blib/lib", "-I$DIST/blib/arch", "$DIST/t/try.pl", $t) } };
-  my ($d, $b, $o) = @r{qw(dash bash ours)};
+           shellspawn => run1($path, $^X, "-I$DIST/blib/lib", "-I$DIST/blib/arch", "$DIST/t/try.pl", $t) } };
+  my ($d, $b, $o) = @r{qw(dash bash shellspawn)};
   my $eq = sub { my ($x, $y) = @_; $x->{status} eq $y->{status} && $x->{out} eq $y->{out} && $x->{files} eq $y->{files} };
   my ($db_, $do, $bo) = ($eq->($d, $b), $eq->($d, $o), $eq->($b, $o));
-  my ($md, $mb, $mo) = (msgs($d->{err}, 'dash'), msgs($b->{err}, 'bash'), msgs($o->{err}, 'ours'));
-  my $c = $o->{status} eq '255' && $o->{err} =~ /^outside the subset/ ? 'ours rejects it alone'
+  my ($md, $mb, $mo) = (msgs($d->{err}, 'dash'), msgs($b->{err}, 'bash'), msgs($o->{err}, 'shellspawn'));
+  my $c = $o->{status} eq '255' && $o->{err} =~ /^outside the subset/ ? 'ShellSpawn rejects it alone'
         : $db_ && $do ? ($md eq $mb && $md eq $mo ? 'same' : $mo eq $md ? 'messages: as dash' : $mo eq $mb ? 'messages: as bash' : 'messages: neither')
-        : $db_ ? 'dash=bash, ours differs' : $do ? 'dash=ours, bash differs' : $bo ? 'bash=ours, dash differs' : 'all three differ';
+        : $db_ ? 'dash=bash, ShellSpawn differs' : $do ? 'dash=ShellSpawn, bash differs' : $bo ? 'bash=ShellSpawn, dash differs' : 'all three differ';
   my $n = $kind{$t} eq 'x_set' ? '(settings)' : $kind{$t} =~ /^(?:not found|denied)\z/ ? "($kind{$t})"
         : $t =~ s/^(?:\w+='(?:[^']|'\\'')*' ?)*'?([^' ]*).*/$1/sr;
   $cls{$c}{calls}++; $cls{$c}{samples} += $calls{$t}; $name{$n}{$c} += $calls{$t};
   print $db $j->encode({ text => $t, samples => $calls{$t}, examples => $samples{$t}, class => $c, %r }), "\n" if $db;
   if ($c ne 'same') { my $f = sub { my $r = shift; (my $x = "$r->{status} $r->{out}|$r->{err}") =~ s/\n/\\n/g; substr($x, 0, 70) };
     push @list, join "\t", $c, $calls{$t}, length $t > 70 ? substr($t, 0, 70) . '...' : $t, $f->($d), $f->($b), $f->($o), join(',', @{$samples{$t}}) } }
-my @C = ('same', 'messages: as dash', 'messages: as bash', 'messages: neither', 'dash=bash, ours differs', 'dash=ours, bash differs', 'bash=ours, dash differs', 'all three differ', 'ours rejects it alone');
+my @C = ('same', 'messages: as dash', 'messages: as bash', 'messages: neither', 'dash=bash, ShellSpawn differs', 'dash=ShellSpawn, bash differs', 'bash=ShellSpawn, dash differs', 'all three differ', 'ShellSpawn rejects it alone');
 printf "%-28s %7s %8s\n", 'class', 'calls', 'samples'; printf "%-28s %7d %8d\n", $_, $cls{$_}{calls} // 0, $cls{$_}{samples} // 0 for @C;
 print "\nsamples, by builtin:\n"; printf "%-9s %s\n", '', join ' ', map sprintf('%10.10s', $_), @C;
 for my $t (sort { my ($x, $y) = map { my $h = $name{$_}; my $s = 0; $s += $_ for values %$h; $s } $a, $b; $y <=> $x } keys %name) {
   printf "%-9s %s\n", $t, join ' ', map sprintf('%10d', $name{$t}{$_} // 0), @C }
-if ($LIST) { open my $o, '>', $LIST or die; print $o "class\tsamples\tcall\tdash\tbash\tours\texamples\n", map "$_\n", sort @list }
+if ($LIST) {   # (post-0.14) the calls that differ in the messages only are counted in the header, not listed
+  open my $o, '>', $LIST or die; my @m = grep /^messages: /, @C;
+  print $o "# large-subset-builtins-differences.tsv (large-subset-builtins.pl -l): every builtin call whose result differs beyond\n",
+    "# the messages between dash, bash --posix and ShellSpawn, or that ShellSpawn alone rejects.  The calls that differ in the\n",
+    "# messages only are counted here, not listed (each with its answers: -db's database, kept with the stored runs):\n",
+    (map sprintf("#   %-18s %6d calls in %6d samples\n", "$_:", $cls{$_}{calls} // 0, $cls{$_}{samples} // 0), @m),
+    "class\tsamples\tcall\tdash\tbash\tShellSpawn\texamples\n", map "$_\n", sort grep !/^messages: /, @list }

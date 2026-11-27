@@ -1,4 +1,5 @@
 package CLI::Simple;
+
 # a Simple, Fast & Easy way to create scripts
 
 use strict;
@@ -22,8 +23,11 @@ use Getopt::Long qw(:config no_ignore_case);
 use IO::Interactive;
 use List::Util qw(none pairs any);
 use Scalar::Util qw(reftype);
+use Role::Tiny::With;
 
-our $VERSION = '2.4.0';
+with qw(CLI::Simple::TempFile CLI::Simple::TempDir CLI::Simple::Options);
+
+our $VERSION = '2.7.0';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -314,6 +318,7 @@ sub main {
 my %LOGGER_ENABLED;
 my %OPTION_PROVIDERS;
 my %OPTION_PROVIDER_ORDER;
+my %TEMP_RESOURCE_ACCESSORS;
 
 ########################################################################
 sub _use_logger {
@@ -437,6 +442,58 @@ sub use_log4perl {
 }
 
 ########################################################################
+sub normalize_commands {
+########################################################################
+  my ( $class, $declarations ) = @_;
+
+  croak 'Command declarations must be a hash reference'
+    if !ref $declarations || reftype($declarations) ne 'HASH';
+
+  my %commands;
+  my %metadata;
+
+  foreach my $name ( keys %{$declarations} ) {
+    my $declaration = $declarations->{$name};
+
+    if ( ref $declaration && reftype($declaration) eq 'HASH' ) {
+      foreach my $key ( keys %{$declaration} ) {
+        croak sprintf q{Unknown attribute '%s' for command '%s'}, $key, $name
+          if !any { $key eq $_ } qw(command description log_level);
+      }
+
+      croak sprintf q{Missing command handler for '%s'}, $name
+        if !exists $declaration->{command};
+
+      my $handler = $declaration->{command};
+      croak sprintf q{Invalid command handler for '%s'}, $name
+        if !ref $handler || reftype($handler) ne 'CODE';
+
+      if ( exists $declaration->{description} ) {
+        croak sprintf q{Description for command '%s' must be a scalar}, $name
+          if ref $declaration->{description};
+      }
+
+      if ( exists $declaration->{log_level} ) {
+        croak sprintf q{Log level for command '%s' must be a scalar}, $name
+          if ref $declaration->{log_level};
+        $commands{$name} = [ $handler, $declaration->{log_level} ];
+      }
+      else {
+        $commands{$name} = $handler;
+      }
+
+      $metadata{$name} = { description => $declaration->{description} }
+        if exists $declaration->{description};
+    }
+    else {
+      $commands{$name} = $declaration;
+    }
+  }
+
+  return ( \%commands, \%metadata );
+}
+
+########################################################################
 sub new {
 ########################################################################
   my ( $class, @params ) = @_;
@@ -451,11 +508,12 @@ sub new {
   }
 
   my (
-    $default_options, $option_specs,  $commands, $command_roles,    $manifest_commands, $extra_options,
-    $abbreviations,   $error_handler, $alias,    $validate_command, $help_sections
+    $default_options, $option_specs,  $commands,      $command_roles, $manifest_commands,
+    $extra_options,   $abbreviations, $error_handler, $alias,         $validate_command,
+    $help_sections,   $temp_file,     $temp_dir,      $option_declarations
     )
     = @args{
-    qw(default_options option_specs commands command_roles manifest_commands extra_options abbreviations error_handler alias validate_command help_sections)
+    qw(default_options option_specs commands command_roles manifest_commands extra_options abbreviations error_handler alias validate_command help_sections temp_file temp_dir options)
     };
 
   $validate_command //= $TRUE;
@@ -478,6 +536,17 @@ sub new {
   $option_specs    //= $OPTION_SPECS;
   $commands        //= $COMMANDS;
 
+  croak 'options and option_specs cannot both be supplied'
+    if exists $args{options} && exists $args{option_specs};
+
+  my $option_metadata = {};
+  if ( exists $args{options} ) {
+    ( $option_specs, $option_metadata ) = $class->normalize_option_specs($option_declarations);
+  }
+  else {
+    ( $option_specs, $option_metadata ) = $class->normalize_option_specs( $option_specs // [] );
+  }
+
   $option_specs      //= [];
   $commands          //= {};
   $manifest_commands //= {};
@@ -489,6 +558,9 @@ sub new {
 
   croak sprintf "ERROR: 'commands' is required\nusage: %s->new( option_specs => specs, commands => commands);\n", __PACKAGE__
     if !$option_specs || !$commands;
+
+  my $command_metadata;
+  ( $commands, $command_metadata ) = $class->normalize_commands($commands);
 
   my %command_target = map { $_ => $_ } keys %{$commands};
 
@@ -620,6 +692,8 @@ sub new {
   }
 
   my $self = $class->SUPER::new( \%cli_options );
+  $self->{_cli_simple_option_metadata}  = $option_metadata;
+  $self->{_cli_simple_command_metadata} = $command_metadata;
   $self->set__options($options);
 
   if ( !$self->can('get_help_sections') ) {
@@ -760,6 +834,10 @@ sub new {
   my %resolved = map { $_ => 1 } keys %{$options};
   $self->resolve_option_providers( \%resolved, \@accessors );
   $self->init_defaults( $default_options, \%resolved );
+  $self->validate_options;
+  $self->finalize_options;
+
+  $self->init_temp_resources( temp_file => $temp_file, temp_dir => $temp_dir );
 
   $self->can('init') && $self->init();
 
@@ -816,6 +894,85 @@ sub resolve_option_providers {
 
       $self->set( $option, $values->{$option} );
       $resolved->{$option} = 1;
+    }
+  }
+
+  return $self;
+}
+
+########################################################################
+sub init_temp_resources {
+########################################################################
+  my ( $self, %specs ) = @_;
+
+  my @resources;
+  my %reserved;
+  my $class = ref $self;
+
+  # Validate the complete declaration before allocating anything.
+  foreach my $kind (qw(temp_dir temp_file)) {
+    my $spec = $specs{$kind};
+    next if !defined $spec || !ref $spec && !$spec;
+
+    my @entries;
+    if ( !ref $spec ) {
+      croak sprintf q{Invalid %s declaration}, $kind
+        if $spec ne q{1};
+      @entries = ( {} );
+    }
+    elsif ( reftype($spec) eq 'HASH' ) {
+      @entries = ($spec);
+    }
+    elsif ( reftype($spec) eq 'ARRAY' ) {
+      @entries = @{$spec};
+    }
+    else {
+      croak sprintf q{Invalid %s declaration}, $kind;
+    }
+
+    foreach my $definition (@entries) {
+      croak sprintf q{%s entries must be hash references}, $kind
+        if !ref $definition || reftype($definition) ne 'HASH';
+
+      my %args         = %{$definition};
+      my $no_accessors = $args{no_accessors} // 0;
+      my $explicit     = exists $args{accessor};
+
+      croak 'accessor and no_accessors cannot be combined'
+        if $no_accessors && $explicit;
+
+      if ( !$no_accessors ) {
+        my $accessor = $args{accessor} // $kind;
+        croak sprintf q{Invalid accessor name: %s}, $accessor
+          if $accessor !~ /\A[a-zA-Z_]\w*\z/;
+
+        croak sprintf q{Duplicate temporary resource accessor: %s}, $accessor
+          if $reserved{$accessor}++;
+
+        foreach my $prefix (qw(get set)) {
+          my $method = $prefix . q{_} . $accessor;
+          croak sprintf q{Temporary resource accessor already exists: %s}, $method
+            if $self->can($method) && !$TEMP_RESOURCE_ACCESSORS{$class}{$method};
+        }
+      }
+
+      push @resources, [ $kind, \%args ];
+    }
+  }
+
+  foreach my $resource (@resources) {
+    my ( $kind, $args ) = @{$resource};
+    if ( $kind eq 'temp_file' ) {
+      $self->create_temp_file( %{$args} );
+    }
+    else {
+      $self->create_temp_dir( %{$args} );
+    }
+
+    if ( !$args->{no_accessors} ) {
+      my $accessor = $args->{accessor} // $kind;
+      $TEMP_RESOURCE_ACCESSORS{$class}{ q{get_} . $accessor } = 1;
+      $TEMP_RESOURCE_ACCESSORS{$class}{ q{set_} . $accessor } = 1;
     }
   }
 
@@ -1265,7 +1422,7 @@ __END__
 
 =head1 NAME
 
-CLI::Simple - a minimalist object oriented base class for CLI applications
+CLI::Simple - a lightweight, low-friction, extensible framework for command-line applications
 
 =head1 SYNOPSIS
 
@@ -1412,9 +1569,16 @@ on the command line. This eliminates repetitive initialization logic
 while leaving each provider responsible for how and where it obtains
 its values.
 
+Version 2.6.0 extends option declarations with optional metadata,
+validation constraints, and finalizers. Applications can declare
+the values they require and how those values should be prepared.
+C<CLI::Simple> resolves, validates, and finalizes options before
+application initialization, allowing command handlers to work
+with application-ready values.
+
 =head1 VERSION
 
-This documentation refers to version 2.4.0.
+This documentation refers to version 2.7.0.
 
 =head1 FEATURES
 
@@ -1445,6 +1609,10 @@ This documentation refers to version 2.4.0.
 =item * customizable help sections via C<help_sections>
 
 =item * pluggable option providers with ordered resolution and precedence
+
+=item * automatic temporary file and directory creation with managed cleanup
+
+=item * declarative option validation and finalization
 
 =back
 
@@ -2057,27 +2225,19 @@ your way.
 
 =head2 Validation, Defaults, and Configuration
 
-C<CLI::Simple> does not impose a validation model. You may:
+C<CLI::Simple> provides optional declarative option validation
+without requiring applications to adopt it.
 
-=over 4
+Applications may continue using traditional L<Getopt::Long>
+specifications, implement their own validation in C<init()>,
+or declare validation constraints through the C<options>
+constructor argument.
 
-=item *
+Option providers and defaults are resolved before validation,
+ensuring that declared constraints apply consistently regardless
+of where values originate.
 
-Use C<Getopt::Long> option specifications for argument types and
-C<default_options> to supply default values
-
-=item *
-
-Write your own validation logic in C<init()>
-
-=item *
-
-Throw exceptions, emit usage, or exit early at any point
-
-=back
-
-The lifecycle is explicit and under your control. You decide how much structure
-you want to add on top of it.
+See L</OPTION DECLARATIONS AND VALIDATION>.
 
 =head2 When to Use
 
@@ -2133,39 +2293,42 @@ and exits. See L</INTERNAL COMMANDS>.
 
 The constructor parses command-line arguments using L<Getopt::Long>,
 normalizes option names, and creates accessors for the declared options.
-After completing command and logger initialization, C<CLI::Simple> resolves
-any remaining options through registered option providers, applies
-application defaults, and invokes the application's C<init()> method,
-if defined.
 
-The order of initialization is significant. Command-line values take
-precedence over provider-supplied values, providers are consulted in
-registration order, and defaults are applied only to options that remain
-unresolved. By the time C<init()> is called, all available option values
-have been assigned to their respective accessors.
+After command and logger initialization, C<CLI::Simple> resolves
+option values through registered providers and applies application
+defaults.
 
-The C<init()> method remains available for application-specific
-initialization, but applications no longer need to implement their own
-option-source resolution and precedence logic when using option
-providers. See L</OPTION PROVIDERS> for details.
+Resolved values are then validated against any declared constraints
+and optionally finalized. Temporary files and directories declared
+through the constructor are created before the application's C<init()>
+method is invoked.
+
+The order is significant. Command-line values take precedence over
+provider-supplied values, providers are consulted in registration
+order, and defaults are applied only to unresolved options.
+
+By the time C<init()> runs, all declared option processing and
+temporary-resource initialization have completed.
+
+Applications can use C<init()> for additional initialization that
+is specific to their requirements, such as:
 
 =over 4
 
-=item * Validating command-line arguments.
+=item * Performing application-specific validation beyond the
+declared option constraints.
 
-=item * Loading configuration files based on a C<--config> option.
+=item * Loading and processing configuration files that are not
+handled through option finalization.
 
-=item * Dynamically overriding the command (e.g., C<$self-E<gt>command('new_default')>).
+=item * Dynamically selecting a command using C<command()>.
 
-=item * Overriding default options
+=item * Adjusting application settings based on resolved option values.
 
-=item * Performing any setup required B<before> a command is run.
+=item * Establishing connections or preparing other resources needed
+before command execution.
 
 =back
-
-=item * B<Phase 3: Execution (C<run>)>
-
-Dispatches to the command method determined during initialization.
 
 =back
 
@@ -2486,10 +2649,7 @@ separately.
 
 =head2 use_log4perl
 
-  __PACKAGE__->use_log4perl(
-    log_level => 'info',
-    color     => 1,
-  );
+  __PACKAGE__->use_log4perl;
 
 Enables L<Log::Log4perl> integration for the application class.
 C<CLI::Simple> initializes logging during object construction, before
@@ -2515,8 +2675,8 @@ their precedence when multiple providers can resolve the same option.
 
 The array reference specifies which application options the provider
 may resolve. An empty array reference allows the provider to resolve
-any eligible application option declared through C<option_specs> or
-C<extra_options>.
+any eligible application option declared through C<options>,
+C<option_specs> or C<extra_options>.
 
 The provider must implement a resolver method named
 C<_provider_name_resolve()> and may optionally implement
@@ -2531,14 +2691,9 @@ examples, and resolution rules.
 
   new( args )
 
-Instantiates a new C<CLI::Simple> instance, parses command-line options,
-creates the corresponding accessors, and optionally initializes logging.
-Registered option providers are then consulted, application defaults
-are applied, and the application's C<init()> method is invoked, if
-defined.
-
-See L</OPTION PROVIDERS> for details on option resolution and
-precedence.
+Instantiates a new C<CLI::Simple> instance, parses options, optionally
+initializes logging, and makes options available via dynamically
+generated accessors.
 
 I<Note: The C<new()> constructor uses L<Getopt::Long>'s C<GetOptions>,
 which directly modifies C<@ARGV> by removing any recognized
@@ -2564,20 +2719,9 @@ default: false
 
 =item * commands (required)
 
-A hash mapping command names to either a subroutine reference or an
-array reference.
-
-If an array reference is used, the first element must be a subroutine
-reference and the second should be a valid log level. (See
-L</Per Command Log Levels>.)
-
-Example:
-
-  {
-    send          => \&send_message,
-    receive       => \&receive_message,
-    list_messages => [ \&list_messages, 'error' ],
-  }
+A hash reference mapping command names to code references, array
+references, extended hash-reference declarations, or command aliases.
+See L</COMMAND DECLARATIONS> for the supported forms and attributes.
 
 If your script does not use command names, you may set a C<default> key
 to the subroutine or method to run:
@@ -2596,24 +2740,57 @@ command.
 
 =item * default_options (optional)
 
-A hash reference providing default values for options. These values
-are applied only when the corresponding option has not been resolved
-by the command line or a registered option provider.
+A hash reference providing default values for options.
+
+Defaults are applied after command-line options and registered option
+providers have been resolved. A default is used only when the
+corresponding option remains unresolved.
 
 =item * extra_options (optional)
 
-An array reference of names for additional accessors you want to create,
-even if they are not part of C<option_specs>.
+An array reference of names for additional accessors that are not
+declared through C<options> or C<option_specs>.
+
+These accessors can be initialized through option providers,
+application defaults, or application code. They do not register
+additional command-line options.
 
 Example:
 
   extra_options => [ qw(foo bar baz) ]
 
-=item * option_specs (optional)
+=item * options / option_specs
 
-An array reference of option specifications, as accepted by
-L<Getopt::Long>. These define the command-line options your program
-recognizes.
+Declares the command-line options recognized by the application.
+
+Both arguments accept either an array reference of L<Getopt::Long>
+option specifications or a hash reference associating specifications
+with optional metadata.
+
+For example, a traditional declaration:
+
+  options => [ qw(help|h verbose|v port|p=i) ],
+
+Or an extended declaration:
+
+  options => {
+    'port|p=i' => {
+      description => 'Port on which to listen',
+      required    => 1,
+      min         => 1,
+      max         => 65535,
+    },
+  },
+
+Extended declarations support descriptive metadata, validation
+constraints, and finalizers. Types are inferred from the option
+specifications unless explicitly declared.
+
+C<options> is the preferred spelling. C<option_specs> remains
+supported for backward compatibility. The two arguments are
+interchangeable but cannot be supplied together.
+
+See L</OPTION DECLARATIONS AND VALIDATION>.
 
 =item * validate_command
 
@@ -2635,14 +2812,14 @@ To do this you should follow this recipe:
 
   sub init {
     my ($self) = @_;
-  
+
     my $command = $self->command;
-  
+
     if ( !exists $self->commands->{$command} ) {
       $self->command_args($command, $self->get_args);
       $self->command('get');
     }
-  
+
     return;
   }
 
@@ -2675,7 +2852,7 @@ To replace the argument list, pass an array reference or a list.
  commands
  commands(command, handler)
 
-Returns the command dispatch hash supplied to the constructor.
+Returns the normalized command dispatch hash.
 When called with a command name and handler, adds the command
 to the dispatch hash. C<handler> must be a code reference.
 
@@ -2703,11 +2880,12 @@ Returns a hash reference containing the command-line options parsed
 by C<Getopt::Long>. Option names are normalized to snake_case.
 
 The hash contains only options explicitly supplied on the command
-line. It does not include values supplied by C<default_options> or
-subsequently initialized by C<init()>.
+line. It does not include values supplied by option providers or
+C<default_options>, nor does it reflect subsequent option
+finalization.
 
-Applications can use this hash to distinguish command-line options
-from default values when resolving configuration.
+Applications can use this hash to distinguish command-line
+options from values obtained through other sources.
 
 =head2 run
 
@@ -2777,18 +2955,21 @@ after command-line options and arguments have been processed and
 before command dispatch. Use this method to perform application-specific
 initialization and validation.
 
-The C<init()> method is invoked after command-line options have been
-parsed, registered option providers have resolved any remaining options,
-and application defaults have been applied. Consequently, all resolved
-option values are available through their corresponding accessors when
-C<init()> executes.
+=over 4
 
-Applications may use C<init()> to perform additional initialization,
-including validation of resolved values, establishing connections, or
-preparing resources needed by command handlers.
+=item * temp_file
 
-See L</OPTION PROVIDERS> for details on option resolution and
-precedence.
+Declares one or more temporary files to be created during construction.
+Accepts a boolean, a hash reference, or an array reference of hash
+references. See L</TEMPORARY RESOURCES>.
+
+=item * temp_dir
+
+Declares one or more temporary directories to be created during
+construction. Accepts the same declaration forms as C<temp_file>.
+See L</TEMPORARY RESOURCES>.
+
+=back
 
 =head1 USING PACKAGE VARIABLES
 
@@ -2813,15 +2994,84 @@ C<$EXTRA_OPTIONS>, C<$OPTION_SPECS>, and C<$COMMANDS>.
    bar => \&bar,
  };
 
+=head1 COMMAND DECLARATIONS
+
+=head2 Traditional Declarations
+
+The C<commands> constructor argument maps command names to handlers.
+A handler may be a code reference or an array reference containing a
+code reference followed by a log level. A string names another command
+and serves as an alias.
+
+  commands => {
+    start  => \&cmd_start,
+    stop   => [ \&cmd_stop, 'debug' ],
+    status => \&cmd_status,
+    s      => 'status',
+  },
+
+See L</ALIASING OPTIONS AND COMMANDS> for alias resolution.
+
+=head2 Extended Declarations
+
+As of version 2.7.0, a command can also be declared using a hash
+reference containing its handler and optional metadata. Traditional
+and extended declarations can coexist in the same commands hash.
+
+  commands => {
+    start => {
+      command     => \&cmd_start,
+      description => 'Start the application',
+      log_level   => 'info',
+    },
+    stop => \&cmd_stop,
+    s    => 'start',
+  },
+
+=head2 Command Attributes
+
+=over 4
+
+=item C<command>
+
+Required. A code reference implementing the command.
+
+=item C<description>
+
+Optional scalar description of the command. Descriptions are retained
+as metadata for future help generation. They do not automatically
+appear in help output.
+
+=item C<log_level>
+
+Optional scalar log level for the command. See
+L</Per Command Log Levels> for supported levels and precedence.
+
+=back
+
+Unknown attributes, missing or invalid handlers, and reference values
+for C<description> or C<log_level> cause an exception during
+normalization. Extended declarations are normalized to the traditional
+dispatch forms; the supplied declarations are not modified.
+
+These declarations apply to the programmatic constructor argument, not
+to command entries in a YAML manifest.
+
 =head1 COMMAND LINE OPTIONS
 
 Command-line options are defined using L<Getopt::Long>-style
-specifications. You pass these into the constructor via the
-C<option_specs> parameter:
+specifications and passed to the constructor through C<options>
+or C<option_specs>.
+
+The simplest form is an array reference:
 
   my $cli = CLI::Simple->new(
-    option_specs => [ qw( help|h foo-bar=s log-level=s ) ]
+    options => [ qw(help|h foo-bar=s log-level=s) ],
   );
+
+For additional metadata, including descriptions, validation rules,
+and finalizers, use a hash reference. See
+L</OPTION DECLARATIONS AND VALIDATION>.
 
 Option values are accessible through automatically generated getter
 methods:
@@ -2861,6 +3111,230 @@ the last occurrence determines its value.
 =back
 
 All other Getopt::Long configuration settings retain their defaults.
+
+=head1 OPTION DECLARATIONS AND VALIDATION
+
+C<CLI::Simple> supports extended option declarations that combine
+L<Getopt::Long> specifications with optional metadata.
+
+Either C<options> or C<option_specs> accepts a hash reference whose
+keys are option specifications and whose values describe the options:
+
+  options => {
+    'config|c=s' => {
+      description => 'Application configuration',
+      type        => 'file',
+      required    => 1,
+      slurp       => 1,
+      finalize    => sub {
+        my ( $self, $contents ) = @_;
+
+        return $self->process_config($contents);
+      },
+    },
+
+    'port|p=i' => {
+      description => 'Port on which to listen',
+      min         => 1,
+      max         => 65535,
+    },
+  },
+
+Traditional array-reference declarations remain supported. Types are
+inferred and validated for both forms. In an extended declaration, an
+empty hash reference is sufficient when no additional attributes are
+needed.
+
+=head2 Option Types
+
+The following validation types are supported:
+
+=over 4
+
+=item C<string>
+
+A scalar string. Inferred from C<=s> or C<:s>.
+
+=item C<integer>
+
+A signed or unsigned integer. Inferred from C<=i>, C<:i>, or the
+incremental counter suffix C<+>.
+
+=item C<number>
+
+A signed or unsigned decimal number, optionally with an exponent.
+Inferred from C<=f> or C<:f>.
+
+=item C<boolean>
+
+Inferred from a bare option name (with optional aliases) or the
+negatable option suffix C<!>. Validation accepts signed or unsigned
+integers, not just zero and one. This also applies to values supplied
+by providers or defaults.
+
+=item C<file>
+
+A pathname identifying an existing regular file (Perl's C<-f> test).
+Declare this type explicitly, normally with a string specification.
+Use C<string> instead for an output pathname that need not yet exist.
+
+=item C<directory>
+
+A pathname identifying an existing directory (Perl's C<-d> test).
+Declare this type explicitly, normally with a string specification.
+
+=back
+
+=head2 Type Inference
+
+L<Getopt::Long> determines how command-line values are parsed. The
+C<type> attribute determines how resolved values are validated; it does
+not change the parsing specification.
+
+An explicit type may match the inferred type or refine C<string> to
+C<file> or C<directory>, or C<integer> to C<number>. Other combinations
+cause an exception. For example:
+
+  'config|c=s' => { type => 'file' },
+  'count=i'    => { type => 'number' },
+
+The latter declaration still parses command-line values as integers.
+If a specification has no recognized suffix or bare-option form, no
+type is inferred. An explicit supported type may still be supplied.
+Without a type, scalar values are still checked for definedness and
+references, and any applicable declared constraints are enforced.
+
+=head2 Option Attributes
+
+=over 4
+
+=item C<description>
+
+Human-readable option metadata reserved for future help generation.
+
+=item C<type>
+
+Explicit validation type, as described above.
+
+=item C<required>
+
+C<0> or C<1>. If enabled, the resolved option must be defined. Zero
+and the empty string satisfy this constraint, subject to other rules.
+
+=item C<min>, C<max>
+
+Inclusive numeric bounds for C<integer> and C<number> options.
+Bounds must be decimal numbers without exponent notation, and the
+minimum must not exceed the maximum.
+
+=item C<min_length>, C<max_length>
+
+Inclusive length bounds for C<string> options, measured using Perl's
+C<length>. Bounds must be nonnegative integers, and the minimum must
+not exceed the maximum.
+
+=item C<enum>
+
+A nonempty array reference of defined scalar values. The option must
+match one of these values using string equality. This constraint can
+be combined with any supported type.
+
+=item C<slurp>
+
+C<0> or C<1>. When enabled, reads the contents of a scalar C<file>
+option after validation. See L</Reading File Options>.
+
+=item C<finalize>
+
+A code reference that transforms the validated value. See
+L</Finalization>.
+
+=back
+
+Unknown attributes and invalid constraint declarations cause an
+exception during normalization. C<spec>, C<inferred_type>, and
+C<collection> are normalization metadata, not application attributes.
+
+=head2 Validation
+
+Validation occurs after command-line options, option providers, and
+defaults have been resolved, and before finalization and C<init()>.
+All resolved values are subject to the same constraints regardless of
+their source. An option is optional by default; an undefined optional
+value is neither validated nor finalized. Defined scalar options may
+not contain references before finalization.
+
+=head2 Collection Options
+
+Specifications ending in C<=s@>, C<=i@>, or C<=f@> (or their optional
+argument counterparts using C<:>) declare array-reference values.
+The corresponding C<%> suffix declares hash-reference values.
+
+  options => {
+    'ports=i@' => {
+      min => 1,
+      max => 65535,
+    },
+    'directories=s@' => {
+      type => 'directory',
+    },
+    'settings=s%' => {
+      max_length => 256,
+    },
+  },
+
+The type describes each array element or hash value, not the
+collection itself. Every element or value must be a defined scalar
+satisfying the declared constraints. Hash keys are not validated.
+Providers and defaults must supply the corresponding reference type.
+A required collection must be defined but may be empty. Length bounds
+apply to individual strings, not the number of collection entries.
+
+A finalizer receives the entire collection once, not each element
+individually. C<slurp> cannot be enabled for collections.
+
+=head2 Finalization
+
+An option may declare a C<finalize> callback to transform its value
+after successful validation.
+
+  finalize => sub {
+    my ( $self, $value ) = @_;
+
+    return $self->prepare_value($value);
+  },
+
+The callback receives the application instance and validated value.
+Its return value replaces the option accessor's value without
+additional validation. The callback may return a reference or C<undef>.
+All options are validated before finalization begins. Finalizers are
+invoked in sorted canonical option-name order, and a callback
+exception is reported with the option name.
+
+Finalization is optional and does not require explicit validation
+constraints.
+
+=head2 Reading File Options
+
+File options may specify C<slurp =E<gt> 1>:
+
+  options => {
+    'template|t=s' => {
+      type  => 'file',
+      slurp => 1,
+    },
+  },
+
+The file is validated and its contents are read before any custom
+finalizer is invoked.
+
+If no finalizer is supplied, the accessor contains the file contents
+rather than the pathname.
+
+File contents are read as raw data; character decoding and
+format-specific deserialization are not performed automatically.
+
+For complete details, see L<CLI::Simple::Options>.
 
 =head1 COMMAND ARGUMENTS
 
@@ -2947,8 +3421,7 @@ an immediate exit.
 =head1 SETTING DEFAULT VALUES FOR OPTIONS
 
 To assign default values to your options, pass a hash reference as the
-C<default_options> argument to the constructor. These values will be
-used unless explicitly overridden by the user on the command line.
+C<default_options> argument to the constructor.
 
 Example:
 
@@ -3015,8 +3488,8 @@ takes precedence. Subsequent providers are asked to resolve only those
 options that remain unresolved.
 
 An empty option list indicates that the provider may resolve any
-unresolved application option declared through C<option_specs> or
-C<extra_options>.
+unresolved application option declared through C<options>,
+C<option_specs> or C<extra_options>.
 
 The provider name determines the methods C<CLI::Simple> invokes. For
 example, a provider registered as C<config> implements
@@ -3025,7 +3498,7 @@ C<_config_resolve()> and may optionally implement C<_config_init()>.
 =head2 Implementing an Option Provider
 
 An option provider is a L<Role::Tiny> role that implements a resolver
-method named C< _foo_config_resolve() >, where I<name> is the name used
+method named C< _I<name>_resolve() >, where I<name> is the name used
 when registering the provider.
 
 For example, the following provider resolves options from a Perl hash:
@@ -3134,12 +3607,17 @@ C<default_options>.
 
 =back
 
-After resolution and default initialization are complete, C<CLI::Simple>
-invokes the application's C<init()> method, if defined.
+After resolution and default initialization are complete,
+C<CLI::Simple> validates the resolved option values and performs
+any declared finalization. Temporary resources are then created
+before the application's C<init()> method is invoked.
 
-Consequently, application initialization and command handlers can access
-resolved option values through their normal accessors without needing
-to know which source supplied them.
+Consequently, application initialization and command handlers
+receive resolved, validated, and optionally finalized option
+values through their normal accessors, without needing to know
+which source supplied them.
+
+See L</OPTION DECLARATIONS AND VALIDATION> for details.
 
 =head1 ADDING ADDITIONAL ACCESSORS
 
@@ -3171,6 +3649,151 @@ internal use.
 Unlike C<option_specs>, C<extra_options> does not register
 command-line options. It only creates accessors for values that
 can be initialized or modified programmatically.
+
+=head1 TEMPORARY RESOURCES
+
+Many command-line applications require temporary files or directories
+for intermediate processing. Traditionally, applications must create
+these resources, retain their paths, and arrange for cleanup when they
+are no longer needed.
+
+C<CLI::Simple> can manage temporary files and directories automatically
+through the C<temp_file> and C<temp_dir> constructor arguments.
+
+Resources are created during object construction, before the application's
+C<init()> method is invoked. Each resource is owned by the application
+instance and, by default, is automatically removed when that instance
+is destroyed.
+
+=head2 Declaring Temporary Resources
+
+For example:
+
+    my $cli = __PACKAGE__->new(
+      temp_dir => {
+        accessor => 'workspace',
+        cleanup  => 1,
+      },
+
+      temp_file => [
+        {
+          accessor => 'report',
+          suffix   => '.csv',
+          cleanup  => 1,
+        },
+        {
+          accessor => 'debug_log',
+          suffix   => '.log',
+          cleanup  => 0,
+        },
+      ],
+
+      commands => {
+        process => \&cmd_process,
+      },
+    );
+
+C<CLI::Simple> creates the resources and generates the corresponding
+accessors in the application class.
+
+The command handler can immediately use them:
+
+    sub cmd_process {
+      my ($self) = @_;
+
+      my $workspace = $self->get_workspace;
+      my $report    = $self->get_report;
+      my $debug_log = $self->get_debug_log;
+
+      # Perform application-specific processing.
+
+      return 0;
+    }
+
+The accessors return pathnames, not filehandles or resource objects.
+
+Both C<temp_file> and C<temp_dir> accept a boolean, a hash reference,
+or an array reference of hash references.
+
+A true value creates one resource using default settings:
+
+    temp_file => 1,
+    temp_dir  => 1,
+
+These declarations generate C<get_temp_file()> and C<get_temp_dir()>
+accessors, respectively. A false value disables resource creation.
+
+A hash reference configures a single resource, while an array reference
+allows multiple resources of the same type. When declaring multiple
+resources, specify distinct accessor names to expose their paths
+independently.
+
+=head2 Resource Attributes
+
+The following attributes are supported by both temporary resource
+types:
+
+=over 4
+
+=item * C<accessor>
+
+Specifies the name used to generate the C<get_> and C<set_> accessors.
+Defaults to C<temp_file> or C<temp_dir>, respectively.
+
+=item * C<cleanup>
+
+Controls automatic cleanup. Defaults to true. When false, the resource
+remains on disk after the owning object is destroyed.
+
+=item * C<dir>
+
+Specifies the parent directory in which the temporary resource is
+created. It does not specify the generated resource's pathname.
+
+=item * C<template>
+
+Specifies the naming template used by L<File::Temp>.
+
+=item * C<no_accessors>
+
+Disables automatic accessor generation when true. Cannot be combined
+with C<accessor>.
+
+=back
+
+Temporary files additionally support C<suffix>, which appends a
+specified suffix to the generated filename.
+
+=head2 Resource Ownership and Cleanup
+
+Each application instance owns the temporary files and directories it
+creates. Resource ownership is independent of the generated accessors.
+
+Changing an accessor value does not change which resource the framework
+owns or which resource will be cleaned up.
+
+When C<cleanup> is enabled, resources are normally removed when the
+owning object is destroyed. For temporary directories, this includes
+B<all files and subdirectories contained within them>.
+
+Use C<cleanup =E<gt> 0> for resources that must survive application
+object destruction.
+
+Cleanup follows normal Perl object-lifetime semantics and cannot be
+guaranteed after abrupt process termination.
+
+=head2 Using the Roles Independently
+
+The functionality is provided by L<CLI::Simple::TempFile> and
+L<CLI::Simple::TempDir>, both implemented as L<Role::Tiny> roles.
+
+These roles can also be composed into classes that do not use
+C<CLI::Simple>. They expose C<create_temp_file()> and
+C<create_temp_dir()>, respectively, and provide the same ownership
+and optional accessor behavior.
+
+See L<CLI::Simple::TempFile> and L<CLI::Simple::TempDir> for complete
+attribute descriptions and standalone usage examples.
 
 =head1 LOGGING
 
@@ -3246,9 +3869,10 @@ example, certain commands might perform complex actions that benefit
 from detailed logs, while others are designed solely to produce clean,
 structured output.
 
-To assign a custom log level to a command, use an array reference as
-the value for that command in the commands hash passed to the
-constructor.
+To assign a custom log level to a command, use the C<log_level>
+attribute of an extended command declaration (see
+L</Command Attributes>), or use an array reference as the value for
+that command in the commands hash passed to the constructor.
 
 The first two elements of the array reference are:
 

@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 # large-subset-difffuzz.pl (2026-11-01, the large-subset session of the old Project; ported post-0.11, 2026-11-11):
 # differential fuzzing.  Random strings made of up to 5 pieces of the large subset (below; joined by ; && || newline |)
-# that the large parser accepts are run by dash, by bash --posix and by ours (t/try.pl), each in an empty directory of
+# that the large parser accepts are run by dash, by bash --posix and by ShellSpawn (t/try.pl), each in an empty directory of
 # its own; compared as section 11 of large-subset-environment.md compares: status, standard output with the shells'
-# message lines dropped, and the files left (names and contents); messages count nowhere.  The classes: same; OURS (dash
-# and bash agree, ours differs: the work list); =dash, =bash, neither (dash and bash differ); timeout.  It found the
+# message lines dropped, and the files left (names and contents); messages count nowhere.  The classes: same; SHELLSPAWN (dash
+# and bash agree, ShellSpawn differs: the work list); =dash, =bash, neither (dash and bash differ); timeout.  It found the
 # executor's bugs L1-L10 in 2026-11 (doc/pspawn-known-issues.md).
 # Usage (from the distribution's directory, after make; also: make probe-fuzz [FUZZ="-n 300 -seed 1 -j 4"]):
 #   perl doc/large-subset/tools/large-subset-difffuzz.pl [-n COUNT] [-seed N] [-all] [-j WORKERS] [-time SECONDS]
@@ -47,7 +47,7 @@ my @S = (   # snippets: each a complete command, or a fragment marked by its use
   'trap "echo int" INT; kill -INT $$', 'x=$(f() { echo sub; }; f); echo $x', 'echo "$(echo "$@")"', 'set -- a; echo "${1+"$@"}"', 'echo ${x##*a}', 'cd ..; cd -', 'set -f; echo *; set +f', 'set -C; echo 1 >f; echo $?',
 );
 my @J = ('; ', ' && ', ' || ', "\n", ' | ');
-my %SH = (dash => ['dash', '-c'], bash => ['bash', '--posix', '-c'], ours => [$^X, "-I$TOP/blib/lib", "-I$TOP/blib/arch", $TRY]);
+my %SH = (dash => ['dash', '-c'], bash => ['bash', '--posix', '-c'], shellspawn => [$^X, "-I$TOP/blib/lib", "-I$TOP/blib/arch", $TRY]);
 my $MSG = qr/^(?:(?:\S*\/)?dash: \d+: |(?:\S*\/)?bash: (?:line \d+: )?|sh: ).*(?:\n|\z)/m;   # as large-subset-matchreport.pl
 my $top = tempdir('difffuzz.XXXXXX', TMPDIR => 1, CLEANUP => 1); my $base;   # $base: the worker's directory
 sub files { my ($d, $p) = @_; opendir my $h, $d or return (); my @r;
@@ -64,13 +64,13 @@ sub run1 { my ($sh, $s) = @_; my $d = "$base/run"; system('rm', '-rf', $d); mkdi
 my $eq = sub { my ($x, $y) = @_; $x->{status} eq $y->{status} && $x->{out} eq $y->{out} && $x->{files} eq $y->{files} };
 sub one {   # the string's class and report (empty when not shown); undef when the parser rejects it
   my ($s) = @_; return undef unless ref Proc::ShellSubset::Large::parse($s) eq 'ARRAY';
-  my %r = map +($_ => run1($_, $s)), qw(dash bash ours);
-  my $c = grep($_->{timeout}, values %r) ? 'timeout' : $eq->($r{dash}, $r{bash}) ? ($eq->($r{dash}, $r{ours}) ? 'same' : 'OURS')
-    : $eq->($r{ours}, $r{dash}) ? '=dash' : $eq->($r{ours}, $r{bash}) ? '=bash' : 'neither';
+  my %r = map +($_ => run1($_, $s)), qw(dash bash shellspawn);
+  my $c = grep($_->{timeout}, values %r) ? 'timeout' : $eq->($r{dash}, $r{bash}) ? ($eq->($r{dash}, $r{shellspawn}) ? 'same' : 'SHELLSPAWN')
+    : $eq->($r{shellspawn}, $r{dash}) ? '=dash' : $eq->($r{shellspawn}, $r{bash}) ? '=bash' : 'neither';
   return [$c, ''] if $c eq 'same' && !$ALL;
   (my $show = $s) =~ s/\n/\\n/g; $show =~ s/\t/\\t/g;
   [$c, join '', "$c: $show\n", map { my $x = $r{$_}; sprintf "  %-4s %s |%s| %s\n", $_, $x->{status}, $x->{out} =~ s/\n/\\n/gr,
-    $x->{files} eq $r{dash}{files} ? '' : 'files: ' . ($x->{files} =~ s/\n/; /gr) } qw(dash bash ours)] }
+    $x->{files} eq $r{dash}{files} ? '' : 'files: ' . ($x->{files} =~ s/\n/; /gr) } qw(dash bash shellspawn)] }
 sub string { my $s = join '', map { ($_ ? $J[rand @J] : '') . $S[rand @S] } 0 .. int rand 5; $s =~ s/\@N/\n/g; $s =~ s/\@T/\t/g; $s }
 my @W;   # per worker: the pipe its records come through, one line each: "-" (rejected), "." (the time is up), or class
 for my $w (0 .. $J - 1) {   # and the length of the report that follows
@@ -90,4 +90,4 @@ for (my $i = 0; !$N || $i < $N; $i++) {
   my ($c, $len) = split ' ', $l; $n{$c}++; next unless $len;
   read($h, my $t, $len); print $t }
 kill 'TERM', map $_->[1], @W; waitpid $_->[1], 0 for @W;
-print "seed $SEED: tried $tried, accepted $acc: ", join(', ', map "$_ " . ($n{$_} // 0), qw(same OURS =dash =bash neither timeout)), "\n";
+print "seed $SEED: tried $tried, accepted $acc: ", join(', ', map "$_ " . ($n{$_} // 0), qw(same SHELLSPAWN =dash =bash neither timeout)), "\n";

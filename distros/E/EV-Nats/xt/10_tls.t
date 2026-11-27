@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 'xt/lib';
+use EVNatsHelpers qw(nats_or_skip);
 use EV;
 use EV::Nats;
 
@@ -8,8 +10,7 @@ plan skip_all => 'EV::Nats built without TLS' unless EV::Nats::HAS_TLS();
 plan skip_all => 'set NATS_TLS=1 and NATS_CA_FILE to enable'
     unless $ENV{NATS_TLS};
 
-my $host    = $ENV{TEST_NATS_HOST} || '127.0.0.1';
-my $port    = $ENV{TEST_NATS_PORT} || 4222;
+my ($host, $port) = nats_or_skip();
 my $ca_file = $ENV{NATS_CA_FILE};
 
 plan tests => 6;

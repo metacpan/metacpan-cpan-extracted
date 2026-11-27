@@ -1,0 +1,73 @@
+---
+abstract: 'Keep one instance of a class and let other processes call it'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  IO::Socket::SSL: '0'
+  Lingua::Conjunction: '0'
+  Net::SSLeay: '0'
+  Test::DescribeMe: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0'
+  Test::More: '0.98'
+  Test::Most: '0'
+  Test::Needs: '0'
+  Test::Permissions: '0'
+  Test::Returns: '0'
+  Test::Without::Module: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Shared
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Class::Shared:
+    file: lib/Class/Shared.pm
+    version: 0.001.0
+  Class::Shared::Backend:
+    file: lib/Class/Shared/Backend.pm
+    version: 0.001.0
+  Class::Shared::Frontend:
+    file: lib/Class/Shared/Frontend.pm
+    version: 0.001.0
+  Class::Shared::Protocol:
+    file: lib/Class/Shared/Protocol.pm
+    version: 0.001.0
+recommends:
+  IO::Socket::SSL: '2.0'
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  IO::Socket::INET: '0'
+  IO::Socket::UNIX: '0'
+  Log::Abstraction: '0.41'
+  Object::Configure: '0.26'
+  POSIX: '0'
+  Params::Get: '0.17'
+  Params::Validate::Strict: '0.43'
+  Scalar::Util: '0'
+  Socket: '0'
+  Storable: '0'
+  Time::HiRes: '0'
+  perl: '5.026'
+  version: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Shared
+  homepage: https://metacpan.org/pod/Class::Shared
+  repository: https://github.com/nigelhorne/Class-Shared.git
+version: 0.001.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

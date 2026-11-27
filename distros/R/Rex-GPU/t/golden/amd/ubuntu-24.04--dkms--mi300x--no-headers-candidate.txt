@@ -1,0 +1,25 @@
+# golden: amd/ubuntu-24.04--dkms--mi300x--no-headers-candidate
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: cat /proc/cmdline 2>/dev/null
+run: grep -rsHE --include='*.conf' '^[[:space:]]*(blacklist[[:space:]]+amdgpu|install[[:space:]]+amdgpu[[:space:]]+(/usr)?/bin/(false|true))([[:space:]]|$)' /etc/modprobe.d /run/modprobe.d /usr/lib/modprobe.d /lib/modprobe.d 2>/dev/null
+run: dpkg --print-architecture
+run: uname -r
+run: od -An -tu1 -j4 -N1 /sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c 2>/dev/null
+run: cat /etc/apt/sources.list.d/amdgpu.list 2>/dev/null
+run: dkms status -m amdgpu -k 6.8.0-85-generic 2>&1
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: command -v curl >/dev/null 2>&1
+run: command -v gpg >/dev/null 2>&1
+run: mkdir -p -m 0755 /etc/apt/keyrings && rm -rf /etc/apt/keyrings/rocm.gpg.tmp.d && mkdir -m 0700 /etc/apt/keyrings/rocm.gpg.tmp.d && curl -fsSL --proto =https https://repo.radeon.com/rocm/rocm.gpg.key -o /etc/apt/keyrings/rocm.gpg.tmp.d/key.asc
+run: GNUPGHOME=/etc/apt/keyrings/rocm.gpg.tmp.d gpg --batch --with-colons --show-keys /etc/apt/keyrings/rocm.gpg.tmp.d/key.asc 2>/dev/null
+run: GNUPGHOME=/etc/apt/keyrings/rocm.gpg.tmp.d gpg --batch --yes --dearmor -o /etc/apt/keyrings/rocm.gpg.tmp.d/key.gpg /etc/apt/keyrings/rocm.gpg.tmp.d/key.asc && test -s /etc/apt/keyrings/rocm.gpg.tmp.d/key.gpg && chmod 0644 /etc/apt/keyrings/rocm.gpg.tmp.d/key.gpg && mv -f /etc/apt/keyrings/rocm.gpg.tmp.d/key.gpg /etc/apt/keyrings/rocm.gpg
+run: rm -rf /etc/apt/keyrings/rocm.gpg.tmp.d
+run: test -s /etc/apt/keyrings/rocm.gpg
+run: printf '%s' 'deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/amdgpu/31.60/ubuntu noble main
+' > /etc/apt/sources.list.d/amdgpu.list.tmp && chmod 0644 /etc/apt/sources.list.d/amdgpu.list.tmp && mv -f /etc/apt/sources.list.d/amdgpu.list.tmp /etc/apt/sources.list.d/amdgpu.list
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: LC_ALL=C apt-cache policy linux-headers-6.8.0-85-generic 2>/dev/null
+DIE: install_driver: linux-headers-6.8.0-85-generic, a header package of the running kernel 6.8.0-85-generic that amdgpu-dkms is built against, cannot be installed from the host's package sources (no candidate): they do not (or no longer) carry this kernel's headers, usually because they have moved on to a newer kernel the host was not upgraded to or rebooted into. Upgrade the kernel, reboot into it and run install_driver again. No driver package was installed; the amdgpu repository /etc/apt/sources.list.d/amdgpu.list and its signing key /etc/apt/keyrings/rocm.gpg are in place, and a re-run accepts them

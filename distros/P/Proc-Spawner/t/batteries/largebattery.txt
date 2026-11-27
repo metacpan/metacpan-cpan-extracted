@@ -130,3 +130,10 @@ HOME=; cd; echo "st=$?"
 nosuch 2>log; echo "st=$?"; sed "s/.*nosuch/nosuch/" log; nosuch 2>&1 | sed "s/.*nosuch/nosuch/"; x=$(nosuch 2>&1); echo "[${x##*nosuch}]"
 shift $(($#-1)); echo after
 v="[n]"; shift $v; echo after
+unset PATH; PATH=/usr/bin:/bin; ls -d /; echo st=$?; PATH=/nonexistent ls -d /; echo st=$?
+cd /usr; unset OLDPWD; cd -; echo "st=$? [$OLDPWD]"; OLDPWD=; cd -; echo "st=$? [$OLDPWD]"; x=$(cd -); echo "[$x]"
+cd /usr; cd /; cd ""; echo "st=$? [$OLDPWD] [$PWD]"; HOME=; cd /usr; cd; echo "[$OLDPWD] [$PWD]"; x=; cd /; cd "$x"; cd - >/dev/null; pwd
+c=umask; (exec $c); echo "st=$?"; f() { echo F; }; (exec f); echo "st=$?"; (exec nosuch-cmd-x); echo "st=$?"; (c=cd; exec $c /); echo "st=$?"
+c=; exec $c; echo after; A=1 exec $c; echo "[$A]"; exec $(false); echo "st=$?"; exec $c >/dev/null; echo hidden; echo shown >&2
+(c=; exec $c >/nonexistent/x; echo not-here); echo "st=$?"; f() { echo F; }; exec f; echo not-here
+mkdir -p d/sub; PATH=$PWD/d:$PATH; sub; echo "st=$?"; hash sub; echo "st=$?"; (exec sub); echo "st=$?"; sub 2>&1 | cat; rm -r d

@@ -1,0 +1,7 @@
+# golden: amd/ubuntu-24.04--auto--synapse-navi31--kernel-7.0
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: uname -r
+DIE: install_driver: AMD supports AMD GPU 0000:95:00.0 [1002:1586] (gfx1151) only with the inbox driver and AMD GPU 0000:0a:00.0 [1002:744c] (gfx1100) with amdgpu-dkms, and one amdgpu drives every GPU of a host. Pass method => 'inbox' to drive all of them with the inbox driver. Nothing was changed on the host

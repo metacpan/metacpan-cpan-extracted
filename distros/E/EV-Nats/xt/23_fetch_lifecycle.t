@@ -9,12 +9,14 @@ use EV;
 use EV::Nats;
 use EV::Nats::JetStream;
 use EV::Nats::KV;
+use EV::Nats::ObjectStore;
+use JSON::PP ();
 
 # fetch, acks and KV against a real JetStream server this test owns, so it
 # can kill and stop it.
 
 my $bin = nats_bin_or_skip();
-plan tests => 15;
+plan tests => 21;
 
 sub mono { Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) }
 
@@ -81,6 +83,20 @@ wait_for(sub { 0 }, 0.3);
 $r = call(consumer_info => 'S', 'C');
 is $r->[0]{num_ack_pending}, 0, 'ack applied';
 
+call(js_publish => 's.x', 'm1b');
+$r = call(fetch => 'S', 'C', { batch => 1, expires => 2_000_000_000 });
+my $msg = $r->[0][0];
+my $synced;
+$js->ack_sync($msg, sub { $synced = [@_] });
+wait_for(sub { $synced });
+$r = call(consumer_info => 'S', 'C');
+is_deeply [@$synced, $r->[0]{num_ack_pending}], [1, undef, 0], 'ack_sync confirmed an applied ack';
+(my $gone = $msg->{reply}) =~ s/\.C\./.GONE./;
+$synced = undef;
+$js->ack_sync($gone, sub { $synced = [@_] });
+wait_for(sub { $synced });
+is_deeply $synced, [undef, 'no responders'], 'ack_sync for a missing consumer';
+
 call(js_publish => 's.x', 'm2');
 $r = call(fetch => 'S', 'C', { batch => 1, expires => 2_000_000_000 });
 $js->term($r->[0][0], 'poison');
@@ -104,6 +120,33 @@ my $put; $kv->put('k', 'v1', sub { $put = [@_] }); wait_for(sub { $put });
 my $got; $kv->get_entry('k', sub { $got = [@_] }); wait_for(sub { $got });
 is_deeply $got->[0], { value => 'v1', revision => $put->[0] },
     'KV get_entry carries the revision';
+
+# Values past ~3/4 max_payload cannot come back through STREAM.MSG.GET
+# (base64 in JSON); Direct Get returns them raw.
+my $big = join '', map { chr($_ % 256) } 1 .. 900 * 1024;
+$put = undef; $kv->put('big', $big, sub { $put = [@_] }); wait_for(sub { $put });
+$got = undef; $kv->get_entry('big', sub { $got = [@_] }); wait_for(sub { $got }, 10);
+ok $got->[0] && $got->[0]{value} eq $big, 'a 900 KB KV value reads back under a 1 MB max_payload'
+    or diag explain [$got->[1]];
+my $dg; $js->direct_get('KV_b', { last_by_subj => '$KV.b.big' }, sub { $dg = [@_] }); wait_for(sub { $dg });
+is $dg->[0]{seq}, $put->[0], 'direct_get reports the sequence';
+
+my $made_legacy;
+$js->stream_create({ name => 'KV_old', subjects => ['$KV.old.>'], max_msgs_per_subject => 1,
+    allow_rollup_hdrs => JSON::PP::true(), deny_delete => JSON::PP::true() }, sub { $made_legacy = [@_] });
+wait_for(sub { $made_legacy });
+my $old = EV::Nats::KV->new(js => EV::Nats::JetStream->new(nats => $nats), bucket => 'old');
+$put = undef; $old->put('k', 'v-old', sub { $put = [@_] }); wait_for(sub { $put });
+$got = undef; $old->get('k', sub { $got = [@_] }); wait_for(sub { $got });
+is $got->[0], 'v-old', 'a bucket without allow_direct is still read';
+
+my $os = EV::Nats::ObjectStore->new(js => $js, bucket => 'objs', chunk_size => 900 * 1024);
+$made = undef; $os->create_bucket({}, sub { $made = [@_] }); wait_for(sub { $made });
+my $blob = $big x 2;
+my $stored; $os->put('blob', $blob, sub { $stored = [@_] }); wait_for(sub { $stored }, 20);
+my $read; $os->get('blob', sub { $read = [@_] }); wait_for(sub { $read }, 20);
+ok defined $read->[0] && $read->[0] eq $blob, 'ObjectStore chunks near max_payload read back'
+    or diag explain [$stored->[1], $read->[1]];
 
 # A stopping server ends a waiting fetch at once: 409 Server Shutdown
 # where the server sends it, else the dropped connection.

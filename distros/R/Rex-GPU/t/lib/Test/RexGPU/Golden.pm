@@ -49,6 +49,7 @@ use Rex::Commands::Gather ();
 use Rex::Commands::Pkg ();
 use Rex::Commands::Run ();
 use Rex::Logger ();
+use Rex::GPU::AMD ();
 use Rex::GPU::Detect ();
 use Rex::GPU::NVIDIA ();
 
@@ -61,6 +62,7 @@ our @EXPORT_OK = qw(
   mutating_lines
   transcript
   working_driver
+  dpkg_l
 );
 
 my $GOLDEN_DIR = path(__FILE__)->absolute->parent(4)->child('golden');
@@ -78,8 +80,24 @@ my @COMMON = (
   # no CUDA library in the linker cache (karr #42); a test with a working
   # driver scripts it present
   [ qr{^/sbin/ldconfig -p }                => '', 1 ],
-  [ qr{^dpkg -l \S+ 2>/dev/null \| grep -q '\^ii'$} => '', 0 ],
+  # the apt layers count a held package (hi) as installed (AMD k89, NVIDIA
+  # k94). There is deliberately no default for the old `grep -q '^ii'` form
+  # any more: no lib/ code emits it, and a rule kept for it would only make a
+  # regression back to it look like any other probe. Unscripted it still
+  # answers success (see _respond), but it is no longer in READ_ONLY, so it
+  # shows as a mutating line and as a golden diff; dpkg_l scripts it by state.
+  [ qr{^dpkg -l \S+ 2>/dev/null \| grep -q '\^\[hi\]i'$} => '', 0 ],
   [ q{rpm -q --qf '%{VERSION}' nvidia-driver 2>&1} => '580.95.05', 0 ],
+  # k100: Setup->verify_driver_branch reads the installed version of the
+  # package a source names in driver_version_from, only where the GPUs' requirement
+  # has a branch bound. Hand-written stand-ins for what dpkg-query prints
+  # ("UPSTREAM-REVISION", no epoch here): the CUDA repository's open kernel
+  # module at a branch above every floor (a Blackwell needs 570), and Debian
+  # 12's non-free nvidia-driver, 535.309.01-0+deb12u1 (bookworm, the string
+  # read on packages.debian.org by the worker on 2026-11-26; NOT a capture
+  # from a host). The debian-13 profile answers its own (trixie's non-free).
+  [ q{dpkg-query -W -f='${Version}' nvidia-kernel-open-dkms 2>/dev/null} => '615.71.09-1', 0 ],
+  [ q{dpkg-query -W -f='${Version}' nvidia-driver 2>/dev/null} => '535.309.01-0+deb12u1', 0 ],
   [ qr{^rpm -q (?:--whatprovides )?(\S+) 2>&1$} => 'installed', 0 ],
   [ 'uname -m'                             => 'x86_64', 0 ],
   [ 'dpkg --print-architecture'            => 'amd64', 0 ]
@@ -110,6 +128,11 @@ my %HOST = (
   'debian-13' => {
     os => 'Debian', release => '13.1',
     responses => [
+      # k100: trixie's non-free nvidia-driver (packages.debian.org, read by the
+      # worker on 2026-11-26; hand-written here, not a capture). Debian 13
+      # gets its own because its branch (550) differs from bookworm's (535): a
+      # test that mixes them up is wrong on one of the two.
+      [ q{dpkg-query -W -f='${Version}' nvidia-driver 2>/dev/null} => '550.163.01-2', 0 ],
       [ 'uname -r' => '6.12.48+deb13-amd64', 0 ],
       # deb822 only (/etc/apt/sources.list.d/debian.sources): no sources.list
       [ 'cat /etc/apt/sources.list 2>/dev/null' => '', 1 ],
@@ -459,10 +482,32 @@ sub _opt_tag {
   return '('.join(',', map { $_.'='.( $o{$_} // 'undef' ) } sort keys %o).')';
 }
 
+# dpkg_l(PKG => 'hi', ...) => Golden responses for the two forms of the check
+# the apt layers have used, `dpkg -l PKG | grep -q '^ii'` (before k89 for AMD,
+# before k94 for NVIDIA) and `... grep -q '^[hi]i'`, for a package in the given
+# first-two-columns state of `dpkg -l` ('ii' installed, 'hi' installed and
+# held, 'iF' half-configured, 'hF' held and half-configured, 'iU' unpacked,
+# 'ri' ...): the host answers each grep as the real one would, so a code
+# version using either form sees the same host. Hand-written; the grep itself
+# is not run, its answer is what the status column would give it.
+# Put before the profile's other responses (host_profile(responses => [...])).
+sub dpkg_l {
+  my ( %state ) = @_;
+  my @r;
+  for my $pkg (sort keys %state) {
+    my $s = $state{$pkg};
+    push @r,
+      [ qr{^dpkg -l \Q$pkg\E 2>/dev/null \| grep -q '\^ii'$} => '', $s =~ /\Aii\z/ ? 0 : 1 ],
+      [ qr{^dpkg -l \Q$pkg\E 2>/dev/null \| grep -q '\^\[hi\]i'$} => '', $s =~ /\A[hi]i\z/ ? 0 : 1 ];
+  }
+  return @r;
+}
+
 #### Classification ###########################################################
 
 # Transcript lines that change the host. Everything else is a read-only probe.
 my $RUN = qr{^run(?:\([^)]*\))?: };
+my $AMD_STATE = do { my $script = Rex::GPU::AMD->state_script; qr{${RUN}\Q$script\E$} };
 my @READ_ONLY = (
   qr{${RUN}nvidia-smi -L },
   qr{${RUN}uname -[rm]$},
@@ -470,7 +515,7 @@ my @READ_ONLY = (
   qr{${RUN}cat \S+ 2>/dev/null$},
   qr{${RUN}ls -1 \S+ 2>/dev/null$},
   qr{${RUN}(?:LC_ALL=C )?apt-cache (?:search|policy) },
-  qr{${RUN}dpkg -l \S+ 2>/dev/null \| grep -q '\^(?:ii|\[hi\]i)'$},
+  qr{${RUN}dpkg -l \S+ 2>/dev/null \| grep -q '\^\[hi\]i'$},
   qr{${RUN}nvidia-ctk --version 2>&1$},
   # karr #74: install_container_toolkit(binaries_suffice => 1)'s `command -v`
   # probes -- read-only on every OS, run before the package manager is asked
@@ -487,8 +532,27 @@ my @READ_ONLY = (
   qr{${RUN}rpm -qa },
   qr{${RUN}LC_ALL=C apt-get -o DPkg::Lock::Timeout=\d+ -s install },
   qr{${RUN}dnf -q list --showduplicates --available },
+  # k84: Rex::GPU::AMD::Setup::RHEL->has_candidate's lookup of a package no
+  # enabled repository may carry -- reads the repo metadata, installs nothing
+  qr{${RUN}dnf -q repoquery --available \S+ 2>&1$},
+  # k109: Rex::GPU::AMD::Setup::RHEL->package_held's read of dnf's lock
+  # list, asked only on a dkms failure path -- lists locks, writes nothing
+  # (without the versionlock plugin it fails, and nothing is installed for it)
+  qr{${RUN}dnf -q versionlock list 2>/dev/null$},
   # karr #56: the HGX B200/B300 Fabric State read
   qr{${RUN}nvidia-smi -q 2>&1$},
+  # k1: Rex::GPU::AMD's driver state read -- ONE command, shell builtins that
+  # only read sysfs (/sys/module/amdgpu, /sys/bus/pci/devices/*/{vendor,class,
+  # device,driver,mem_info_*}, /sys/class/drm/renderD*, the KFD topology
+  # properties) and test -c /dev/kfd. It writes nothing. Matched as the exact
+  # string the module hands out, so a changed script is flagged until read.
+  $AMD_STATE,
+  # k1: the other AMD probes -- modinfo, dkms status, the Secure Boot EFI
+  # variable's value byte, and the grep over modprobe.d for a blacklist
+  qr{${RUN}modinfo -n amdgpu 2>/dev/null$},
+  qr{${RUN}dkms status -m amdgpu -k \S+ 2>&1$},
+  qr{${RUN}od -An -tu1 -j4 -N1 /sys/firmware/efi/efivars/\S+ 2>/dev/null$},
+  qr{${RUN}grep -rsHE --include='\*\.conf' '[^']*' /etc/modprobe\.d /run/modprobe\.d /usr/lib/modprobe\.d /lib/modprobe\.d 2>/dev/null$},
   qr{^can_run: }
 );
 

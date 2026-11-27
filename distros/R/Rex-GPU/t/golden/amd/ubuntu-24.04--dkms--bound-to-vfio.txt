@@ -1,0 +1,8 @@
+# golden: amd/ubuntu-24.04--dkms--bound-to-vfio
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: cat /proc/cmdline 2>/dev/null
+run: grep -rsHE --include='*.conf' '^[[:space:]]*(blacklist[[:space:]]+amdgpu|install[[:space:]]+amdgpu[[:space:]]+(/usr)?/bin/(false|true))([[:space:]]|$)' /etc/modprobe.d /run/modprobe.d /usr/lib/modprobe.d /lib/modprobe.d 2>/dev/null
+DIE: install_driver: AMD GPU 0000:c1:00.0 [1002:74a1] (gfx942) is bound to vfio-pci; install_driver does not unbind it. Nothing was changed on the host

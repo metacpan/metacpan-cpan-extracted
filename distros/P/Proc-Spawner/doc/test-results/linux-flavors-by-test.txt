@@ -1,14 +1,25 @@
-# t/flavors-outcomes.pl per flavor, compared by t/flavors-compare.pl; Linux (glibc 2.39, Perl v5.38.2, dash 0.5.12, bash 5.2.21), Proc::Spawner post-0.12 (commit 6c084cc), Run 0.07; 2026-11-18
+# t/flavors-outcomes.pl per flavor, compared by t/flavors-compare.pl; Linux (glibc 2.39, Perl v5.38.2, dash 0.5.12, bash 5.2.21), Proc::Spawner 0.14 (commit 300077e), Run 0.07; 2026-11-26
 # flavors: as built (posix_spawn); redirections only (PROC_SPAWNER_MISSING: every setting but dup2, close, open); fork (posix_spawn missing); system1 (posix_spawn and fork missing, Run on PERL5LIB)
 # the test files of make test (t/*.t), the quick tests only; the library of samples not run
+# (t/dash.t is listed below for a battery line known to vary, not for the flavor)
 
 flavor                          ok      FAILED TODO-FAILED TODO-PASSED        SKIP FILE-SKIPPED FILE-FAILED
-L1-as-built                    206           0           0           0           4           6           0
-L2-redirections-only           194           0           0           0          16           6           0
-L3-fork                        204           0           0           0           6           6           0
-L4-system1                     194           0           0           0          16           6           0
+L1-as-built                    330           0           0           0           4           6           0
+L2-redirections-only           318           0           0           0          16           6           0
+L3-fork                        316           0           0           0          18           6           0
+L4-system1                     306           0           0           0          28           6           0
 
 Tests whose outcome differs between the flavors (absent: the test does not exist in that flavor):
+t/at-exit.t    all: waits until every job has ended (1.6 s; two,late)
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             ok           
+t/dash.t       t2.txt: 42 of 44 agree with dash, the rest known
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                absent       
+    L4-system1             absent       
 t/spawner.t    sigignore
     L1-as-built            ok           
     L2-redirections-only   absent       
@@ -69,6 +80,76 @@ t/spawner.t    win_priority elsewhere: nice, if given, wins
     L2-redirections-only   absent       
     L3-fork                ok           
     L4-system1             absent       
+t/spawner.t    closefrom missing, not asked: fds given
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    closefrom missing, not asked: no fd action done in this process (X67)
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    closefrom missing, asked: 9 closed, 8 kept
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    closefrom missing, asked: as closes, left to posix_spawn (no fd action done in this process)
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    an fd of this process without close-on-exec: the child has it
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    closefrom missing, asked: an fd inherited from this process is closed too
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    and that too is left to posix_spawn
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    inheritable_from: an fd without close-on-exec is listed
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    closefrom as closes: the inherited fds and the targets still open; a second one closes only what came after
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    inheritable_from: not an fd with the flag
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    closefrom and dup2 missing, asked: done here
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    closefrom and dup2 missing: the fd actions done in this process
+    L1-as-built            ok           
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/at-exit.t    all: waits until every job has ended (1.5 s; two,late)
+    L1-as-built            absent       
+    L2-redirections-only   ok           
+    L3-fork                absent       
+    L4-system1             absent       
+t/dash.t       t2.txt: 43 of 44 agree with dash, the rest known
+    L1-as-built            absent       
+    L2-redirections-only   ok           
+    L3-fork                ok           
+    L4-system1             ok           
 t/spawner.t    skip: sigignore: not done by this spawn
     L1-as-built            absent       
     L2-redirections-only   SKIP         sigignore: not done by this spawn
@@ -129,3 +210,63 @@ t/spawner.t    skip: nice: not done by this spawn, or not undone without privile
     L2-redirections-only   SKIP         nice: not done by this spawn, or not undone without privilege here
     L3-fork                absent       
     L4-system1             SKIP         nice: not done by this spawn, or not undone without privilege here
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#2
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#3
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#4
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#5
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#6
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#7
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#8
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#9
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#10
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#11
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively
+t/spawner.t    skip: X67: needs posix_spawn doing dup2, close, open natively#12
+    L1-as-built            absent       
+    L2-redirections-only   absent       
+    L3-fork                SKIP         X67: needs posix_spawn doing dup2, close, open natively
+    L4-system1             SKIP         X67: needs posix_spawn doing dup2, close, open natively

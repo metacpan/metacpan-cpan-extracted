@@ -1,0 +1,44 @@
+{"id":"NB:10611","k":1,"does":["src/js a directory with a.js","$jsbuild=[\"out\"]"],"env":{"jsbuild":"out"},"files":{"src/js":["dir"],"src/js/a.js":["file","one\ntwo\n"]}}
+{"id":"NB:10611","k":2,"does":["src/js a directory with a.js","$jsbuild=[\"x1\"]","$@ of [\"x1\"]"],"env":{"jsbuild":"x1"},"args":["x1"],"files":{"src/js":["dir"],"src/js/a.js":["file","one\ntwo\n"]}}
+{"id":"NB:10611","k":3,"does":["src/js absent","$jsbuild=[\"\"]","$@ of [\"two  words\",\"*\",\"last\"]"],"env":{"jsbuild":""},"args":["two  words","*","last"],"files":{}}
+{"id":"NB:6901","k":1,"does":["standard input: two lines"],"env":{},"files":{},"stdin":"one\ntwo\n"}
+{"id":"NB:6901","k":2,"does":["standard input: a line without its newline"],"env":{},"files":{},"stdin":"one"}
+{"id":"NB:9059","k":1,"does":["input.txt.gz a file of two lines (not gzip)"],"env":{},"files":{"input.txt.gz":["file","one\ntwo\n"]}}
+{"id":"NB:9059","k":2,"does":["input.txt.gz a directory"],"env":{},"files":{"input.txt.gz":["dir"]}}
+{"id":"NB:9531","k":1,"does":["$BASH_FUNC_ls%%=[\"() { echo f; }\"] (a function bash imports, dash does not)"],"env":{"BASH_FUNC_ls%%":"() { echo f; }"},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkBadParameterSubstitution1","k":1,"does":["$foo=[\"x1\"]","$n=[\"x1\"]"],"env":{"foo":"x1","n":"x1"},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkBadParameterSubstitution1","k":2,"does":["$foo=[\"two  words *\"]","$n=[\"\"]"],"env":{"foo":"two  words *","n":""},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkBadParameterSubstitution11","k":1,"does":["$x=[\"x1.tar\"]"],"env":{"x":"x1.tar"},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkBadParameterSubstitution4","k":1,"does":["$var=[\"x1\"]","$n=[\"x1\"]","$i=[\"1\"]"],"env":{"var":"x1","n":"x1","i":"1"},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkBadParameterSubstitution7","k":1,"does":["$var=[\"x1\"]"],"env":{"var":"x1"},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkBadParameterSubstitution8","k":1,"does":["$x=[\"x1\"]"],"env":{"x":"x1"},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkCharRangeGlob9","k":1,"does":["standard input: two lines"],"env":{},"files":{},"stdin":"one\ntwo\n"}
+{"id":"SC:Analytics.hs:prop_checkCharRangeGlob9","k":2,"does":["arrk a file (the pattern arr[keykey] matches it)","standard input: two lines"],"env":{},"files":{"arrk":["file","one\ntwo\n"]},"stdin":"one\ntwo\n"}
+{"id":"SC:Analytics.hs:prop_checkExpansionWithRedirection3","k":1,"does":["bar a file of two lines"],"env":{},"files":{"bar":["file","one\ntwo\n"]}}
+{"id":"SC:Analytics.hs:prop_checkGlobAsCommand2","k":1,"does":["vari a file (the pattern var[i] matches it)"],"env":{},"files":{"vari":["file","one\ntwo\n"]}}
+{"id":"SC:Analytics.hs:prop_checkLoopVariableReassignment4","k":1,"does":["x1.bar, y1.bar files"],"env":{},"files":{"x1.bar":["file","one\ntwo\n"],"y1.bar":["file",""]}}
+{"id":"SC:Analytics.hs:prop_checkLoopVariableReassignment4","k":2,"does":["x1.bar a directory"],"env":{},"files":{"x1.bar":["dir"]}}
+{"id":"SC:Analytics.hs:prop_checkRedirectToSame8","k":1,"does":["$fname=[\"x1\"]","x1 a file of two lines"],"env":{"fname":"x1"},"files":{"x1":["file","one\ntwo\n"]}}
+{"id":"SC:Analytics.hs:prop_checkRedirectToSame8","k":2,"does":["$fname=[\"x1\"]","x1 absent"],"env":{"fname":"x1"},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkRedirectToSame8","k":3,"does":["$fname=[\"\"]"],"env":{"fname":""},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkSingleQuotedVariables5","k":1,"does":["$SECONDS=[\"5\"]"],"env":{"SECONDS":"5"},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkSingleQuotedVariables5","k":2,"does":["$SECONDS=[\"x1\"]"],"env":{"SECONDS":"x1"},"files":{}}
+{"id":"SC:Analytics.hs:prop_checkUnnecessaryArithmeticExpansionIndex3","k":1,"does":["a2=n a file (the pattern a[2]=n matches it)"],"env":{},"files":{"a2=n":["file","one\ntwo\n"]}}
+{"id":"SC:Analytics.hs:prop_checkUnused11","k":1,"does":["foo5=3 a file (the pattern foo[5]=3 matches it)"],"env":{},"files":{"foo5=3":["file","one\ntwo\n"]}}
+{"id":"SC:Analytics.hs:prop_checkUnused9","k":1,"does":["standard input: two lines"],"env":{},"files":{},"stdin":"one\ntwo\n"}
+{"id":"SC:Checks/Commands.hs:prop_checkEvalArray3","k":1,"does":["$args=[\"x1\"]"],"env":{"args":"x1"},"files":{}}
+{"id":"SC:Checks/Commands.hs:prop_checkEvalArray3","k":2,"does":["$args=[\"two  words *\"]"],"env":{"args":"two  words *"},"files":{}}
+{"id":"SC:Checks/Commands.hs:prop_checkEvalArray4","k":1,"does":["$args=[\"x1\"]"],"env":{"args":"x1"},"files":{}}
+{"id":"SC:Checks/Commands.hs:prop_checkEvalArray4","k":2,"does":["$args=[\"two  words *\"]"],"env":{"args":"two  words *"},"files":{}}
+{"id":"SC:Checks/Commands.hs:prop_checkExportedExpansions4","k":1,"does":["$foo=[\"\"]"],"env":{"foo":""},"files":{}}
+{"id":"SC:Checks/Commands.hs:prop_checkExportedExpansions4","k":2,"does":["$foo=[\"x1\"]"],"env":{"foo":"x1"},"files":{}}
+{"id":"SC:Checks/Commands.hs:prop_checkExportedExpansions4","k":3,"does":["$foo=[\"two  words *\"]"],"env":{"foo":"two  words *"},"files":{}}
+{"id":"SC:Checks/Commands.hs:prop_checkReadExpansions9","k":1,"does":["standard input: two lines"],"env":{},"files":{},"stdin":"one\ntwo\n"}
+{"id":"SC:Checks/Commands.hs:prop_checkReadExpansions9","k":2,"does":["arrv a file (the pattern arr[val] matches it)","standard input: two lines"],"env":{},"files":{"arrv":["file","one\ntwo\n"]},"stdin":"one\ntwo\n"}
+{"id":"SC:Checks/ShellSupport.hs:prop_checkBashisms52b","k":1,"does":["$var=[\"1\"]"],"env":{"var":"1"},"files":{}}
+{"id":"SC:Checks/ShellSupport.hs:prop_checkBashisms52b","k":2,"does":["$var=[\"x1\"]"],"env":{"var":"x1"},"files":{}}
+{"id":"SC:Checks/ShellSupport.hs:prop_checkBashisms52b","k":3,"does":["$var=[\"\"]"],"env":{"var":""},"files":{}}
+{"id":"SC:Checks/ShellSupport.hs:prop_checkMultiDimensionalArrays1","k":1,"does":["fooab=3 a file (the pattern foo[a][b]=3 matches it)"],"env":{},"files":{"fooab=3":["file","one\ntwo\n"]}}
+{"id":"TL:common/~.md:16","k":1,"does":["$OLDPWD=[\"/\"]"],"env":{"OLDPWD":"/"},"files":{}}
+{"id":"TL:common/~.md:16","k":2,"does":["$OLDPWD=[\"x1\"]","x1 a directory"],"env":{"OLDPWD":"x1"},"files":{"x1":["dir"]}}
+{"id":"TL:common/~.md:16","k":3,"does":["$OLDPWD=[\"\"]"],"env":{"OLDPWD":""},"files":{}}

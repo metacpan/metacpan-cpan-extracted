@@ -40,15 +40,40 @@ subtest 'each kind of stop stops a pipeline' => sub {
 
 subtest 'Stop is exported by default' => sub {
 
-    package Importing {    ## no critic (Modules::ProhibitMultiplePackages)
+    package Importing::Default {    ## no critic (Modules::ProhibitMultiplePackages)
         use DBIx::Squirrel::Stop;
     }
-    ok Importing->can('Stop'), 'by default';
+    ok Importing::Default->can('Stop'), 'by default';
 
-    package Not::Importing {    ## no critic (Modules::ProhibitMultiplePackages)
+    package Not::Importing {        ## no critic (Modules::ProhibitMultiplePackages)
         use DBIx::Squirrel::Stop ();
     }
     ok !Not::Importing->can('Stop'), 'not when told not to';
+};
+
+subtest 'is_stop tells a stop from anything else, on request' => sub {
+
+    package Asking {                ## no critic (Modules::ProhibitMultiplePackages)
+        use DBIx::Squirrel::Stop qw(is_stop);
+    }
+    ok !Importing::Default->can('is_stop'), 'not by default';
+    ok +Asking->can('is_stop'),             'on request';
+    my $is_stop = \&DBIx::Squirrel::Stop::is_stop;
+    ok $is_stop->(dies { Stop() }),                       "Stop's";
+    ok $is_stop->(dies { My::Stop->throw }),              "a subclass's";
+    ok $is_stop->(dies { Ekorn::Pipeline::Stop->throw }), "throw's";
+    my $taken;
+    my $p = Ekorn::Pipeline->new(sub {
+        my $value = $_[0];
+        local $@;
+        my $ok = eval { $value == 2 ? Stop() : 1 };
+        $taken = $@ unless $ok;
+        return $value;
+    });
+    $p->(1, 2);
+    ok $is_stop->($taken), 'one caught in a stage';
+    ok !$is_stop->($_), 'not ' . ($_ // 'undef')
+        for 'Stop used outside a pipeline', undef, '', [], bless {}, 'Other';
 };
 
 subtest 'a Stop explains itself as a string' => sub {

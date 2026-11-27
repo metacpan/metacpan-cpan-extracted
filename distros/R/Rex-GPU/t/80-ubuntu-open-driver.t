@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -110,12 +111,12 @@ subtest 'open_kernel_module_required — GH200 (karr #72, REPLACES "2342 => 0" a
   my $okm = \&Rex::GPU::Detect::open_kernel_module_required;
   # Maintainer decision (karr #72): GH200's own narrow row in
   # Rex::GPU::NVIDIA::Requirement's generations table gives it the open
-  # kernel module even though it sits inside the Turing-to-Hopper block and
+  # kernel module even though it sits inside the Hopper block and
   # NVIDIA's own driver README still lists Hopper as proprietary-supported.
   is($okm->('2342'), 1, 'GH200 120GB/480GB (2342) => open');
   is($okm->('2348'), 1, 'GH200 144G HBM3e (2348) => open');
-  is($okm->('2341'), 0, 'neighbour 2341 (just below 2342) => 0, still Turing/Ampere/Ada/Hopper');
-  is($okm->('2343'), 0, 'neighbour 2343 (just above 2342) => 0, still Turing/Ampere/Ada/Hopper');
+  is($okm->('2341'), 0, 'neighbour 2341 (just below 2342) => 0, still the Hopper block');
+  is($okm->('2343'), 0, 'neighbour 2343 (just above 2342) => 0, still the Hopper block');
 };
 
 #### Which Ubuntu source the plan picks

@@ -80,7 +80,6 @@ subtest 'joins once the server has announced the same protocol version, and expo
     my $bs       = client();
     my $statuses = collect($bs->status_o);
     my $channel  = $bs->join('counter');
-    is $bs->join('counter'), $channel, 'joining twice gives the same channel';
     my $server = connection_number(1);
 
     idle(0.1);
@@ -307,6 +306,160 @@ subtest 'leave and close' => sub {
     is_deeply $statuses, ['connecting', 'connected', 'closed', '(complete)'], 'closed for good';
     idle(0.6);
     is scalar @connections, 1, 'it does not reconnect';
+};
+
+subtest 'joining a channel twice shares one membership, which ends when both have left' => sub {
+    @connections = ();
+    my $bs     = client();
+    my $first  = $bs->join('counter');
+    my $server = connection_number(1);
+    greet($server);
+    is_deeply [take($server, 1, 'join')], [{ type => 'join', channel => 'counter' }], 'one join';
+    server_says($server, { type => 'joined', channel => 'counter', seq => 1, state => { n => 1 } });
+    wait_for(sub { $first->state }, 'joined');
+
+    my $second = $bs->join('counter');
+    isnt $second, $first, 'a second join is a separate object';
+    is((outcome($second->joined))[0], 'resolved', '...which is joined at once');
+    is_deeply $second->state, { n => 1 }, '...and has the state';
+
+    my %seen     = (first => collect($first->state_o),  second => collect($second->state_o));
+    my %added    = (first => collect($first->on('added')), second => collect($second->on('added')));
+    my %statuses = (first => collect($first->status_o), second => collect($second->status_o));
+    server_says($server, { type => 'update', channel => 'counter', seq => 2, diff => { o => { n => { v => 2 } } },
+        events => [{ name => 'added', payload => 1 }] });
+    wait_for(sub { $added{second}->@* }, 'an update arrived');
+    is_deeply \%seen,  { first => [{ n => 1 }, { n => 2 }], second => [{ n => 1 }, { n => 2 }] }, 'both see the state';
+    is_deeply \%added, { first => [1], second => [1] }, 'both see the event';
+
+    my $lost = $first->request('add');
+    my $kept = $second->request('add');
+    $first->action('wave');
+    my ($lost_message, $kept_message, $wave_message) = take($server, 3, 'two requests and an action');
+    $first->leave;
+    $first->leave;
+    is_deeply \%statuses, { first => ['joined', 'left', '(complete)'], second => ['joined'] }, 'only the one that left has ended';
+    error_like($lost, 'left', undef, 'its unanswered request');
+    error_like($first->request('add'), 'left', undef, 'a request made after leaving');
+
+    server_says($server, { type => 'update', channel => 'counter', seq => 3, diff => { o => { n => { v => 3 } } },
+        events => [{ name => 'added', payload => 1 }] });
+    server_says($server, { type => 'response', id => $kept_message->{id}, ok => Mojo::JSON->true, payload => 'done', seq => 3 });
+    server_says($server, { type => 'response', id => $lost_message->{id}, ok => Mojo::JSON->true, payload => 'ignored', seq => 3 });
+    is_deeply [outcome($kept)], [resolved => 'done'], 'the request of the other is answered';
+    is_deeply $server->{got}, [], 'the server was not told about the one that left';
+    is_deeply $seen{first}, [{ n => 1 }, { n => 2 }, '(complete)'], 'the one that left sees nothing more';
+    is_deeply $added{second}, [1, 1], 'the other carries on';
+    is_deeply $first->state,  { n => 2 }, 'the one that left keeps its last state';
+    is_deeply $second->state, { n => 3 }, 'the other has the new state';
+
+    $server->{c}->finish;
+    my $again = connection_number(2);
+    greet($again);
+    is_deeply [take($again, 1, 'rejoin')], [{ type => 'join', channel => 'counter', since => 3 }], 'rejoined once';
+    server_says($again, { type => 'joined', channel => 'counter', seq => 3, updates => [] });
+    is_deeply [take($again, 1, 'resent')], [$wave_message], 'the action of the one that left is still delivered, its request is not';
+
+    my $third = $bs->join('counter');
+    $second->leave;
+    idle(0.1);
+    is_deeply $again->{got}, [], 'the server is not told while someone remains';
+    $third->leave;
+    is_deeply [take($again, 1, 'leave')], [{ type => 'leave', channel => 'counter' }], 'the last one to leave tells the server';
+    is_deeply $statuses{second}, ['joined', 'joining', 'joined', 'left', '(complete)'], 'statuses of the second';
+
+    $bs->join('counter');
+    is_deeply [take($again, 1, 'join')], [{ type => 'join', channel => 'counter' }], 'joining again after that starts afresh';
+    $bs->close;
+};
+
+subtest 'being refused or closed ends every object of a channel' => sub {
+    @connections = ();
+    my $bs     = client();
+    my $first  = $bs->join('counter');
+    my $second = $bs->join('counter');
+    my $server = connection_number(1);
+    greet($server);
+    is_deeply [take($server, 1, 'join')], [{ type => 'join', channel => 'counter' }], 'two objects, one join';
+    server_says($server, { type => 'rejected', channel => 'counter', reason => 'forbidden', data => undef });
+    error_like($first->joined,  'forbidden', undef, 'joined() of the first');
+    error_like($second->joined, 'forbidden', undef, 'joined() of the second');
+
+    my $third  = $bs->join('counter');
+    my $fourth = $bs->join('counter');
+    take($server, 1, 'a fresh join');
+    server_says($server, { type => 'joined', channel => 'counter', seq => 0, state => {} });
+    wait_for(sub { $fourth->state }, 'joined');
+    my @statuses = (collect($third->status_o), collect($fourth->status_o));
+    $bs->close;
+    is_deeply \@statuses, [['joined', 'left', '(complete)'], ['joined', 'left', '(complete)']], 'close ends both';
+};
+
+subtest 'with no channel joined the connection is closed after a while, and the next join reopens it' => sub {
+    @connections = ();
+    my $bs       = client(idle_delay => 0.5);
+    my $statuses = collect($bs->status_o);
+    my $server   = connection_number(1);
+    greet($server);
+
+    # A channel joined in time keeps it open, however long it stays joined.
+    idle(0.3);
+    my $channel = $bs->join('counter');
+    take($server, 1, 'join');
+    server_says($server, { type => 'joined', channel => 'counter', seq => 0, state => {} });
+    idle(0.8);
+    ok !$server->{closed}, 'a joined channel keeps the connection open';
+
+    # The wait starts when the last channel is left, and a new join cancels it.
+    $channel->leave;
+    idle(0.3);
+    my $other = $bs->join('other');
+    idle(0.5);
+    ok !$server->{closed}, 'a new join cancels the wait';
+    $other->leave;
+    idle(0.3);
+    ok !$server->{closed}, 'still open before the delay is over';
+    wait_for(sub { $server->{closed} }, 'closed once the delay is over');
+    is_deeply $statuses, ['connecting', 'connected', 'idle'], 'the status is idle';
+    idle(0.8);
+    is scalar @connections, 1, 'it does not reconnect';
+
+    my $again = $bs->join('counter');
+    my $second = connection_number(2);
+    greet($second);
+    is_deeply [take($second, 1, 'join')], [{ type => 'join', channel => 'counter' }], 'the next join opens a connection and joins';
+    is_deeply $statuses, ['connecting', 'connected', 'idle', 'connecting', 'connected'], 'connected again';
+
+    # Closing an idle client is final: a later join does not reconnect.
+    $again->leave;
+    wait_for(sub { $second->{closed} }, 'idle again');
+    $bs->close;
+    $bs->join('counter');
+    idle(0.3);
+    is scalar @connections, 2, 'no connection after close';
+    is_deeply [@$statuses[-3 .. -1]], ['idle', 'closed', '(complete)'], 'closed for good';
+};
+
+subtest 'idle_delay can be turned off, and applies while the server cannot be reached' => sub {
+    @connections = ();
+    my $never  = client(idle_delay => undef);
+    my $server = connection_number(1);
+    greet($server);
+    idle(0.8);
+    ok !$server->{closed}, 'with undef the connection stays open';
+    $never->close;
+
+    @connections = ();
+    $accepting = 0;
+    my $bs       = client(idle_delay => 0.5);
+    my $statuses = collect($bs->status_o);
+    wait_for(sub { $statuses->[-1] eq 'idle' }, 'it goes idle while retrying');
+    my $attempts = @connections;
+    idle(0.8);
+    is scalar @connections, $attempts, 'and stops retrying';
+    is $statuses->[-1], 'idle', 'it stays idle';
+    $accepting = 1;
+    $bs->close;
 };
 
 subtest 'a connection that goes silent is abandoned and replaced' => sub {

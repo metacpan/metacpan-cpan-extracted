@@ -1,14 +1,15 @@
 package EV::Nats::ObjectStore;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 use Digest::SHA qw(sha256 sha256_hex);
+use JSON::PP ();
+use MIME::Base64 ();
 use EV::Nats::JetStream;
 
-my $CHUNK_SIZE = 128 * 1024; # 128KB default
-
-my $NUID_PID = $$;
-srand();
+my $CHUNK_SIZE = 128 * 1024;
+my $PUT_WINDOW = 16;   # chunks in flight; each one's timeout runs from its own send
+my @NUID_CHARS = ('A'..'Z', 'a'..'z', '0'..'9');
 
 sub new {
     my ($class, %opts) = @_;
@@ -16,38 +17,36 @@ sub new {
     my $bucket  = delete $opts{bucket}  || die "bucket name required";
     die "invalid ObjectStore bucket name '$bucket'"
         unless $bucket =~ /\A[a-zA-Z0-9_-]+\z/;
-    my $timeout = delete $opts{timeout} || $js->{timeout};
+    my $timeout = delete $opts{timeout};
     my $chunk_size = delete $opts{chunk_size} || $CHUNK_SIZE;
     die "invalid chunk_size '$chunk_size'"
         unless $chunk_size =~ /\A\d+\z/ && $chunk_size > 0;
     warn "EV::Nats::ObjectStore::new: unknown option '$_'" for keys %opts;
     bless {
-        js         => $js,
-        bucket     => $bucket,
-        stream     => "OBJ_$bucket",
-        chunk_size => $chunk_size,
-        timeout    => $timeout,
+        js           => $js->with_timeout($timeout),
+        bucket       => $bucket,
+        stream       => "OBJ_$bucket",
+        chunk_prefix => "\$O.$bucket.C.",
+        meta_prefix  => "\$O.$bucket.M.",
+        chunk_size   => $chunk_size,
     }, $class;
 }
 
 sub create_bucket {
     my ($self, $opts, $cb) = @_;
     $opts //= {};
-    require JSON::PP;
     my $config = {
         name     => $self->{stream},
-        subjects => [
-            '$O.' . $self->{bucket} . '.C.>',  # chunks
-            '$O.' . $self->{bucket} . '.M.>',  # metadata
-        ],
+        subjects => [ $self->{chunk_prefix} . '>', $self->{meta_prefix} . '>' ],
         retention    => 'limits',
-        ($opts->{max_bytes}    ? (max_bytes    => $opts->{max_bytes})    : ()),
-        ($opts->{max_age}      ? (max_age      => $opts->{max_age})     : ()),
-        ($opts->{replicas}     ? (num_replicas => $opts->{replicas})    : ()),
+        ($opts->{max_bytes}    ? (max_bytes    => 0 + $opts->{max_bytes})    : ()),
+        ($opts->{max_age}      ? (max_age      => 0 + $opts->{max_age})     : ()),
+        ($opts->{replicas}     ? (num_replicas => 0 + $opts->{replicas})    : ()),
         discard      => 'new',
         allow_rollup_hdrs => JSON::PP::true(),
+        allow_direct => JSON::PP::true(),
     };
-    $self->{js}->stream_create($config, sub { $cb->(@_[0, 1]) });
+    $self->{js}->create_bucket_stream($config, sub { $cb->(@_[0, 1]) });
 }
 
 sub delete_bucket {
@@ -55,233 +54,168 @@ sub delete_bucket {
     $self->{js}->stream_delete($self->{stream}, sub { $cb->(@_[0, 1]) });
 }
 
-# Best-effort purge that survives a dead connection: a sync croak
-# (not connected, nothing queued) skips the purge and runs $cb now.
-sub _purge_best_effort {
+# Survives a dead connection: a sync croak (not connected, nothing
+# queued) skips the purge and runs $cb now.
+sub purge_best_effort {
     my ($self, $filter, $cb) = @_;
     my $ok = eval {
-        $self->{js}->_json_api('STREAM.PURGE.' . $self->{stream},
+        $self->{js}->json_api('STREAM.PURGE.' . $self->{stream},
             { filter => $filter }, $cb);
         1;
     };
     $cb->() unless $ok;
 }
 
+sub purge_each {
+    my ($self, $done, @filters) = @_;
+    return $done->() unless @filters;
+    my $filter = shift @filters;
+    $self->purge_best_effort($filter, sub { $self->purge_each($done, @filters) });
+}
+
 sub put {
     my ($self, $name, $data, $cb) = @_;
-    # Fail fast on a chunk_size the server cannot take, instead of dying
-    # async in a chunk publish. Skipped pre-connect: max_payload is only
-    # the default until the first INFO arrives.
-    if ($self->{js}{nats}->is_connected) {
-        my $max = $self->{js}{nats}->max_payload;
-        if ($max > 0 && $self->{chunk_size} > $max) {
-            die "chunk_size ($self->{chunk_size}) exceeds max_payload ($max)";
-        }
+    # the chunks, the size and the digest must all see the same bytes
+    utf8::downgrade($data, 1) or die "ObjectStore put: wide character in data\n";
+    my $nats = $self->{js}{nats};
+    # fail here rather than in a chunk publish; before the first INFO
+    # max_payload is only the default
+    if ($nats->is_connected) {
+        my $max = $nats->max_payload;
+        die "chunk_size ($self->{chunk_size}) exceeds max_payload ($max)"
+            if $max > 0 && $self->{chunk_size} > $max;
     }
-    # Look up any existing object first so its old chunks / legacy %XX meta
-    # can be purged after the new meta is rolled up. A real error aborts.
-    $self->_raw_meta($name, sub {
+    # the previous object's chunks and legacy meta go once the new meta is stored
+    $self->raw_meta($name, sub {
         my ($old_meta, $old_subj, $old_gone, $err) = @_;
         return $cb->(undef, $err) if $err;
 
-        my $nuid   = _nuid();
-        # ADR-20 digest: padded base64url of the raw SHA-256 (nats.go form).
-        my $sha    = _b64url(sha256($data));
-        my $size   = length $data;
-        my $chunks = 0;
-        my $offset = 0;
-        my $chunk_subj = '$O.' . $self->{bucket} . '.C.' . $nuid;
+        my $nuid = nuid();
+        my $size = length $data;
+        my $cs   = $self->{chunk_size};
+        my $chunks = $size ? int(($size + $cs - 1) / $cs) : 1;
+        my $chunk_subj = $self->{chunk_prefix} . $nuid;
 
-        # Publish chunks via JetStream (with ack for durability)
-        my $chunk_errors = 0;
-        my $chunks_acked = 0;
-
-        # Define completion handler before starting any publishes
-        my $on_all_chunks = sub {
-            if ($chunk_errors) {
-                # Best-effort: purge this put's already-stored chunks so a
-                # failed put leaves no debris no meta points at.
-                $self->_purge_best_effort($chunk_subj,
-                    sub { $cb->(undef, "$chunk_errors chunk(s) failed to publish") });
-                return;
-            }
-            require JSON::PP;
+        my $store_meta = sub {
+            my ($failed) = @_;
+            return $self->purge_best_effort($chunk_subj,
+                sub { $cb->(undef, "$failed chunk(s) failed to publish") }) if $failed;
             my $meta = JSON::PP::encode_json({
-                name    => $name,
-                size    => $size,
-                chunks  => $chunks,
-                nuid    => $nuid,
-                digest  => "SHA-256=$sha",
-                bucket  => $self->{bucket},
+                name   => meta_name($name),
+                size   => $size,
+                chunks => $chunks,
+                nuid   => $nuid,
+                # ADR-20: padded base64url of the raw SHA-256, as nats.go writes it
+                digest => 'SHA-256=' . b64url(sha256($data)),
+                bucket => $self->{bucket},
             });
-            my $meta_subj = '$O.' . $self->{bucket} . '.M.' . _encode_name($name);
-            # Nats-Rollup: sub keeps exactly one message on the meta subject.
-            my $headers = "NATS/1.0\r\nNats-Rollup: sub\r\n\r\n";
             my $on_meta = sub {
                 my ($ack, $err) = @_;
-                if ($err) {
-                    $self->_purge_best_effort($chunk_subj,
-                        sub { $cb->(undef, $err) });
-                    return;
-                }
-
-                # Purge the previous object's chunks, and its legacy %XX
-                # meta subject when found there (migrate to base64url).
-                my @purges;
-                if ($old_meta && !$old_gone
-                    && length($old_meta->{nuid} // '')
-                    && $old_meta->{nuid} ne $nuid) {
-                    push @purges, '$O.' . $self->{bucket} . '.C.' . $old_meta->{nuid};
-                }
-                my $legacy_subj = '$O.' . $self->{bucket} . '.M.' . _encode_name_legacy($name);
-                if ($old_subj && $old_subj eq $legacy_subj) {
-                    push @purges, $legacy_subj;
-                }
-                # The put already succeeded (meta rolled up); old-chunk
-                # cleanup is best-effort.
-                my $run_purge;
-                $run_purge = sub {
-                    my $filter = shift @purges;
-                    if (!defined $filter) {
-                        # Break the $run_purge self-cycle before firing $cb.
-                        undef $run_purge;
-                        return $cb->({ name => $name, size => $size, chunks => $chunks, seq => $ack->{seq} }, undef);
-                    }
-                    $self->_purge_best_effort($filter,
-                        sub { $run_purge->() });   # ignore purge errors
-                };
-                $run_purge->();
+                return $self->purge_best_effort($chunk_subj, sub { $cb->(undef, $err) })
+                    if $err;
+                my @stale;
+                push @stale, $self->{chunk_prefix} . $old_meta->{nuid}
+                    if $old_meta && !$old_gone && length($old_meta->{nuid} // '')
+                        && $old_meta->{nuid} ne $nuid;
+                my $legacy = $self->{meta_prefix} . encode_name_legacy($name);
+                push @stale, $legacy if $old_subj && $old_subj eq $legacy;
+                $self->purge_each(sub {
+                    $cb->({ name => $name, size => $size, chunks => $chunks, seq => $ack->{seq} }, undef);
+                }, @stale);
             };
-            if (!eval { $self->{js}->js_publish_h($meta_subj, $headers, $meta, $on_meta); 1 }) {
+            # the rollup keeps exactly one message on the meta subject
+            eval {
+                $self->{js}->js_publish_h($self->{meta_prefix} . encode_name($name),
+                    "NATS/1.0\r\nNats-Rollup: sub\r\n\r\n", $meta, $on_meta);
+                1;
+            } or do {
                 my $err = $@;
-                $self->_purge_best_effort($chunk_subj, sub { $cb->(undef, $err) });
-            }
-        };
-
-        my $publish_chunk = sub {
-            my $chunk = shift;
-            my $on_ack = sub {
-                my ($ack, $err) = @_;
-                $chunk_errors++ if $err;
-                $chunks_acked++;
-                $on_all_chunks->() if $chunks_acked >= $chunks;
+                $self->purge_best_effort($chunk_subj, sub { $cb->(undef, $err) });
             };
-            $on_ack->(undef, $@)
-                unless eval { $self->{js}->js_publish($chunk_subj, $chunk, $on_ack); 1 };
         };
-
-        if ($size == 0) {
-            $chunks = 1;
-            $publish_chunk->('');
-        } else {
-            # Fix the total first: an ack arriving before the loop ends would
-            # otherwise complete the object with a short count.
-            $chunks = int(($size + $self->{chunk_size} - 1) / $self->{chunk_size});
-            while ($offset < $size) {
-                my $end = $offset + $self->{chunk_size};
-                $end = $size if $end > $size;
-                $publish_chunk->(substr($data, $offset, $end - $offset));
-                $offset = $end;
-            }
-        }
+        $self->put_chunks({ data => $data, subj => $chunk_subj, chunks => $chunks,
+                            sent => 0, acked => 0, failed => 0, done => $store_meta });
     });
+}
+
+# a failure stops further sends; done fires once every sent chunk is answered
+sub put_chunks {
+    my ($self, $st) = @_;
+    my $cs = $self->{chunk_size};
+    while ($st->{sent} < $st->{chunks} && !$st->{failed}
+           && $st->{sent} - $st->{acked} < $PUT_WINDOW) {
+        my $chunk = substr $st->{data}, $st->{sent}++ * $cs, $cs;
+        next if eval {
+            $self->{js}->js_publish($st->{subj}, $chunk, sub {
+                $st->{failed}++ if $_[1];
+                $st->{acked}++;
+                $self->put_chunks($st);
+            });
+            1;
+        };
+        $st->{failed}++;
+        $st->{acked}++;
+    }
+    return unless $st->{acked} == $st->{sent}
+        && ($st->{sent} == $st->{chunks} || $st->{failed});
+    my $done = delete $st->{done} or return;
+    $done->($st->{failed});
 }
 
 sub get {
     my ($self, $name, $cb) = @_;
-
-    $self->_raw_meta($name, sub {
-        my ($meta, $meta_subj, $gone, $err) = @_;
+    $self->raw_meta($name, sub {
+        my ($meta, undef, $gone, $err) = @_;
         return $cb->(undef, $err) if $err;
-        # Missing object or deleted marker: a clean miss, same as KV::get.
+        # a missing or deleted object is a clean miss, as in KV::get
         return $cb->(undef, undef) if !$meta || $gone;
-
-        my $nuid = $meta->{nuid};
-        my $expected = $meta->{chunks} || 0;
-        my $chunk_subj = '$O.' . $self->{bucket} . '.C.' . $nuid;
-
-        if ($expected == 0) {
-            return $cb->('', undef, $meta);
-        }
-
-        # Fetch chunks sequentially via STREAM.MSG.GET.
-        # next_by_subj returns first matching message with seq >= start_sequence,
-        # so after each hit we must advance past the returned seq.
-        my @chunks;
-        my $seq = 1;
-
-        my $fetch_next;
-        $fetch_next = sub {
-            $self->{js}->_json_api(
-                'STREAM.MSG.GET.' . $self->{stream},
-                { next_by_subj => $chunk_subj, seq => $seq },
-                sub {
-                    my ($resp, $err) = @_;
-                    if ($err) {
-                        # Break the $fetch_next self-cycle before firing
-                        # $cb, or the closure pins $self forever.
-                        undef $fetch_next;
-                        return $cb->(undef, "chunk fetch error: $err", $meta);
-                    }
-                    my $msg = $resp->{message};
-                    if (!$msg) {
-                        undef $fetch_next;
-                        return $cb->(undef, "missing chunk message", $meta);
-                    }
-                    require MIME::Base64;
-                    my $data = MIME::Base64::decode_base64($msg->{data} || '');
-                    push @chunks, $data;
-                    $seq = ($msg->{seq} || $seq) + 1;
-
-                    if (scalar @chunks >= $expected) {
-                        my $assembled = join('', @chunks);
-                        if ($meta->{digest} && $meta->{digest} =~ /^SHA-256=(.+)\z/) {
-                            # Accept all three writers: 0.03/0.04 hex, 0.05
-                            # unpadded base64url, and 0.06+/nats.go padded.
-                            my $stored = $1;
-                            my $ok;
-                            if ($stored =~ /\A[0-9a-f]{64}\z/) {
-                                $ok = sha256_hex($assembled) eq $stored;
-                            } else {
-                                (my $s = $stored) =~ s/=+\z//;
-                                (my $g = _b64url(sha256($assembled))) =~ s/=+\z//;
-                                $ok = $g eq $s;
-                            }
-                            unless ($ok) {
-                                undef $fetch_next;
-                                return $cb->(undef, "digest mismatch", $meta);
-                            }
-                        }
-                        undef $fetch_next;
-                        $cb->($assembled, undef, $meta);
-                    } else {
-                        $fetch_next->();
-                    }
-                }
-            );
-        };
-        $fetch_next->();
+        return $cb->('', undef, $meta) unless $meta->{chunks};
+        $self->fetch_chunks($meta, 1, [], $cb);
     });
+}
+
+# next_by_subj answers the first match at or after seq. A replica that has
+# not caught up misses a chunk the leader has: ask the leader before failing.
+sub fetch_chunks {
+    my ($self, $meta, $seq, $chunks, $cb, $leader) = @_;
+    $self->{js}->get_msg($self->{stream},
+        { next_by_subj => $self->{chunk_prefix} . $meta->{nuid}, seq => $seq }, sub {
+            my ($msg, $err) = @_;
+            return $cb->(undef, "chunk fetch error: $err", $meta) if $err;
+            return $self->fetch_chunks($meta, $seq, $chunks, $cb, 1) if !$msg && !$leader;
+            return $cb->(undef, "missing chunk message", $meta) unless $msg;
+            push @$chunks, $msg->{data};
+            return $self->fetch_chunks($meta, ($msg->{seq} || $seq) + 1, $chunks, $cb)
+                if @$chunks < $meta->{chunks};
+            my $data = join '', @$chunks;
+            return $cb->(undef, "digest mismatch", $meta) unless digest_ok($meta->{digest}, $data);
+            $cb->($data, undef, $meta);
+        }, $leader);
+}
+
+# hex and unpadded base64url digests come from older writers
+sub digest_ok {
+    my ($digest, $data) = @_;
+    return 1 unless $digest && $digest =~ /^SHA-256=(.+)\z/;
+    my $stored = $1;
+    return sha256_hex($data) eq $stored if $stored =~ /\A[0-9a-f]{64}\z/;
+    (my $s = $stored) =~ s/=+\z//;
+    (my $g = b64url(sha256($data))) =~ s/=+\z//;
+    return $g eq $s;
 }
 
 sub delete {
     my ($self, $name, $cb) = @_;
-    # nats.go marks a delete with the full metadata JSON carrying
-    # "deleted":true and a rollup header, not an empty KV-Operation tombstone.
-    $self->_raw_meta($name, sub {
+    $cb //= sub {};
+    # nats.go marks a delete with the full metadata carrying "deleted":true
+    # under a rollup, not with an empty KV-Operation tombstone
+    $self->raw_meta($name, sub {
         my ($meta, $found_subj, $gone, $err) = @_;
-        return $cb ? $cb->(undef, $err) : undef if $err;
-        # Idempotent: nothing live to delete -> success, no spurious marker.
-        return $cb ? $cb->(1, undef) : undef if !$meta || $gone;
-
-        my $prefix = '$O.' . $self->{bucket} . '.M.';
-        my $meta_subj   = $prefix . _encode_name($name);
-        my $legacy_subj = $prefix . _encode_name_legacy($name);
-        my $nuid        = length($meta->{nuid} // '') ? $meta->{nuid} : undef;
-
-        require JSON::PP;
+        return $cb->(undef, $err) if $err;
+        # nothing live: success, and no spurious marker
+        return $cb->(1, undef) if !$meta || $gone;
         my $marker = JSON::PP::encode_json({
-            name    => $name,
+            name    => meta_name($name),
             bucket  => $self->{bucket},
             nuid    => '',
             size    => 0,
@@ -289,60 +223,37 @@ sub delete {
             digest  => '',
             deleted => JSON::PP::true(),
         });
-        my $headers = "NATS/1.0\r\nNats-Rollup: sub\r\n\r\n";
-
-        # Mark deleted first (nats.go order) so a best-effort cleanup purge
-        # can't leave a "deleted" object still readable.
-        $self->{js}->js_publish_h($meta_subj, $headers, $marker, sub {
-            my ($ack, $perr) = @_;
-            return $cb ? $cb->(undef, $perr) : undef if $perr;
-
-            my @cleanup;
-            push @cleanup, '$O.' . $self->{bucket} . '.C.' . $nuid if $nuid;
-            # A live meta at the legacy %XX subject would resurface via the
-            # dual-read fallback / list(); purge it too.
-            push @cleanup, $legacy_subj if $found_subj && $found_subj eq $legacy_subj;
-
-            my $step; $step = sub {
-                my $subj = shift @cleanup;
-                if (!defined $subj) { undef $step; return $cb ? $cb->(1, undef) : undef }
-                $self->_purge_best_effort($subj, sub { $step->() });
-            };
-            $step->();
-        });
+        my $legacy = $self->{meta_prefix} . encode_name_legacy($name);
+        # marked first, as nats.go does, so a failed purge cannot leave it readable
+        $self->{js}->js_publish_h($self->{meta_prefix} . encode_name($name),
+            "NATS/1.0\r\nNats-Rollup: sub\r\n\r\n", $marker, sub {
+                my (undef, $perr) = @_;
+                return $cb->(undef, $perr) if $perr;
+                my @cleanup;
+                push @cleanup, $self->{chunk_prefix} . $meta->{nuid} if length($meta->{nuid} // '');
+                # a live legacy meta would resurface through the dual read and list()
+                push @cleanup, $legacy if $found_subj && $found_subj eq $legacy;
+                $self->purge_each(sub { $cb->(1, undef) }, @cleanup);
+            });
     });
 }
 
 sub info {
     my ($self, $name, $cb) = @_;
-    $self->_raw_meta($name, sub {
-        my ($meta, $meta_subj, $gone, $err) = @_;
+    $self->raw_meta($name, sub {
+        my ($meta, undef, $gone, $err) = @_;
         return $cb->(undef, $err) if $err;
-        # Missing or deleted (tombstone or "deleted":true): a clean miss.
-        return $cb->(undef, undef) if !$meta || $gone;
-        $cb->($meta, undef);
+        $cb->($meta && !$gone ? $meta : undef, undef);
     });
 }
 
 sub list {
     my ($self, $cb) = @_;
-    my $prefix = '$O.' . $self->{bucket} . '.M.';
-    $self->{js}->stream_info(
-        $self->{stream},
-        { subjects_filter => $prefix . '>' },
-        sub {
-            my ($info, $err) = @_;
-            return $cb->(undef, $err) if $err;
-            my $subjects = $info->{state}{subjects} || {};
-            my $plen = length $prefix;
-            # Best-effort decode: base64url names (0.06+/nats.go) and
-            # legacy %XX names (0.03-0.05) can share a bucket.
-            my @names = map { _decode_name_best(substr($_, $plen)) }
-                        grep { substr($_, 0, $plen) eq $prefix }
-                        keys %$subjects;
-            $cb->(\@names, undef);
-        },
-    );
+    $self->{js}->subjects_under($self->{stream}, $self->{meta_prefix}, sub {
+        my ($tokens, $err) = @_;
+        return $cb->(undef, $err) if $err;
+        $cb->([ map { decode_name_best($_) } @$tokens ], undef);
+    });
 }
 
 sub status {
@@ -358,100 +269,86 @@ sub status {
     });
 }
 
-# ($meta, $found_subject, $is_gone, $err) -> $cb. Dual-read: base64url meta
-# subject first, then legacy %XX (0.03-0.05 buckets stay readable). $is_gone
-# covers a KV-Operation tombstone and a "deleted":true meta; $meta is still
-# returned when gone so delete() can read its nuid.
-sub _raw_meta {
+# ($meta, $found_subject, $is_gone, $err) -> $cb. The base64url subject is
+# read first, then the legacy %XX one. $is_gone covers a KV-Operation
+# tombstone and a "deleted":true meta; $meta still comes back when gone,
+# so delete() can read its nuid.
+sub raw_meta {
     my ($self, $name, $cb) = @_;
-    my $prefix = '$O.' . $self->{bucket} . '.M.';
-    my @try = $prefix . _encode_name($name);
-    my $legacy = $prefix . _encode_name_legacy($name);
+    my @try = ($self->{meta_prefix} . encode_name($name));
+    my $legacy = $self->{meta_prefix} . encode_name_legacy($name);
     push @try, $legacy if $legacy ne $try[0];
+    $self->meta_at($cb, @try);
+}
 
-    my $attempt;
-    $attempt = sub {
-        my $meta_subj = shift @try;
-        if (!defined $meta_subj) {
-            # Break the $attempt self-cycle before firing $cb.
-            undef $attempt;
-            return $cb->(undef, undef, 0, undef);
+sub meta_at {
+    my ($self, $cb, $subj, @rest) = @_;
+    return $cb->(undef, undef, 0, undef) unless defined $subj;
+    $self->{js}->get_msg($self->{stream}, { last_by_subj => $subj }, sub {
+        my ($msg, $err) = @_;
+        return $cb->(undef, undef, 0, $err) if $err;
+        return $self->meta_at($cb, @rest) unless $msg;
+        my ($meta, $derr);
+        # a tombstone's payload is empty
+        if (length($msg->{data} // '')) {
+            ($meta, $derr) = EV::Nats::JetStream::decode_json_or_error($msg->{data});
+            return $cb->(undef, $subj, 0, "invalid metadata: $derr") if $derr;
         }
-        $self->{js}->_json_api(
-            'STREAM.MSG.GET.' . $self->{stream},
-            { last_by_subj => $meta_subj },
-            sub {
-                my ($resp, $err) = @_;
-                if ($err) {
-                    # Clean miss on this subject -> try the fallback form.
-                    return $attempt->() if $err =~ /no message found|\(code 10037\)/;
-                    undef $attempt;
-                    return $cb->(undef, undef, 0, $err);
-                }
-                my $msg = $resp->{message};
-                return $attempt->() if !$msg;
-                my $tombstone = EV::Nats::JetStream::msg_is_tombstone($msg);
-                require MIME::Base64;
-                my $meta_json = MIME::Base64::decode_base64($msg->{data} || '');
-                my ($meta, $derr);
-                # A tombstone's payload is empty; only parse real data.
-                if (length $meta_json) {
-                    ($meta, $derr) = EV::Nats::JetStream::decode_json_or_error($meta_json);
-                    if ($derr) {
-                        undef $attempt;
-                        return $cb->(undef, $meta_subj, 0, "invalid metadata: $derr");
-                    }
-                }
-                my $gone = ($tombstone || ($meta && $meta->{deleted})) ? 1 : 0;
-                undef $attempt;
-                $cb->($meta, $meta_subj, $gone, undef);
-            }
-        );
-    };
-    $attempt->();
+        my $gone = EV::Nats::JetStream::msg_is_tombstone($msg) || ($meta && $meta->{deleted}) ? 1 : 0;
+        $cb->($meta, $subj, $gone, undef);
+    }, 1);   # put and delete act on it: a replica's lagging copy would mislead them
 }
 
-sub _nuid {
-    if ($NUID_PID != $$) {
-        srand();
-        $NUID_PID = $$;
+# concurrent writers' chunk subjects must never collide
+sub nuid {
+    my $bytes = '';
+    if (open my $fh, '<:raw', '/dev/urandom') {
+        read $fh, $bytes, 22;
     }
-    my @chars = ('A'..'Z', 'a'..'z', '0'..'9');
-    join '', map { $chars[rand @chars] } 1..22;
+    $bytes .= chr int rand 256 while length $bytes < 22;
+    return join '', map { $NUID_CHARS[ord($_) % @NUID_CHARS] } split //, $bytes;
 }
 
-# padded base64url of a byte/most-strings value, matching Go URLEncoding
-sub _b64url {
-    my $bytes = shift;
-    utf8::encode($bytes) if utf8::is_utf8($bytes);   # names may be wide
-    require MIME::Base64;
-    (my $e = MIME::Base64::encode_base64($bytes, '')) =~ tr{+/}{-_};
-    return $e;                                        # keeps '=' padding
+# padded base64url of bytes, as Go's URLEncoding
+sub b64url {
+    (my $e = MIME::Base64::encode_base64($_[0], '')) =~ tr{+/}{-_};
+    return $e;
 }
-# inverse: padded-or-unpadded base64url -> UTF-8-decoded string
-sub _b64url_dec {
+
+# padded or unpadded base64url to a UTF-8-decoded string
+sub b64url_dec {
     my $s = shift;
     $s =~ tr{-_}{+/};
-    require MIME::Base64;
-    my $b = MIME::Base64::decode_base64($s);          # tolerant of padding
+    my $b = MIME::Base64::decode_base64($s);
     utf8::decode($b);
     return $b;
 }
 
-# ADR-20 name encoding: padded base64url (nats.go). The 0.03-0.05 %XX
-# percent form is kept as *_legacy for the dual-read fallback.
-sub _encode_name { _b64url($_[0]) }
-sub _decode_name { _b64url_dec($_[0]) }
-sub _encode_name_legacy { my $n = $_[0]; $n =~ s/([^A-Za-z0-9._-])/sprintf("%%%02X", ord($1))/ge; $n }
-sub _decode_name_legacy { my $n = $_[0]; $n =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge; $n }
+# ADR-20 names are padded base64url of the name's bytes (a character string
+# as UTF-8); *_legacy is the older %XX form
+sub encode_name {
+    my $n = shift;
+    utf8::encode($n) if utf8::is_utf8($n);
+    return b64url($n);
+}
 
-# Best-effort name decode for list(): the base64url form wins when
-# re-encoding round-trips, otherwise fall back to the legacy %XX form.
-sub _decode_name_best {
+# the metadata's name is text: UTF-8 bytes are decoded so it names the same
+# subject for every client, not encoded a second time by the JSON encoder
+sub meta_name {
+    my $n = shift;
+    return $n if utf8::is_utf8($n);
+    my $text = $n;
+    return utf8::decode($text) ? $text : $n;
+}
+sub encode_name_legacy { my $n = $_[0]; $n =~ s/([^A-Za-z0-9._-])/sprintf("%%%02X", ord($1))/ge; $n }
+sub decode_name_legacy { my $n = $_[0]; $n =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge; $n }
+
+# the base64url form wins when re-encoding round-trips
+sub decode_name_best {
     my $tok = shift;
-    my $dec = _b64url_dec($tok);
-    return $dec if _encode_name($dec) eq $tok;
-    return _decode_name_legacy($tok);
+    my $dec = b64url_dec($tok);
+    return $dec if encode_name($dec) eq $tok;
+    return decode_name_legacy($tok);
 }
 
 1;
@@ -502,7 +399,8 @@ metadata describing an object (name, size, chunk count, SHA-256 digest).
 
 C<put> chunks the input, publishes each chunk via C<js_publish> for
 durability, then writes a metadata entry. C<get> fetches the metadata,
-walks the chunks back via C<STREAM.MSG.GET>, and verifies the digest.
+reads the chunks back with Direct Get (C<STREAM.MSG.GET> for a bucket
+without C<allow_direct>), and verifies the digest.
 
 =head1 METHODS
 
@@ -510,7 +408,7 @@ All callbacks fire on the L<EV> loop, not synchronously.
 
 =head2 new
 
-    new(js => $js, bucket => $name, [chunk_size => $bytes])
+    new(js => $js, bucket => $name, [chunk_size => $bytes], [timeout => $ms])
 
 Default C<chunk_size> is 128 KiB. C<timeout> defaults to the timeout
 of C<$js>. The bucket name must match C<[a-zA-Z0-9_-]+> and
@@ -562,9 +460,7 @@ Retrieve a previously-stored object. Callback: C<($data, $err, $meta)>.
 C<$data> is C<undef> if the object does not exist or has been deleted
 (both the old C<KV-Operation> tombstone and the nats.go
 C<"deleted":true> marker are recognised). On digest mismatch, C<$data>
-is C<undef> and C<$err> is C<"digest mismatch">. Digests written by
-0.03/0.04 (hex), 0.05 (unpadded base64url) and 0.06+/nats.go (padded
-base64url) all verify.
+is C<undef> and C<$err> is C<"digest mismatch">.
 
 =head2 delete
 
@@ -593,10 +489,8 @@ of a L</list> result.
     list($cb)
 
 List object names in the bucket. Callback: C<(\@names, $err)>.
-Names written by 0.03-0.05 (legacy %XX encoding) and by 0.06+/nats.go
-(base64url) are both decoded. Deleted entries still appear in the
-listing -- filtering them would cost a per-name metadata round-trip,
-so call C<info> to filter.
+Deleted entries still appear in the listing -- filtering them would
+cost a per-name metadata round-trip, so call C<info> to filter.
 
 =head2 status
 
@@ -606,9 +500,7 @@ Returns a snapshot hashref:
 
     { bucket => $name, bytes => $n, sealed => 0|1 }
 
-C<sealed> reflects the underlying stream's C<config.sealed> flag;
-this client never seals on its own, so unless someone manually
-sealed the stream out-of-band the value is always 0.
+C<sealed> reflects the stream's C<config.sealed> flag.
 
 Callback: C<(\%status, $err)>.
 

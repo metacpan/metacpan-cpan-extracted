@@ -1,0 +1,11 @@
+# golden: amd/debian-13--inbox--mi300x--no-module
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: dpkg-query -W -f='${Status}\n' pve-firmware 2>/dev/null
+run: cat /proc/cmdline 2>/dev/null
+run: grep -rsHE --include='*.conf' '^[[:space:]]*(blacklist[[:space:]]+amdgpu|install[[:space:]]+amdgpu[[:space:]]+(/usr)?/bin/(false|true))([[:space:]]|$)' /etc/modprobe.d /run/modprobe.d /usr/lib/modprobe.d /lib/modprobe.d 2>/dev/null
+run: uname -r
+run: modinfo -n amdgpu 2>/dev/null
+DIE: install_driver: kernel 6.12.48+deb13-amd64 has no amdgpu module, and no package for it is known on Debian GNU/Linux 13 (trixie). Nothing was changed on the host

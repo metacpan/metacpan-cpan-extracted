@@ -24,11 +24,11 @@ no_index:
     - xt
 requires:
   Exporter: '5.57'
-  XSLoader: '0'
+  XSLoader: '0.14'
   perl: '5.012000'
   warnings: '0'
 resources:
   bugtracker: https://codeberg.org/mauke/Text-EditDistance-DamerauLevenshtein/issues
   repository: https://codeberg.org/mauke/Text-EditDistance-DamerauLevenshtein.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

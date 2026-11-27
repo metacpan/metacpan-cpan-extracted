@@ -1,0 +1,7 @@
+# golden: amd/ubuntu-22.04--auto--synapse-navi31--hwe-6.8
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: uname -r
+DIE: install_driver: AMD supports AMD GPU 0000:95:00.0 [1002:1586] (gfx1151) only with the inbox driver and AMD GPU 0000:0a:00.0 [1002:744c] (gfx1100) with amdgpu-dkms, and one amdgpu drives every GPU of a host. method => 'inbox' is no way out on this host for AMD GPU 0000:95:00.0 [1002:1586] (gfx1151): AMD supports them with the inbox driver only on Ubuntu 26.04 (GA kernel 7.0) and Ubuntu 24.04 (HWE kernel 7.0), per the ROCm 10.1 compatibility matrix; this host runs Ubuntu 22.04.5 LTS with kernel 6.8.0-85-generic. Pass gpus => with AMD GPU 0000:0a:00.0 [1002:744c] (gfx1100) only to leave AMD GPU 0000:95:00.0 [1002:1586] (gfx1151) out. Nothing was changed on the host

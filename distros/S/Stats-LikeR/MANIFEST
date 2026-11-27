@@ -8,7 +8,6 @@ META.json
 META.yml
 Makefile.PL
 README
-README.md
 SECURITY.md
 lib/Stats/LikeR.pm
 lib/Stats/LikeR/Usage.pm
@@ -27,6 +26,8 @@ t/TukeyHSD.twoway.R.R
 t/TukeyHSD.twoway.R.t
 t/_parse_csv.t
 t/add_data.t
+t/age_standardize.R.fayfeuer.R
+t/age_standardize.R.fayfeuer.t
 t/age_standardize.t
 t/agg.R.pandas.R
 t/agg.R.pandas.py
@@ -61,6 +62,7 @@ t/audit.2026-10-20.D.t
 t/audit.2026-10-20.E.R
 t/audit.2026-10-20.E.t
 t/audit.2026-10-20.F.t
+t/audit.2026-11-26.regressions.t
 t/avals.t
 t/base_did.csv
 t/bedroc.mpmath.py
@@ -108,6 +110,9 @@ t/coxph.R.R
 t/coxph.R.t
 t/coxph_extended.R.R
 t/coxph_extended.R.t
+t/cramers_v.R.scipy.R
+t/cramers_v.R.scipy.py
+t/cramers_v.R.scipy.t
 t/crlf_quoted.tukey_aliases.regressions.t
 t/croak.leaks.t
 t/croak.messages.t
@@ -125,6 +130,8 @@ t/density.t
 t/df2h.t
 t/df_shape.t
 t/dftype.t
+t/dist.recycle.R.R
+t/dist.recycle.R.t
 t/distributions.R.scipy.R
 t/distributions.R.scipy.t
 t/distributions.limits.R.R
@@ -133,6 +140,7 @@ t/distributions.limits.mpmath.py
 t/distributions.mpmath.py
 t/distributions.q.ends.R.R
 t/distributions.q.ends.R.t
+t/dnorm.R.t
 t/dnorm.nv_width.t
 t/docvis.csv
 t/drop_duplicates.t
@@ -141,10 +149,16 @@ t/dunn_test.statsmodels.py
 t/dunn_test.statsmodels.t
 t/dunn_test.t
 t/effect_sizes.t
+t/epi_2x2.R.statsmodels.R
+t/epi_2x2.R.statsmodels.py
+t/epi_2x2.R.statsmodels.t
 t/epi_2x2.t
 t/eta_squared.R.R
 t/eta_squared.R.t
 t/fillna.t
+t/filter.R.pandas.R
+t/filter.R.pandas.py
+t/filter.R.pandas.t
 t/filter.compiled.t
 t/filter.regressions.t
 t/filter.rowid.t
@@ -161,7 +175,16 @@ t/formula.parser.R.t
 t/formula.utf8_names.t
 t/formula_groups.R.R
 t/formula_groups.R.t
+t/frame.cleaning.R.pandas.R
+t/frame.cleaning.R.pandas.py
+t/frame.cleaning.R.pandas.t
 t/frame.fixes.0_3428.t
+t/frame_ops_sets.R.pandas.R
+t/frame_ops_sets.R.pandas.py
+t/frame_ops_sets.R.pandas.t
+t/frame_reshape.R.pandas.R
+t/frame_reshape.R.pandas.py
+t/frame_reshape.R.pandas.t
 t/friedman_mcnemar_prop_cmh.R.R
 t/friedman_mcnemar_prop_cmh.R.t
 t/friedman_test.t
@@ -191,6 +214,9 @@ t/glmer.negbin_epil.R.t
 t/glmer.poisson.R.t
 t/griliches76.csv
 t/group_by.HoH.filter.t
+t/group_by.R.pandas.R
+t/group_by.R.pandas.py
+t/group_by.R.pandas.t
 t/group_by.tmps.t
 t/h2aoh_aoh2h.t
 t/help.t
@@ -260,6 +286,8 @@ t/logrank_test.many_groups.R.t
 t/mcnemar_test.exact.R.t
 t/mcnemar_test.t
 t/mean.t
+t/median.R.numpy.t
+t/median.dnorm.summary.R.R
 t/median.t
 t/melt.t
 t/merge.R.pandas.R
@@ -276,6 +304,8 @@ t/morley.tab.bgz
 t/morley.tab.bz2
 t/morley.tab.gz
 t/ncol.t
+t/nrow.ncol.R.pandas.py
+t/nrow.ncol.R.pandas.t
 t/nrow.t
 t/numeric.fixes.t
 t/numeric.options.t
@@ -361,6 +391,9 @@ t/read_table.input_record_separator.t
 t/read_table.int_cells.t
 t/read_table.keep_cols.t
 t/read_table.na_strings.t
+t/read_table.ods.pandas.t
+t/read_table.ods.t
+t/read_table.pandas.fixtures.pl
 t/read_table.quote.R
 t/read_table.quote.R.pandas.t
 t/read_table.quote.pandas.py
@@ -371,6 +404,8 @@ t/read_table.regressions.t
 t/read_table.sep_unicode.pl
 t/read_table.sep_unicode.t
 t/read_table.shared_cells.t
+t/read_table.skiprows.pandas.t
+t/read_table.skiprows.t
 t/read_table.t
 t/read_table.vcf.htslib.pl
 t/read_table.vcf.htslib.t
@@ -402,6 +437,8 @@ t/sets.no_upgrade.t
 t/shapiro_test.R.scipy.R
 t/shapiro_test.R.scipy.py
 t/shapiro_test.R.scipy.t
+t/skew_kurtosis.scipy.py
+t/skew_kurtosis.scipy.t
 t/skew_kurtosis.t
 t/sleepstudy.csv
 t/smd.R.R
@@ -409,6 +446,7 @@ t/smd.R.t
 t/srand.stream.t
 t/std_qnorm.mpmath.py
 t/sum.overflow.R.t
+t/summary.R.t
 t/summary.t
 t/survey_fpc.csv
 t/survival.R.R
@@ -424,6 +462,8 @@ t/t_test.R.scipy.t
 t/t_test.t
 t/t_test.tails.R.R
 t/t_test.tails.R.t
+t/table_one.R.datasets.R
+t/table_one.R.datasets.t
 t/table_one.t
 t/tied.fetch.once.t
 t/tied.frames.t
@@ -438,6 +478,9 @@ t/transpose.t
 t/tukey.t
 t/tukey_aov_prcomp.R.R
 t/tukey_aov_prcomp.R.t
+t/uniq.R.numpy.R
+t/uniq.R.numpy.py
+t/uniq.R.numpy.t
 t/uniq.t
 t/unzip_member.t
 t/usage.t

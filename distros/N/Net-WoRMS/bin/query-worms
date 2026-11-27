@@ -62,7 +62,7 @@ GetOptions(
     "aphia-ns=s"       => \$APHIA_NS,
     "aphia-uri=s"      => \$APHIA_URI,
     "D|debug"          => \$DEBUG,
-    "endpoint"         => \$END_POINT,
+    "endpoint=s"       => \$END_POINT,
     "f|format=s"       => \$FORMAT,
     "h|help"           => \$IS_HELP,
     "m|man"            => \$IS_MANUAL,
@@ -178,7 +178,7 @@ sub errorMissingParam($task) {
         "$HELP_INFO\n";
 }
 
-sub errWrongTask($task) {
+sub errorWrongTask($task) {
     die "ERROR: Unknown TASK: '$task'! $HELP_INFO\n";
 }
 

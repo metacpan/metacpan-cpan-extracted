@@ -7,8 +7,11 @@ description: Load before editing Rex::GPU — the detect→driver→toolkit→CD
 
 A Rex distribution that makes an NVIDIA GPU on a bare-metal host usable by Kubernetes
 workloads. `gpu_setup()` is the single entry point; everything else is one stage of one
-pipeline. AMD is *detected* but never installed — `compute => 0` always, a warning, no
-driver path. Do not add AMD install code without a ticket that says to.
+pipeline. AMD (k1, experimental) gets the `amdgpu` kernel driver only — `Rex::GPU::AMD`
+(`install_driver` → `present|inbox|dkms`, `verify_amd`, separate `install_rocm`), no
+toolkit/CDI/containerd. Its name and signature are a contract with kubernetes-ocp's
+Rexfile (`Rex::GPU::AMD::install_driver(gpus => [...])`, `verify_amd()`): change only with a
+card note.
 
 Consumes `Rex::LibSSH` (`recommends`, not a pin) because the target hosts — Hetzner
 dedicated servers — ship without an SFTP subsystem. Every file op in this distribution
@@ -24,6 +27,10 @@ therefore has to survive on exec channels; Rex idioms and the SFTP question live
 3. Only if a **CUDA-capable** NVIDIA GPU is present (`grep { $_->{compute} }`):
    `install_driver(gpus => \@compute)` (all of them; `gpu =>` is the one-GPU alias) → `install_container_toolkit` → `generate_cdi_specs` →
    `configure_containerd($runtime)` unless `containerd_config eq 'none'`.
+4. AMD: every GPU with true `compute` and not `integrated` (an APU only with
+   `amd_integrated => 1`) → `Rex::GPU::AMD::install_driver(gpus =>, reboot =>)` →
+   `verify_amd(gpus =>)`; every skipped one gets a warning with the reason. `install_driver`
+   filters nothing itself.
 
 The order is not cosmetic. CDI generation runs `nvidia-ctk cdi generate`, which
 enumerates *physical* devices — so it must come after the toolkit provides `nvidia-ctk`
@@ -39,6 +46,16 @@ class `[0300]`/`[0302]`, vendor `10de` NVIDIA / `1002` AMD. `compute` is decided
 **generation, not marketing name**; **unknown defaults to `0`** (safe: no install) with a
 warning — keep it 0. `detect()` first ensures `lspci` (`command -v`, else pciutils via
 dnf + `rpm -q` on RHEL names Rex::Pkg can't handle; k46).
+
+AMD also at class `[0380]` and `[1200]` (MI300/MI350), vendor `1002` only — an NVIDIA device
+there stays unlisted. Each AMD element always has `slot device_id gfx_target compute
+integrated`, from `Rex::GPU::AMD::Hardware` (`targets` by gfx target, `devices` by PCI ID;
+the curator's rows). On a host with an AMD GPU detection runs one more read-only command,
+`Rex::GPU::AMD->state_script` (sysfs + KFD topology); the KFD gfx target wins over the
+table, with a warning. No row ⇒ `compute => undef`, no install — never guess a row.
+Every AMD host command goes through `Rex::GPU::AMD->host_run` (one seam), files via
+`printf` + `mv`, driver packages via direct `apt-get/dnf install` + `dpkg -l`/`rpm -q`
+(+ `dkms status` for `amdgpu-dkms`), never `pkg`.
 
 `Rex::GPU::Detect::Sysfs` (k73, opt-in via the k71 class mechanism — `lspci` stays the
 default, never auto-switched) reads `/sys/bus/pci/devices` in one builtin-only `run`,
@@ -102,7 +119,9 @@ via `update-initramfs`/`dracut`), then reboot-and-verify or `modprobe nvidia`.
 ## Never Rex::Pkg for the driver/toolkit — the load-bearing invariant
 
 Driver and toolkit installs call `run "apt-get/dnf/zypper install -y …", auto_die => 0`
-directly, then verify with `dpkg -l | grep '^ii'` / `rpm -q`. **Not `pkg`.**
+directly, then verify with `dpkg -l PKG | grep -q '^[hi]i'` / `rpm -q`. **Not `pkg`.**
+Held (`hi`) counts as installed; half-configured (`iF`/`hF`, a failed DKMS postinst) and
+unpacked (`iU`) do not.
 `Rex::Pkg::{Apt,Dnf}` dies on any non-zero exit, and DKMS module builds, grub updates and
 initramfs regeneration routinely exit non-zero on success. `pkg` is fine only for
 inert helpers (`pciutils`, `curl`, `gnupg`, `epel-release`). Route a real driver package

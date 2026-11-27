@@ -20,7 +20,7 @@ use DBIx::Squirrel::Util   qw(
 
 use namespace::clean;
 
-our $VERSION = 'v4.1.1';
+our $VERSION = 'v4.2.0';
 
 our @ISA = ('DBI::db', 'Ekorn::Pipeline::Pipes');
 

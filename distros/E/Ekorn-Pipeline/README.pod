@@ -735,7 +735,9 @@ place of its own copy, from v2.0.5.
 L<The user guide|Ekorn::Pipeline::Manual::HowTo> tours the package
 from the bottom up, from a single stage to functions and packages
 built on it, with recipes for what each part can do, and where it
-falls short. L<The reference|Ekorn::Pipeline::Manual::Reference> describes
+falls short; if you know DBIx::Squirrel, its section L<Coming from
+DBIx::Squirrel|Ekorn::Pipeline::Manual::HowTo/"Coming from DBIx::Squirrel">
+says where to start. L<The reference|Ekorn::Pipeline::Manual::Reference> describes
 every module, function and method in full, and how a pipeline
 behaves, with notes for stage authors. Each module's POD, starting
 with L<Ekorn::Pipeline>, says the same more briefly, and is the

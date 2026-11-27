@@ -1,6 +1,6 @@
 ---
 name: getty-git-commit-style
-description: Use when writing or amending a commit message or a Changes/CHANGELOG entry in a Getty repository, stamping a release's version line, or committing across several repos.
+description: Use when committing in a Getty repository — writing or amending a commit message or a Changes/CHANGELOG entry, stamping a release's version line, or committing across several repos.
 ---
 
 # Commit Message Style
@@ -8,7 +8,7 @@ description: Use when writing or amending a commit message or a Changes/CHANGELO
 ## Format
 
 ```
-<summary line — imperative, max ~72 chars>
+<summary line — imperative or "<component>: <what>", no type prefix, max ~72 chars>
 
 <body — one line per change, no filler>
 
@@ -17,7 +17,17 @@ Co-Authored-By: Claude <Model> <noreply@anthropic.com>
 
 ## Rules
 
-- **Summary line**: imperative mood ("Add", "Fix", "Rename", "Remove"), describe the primary intent
+- **Summary line**: describe the primary intent, in one of two forms:
+  - imperative mood ("Add", "Fix", "Rename", "Remove"):
+    `Rename _dbic_connect_attributes to _dbio_connect_attributes`
+  - `<component>: <what>`, the component saying *where* the change lies — a file, a
+    directory, a command, an area:
+    `README.md: rework for first-time readers, with current limits stated`
+- **No type prefix**: what stands before the colon names a place, never the kind of change —
+  no Conventional Commits type (`feat:`, `fix:`, `docs:`, `chore(scope):`). A place whose
+  name is also a type word (docs, test, tests, ci, build, chore) is written as its path:
+  `docs/plan.md:`, `t/hooks.t:`, `.github/workflows/ci.yml:`, never bare `docs:`
+- **No `--signoff`**: commit without `-s`; the message carries no `Signed-off-by:` line, only the co-author trailer below
 - **Body**: list every discrete change on its own line, no bullets needed, no prose explanations
 - **Completeness**: every file-level change must be mentioned — don't silently lump things together
 - **Brevity**: state what changed, not why it's important or how it works — the diff shows that
@@ -131,7 +141,14 @@ section that was allowed to accrete.
 ## Multi-repo commits
 
 When committing across multiple repos in a workspace, each repo gets its own
-commit with its own message. Don't reference other repos in the message.
+commit with its own message, and that message describes this repo's change.
+
+- **A card on another repo's board** is named in that board's notation:
+  `agent-developer k3`, never `#3`.
+- **Beyond that, a product repo's message names no other repo.**
+- **A hub repo names its family's commits** (`agent-bun-runtime 5ef1201`,
+  `Getty/skills 9c5ed41`): recording the state across repos is its job (skill
+  `getty-developer-hub`).
 
 ## HEREDOC usage
 

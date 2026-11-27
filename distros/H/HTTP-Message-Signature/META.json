@@ -90,12 +90,14 @@
          },
          "requires" : {
             "Carp" : "0",
-            "Crypt::PK::Ed25519" : "0.089",
+            "Crypt::PK::Ed25519" : "0",
+            "Crypt::PK::RSA" : "0",
             "HTTP::Message" : "0",
+            "HTTP::StructuredField" : "v0.0.3",
             "HTTP::Tiny" : "0",
             "Hash::MultiValue" : "0",
             "Hash::Ordered" : "0",
-            "JSON::MaybeXS" : "0",
+            "JSON" : "0",
             "List::Util" : "1.29",
             "MIME::Base64" : "0",
             "Moo" : "0",
@@ -107,7 +109,6 @@
             "Types::Common" : "0",
             "Types::URI" : "0",
             "URI" : "0",
-            "constant" : "0",
             "experimental" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.24.0"
@@ -123,6 +124,7 @@
             "HTTP::Request" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "JSON::MaybeXS" : "0",
             "Module::Metadata" : "0",
             "Path::Tiny" : "0",
             "Test2::Tools::Exception" : "0",
@@ -136,7 +138,7 @@
    "provides" : {
       "HTTP::Message::Signature" : {
          "file" : "lib/HTTP/Message/Signature.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -150,7 +152,7 @@
          "web" : "https://github.com/robrwo/perl-HTTP-Message-Signature"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.3",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.42.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.82",

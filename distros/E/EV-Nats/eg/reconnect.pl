@@ -20,7 +20,7 @@ my $nats = EV::Nats->new(
     },
 );
 
-# subscribe before connect — will be sent on first connect and restored on reconnect
+# subscribe before connect -will be sent on first connect and restored on reconnect
 $nats->subscribe('heartbeat', sub {
     my ($subject, $payload) = @_;
     print "heartbeat: $payload\n";

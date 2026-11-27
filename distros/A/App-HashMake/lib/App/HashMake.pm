@@ -17,11 +17,11 @@ App::HashMake - Perform make-like actions based on target file's MD5 hash value
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our $default_hash_makefile = 'Hash.Makefile';
 our $index_file = '.hash_index';
@@ -441,9 +441,6 @@ Please report any bugs or feature requests to C<bug-app-hashmake at rt.cpan.org>
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-HashMake>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -471,6 +468,9 @@ L<https://metacpan.org/release/App-HashMake>
 
 
 =head1 ACKNOWLEDGEMENTS
+
+Many thanks to brian d foy for his assistance in building this package so that
+the executable file 'hashmake' actually goes where it's supposed to go.
 
 
 =head1 LICENSE AND COPYRIGHT

@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-SECURITY
 bin/query-worms
 dist.ini
 lib/Net/WoRMS.pm
@@ -15,5 +14,6 @@ meta/Security.org
 t/00-base.t
 t/01-config.t
 t/02-query.t
+t/03-sani.t
 t/author-pod-syntax.t
 t/release-kwalitee.t

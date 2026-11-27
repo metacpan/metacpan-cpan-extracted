@@ -42,7 +42,7 @@ my @c = (
 );
 # Where we differ from coreutils 9.4 on purpose (X21): its %q of a word with a ' and a character it escapes keeps a stale
 # state of gnulib's quotearg when it starts over (fixed in gnulib since): an extra '' at the start, or, when the word
-# starts with an escaped character, no $' before it, so the shell reads it back wrong (❰BUG❱).  Ours: gnulib's fixed rule.
+# starts with an escaped character, no $' before it, so the shell reads it back wrong (❰BUG❱).  ShellSpawn's printf: gnulib's fixed rule.
 my %KNOWN = map { my ($w, $q) = @$_; map +(key(['printf', '%q\n', $w], { LC_ALL => $_ }) => [0, "$q\n", '']), 'C', 'C.UTF-8' }
   ["a'b\n", q{'a'\''b'$'\n'}], ["\x1b'\f", q{''$'\033'\'''$'\f'}];
 { # generated (the same generator as when the module was written, with fewer cases)
@@ -241,9 +241,37 @@ SKIP: { skip 'no * in a file name on Windows', 4 if $WIN;
 # bash, rule E); dash takes the first
 { mkdir "$dir/x54"; mkdir "$dir/x54/d";
   for (['x="d e"; cd $x; echo "st=$?"', "sh: cd: too many arguments\nst=1\n"], ['cd d e; echo "st=$?"', "sh: cd: too many arguments\nst=1\n"],
-       ['cd $(echo d e) && pwd', "sh: cd: too many arguments\n"], ['x=d; cd $x && echo in', "in\n"], ['x=-n; cd $x; echo "st=$?"', "sh: cd: bad argument\nst=2\n"]) {
+       ['cd $(echo d e) && pwd', "sh: cd: too many arguments\n"], ['x=d; cd $x && echo in', "in\n"], ['x=-n; cd $x; echo "st=$?"', "sh: cd: Illegal option -n\nst=2\n"]) {
     my ($s, $out) = @$_; my $f = "$dir/x54-cmd"; open my $h, '>', $f or die; print $h "cd x54; $s"; close $h;
     local $ENV{TRY_FILE} = $f; is scalar(`"$^X" "$try" 2>&1`), $out, "cd with more operands from an expansion (X54): $s" } }
+
+# X80: cd's operands taken apart only after every word is expanded: options from an expansion read as both shells read them
+# (an unknown one, and bash's own -e, refused as dash does), a word expanding to nothing not counted, the words after the
+# first expanded with their effects, then more than one operand an error (as bash, X54)
+{ mkdir "$dir/x80"; mkdir "$dir/x80/d";
+  for (['x="-n d"; cd $x; echo "st=$?"', "sh: cd: Illegal option -n\nst=2\n"],
+       ['x="-P d"; cd $x; echo "st=$? ${PWD##*/}"', "st=0 d\n"], ['x=-P; HOME=$PWD/d; cd $x; echo "st=$? ${PWD##*/}"', "st=0 d\n"],
+       ['x="-- d"; cd $x; echo "st=$? ${PWD##*/}"', "st=0 d\n"], ['x="-e d"; cd $x; echo "st=$?"', "sh: cd: Illegal option -e\nst=2\n"],
+       ['cd $x d; echo "st=$? ${PWD##*/}"', "st=0 d\n"], ['set --; cd d "$@"; echo "st=$? ${PWD##*/}"', "st=0 d\n"],
+       ['cd d $(echo SUBST >&2); echo "st=$?"', "SUBST\nst=0\n"], ['cd d ${u?unset-err}; echo after', "sh: u: unset-err\n"],
+       ['cd d; x="-P -"; cd $x >/dev/null; echo "st=$? ${PWD##*/}"', "st=0 x80\n"], ['x="-- -x"; cd $x; echo "st=$?"', "sh: cd: can't cd to -x\nst=2\n"],
+       ['x=d; cd $x -n; echo "st=$?"', "sh: cd: too many arguments\nst=1\n"]) {
+    my ($s, $out) = @$_; my $f = "$dir/x80-cmd"; open my $h, '>', $f or die; print $h "cd x80; $s"; close $h;
+    local $ENV{TRY_FILE} = $f; is scalar(`"$^X" "$try" 2>&1`), $out, "cd's operands after the expansion (X80): $s" } }
+
+# D3 (TODO A17): a command run inside Perl that dash and bash run as a builtin (echo, printf) and that writes into a pipe whose
+# reader has gone ends the shell running it, as SIGPIPE ends it in the shells: the pipeline element (nothing more of it
+# runs, no EXIT trap), or the main shell; with SIGPIPE ignored the write fails alone and the element goes on
+SKIP: { skip 'no SIGPIPE on Windows', 5 if $WIN;
+  for (['(echo a; sleep 0.3; echo b; echo after >&2) | true; echo "st=$?"', "st=0\n"],
+       ['{ printf "a\\n"; sleep 0.3; printf "b\\n"; echo after >&2; } | true; echo "st=$?"', "st=0\n"],
+       ['f() { echo a; sleep 0.3; echo b; echo after >&2; }; f | true; echo "st=$?"', "st=0\n"],
+       ["trap '' PIPE; (echo a 2>/dev/null; sleep 0.3; echo b 2>/dev/null; echo after >&2) | true", "after\n"]) {
+    my ($s, $out) = @$_; my $f = "$dir/d3-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+    local $ENV{TRY_FILE} = $f; is scalar(`"$^X" "$try" 2>&1`), $out, "SIGPIPE ends the element (D3): $s" }
+  my $f = "$dir/d3-main"; open my $h, '>', $f or die; print $h 'echo a; sleep 0.3; echo b; echo after >&2'; close $h;
+  local $ENV{TRY_FILE} = $f; my $err = "$dir/d3-err"; system qq{"$^X" "$try" 2>"$err" | true};
+  is do { open my $e, '<', $err or die; local $/; <$e> }, '', 'SIGPIPE ends the main shell (D3)' }
 
 # The shell layer: the same strings with the programs (PROC_SHELLSPAWN_INPROC=none) and with these (all, the default), where
 # the programs exist

@@ -2,6 +2,79 @@ Revision history for DBIx-Squirrel
 
 Unreleased
 
+v4.2.0 2026-11-26
+
+    The README, the user guide and the reference each come in two
+    parts, DBIx::Squirrel first, then what Ekorn::Pipeline adds.
+    DBIx::Squirrel::Tooling's tags hold lists of its own, so a newer
+    Ekorn::Pipeline changes nothing a caller imports. Three names come
+    in: is_stop, which tells a stop from any other error; is_stage, in
+    Tooling's :core; and $DBIx::Squirrel::Stages::Taps::DumpSecrets,
+    dump_to's setting by DBIx::Squirrel's name.
+
+    It ships roadmap 2026-0052 to 2026-0056, and 2026-0058 to 2026-0063.
+    Requires Ekorn::Pipeline >= v0.4.3, < v0.5.0, which gives a
+    pipeline's iterator its next.
+
+    - Why. Ekorn::Pipeline began as DBIx::Squirrel's pipeline, and
+      moved into a distribution of its own in 2026, as it was useful,
+      and usable, well beyond database rows. The documents went on
+      telling DBIx::Squirrel's story in its words: keep_all, one of
+      Ekorn::Pipeline's sinks, appeared 29 times in the guide and 25 in
+      the reference, and the README used it more than the iterator's
+      own all. So a reader had to learn both libraries to follow
+      either, and the two read as one. The separation the split began
+      is only now being completed, in the documents first (roadmap
+      2026-0052, 2026-0053).
+    - Part 1 of each document is DBIx::Squirrel, complete in itself:
+      placeholders, the iterator and stages, on handles that are still
+      the DBI's, ending where a reader may stop. It opens with what
+      DBIx::Squirrel is, said without Ekorn::Pipeline, and shows its
+      gains beside plain DBI. Results come from the iterator's own
+      methods. An author test keeps Ekorn::Pipeline's names out of it.
+    - Part 2 is a different job, data crossing the database's edge:
+      query results written to files, JSON and CSV, loaded from them
+      in batches, or sent to several places in one run. It opens, in
+      the guide, with why the two split, and shows the two working
+      together: a function written in Part 1's terms takes Part 2's
+      sinks unchanged (roadmap 2026-0054 to 2026-0056).
+    - Each example in the guide and the reference imports what it
+      uses, from the module that makes it, so it works when copied.
+      An author test checks it.
+    - The guide's account of a missing bind value is corrected: plain
+      DBI fails when a ? has no value, and binds NULL, without a word,
+      only for a placeholder bound by name with bind_param. It gains a
+      JSON recipe, and explains a pipeline's iterator.
+    - DBIx::Squirrel::Tooling's tags hold lists of its own. What a tag
+      of Ekorn::Pipeline's names holds, such as :sinks, was whatever
+      Ekorn::Pipeline::Tooling's held, so a name Ekorn::Pipeline added
+      in a v0.4.x failed t/28-tooling.t as DBIx::Squirrel installed
+      beside it, and needed a release of ours. Now a name it adds
+      comes into a tag only in a release of DBIx::Squirrel that adds
+      it, and one it drops fails as Tooling loads. A caller imports
+      the same names as before (roadmap 2026-0059).
+    - is_stop, from DBIx::Squirrel::Stop on request, and in Tooling's
+      :core, is true of a stop, however it was thrown, and false of any
+      other error, so a stage that catches errors can pass a stop on
+      without naming its class, Ekorn::Pipeline::Stop. The guide's and
+      the reference's catch examples use it (roadmap 2026-0060).
+    - DBIx::Squirrel::Tooling's :core holds is_stage, Ekorn::Pipeline's,
+      so a function finding the stages at the end of its arguments
+      imports it from DBIx::Squirrel, as the reference now shows.
+      Tooling had left it out as for extending, not using (roadmap
+      2026-0061).
+    - $DBIx::Squirrel::Stages::Taps::DumpSecrets, true, has dump_to
+      write each value in full, without redacting secrets. It's
+      Ekorn::Pipeline's setting under DBIx::Squirrel's name, tied to
+      it, so local on either sets both, as callers set Data::Dumper's
+      (roadmap 2026-0062).
+    - Requires Ekorn::Pipeline v0.4.3 or later, below v0.5.0, where it
+      was v0.4.0: its iterator has next, as DBIx::Squirrel's has, so the
+      guide shows one loop that reads either, and the reference's
+      examples use it. The guide's Part 2 links to Ekorn::Pipeline's
+      new way in for readers coming from DBIx::Squirrel (roadmap
+      2026-0063).
+
 v4.1.1 2026-11-26
 
     Documentation only: the reference's index lists the names

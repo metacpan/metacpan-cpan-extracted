@@ -231,7 +231,7 @@ my $vcf_head = "##fileformat=VCFv4.2\n"
 		qr/\nread_table: error: 'row_names' has no meaning for output_type "aoh"/,
 		'... on an exploded VCF as well';
 	throws_ok { read_table($f, sheet => 2) }
-		qr/\nread_table: error: 'sheet' applies only to an \.xlsx, and "\Q$f\E" is not named as one$/,
+		qr/\nread_table: error: 'sheet' applies only to an \.xlsx or an \.ods, and "\Q$f\E" is not named as one$/,
 		'sheet on a CSV';
 	is_deeply read_table($f, sheet => undef), [ { id => 1, v => 2 } ], 'sheet => undef is no sheet';
 }

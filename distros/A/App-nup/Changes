@@ -1,5 +1,14 @@
 Revision history for Perl extension App-nup
 
+1.26 2026-11-27T02:27:59Z
+
+    - New option --column-opts ... -- (--ac) gives options to
+      ansicolumn in both file view and command mode, as
+      "nup --ac --tabstop 4 -- file"
+    - New option -w/--width sets the output width.  It is given to
+      ansicolumn, as -w after the file names was
+    - Require Getopt::Long::Bash 2.1.0
+
 1.25 2026-11-26T09:37:40Z
 
     - On paper (-T), the start of each pane is marked for ansi2pdf by

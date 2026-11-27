@@ -14,6 +14,7 @@ run: dnf module enable nvidia-driver:open-dkms -y 2>/dev/null || true
 run: dnf install -y kernel-devel-matched kernel-headers nvidia-open
 run: rpm -q nvidia-driver 2>&1
 run: rpm -q --qf '%{VERSION}' nvidia-driver 2>&1
+run: rpm -q --qf '%{VERSION}' nvidia-driver 2>&1
 run: dnf install -y nvidia-fabricmanager-580.95.05
 run: rpm -q nvidia-fabricmanager 2>&1
 run: rpm -q --qf '%{VERSION}' nvidia-fabricmanager 2>&1

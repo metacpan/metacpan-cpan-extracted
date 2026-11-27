@@ -18,7 +18,7 @@ BEGIN {
 
 use Exporter ();
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
-$VERSION   = '2.18';
+$VERSION   = '2.19';
 $VERSION   = eval $VERSION;
 @ISA       = qw(Exporter);
 @EXPORT    = qw(mkpath rmtree);
@@ -633,7 +633,7 @@ File::Path - Create or remove directory trees
 
 =head1 VERSION
 
-2.18 - released November 4 2020.
+2.19 - released November 26 2026.
 
 =head1 SYNOPSIS
 
@@ -1211,20 +1211,9 @@ filesystem availability by reading the root of the mounted filesystem.
 
 =head2 REPORTING BUGS
 
-Please report all bugs on the RT queue, either via the web interface:
+Send bug reports and pull requests to the Github repository:
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Path>
-
-or by email:
-
-    bug-File-Path@rt.cpan.org
-
-In either case, please B<attach> patches to the bug report rather than
-including them inline in the web post or the body of the email.
-
-You can also send pull requests to the Github repository:
-
-L<https://github.com/rpcme/File-Path>
+L<https://github.com/jkeenan/File-Path>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -1277,7 +1266,7 @@ Contributors to File::Path, in alphabetical order by first name.
 =head1 COPYRIGHT
 
 This module is copyright (C) Charles Bailey, Tim Bunce, David Landgren,
-James Keenan and Richard Elberger 1995-2020. All rights reserved.
+James Keenan and Richard Elberger 1995-2026. All rights reserved.
 
 =head1 LICENSE
 
@@ -1285,3 +1274,4 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+

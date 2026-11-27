@@ -1,0 +1,30 @@
+# golden: amd/debian-13--rocm-10.1--gfx942
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: cat /etc/os-release 2>/dev/null
+run: dpkg --print-architecture
+run: dpkg-query -W -f='${Package} ${Status} ${Version}\n' rocm-core amdrocm10.1-gfx942 2>/dev/null
+run: cat /etc/apt/sources.list.d/amdrocm-stable.sources 2>/dev/null
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: command -v curl >/dev/null 2>&1
+run: command -v gpg >/dev/null 2>&1
+run: mkdir -p -m 0755 /etc/apt/keyrings && rm -rf /etc/apt/keyrings/amdrocm.gpg.tmp.d && mkdir -m 0700 /etc/apt/keyrings/amdrocm.gpg.tmp.d && curl -fsSL --proto =https https://stable.repo.amd.com/rocm/gpg/packages.gpg -o /etc/apt/keyrings/amdrocm.gpg.tmp.d/key.asc
+run: GNUPGHOME=/etc/apt/keyrings/amdrocm.gpg.tmp.d gpg --batch --with-colons --show-keys /etc/apt/keyrings/amdrocm.gpg.tmp.d/key.asc 2>/dev/null
+run: GNUPGHOME=/etc/apt/keyrings/amdrocm.gpg.tmp.d gpg --batch --yes --dearmor -o /etc/apt/keyrings/amdrocm.gpg.tmp.d/key.gpg /etc/apt/keyrings/amdrocm.gpg.tmp.d/key.asc && test -s /etc/apt/keyrings/amdrocm.gpg.tmp.d/key.gpg && chmod 0644 /etc/apt/keyrings/amdrocm.gpg.tmp.d/key.gpg && mv -f /etc/apt/keyrings/amdrocm.gpg.tmp.d/key.gpg /etc/apt/keyrings/amdrocm.gpg
+run: rm -rf /etc/apt/keyrings/amdrocm.gpg.tmp.d
+run: test -s /etc/apt/keyrings/amdrocm.gpg
+run: printf '%s' 'X-Repo-Id: amdrocm-stable
+Types: deb
+URIs: https://stable.repo.amd.com/rocm/core/packages/debian13/
+Suites: stable
+Components: main
+Architectures: amd64
+Signed-By: /etc/apt/keyrings/amdrocm.gpg
+Enabled: yes
+' > /etc/apt/sources.list.d/amdrocm-stable.sources.tmp && chmod 0644 /etc/apt/sources.list.d/amdrocm-stable.sources.tmp && mv -f /etc/apt/sources.list.d/amdrocm-stable.sources.tmp /etc/apt/sources.list.d/amdrocm-stable.sources
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y libatomic1 libquadmath0 amdrocm10.1-gfx942
+run: dpkg -l libatomic1 2>/dev/null | grep -q '^[hi]i'
+run: dpkg -l libquadmath0 2>/dev/null | grep -q '^[hi]i'
+run: dpkg -l amdrocm10.1-gfx942 2>/dev/null | grep -q '^[hi]i'
+run: dpkg-query -W -f='${Package} ${Status} ${Version}\n' amdrocm10.1-gfx942 2>/dev/null

@@ -1,22 +1,13 @@
 use strict;
 use warnings;
 use Test::More;
-use IO::Socket::INET;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use NatsLive;
 use EV;
 use EV::Nats;
 
-my $host = $ENV{TEST_NATS_HOST} || '127.0.0.1';
-my $port = $ENV{TEST_NATS_PORT} || 4222;
-
-my $sock = IO::Socket::INET->new(
-    PeerAddr => $host,
-    PeerPort => $port,
-    Timeout  => 1,
-);
-unless ($sock) {
-    plan skip_all => "NATS server not available at $host:$port";
-}
-close $sock;
+my ($host, $port) = nats_or_skip();
 
 plan tests => 2;
 
@@ -34,7 +25,7 @@ my $ready; $ready = EV::timer 0.1, 0.1, sub {
     return unless $nats->is_connected;
     undef $ready;
 
-    # request with no responder — should timeout
+    # request with no responder -should timeout
     $nats->request('nonexistent.service', 'hello', sub {
         my ($resp, $err) = @_;
         ok !defined $resp, 'response is undef on timeout';

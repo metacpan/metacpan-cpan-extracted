@@ -66,9 +66,6 @@ DESCRIPTION
   Higher-level APIs
     EV::Nats::JetStream, EV::Nats::KV, EV::Nats::ObjectStore.
 
-    Note: DNS resolution via "getaddrinfo" is blocking. Use numeric IP
-    addresses for latency-sensitive applications.
-
 METHODS
   new
         new(%options)
@@ -156,7 +153,8 @@ METHODS
 
    Reconnect options
     reconnect => Bool (default 0)
-        Enable automatic reconnection.
+        Enable automatic reconnection. A failed initial connect is retried
+        the same way, so a client may start before its server.
 
     reconnect_delay => Int (ms, default 2000)
         Initial delay between reconnect attempts; subsequent attempts use
@@ -187,6 +185,7 @@ METHODS
 
     on_disconnect => sub { }
         Called when the connection drops, before any auto-reconnect attempt.
+        An attempt that never connects reports through "on_error" only.
 
     on_error => sub { my ($err) = @_ }
         Receives a string. If unset, errors "croak".
@@ -214,9 +213,8 @@ METHODS
 
   disconnect
     Cancel any pending reconnect, drop queued writes, close the socket, and
-    fire "on_disconnect". "intentional_disconnect" is set so no
-    auto-reconnect is scheduled. For a clean shutdown that flushes pending
-    writes first, see "drain".
+    fire "on_disconnect". No auto-reconnect is scheduled. For a clean
+    shutdown that flushes pending writes first, see "drain".
 
   is_connected
     True if the CONNECT/PONG handshake has completed and no disconnect or
@@ -225,7 +223,8 @@ METHODS
   publish
         publish($subject, [$payload], [$reply_to])
 
-    Publish a message. Alias: "pub". Croaks on an undef or empty subject.
+    Publish a message. Alias: "pub". Croaks on an undef, empty or over-long
+    subject.
 
         $nats->publish('foo', 'hello');
         $nats->publish('foo', 'hello', 'reply.subject');
@@ -242,7 +241,7 @@ METHODS
         subscribe($subject, $cb, [$queue_group])
 
     Subscribe to a subject. Returns subscription ID. Alias: "sub". Croaks on
-    an undef or empty subject.
+    an undef or empty subject, or one with an empty token ("a..b").
 
         my $sid = $nats->subscribe('foo.*', sub {
             my ($subject, $payload, $reply, $headers) = @_;
@@ -266,10 +265,9 @@ METHODS
   unsubscribe
         unsubscribe($sid, [$max_msgs])
 
-    Unsubscribe. With $max_msgs, the server is told to deliver that many
-    more messages and then drop the subscription. The auto-unsub state is
-    restored on reconnect (so the partial count survives a disconnect).
-    Alias: "unsub".
+    Unsubscribe. With $max_msgs, the subscription ends once that many
+    messages have been delivered in total, at once if they already have. The
+    count survives a reconnect. Alias: "unsub".
 
   request
         request($subject, $payload, $cb, [$timeout_ms])
@@ -287,7 +285,8 @@ METHODS
     message headers (HMSG), a third argument $headers with the raw header
     block is also passed. Error is set on timeout ("request timeout"), no
     responders ("no responders"), or a dropped connection ("disconnected").
-    A $timeout_ms of 0 disables the timeout; the callback then waits
+    A request made while reconnecting waits for the connection. A
+    $timeout_ms of 0 disables the timeout; the callback then waits
     indefinitely.
 
   hrequest
@@ -300,8 +299,9 @@ METHODS
 
     Graceful shutdown: sends UNSUB for all subscriptions, flushes pending
     writes with a PING fence, fires $cb when the server confirms with PONG,
-    then disconnects. No new messages will be received after drain is
-    initiated.
+    then disconnects. Messages already on their way are still delivered, and
+    what their callbacks publish is sent before the disconnect. A later
+    "connect" does not restore the drained subscriptions.
 
     $cb receives a single argument: "undef" on clean drain, or an error
     string (e.g. "disconnected") if the connection dropped before the PONG
@@ -359,8 +359,9 @@ METHODS
         max_payload([$limit])
 
     Server-advertised maximum payload size in bytes. Returns the current
-    value; with an argument, overrides it (publishes above this croak
-    locally before reaching the wire).
+    value; with an argument, overrides it until the server's next INFO
+    (publishes above this croak locally before reaching the wire). Inbound
+    messages may exceed it, as JetStream replies do, up to 64 MiB.
 
   waiting_count
     Number of writes queued locally during connect or reconnect (i.e.
@@ -530,18 +531,14 @@ BUILD-TIME FEATURES
         True if NKey/JWT signing is available (also requires OpenSSL).
 
 BENCHMARKS
-    Measured on Linux with TCP loopback, Perl 5.40, nats-server 2.12,
-    100-byte payloads ("bench/benchmark.pl"):
+    Measured on Linux with TCP loopback, Perl 5.40, 100-byte payloads
+    ("bench/benchmark.pl"):
 
                                     100K msgs    200K msgs
         PUB fire-and-forget         4.7M         5.0M msgs/sec
         PUB + SUB (loopback)        1.8M         1.6M msgs/sec
         PUB + SUB (8B payload)      2.2M         1.9M msgs/sec
-        REQ/REP (pipelined, 64)     334K               msgs/sec
-
-    Connected-path publish appends directly to the write buffer with no
-    per-message allocation. Write coalescing via "ev_prepare" batches all
-    publishes per event-loop iteration into a single write() syscall.
+        REQ/REP (64 in flight)      334K               msgs/sec
 
     Run "perl bench/benchmark.pl" for full results. Set "BENCH_MESSAGES",
     "BENCH_PAYLOAD", "BENCH_HOST", "BENCH_PORT" to customize.
@@ -570,6 +567,9 @@ CAVEATS
     *   The module handles all data as bytes. Encode UTF-8 strings before
         passing them.
 
+    *   A die in a callback leaves "EV::run" once the client has finished
+        handling the event that ran it.
+
     *   Cluster URL discovery (the "connect_urls" field of INFO) is trusted
         by default. On failover the client connects to whatever hostnames
         the previous server advertised, and TLS hostname verification is
@@ -584,8 +584,8 @@ CAVEATS
 
 ENVIRONMENT
     TEST_NATS_HOST, TEST_NATS_PORT
-        Set these to run the test suite against a NATS server (default:
-        127.0.0.1:4222).
+        The live-server tests run only against the server these name;
+        without them they skip.
 
 SEE ALSO
     EV::Nats::JetStream, EV::Nats::KV, EV::Nats::ObjectStore, EV, NATS

@@ -28,13 +28,13 @@
       "configure" : {
          "requires" : {
             "Alien::Base::Wrapper" : "1.97",
-            "Alien::libhisto" : "v0.4.0",
+            "Alien::libhisto" : "v0.4.2",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::libhisto" : "v0.4.0",
+            "Alien::libhisto" : "v0.4.2",
             "Exporter" : "5.57",
             "XSLoader" : "0",
             "perl" : "5.008001"
@@ -57,6 +57,6 @@
          "web" : "https://github.com/tsee/libhisto"
       }
    },
-   "version" : "v0.4.1",
+   "version" : "v0.4.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

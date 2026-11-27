@@ -83,20 +83,101 @@ Tools register on the options object:
 
 =head1 EXAMPLES
 
-Runnable examples are in the repository:
+Runnable examples live in the repository:
 
 =over 4
 
-=item * Consumer starter (allow/deny):
+=item * C<consumer>: install and deny one unsafe call.
 L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/consumer>
 
-=item * Live model:
+=item * C<live-model>: connect a real model.
 L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/live-model>
+
+=item * C<mcp>: connect MCP tools.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/mcp>
+
+=item * C<structured-output>: validate structured output.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/structured-output>
+
+=item * C<streaming>: stream a response.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/streaming>
+
+=item * C<identity-policy>: add identity and policy.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/identity-policy>
+
+=item * C<hitl>: require human approval.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/hitl>
+
+=item * C<checkpoint>: persist checkpoints.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/checkpoint>
+
+=item * C<service>: run behind HTTP.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/service>
+
+=item * C<session-checkpoint>: resume a multi-turn session.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/session-checkpoint>
+
+=item * C<retry>: retry transient failures.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/retry>
+
+=item * C<provider-fallback>: add provider fallback.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/provider-fallback>
+
+=item * C<event-sink>: observe agent events.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/event-sink>
+
+=item * C<representative-chain>: run the representative chain.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/representative-chain>
+
+=item * C<advanced-delegation>: apply governed delegation.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/advanced-delegation>
 
 =item * Full example index:
 L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples>
 
 =back
+
+=head1 SCENARIO TUTORIALS
+
+=over 4
+
+=item * C<community-governance>: fixed synthetic issues produce four classified
+items and a review-only reviewer request. No GitHub API, closure, or
+impersonation.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/Tutorial/community-governance>
+
+=item * C<compliance-tracking>: fixed policy versions yield two changed sections
+and a duplicate removal; Core drafts review-only remediation. No filing, audit
+conclusion, or live source.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/Tutorial/compliance-tracking>
+
+=item * C<localization-draft>: fixed market rules produce a review-only
+localized text draft. No translation engine, CMS, or publication.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/Tutorial/localization-draft>
+
+=item * C<log-triage>: one fixed C<summarize_log> tool reads the tutorial's log
+fixture and returns severity counts.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/Tutorial/log-triage>
+
+=item * C<news-factcheck>: compares fixed source excerpts for one synthetic
+article, cites a contradiction, and drafts a review-only fact-check. No
+truth-verification service.
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/Tutorial/news-factcheck>
+
+=item * Tutorial index:
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/Tutorial>
+
+=back
+
+=head1 REFERENCE APPLICATIONS
+
+No accepted end-to-end reference application is recorded for this language yet.
+Candidate goals are tracked in the Reference Application Portfolio:
+L<https://axisvela.github.io/praxo-core/project/roadmap/#reference-application-portfolio>
+
+Planning context: L<https://axisvela.github.io/praxo-core/getting-started/tutorial-plan/>,
+L<https://axisvela.github.io/praxo-core/getting-started/agent-scenarios/>, and
+L<https://axisvela.github.io/praxo-core/getting-started/tutorial-catalog/>.
 
 =head1 LIMITS
 
@@ -128,6 +209,32 @@ L<https://axisvela.github.io/praxo-core/languages/matrix/>
 
 =item * Registry introduction:
 L<https://github.com/axisvela/praxo-core/blob/main/language/perl/REGISTRY.md>
+
+=back
+
+=head1 COMMUNITY
+
+=over 4
+
+=item * GitHub Discussions: L<https://github.com/axisvela/praxo-core/discussions>
+
+=item * GitHub Issues: L<https://github.com/axisvela/praxo-core/issues>
+
+=item * X: L<https://x.com/axisvela>
+
+=item * Weibo: L<https://weibo.com/u/1936025761>
+
+=item * LinkedIn: L<https://www.linkedin.com/company/axisvela/>
+
+=item * Facebook: L<https://www.facebook.com/profile.php?id=61596905732406>
+
+=item * YouTube: L<https://www.youtube.com/@axisvela>
+
+=item * Discord: L<https://discord.com/channels/1575163993767809064/1575164343148875977>
+
+=item * Documentation: L<https://axisvela.github.io/praxo-core/>
+
+=item * Architect: L<https://axisvela.architect.pub>
 
 =back
 

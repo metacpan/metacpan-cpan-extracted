@@ -11,6 +11,7 @@ run: dnf config-manager --add-repo https://developer.download.nvidia.com/compute
 run: dnf clean expire-cache
 run: dnf install -y kernel-devel-matched kernel-headers kmod-nvidia-open-dkms nvidia-driver nvidia-driver-cuda
 run: rpm -q nvidia-driver 2>&1
+run: rpm -q --qf '%{VERSION}' nvidia-driver 2>&1
 file: /etc/modprobe.d/blacklist-nouveau.conf
   | blacklist nouveau
   | options nouveau modeset=0

@@ -8,11 +8,11 @@ use File::Temp qw(tempdir);
 # Run the examples in docs/HOWTO.md and docs/REFERENCE.md, each document
 # as one program, so they can't drift from the code, and check that each
 # prints what its comments say; those in README.pod are compiled, as the
-# end of this file says. A document's examples share a database,
-# set up by its first, and follow on from each other: the first runs as
-# it is, and each after it in a block of its own, so their names don't
-# clash. An example marked <!-- not run -->, such as a usage synopsis, or
-# one needing a server or driver the tests don't have, is left out.
+# end of this file says. A document's examples share a database, set up by its
+# first, and follow on from each other: the first runs as it is, and
+# each after it in a block of its own, so their names don't clash. An
+# example marked <!-- not run -->, such as a usage synopsis, or one
+# needing a server or driver the tests don't have, is left out.
 #
 # What an example prints is in its comments:
 #
@@ -173,8 +173,7 @@ for my $doc (@DOCS) {
 # name DBIx::Squirrel::Tooling exports, as Ekorn-Pipeline compiles its
 # README's (roadmap 2026-0049). One that isn't Perl is marked
 # =for not-run.
-my $README = 'README.pod';
-if (-e $README) {
+for my $README (grep { -e } qw(README.pod)) {
     subtest $README => sub {
         my @examples = pod_examples($README);
         ok @examples, 'it has examples' or return;
@@ -195,6 +194,76 @@ if (-e $README) {
                 "the example at line $line compiles";
         }
     };
+}
+
+# In the documents, each example imports what it calls, so it works
+# when copied (2026-0054 and 2026-0055, What
+# happened). Running the examples can't show that, as an import in one
+# reaches every one after it, nor compiling them, where a bareword is
+# a string. So each example's calls of the functions DBIx::Squirrel's
+# modules export, Ekorn's through Tooling among them, are checked
+# against what its own use lines import.
+
+# Return the names DBIx::Squirrel's and Ekorn's modules export, as they
+# may be called in an example.
+sub exported_names () {
+    require DBIx::Squirrel::Tooling;
+    require DBIx::Squirrel::Errors;
+    no warnings 'once';
+    return (
+        @DBIx::Squirrel::Tooling::EXPORT_OK,
+        @DBIx::Squirrel::Errors::EXPORT_OK,
+    );
+}
+
+# Return the names a use line imports from a module, given its list.
+sub imported ($module, $list) {
+    return unless eval "require $module; 1";    ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    no strict 'refs';                           ## no critic (TestingAndDebugging::ProhibitNoStrict)
+    my @default = @{ "${module}::EXPORT" };
+    return @default unless defined $list;
+    my %tags = %{ "${module}::EXPORT_TAGS" };
+    return map {
+              $_ eq ':DEFAULT' ? @default
+            : m( \A : (\w+) )x ? @{ $tags{$1} // [] }
+            : $_
+    } split ' ', $list;
+}
+
+# Return what an example calls that it doesn't import.
+sub not_imported ($code, $names) {
+    my %have;
+    while ($code
+        =~ m{ ^ \s* use \s+ ([\w:]+) (?: \s+ qw\( ([^)]*) \) | \s* \(\) )? }xmg)
+    {
+        my($module, $list) = ($1, $2);
+        $list = '' if !defined $list && $& =~ m{ \(\) \z }x;
+        $have{$_} = 1 for imported($module, $list);
+    }
+    my $calls = join "\n", map { s( (?: \A | \s ) \# \s .* \z )()xr }
+        grep { !m{ \A \s* use \s+ [\w:]+ \s+ qw\( }x } split m( \n )x, $code;
+    $calls =~ s( ' (?: [^'\\] | \\. )* ' | " (?: [^"\\] | \\. )* " )('')xg;    # strings
+    return grep {
+        !$have{$_} && $calls =~ m( (?<! [\$\@\%\w>:-] ) \b \Q$_\E \b (?! \s* => ) )x
+    } @$names;
+}
+
+my @IMPORTING = grep { -e } qw(docs/HOWTO.md docs/REFERENCE.md README.pod);
+if (@IMPORTING) {
+    my @names = exported_names();
+    for my $doc (@IMPORTING) {
+        subtest "$doc: each example imports what it calls" => sub {
+            my @found;
+            for
+                my $example ($doc =~ m( \.pod \z )x ? pod_examples($doc) : examples($doc))
+            {
+                my($line, $code) = @$example;
+                my @missing = not_imported($code, \@names);
+                push @found, "line $line: @missing" if @missing;
+            }
+            is \@found, [], 'none calls a function it leaves unimported';
+        };
+    }
 }
 
 done_testing;

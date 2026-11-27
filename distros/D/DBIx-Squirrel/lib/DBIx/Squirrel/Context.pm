@@ -11,7 +11,7 @@ use Ekorn::Pipeline::Context qw();
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v4.1.1';
+our $VERSION = 'v4.2.0';
 
 our @EXPORT_OK = qw(iterator result_number result_original);
 

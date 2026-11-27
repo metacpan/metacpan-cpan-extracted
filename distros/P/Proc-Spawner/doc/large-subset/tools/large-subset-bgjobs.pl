@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # large-subset-bgjobs.pl (post-0.12, K5): the ids of the samples with a background job (an and-or list ending in &, as
-# the parser gives it), one a line: the samples whose result can depend on ours' wait at exit (PROC_SHELLSPAWN_END).
+# the parser gives it), one a line: the samples whose result can depend on ShellSpawn's wait at exit (PROC_SHELLSPAWN_END).
 # Usage: perl -Ilib large-subset-bgjobs.pl samples.jsonl [samples.tsv] > bg.ids
 #   samples.tsv: only the samples the large subset accepts (column large = 1: the ones the runner takes).
 use strict; use warnings; use JSON::PP; use Proc::ShellSubset::Large;

@@ -4330,4 +4330,5 @@ zukatakana;30BA
 ;~
 .notdef;0001
 ~;0
+Digamma;D875 DFCB
 #END

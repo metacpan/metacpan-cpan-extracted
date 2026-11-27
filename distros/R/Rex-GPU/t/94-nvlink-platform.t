@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -56,7 +57,7 @@ use lib "$Bin/lib";
 # -----------------------------------------------------------------------------
 
 use Test::RexGPU::Golden qw(
-  record_host golden_is host_profile gpu_fixture mutating_lines working_driver
+  record_host golden_is host_profile gpu_fixture mutating_lines working_driver dpkg_l
 );
 use Rex::GPU::NVIDIA;
 use Rex::GPU::NVIDIA::Setup;
@@ -65,7 +66,7 @@ use Rex::GPU::NVIDIA::Setup::Ubuntu;
 
 my $IS_ACTIVE  = 'systemctl is-active --quiet nvidia-fabricmanager.service';
 my $SMI_Q      = 'nvidia-smi -q 2>&1';
-my $KEYRING_Q  = q{dpkg -l cuda-keyring 2>/dev/null | grep -q '^ii'};
+my $KEYRING_Q  = q{dpkg -l cuda-keyring 2>/dev/null | grep -q '^[hi]i'};
 my $FABRIC_BAD = qr/^HGX B200\/B300: the NVLink fabric is not up/;
 my $KERNEL_RE  = qr/^HGX B200\/B300: kernel \S+ is older than 5\.17/;
 my $IMEX_RE    = qr/^GB200\/GB300 NVL72 compute tray: multi-node NVLink needs nvidia-imex/;
@@ -119,7 +120,7 @@ my %FM = (
 # the start, the fabric up.
 sub hgx_host {
   my ( $os, %opt ) = @_;
-  my @keyring = $os =~ /^ubuntu/ ? ( [ $KEYRING_Q => '', 1 ] ) : ();
+  my @keyring = $os =~ /^ubuntu/ ? dpkg_l('cuda-keyring' => 'un') : ();
   return host_profile($os, ( map { $_ => $opt{$_} } grep { $_ ne 'responses' } keys %opt ),
     responses => [
       @{ $opt{responses} // [] },
@@ -321,7 +322,7 @@ for my $case (
 #### Ubuntu: cuda-keyring already installed
 
 {
-  my $rec = driver(hgx_host('ubuntu-24.04', responses => [ [ $KEYRING_Q => '', 0 ] ]), @B200);
+  my $rec = driver(hgx_host('ubuntu-24.04', responses => [ dpkg_l('cuda-keyring' => 'ii') ]), @B200);
   is($rec->{error}, undef, 'Ubuntu with cuda-keyring installed: lives');
   ok(!(grep { /rex-gpu-nvlsm|cuda-archive-keyring|install -y --no-upgrade curl/ } @{ $rec->{lines} }),
     '... no key, pin or source of our own');
@@ -440,7 +441,7 @@ is_deeply([ Rex::GPU::NVIDIA::Setup->fabric_state_poll ], [ 12, 10 ], 'default p
     [ 'nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>&1' => join("\n", ('590.48.01') x 8), 0 ],
     [ q{dpkg-query -W -f='${Package} ${db:Status-Abbrev} ${Version}\n' 'nvidia-fabric*manager*' 2>/dev/null}
       => 'nvidia-fabricmanager-590 ii  590.48.01-0ubuntu0.24.04.1', 0 ],
-    [ q{dpkg -l nvlsm 2>/dev/null | grep -q '^ii'} => '', 1 ],
+    dpkg_l('nvlsm' => 'un'),
     [ q{lsmod | grep -q '^ib_umad '} => '', 1 ],
     [ $IS_ACTIVE => '', 3 ],
     [ $SMI_Q => smi_q(( [ 'Not Started', 'N/A' ] ) x 8), 0 ]

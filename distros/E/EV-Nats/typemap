@@ -1,4 +1,7 @@
 TYPEMAP
 
-EV::Nats	T_PTROBJ
-EV::Loop	T_PTROBJ
+EV::Nats	T_NATS
+
+INPUT
+T_NATS
+	$var = nats_self(aTHX_ $arg);

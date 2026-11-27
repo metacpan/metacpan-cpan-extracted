@@ -1,0 +1,91 @@
+# The large subset under Wine: Proc::ShellSpawn on Windows against the base run on Linux, both ways (posix_spawn:
+# win_spawn.h; system1: Perl's own system, through Run).  Wine 9.0, Strawberry Perl 5.38.2.2, Proc-Spawner post-0.12
+# (commit 6c084cc, whose lib/, t/try.pl, win_spawn.h, win_loop.h and Spawner.xs are the base run's); runs of
+# 2026-11-18/19.  Linux: the base run of make corpus-all, 2026-11-17 (corpus-work/run, corpus-work/run-system1).
+# The records, the tables per snippet (cmp-*.tsv, cls-*.tsv, rows-*.tsv), the tools: repository
+# ilyaz-ai/Proc-Spawner-results, proc-spawner/2026-11-19-post-0.12-wine/.  This file is its
+# tables/after-s1-portablegit/regroup.txt (row (s2)'s 15 snippets run again, 2026-11-21, with the runner's
+# environment trimmed: tools/rerun-s2.sh; row (s1)'s 72 with Git for Windows' programs: tools/rerun-s1pg.sh), made
+# by its tools/regroup.pl from those tables and doc/large-subset/tools/large-subset-match.tsv (the project's chance
+# and never-ending snippets) and
+# tables/after-s1-portablegit/linux-varies.tsv (every record of Linux runs of one setup: tools/linux-varies.sh).
+# Rows (pspawn-shell-windows.md, "The large subset under Wine", whose table labels them): same, and M: the same as
+# the Linux runs made where Windows ran (the base run's machine differs), counted with same; paths: the same once
+# Windows paths are written as /x; L: says nothing, Linux itself gives no stable result; S1, S2, S3: differences made
+# by the test setup ((s1) only the Linux runner limits the size of files; (s2) on Linux, PATH holds the runner's
+# recorders; (s3) environment variables only the Windows runs had; S4: (s4) under Wine, Git's programs cannot fork);
+# OS, D, P, G, X, U: differences found on Windows
+# ((a) Windows behaves otherwise; (b) the module's design for Windows; (c) Perl's own system; (d) Git for Windows' kill
+# and comm; (e) a known bug, X71; U: not explained, none); WV: changes from run to run on Windows only (none).  "by row and
+# rule": each row by the check of cls-*.tsv that
+# gave the snippet's cause, and L by why; then where a row's snippets are through the other way.
+
+row                                      posix_spawn     system1
+same                                           39822       39471
+paths                                            357         348
+M                                                 15          13
+L                                                131         131
+S1                                                 3           3
+S2                                                 1           1
+S3                                                 1           0
+S4                                                 1           1
+OS                                                50          46
+D                                                 10          10
+P                                                  0         368
+G                                                 18          17
+X                                                  1           1
+WV                                                 0           0
+U                                                  0           0
+all                                            40410       40410
+check posix_spawn: ok
+check system1: ok
+
+by row and rule (or why):
+D:W-BACKSLASH                                      1           1
+D:W-PWD                                            2           2
+D:W-ULIMIT                                         3           3
+D:W-UMASK                                          3           3
+D:W-WINPATH                                        1           1
+G:G-FD3                                            1           0
+G:G-KILL                                          17          17
+L why:Linux runs differ                           73          73
+L why:project: chance                             45          45
+L why:project: never ends                         13          13
+L:C-CHANCE                                         2           1
+L:C-VARIES                                        37          38
+L:H-DEVFD                                          1           1
+L:H-DOTDOT                                         3           3
+L:H-ELF                                            1           1
+L:H-ENV                                            5           5
+L:H-NOSIGPIPE                                      1           0
+L:H-NOSTREAM                                       2           2
+L:P-ARGV                                           0           1
+L:T-timeout-both                                  13          14
+L:T-timeout-linux                                  1           2
+L:T-timeout-win                                    2           0
+L:same                                            61          61
+L:same-paths                                       2           2
+M:C-MACHINE                                       15          13
+OS:H-ELF                                          18          16
+OS:H-WINEFS                                       12          12
+OS:W-ARGMAX                                        2           0
+OS:W-CASE                                          5           5
+OS:W-DIRREDIR                                      1           1
+OS:W-FILENAME                                      1           1
+OS:W-LSMETA                                        4           4
+OS:W-NOLDSO                                        1           1
+OS:W-NULDEV                                        1           1
+OS:W-PATHSEP                                       3           3
+OS:W-STICKY                                        2           2
+P:P-ARGV                                           0         363
+P:P-ENOENT                                         0           2
+P:P-SYS1FD                                         0           3
+S1:H-NOFSIZE                                       3           3
+S2:H-DOTSOURCE                                     1           1
+S3:H-ENV                                           1           0
+S4:H-NOFORK                                        1           1
+X:B-X71                                            1           1
+
+where the snippets of a row in one way are in the other (rows of the other way; same: the same or paths there):
+posix_spawn -> system1: G -> P 1, M -> P 1, M -> same 1, OS -> P 4, S3 -> P 1
+system1 -> posix_spawn: P -> G 1, P -> M 1, P -> OS 4, P -> S3 1, P -> same 361

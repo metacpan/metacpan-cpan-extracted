@@ -1,0 +1,30 @@
+# golden: amd/rhel-9--dkms--mi300x--repoquery-failed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: cat /proc/cmdline 2>/dev/null
+run: grep -rsHE --include='*.conf' '^[[:space:]]*(blacklist[[:space:]]+amdgpu|install[[:space:]]+amdgpu[[:space:]]+(/usr)?/bin/(false|true))([[:space:]]|$)' /etc/modprobe.d /run/modprobe.d /usr/lib/modprobe.d /lib/modprobe.d 2>/dev/null
+run: uname -m
+run: uname -r
+run: od -An -tu1 -j4 -N1 /sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c 2>/dev/null
+run: cat /etc/yum.repos.d/amdgpu.repo 2>/dev/null
+run: dkms status -m amdgpu -k 5.14.0-570.12.1.el9_6.x86_64 2>&1
+run: command -v curl >/dev/null 2>&1
+run: command -v gpg >/dev/null 2>&1
+run: mkdir -p -m 0755 /etc/pki/rpm-gpg && rm -rf /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm.tmp.d && mkdir -m 0700 /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm.tmp.d && curl -fsSL --proto =https https://repo.radeon.com/rocm/rocm.gpg.key -o /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm.tmp.d/key.asc
+run: GNUPGHOME=/etc/pki/rpm-gpg/RPM-GPG-KEY-rocm.tmp.d gpg --batch --with-colons --show-keys /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm.tmp.d/key.asc 2>/dev/null
+run: chmod 0644 /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm.tmp.d/key.asc && mv -f /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm.tmp.d/key.asc /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm && rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm
+run: rm -rf /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm.tmp.d
+run: test -s /etc/pki/rpm-gpg/RPM-GPG-KEY-rocm
+run: printf '%s' '[amdgpu]
+name=amdgpu
+baseurl=https://repo.radeon.com/amdgpu/31.60/el/9/main/x86_64/
+enabled=1
+priority=50
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rocm
+' > /etc/yum.repos.d/amdgpu.repo.tmp && chmod 0644 /etc/yum.repos.d/amdgpu.repo.tmp && mv -f /etc/yum.repos.d/amdgpu.repo.tmp /etc/yum.repos.d/amdgpu.repo
+run: rpm -q kernel-headers-5.14.0-570.12.1.el9_6.x86_64 2>&1
+run: dnf -q repoquery --available kernel-headers-5.14.0-570.12.1.el9_6.x86_64 2>&1
+DIE: install_driver: looking up kernel-headers-5.14.0-570.12.1.el9_6.x86_64 with dnf failed (Error: Failed to download metadata for repo 'amdgpu': Cannot download repomd.xml: Cannot download repodata/repomd.xml: All mirrors were tried). No driver package was installed

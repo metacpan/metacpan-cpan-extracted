@@ -1,8 +1,7 @@
 package EV::Nats::JetStream;
 use strict;
 use warnings;
-our $VERSION = '0.07';
-use EV;
+our $VERSION = '0.09';
 use JSON::PP ();
 
 sub new {
@@ -20,113 +19,297 @@ sub new {
     }, $class;
 }
 
-sub _api {
-    my ($self, $subj, $payload, $cb) = @_;
-    $payload //= '';
-    $self->{nats}->request(
-        "$self->{prefix}.$subj",
-        $payload, $cb, $self->{timeout},
-    );
+# the same client with another request timeout; the direct-get cache is shared
+sub with_timeout {
+    my ($self, $ms) = @_;
+    return $self if !$ms || $ms == $self->{timeout};
+    return bless { %$self, direct => ($self->{direct} //= {}), timeout => $ms }, ref $self;
 }
 
-## Public to sibling modules (KV, ObjectStore, ...) -- not part of the user
-## API. Decode a JSON string; returns ($decoded, $error_or_undef) where
-## $error already includes a "JSON decode error: ..." prefix when set.
-## Gates on $@ so falsy-but-valid JSON (null/0/false/empty-string) doesn't
-## get misreported as a decode failure.
+my $JSON = eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->new }
+        || eval { require JSON::XS; JSON::XS->new }
+        || JSON::PP->new;
+$JSON->utf8->allow_nonref;
+
 sub decode_json_or_error {
     my ($json) = @_;
     local $@;
-    my $r = eval { JSON::PP::decode_json($json) };
+    my $r = eval { $JSON->decode($json) };
     return ($r, undef) unless $@;
     return (undef, "JSON decode error: $@");
 }
 
-## Public to sibling modules. True if a STREAM.MSG.GET response message
-## carries a KV-Operation: DEL or PURGE tombstone header. $msg is the
-## decoded {message} hash; its {hdrs} field is base64-encoded by the server.
 sub msg_is_tombstone {
     my ($msg) = @_;
-    return 0 unless $msg && $msg->{hdrs};
-    require MIME::Base64;
-    my $hdrs = MIME::Base64::decode_base64($msg->{hdrs});
-    return $hdrs =~ /KV-Operation:\s*(?:DEL|PURGE)/i ? 1 : 0;
+    return 0 unless $msg && defined $msg->{headers};
+    # or a server TTL marker (nats-server 2.11+), as nats.go reads it
+    return $msg->{headers} =~ /KV-Operation:\s*(?:DEL|PURGE)|Nats-Marker-Reason:\s*(?:MaxAge|Purge|Remove)/i
+        ? 1 : 0;
 }
 
-sub _json_api {
+sub json_api {
     my ($self, $subj, $data, $cb) = @_;
     my $payload = defined $data ? JSON::PP::encode_json($data) : '';
-    $self->_api($subj, $payload, $self->_decoded($cb));
+    $self->{nats}->request("$self->{prefix}.$subj", $payload, $self->decoded($cb), $self->{timeout});
 }
 
-## Public to sibling modules. A request callback that decodes the JSON
-## reply for $cb and turns an API error object into an error string.
-sub _decoded {
+# a request callback decoding the reply for $cb; API errors become strings
+sub decoded {
     my ($self, $cb) = @_;
     return sub {
         my ($resp, $err) = @_;
-        return $cb->(undef, $err) if $err;
+        return $cb->(undef, $err, $self->err_status($err)) if $err;
         my ($decoded, $derr) = decode_json_or_error($resp);
         return $cb->(undef, $derr) if $derr;
-        my $e = $decoded->{error};
+        my $e = ref $decoded eq 'HASH' ? $decoded->{error} : undef;
         return $cb->(undef, "$e->{description} (code $e->{code})", $self->{with_status} ? $e : ())
             if $e;
         $cb->($decoded, undef);
     };
 }
 
-sub _defer {
+sub err_status {
+    my ($self, $err) = @_;
+    return $self->{with_status} && $err eq 'no responders' ? ({ code => 503, description => '' }) : ();
+}
+
+sub later {
     my ($nats, $code) = @_;
     my $t;
-    $t = $nats->_timer(0, 0, sub { undef $t; $code->() });
+    $t = $nats->timer(0, 0, sub { undef $t; $code->() });
     return;
 }
 
-# Stream management
+# report a croak through $cb on the next loop iteration
+sub fail_later {
+    my ($nats, $cb, $err) = @_;
+    $err = 'not connected' unless defined $err && length $err;
+    $err =~ s/ at \S+ line \d+.*//s;
+    $err =~ s/\n\z//;
+    later($nats, sub { $cb->(undef, $err) });
+}
+
+# the subjects under $prefix that hold messages, without the prefix; the
+# server pages them, 100k per reply
+sub subjects_under {
+    my ($self, $stream, $prefix, $cb) = @_;
+    my $plen = length $prefix;
+    $self->offset_pages(sub {
+        my ($offset, $done) = @_;
+        $self->stream_info($stream, { subjects_filter => "$prefix>", ($offset ? (offset => $offset) : ()) }, sub {
+            my ($info, $err) = @_;
+            return $cb->(undef, $err) if $err;
+            $done->($info, $info->{total},
+                map { [ $_, substr $_, $plen ] } grep { substr($_, 0, $plen) eq $prefix }
+                sort keys %{ $info->{state}{subjects} || {} });
+        });
+    }, sub { $cb->($_[0], undef) });
+}
+
+my $RELIST = 3;   # list again from the start at most this often, then settle
+
+# The API pages a name-sorted list by offset, so an entry created or deleted
+# ahead of the offset between two requests shifts the next page. Each later
+# page is asked one entry early: when it does not start with the last entry
+# held, the list moved and is read again. Past $RELIST, plain offsets finish
+# it without duplicates. $fetch->($offset, $done) answers
+# $done->($resp, $total, [$name, $item]...) in server order, or reports an
+# error itself; $cb gets ([$item...], $last_resp).
+sub offset_pages {
+    my ($self, $fetch, $cb, $st) = @_;
+    $st //= { items => [], seen => {}, relists => 0, offset => undef };
+    my $items = $st->{items};
+    my $offset = $st->{offset} // (@$items ? @$items - 1 : 0);
+    $fetch->($offset, sub {
+        my ($resp, $total, @page) = @_;
+        my $had = @$items;
+        if ($had && !defined $st->{offset}) {
+            if (@page && $page[0][0] eq $items->[-1][0]) {
+                shift @page;
+            } elsif ($st->{relists}++ < $RELIST) {
+                @$items = ();
+                %{ $st->{seen} } = ();
+                return $self->offset_pages($fetch, $cb, $st);
+            } else {
+                $st->{offset} = $offset;
+            }
+        }
+        $st->{offset} += @page if defined $st->{offset};
+        push @$items, grep { !$st->{seen}{ $_->[0] }++ } @page;
+        my $more = defined $st->{offset} ? @page && $st->{offset} < ($total // 0)
+                                         : @$items > $had && @$items < ($total // 0);
+        return $self->offset_pages($fetch, $cb, $st) if $more;
+        $cb->([ map { $_->[1] } @$items ], $resp);
+    });
+}
+
+# remember a stream's allow_direct from any reply carrying its config
+sub noting_direct {
+    my ($self, $name, $cb) = @_;
+    return sub {
+        $self->{direct}{$name} = $_[0]{config}{allow_direct} ? 1 : 0
+            if ref $_[0] eq 'HASH' && $_[0]{config};
+        $cb->(@_);
+    };
+}
 
 sub stream_create {
     my ($self, $config, $cb) = @_;
     my $name = $config->{name} || die "stream name required";
-    $self->_json_api("STREAM.CREATE.$name", $config, $cb);
+    $self->json_api("STREAM.CREATE.$name", $config, $self->noting_direct($name, $cb));
 }
 
 sub stream_update {
     my ($self, $config, $cb) = @_;
     my $name = $config->{name} || die "stream name required";
-    $self->_json_api("STREAM.UPDATE.$name", $config, $cb);
+    $self->json_api("STREAM.UPDATE.$name", $config, $self->noting_direct($name, $cb));
+}
+
+# A KV or ObjectStore bucket made before allow_direct differs from $config
+# only there: turn it on, keeping the stream's other settings, as nats.go
+# does. A difference in a field the bucket sets is still refused. The
+# server leaves false booleans out of the config it reports, and these
+# limits when unset.
+my %BUCKET_DEFAULT = (max_bytes => -1, max_age => 0, num_replicas => 1);
+
+sub create_bucket_stream {
+    my ($self, $config, $cb) = @_;
+    $self->stream_create($config, sub {
+        my ($info, $err) = @_;
+        return $cb->($info, $err) unless $err && $err =~ /already in use with a different configuration/i;
+        $self->stream_info($config->{name}, sub {
+            my $have = $_[0] && $_[0]{config} or return $cb->(undef, $err);
+            for my $k (grep { $_ ne 'allow_direct' } keys %$config, keys %BUCKET_DEFAULT) {
+                my ($x, $y) = map {
+                    ref($_) eq 'ARRAY' ? join("\0", @$_) : ref($_) || !defined($_) ? ($_ ? 1 : 0) : "$_"
+                } map { $_->{$k} // $BUCKET_DEFAULT{$k} } $have, $config;
+                return $cb->(undef, $err) if $x ne $y;
+            }
+            $self->stream_update({ %$have, allow_direct => JSON::PP::true() }, sub { $cb->(@_[0, 1]) });
+        });
+    });
 }
 
 sub stream_delete {
     my ($self, $name, $cb) = @_;
-    $self->_json_api("STREAM.DELETE.$name", undef, $cb);
+    delete $self->{direct}{$name};
+    $self->json_api("STREAM.DELETE.$name", undef, $cb);
 }
 
 sub stream_info {
     my ($self, $name, @rest) = @_;
     my $cb   = pop @rest;
     my $opts = $rest[0];
-    $self->_json_api("STREAM.INFO.$name", $opts, $cb);
+    $self->json_api("STREAM.INFO.$name", $opts, $self->noting_direct($name, $cb));
+}
+
+# $leader: read through the stream leader. A Direct Get may be answered by
+# a replica that has not applied the latest write yet.
+sub get_msg {
+    my ($self, $stream, $opts, $cb, $leader) = @_;
+    return $self->get_msg_using($stream, $opts, 0, $cb) if $leader;
+    my $direct = $self->{direct}{$stream};
+    return $self->get_msg_using($stream, $opts, $direct, $cb) if defined $direct;
+    my $waiting = $self->{direct_wait}{$stream} //= [];
+    push @$waiting, [$opts, $cb];
+    return if @$waiting > 1;
+    my $asked = eval {
+        $self->stream_info($stream, sub {
+            my ($info, $err) = @_;
+            for (@{ delete $self->{direct_wait}{$stream} }) {
+                my ($o, $c) = @$_;
+                $err ? $c->(undef, $err) : $self->get_msg_using($stream, $o, $self->{direct}{$stream}, $c);
+            }
+        });
+        1;
+    };
+    return if $asked;
+    delete $self->{direct_wait}{$stream};
+    die $@;
+}
+
+sub get_msg_using {
+    my ($self, $stream, $opts, $direct, $cb) = @_;
+    if ($direct) {
+        return $self->direct_get($stream, $opts, sub {
+            my ($msg, $err) = @_;
+            return $cb->($msg, $err) unless defined $err && $err eq 'no responders';
+            $self->{direct}{$stream} = 0;
+            $self->get_msg_using($stream, $opts, 0, $cb);
+        });
+    }
+    $self->json_api("STREAM.MSG.GET.$stream", $opts, sub {
+        my ($resp, $err) = @_;
+        if ($err) {
+            return $cb->(undef, undef) if $err =~ /no message found|\(code 10037\)/;
+            return $cb->(undef, $err);
+        }
+        my $m = $resp->{message} or return $cb->(undef, undef);
+        require MIME::Base64;
+        $cb->({
+            subject => $m->{subject},
+            seq     => $m->{seq},
+            time    => $m->{time},
+            data    => MIME::Base64::decode_base64($m->{data} // ''),
+            headers => defined $m->{hdrs} ? MIME::Base64::decode_base64($m->{hdrs}) : undef,
+        }, undef);
+    });
+}
+
+sub direct_get {
+    my ($self, $stream, $opts, $cb) = @_;
+    $self->{nats}->request("$self->{prefix}.DIRECT.GET.$stream", JSON::PP::encode_json($opts), sub {
+        my ($data, $err, $hdr) = @_;
+        return $cb->(undef, $err, $self->err_status($err)) if $err;
+        $hdr //= '';
+        if ($hdr =~ m{\ANATS/1\.0 (\d{3})(?: ([^\r\n]*))?}) {
+            my ($code, $desc) = ($1, $2 // '');
+            return $cb->(undef, undef) if $code == 404;
+            return $cb->(undef, "direct get failed: NATS/1.0 $code" . (length $desc ? " $desc" : ''),
+                $self->{with_status} ? ({ code => 0 + $code, description => $desc }) : ());
+        }
+        my %nats_hdr = map { /\ANats-([\w-]+):\s*(.*)\z/i ? (lc $1 => $2) : () } split /\r\n/, $hdr;
+        $cb->({
+            subject => $nats_hdr{subject},
+            seq     => defined $nats_hdr{sequence} ? 0 + $nats_hdr{sequence} : undef,
+            time    => $nats_hdr{'time-stamp'},
+            data    => $data,
+            headers => $hdr,
+        }, undef);
+    }, $self->{timeout});
 }
 
 sub stream_list {
     my ($self, $cb) = @_;
-    $self->_json_api("STREAM.LIST", undef, $cb);
+    $self->all_pages("STREAM.LIST", 'streams', $cb);
+}
+
+# the API pages its lists (256 per reply): one reply with every page merged
+sub all_pages {
+    my ($self, $subj, $key, $cb) = @_;
+    $self->offset_pages(sub {
+        my ($offset, $done) = @_;
+        $self->json_api($subj, $offset ? { offset => $offset } : undef, sub {
+            my ($resp, $err) = @_;
+            return $cb->(@_) if $err;
+            $done->($resp, $resp->{total},
+                map { [ $_->{name} // $_->{config}{name} // '', $_ ] } @{ $resp->{$key} || [] });
+        });
+    }, sub {
+        my ($items, $resp) = @_;
+        $cb->({ %$resp, $key => $items, offset => 0, limit => scalar @$items }, undef);
+    });
 }
 
 sub stream_purge {
     my ($self, $name, $cb) = @_;
-    $self->_json_api("STREAM.PURGE.$name", undef, $cb);
+    $self->json_api("STREAM.PURGE.$name", undef, $cb);
 }
 
-# Fetch a single message from a stream by sequence, last-by-subject, or
-# next-by-subject. \%opts is passed verbatim as the request body
-# (server accepts: seq, last_by_subj, next_by_subj).
 sub stream_msg_get {
     my ($self, $stream, $opts, $cb) = @_;
-    $self->_json_api("STREAM.MSG.GET.$stream", $opts, $cb);
+    $self->json_api("STREAM.MSG.GET.$stream", $opts, $cb);
 }
-
-# Consumer management
 
 sub consumer_create {
     my ($self, $stream, $config, $cb) = @_;
@@ -134,34 +317,32 @@ sub consumer_create {
     my $subj = $name
         ? "CONSUMER.CREATE.$stream.$name"
         : "CONSUMER.CREATE.$stream";
-    $self->_json_api($subj, { stream_name => $stream, config => $config }, $cb);
+    $self->json_api($subj, { stream_name => $stream, config => $config }, $cb);
 }
 
 sub consumer_delete {
     my ($self, $stream, $consumer, $cb) = @_;
-    $self->_json_api("CONSUMER.DELETE.$stream.$consumer", undef, $cb);
+    $self->json_api("CONSUMER.DELETE.$stream.$consumer", undef, $cb);
 }
 
 sub consumer_info {
     my ($self, $stream, $consumer, $cb) = @_;
-    $self->_json_api("CONSUMER.INFO.$stream.$consumer", undef, $cb);
+    $self->json_api("CONSUMER.INFO.$stream.$consumer", undef, $cb);
 }
 
 sub consumer_list {
     my ($self, $stream, $cb) = @_;
-    $self->_json_api("CONSUMER.LIST.$stream", undef, $cb);
+    $self->all_pages("CONSUMER.LIST.$stream", 'consumers', $cb);
 }
-
-# Publishing with ack
 
 sub js_publish {
     my ($self, $subject, $payload, $cb) = @_;
-    $self->{nats}->request($subject, $payload, $self->_decoded($cb), $self->{timeout});
+    $self->{nats}->request($subject, $payload, $self->decoded($cb), $self->{timeout});
 }
 
 sub js_publish_h {
     my ($self, $subject, $headers, $payload, $cb) = @_;
-    $self->{nats}->hrequest($subject, $headers, $payload, $self->_decoded($cb), $self->{timeout});
+    $self->{nats}->hrequest($subject, $headers, $payload, $self->decoded($cb), $self->{timeout});
 }
 
 # The server serves a pull until it expires even after a cancel or a
@@ -169,8 +350,9 @@ sub js_publish_h {
 sub fetch {
     my ($self, $stream, $consumer, $opts, $cb) = @_;
     $opts //= {};
-    my $batch      = $opts->{batch}   || 1;
-    my $expires_ns = $opts->{expires} || 5_000_000_000;
+    # numified: JSON::PP sends a string the server rejects for an integer
+    my $batch      = 0 + ($opts->{batch}   || 1);
+    my $expires_ns = 0 + ($opts->{expires} || 5_000_000_000);
     my $no_wait    = $opts->{no_wait} ? 1 : 0;
     my $wait = $no_wait ? $self->{timeout} / 1000 : $expires_ns / 1e9 + 1;
 
@@ -185,7 +367,7 @@ sub fetch {
         return unless $timer;
         $timer->stop;
         undef $timer;
-        $nats->_unwatch_disconnect($watch) if defined $watch;
+        $nats->unwatch_disconnect($watch) if defined $watch;
         undef $watch;
         eval { $nats->unsubscribe($sid) };
     };
@@ -237,15 +419,15 @@ sub fetch {
         die $err;
     }
 
-    $timer = $nats->_timer($wait, 0, sub {
+    $timer = $nats->timer($wait, 0, sub {
         $close->();
         $answer->([splice @messages]);
     });
-    $watch = $nats->_watch_disconnect(sub {
+    $watch = $nats->watch_disconnect(sub {
         undef $watch;
         return if $answered++;
         my @undelivered = splice @messages;
-        _defer($nats, sub {
+        later($nats, sub {
             $nak->(@undelivered);
             $cb->(undef, 'disconnected') unless $cancelled;
         });
@@ -258,25 +440,44 @@ sub fetch {
     }, 'EV::Nats::JetStream::Fetch';
 }
 
-sub ack         { $_[0]->_ack_reply($_[1], '+ACK') }
-sub in_progress { $_[0]->_ack_reply($_[1], '+WPI') }
+sub ack         { $_[0]->ack_reply($_[1], '+ACK') }
+sub in_progress { $_[0]->ack_reply($_[1], '+WPI') }
 
 sub nak {
     my ($self, $msg, $delay) = @_;
-    return $self->_ack_reply($msg, '-NAK') unless defined $delay;
+    return $self->ack_reply($msg, '-NAK') unless defined $delay;
     die "invalid nak delay '$delay'" unless $delay =~ /\A[0-9]+\z/;
-    $self->_ack_reply($msg, qq{-NAK {"delay":$delay}});
+    $self->ack_reply($msg, qq{-NAK {"delay":$delay}});
 }
 
 sub term {
     my ($self, $msg, $reason) = @_;
-    $self->_ack_reply($msg, defined $reason && length $reason ? "+TERM $reason" : '+TERM');
+    $self->ack_reply($msg, defined $reason && length $reason ? "+TERM $reason" : '+TERM');
 }
 
-sub _ack_reply {
-    my ($self, $msg, $body) = @_;
+sub ack_sync {
+    my ($self, $msg, $cb, $timeout_ms) = @_;
+    my $reply = reply_of($msg);
+    my $sent = eval {
+        $self->{nats}->request($reply, '+ACK', sub { $cb->($_[1] ? (undef, $_[1]) : (1, undef)) },
+            $timeout_ms // $self->{timeout});
+        1;
+    };
+    return 1 if $sent;
+    fail_later($self->{nats}, $cb, $@);
+    return 0;
+}
+
+sub reply_of {
+    my ($msg) = @_;
     my $reply = ref $msg ? $msg->{reply} : $msg;
     die "message has no reply subject" unless defined $reply && length $reply;
+    return $reply;
+}
+
+sub ack_reply {
+    my ($self, $msg, $body) = @_;
+    my $reply = reply_of($msg);
     return eval { $self->{nats}->publish($reply, $body); 1 } ? 1 : 0;
 }
 
@@ -339,7 +540,8 @@ All methods are async. Callbacks fire on the L<EV> loop.
 With C<with_status>, callbacks receive a third argument when the server
 reported a status: a JetStream API error's object,
 C<< { code => 404, err_code => 10014, description => 'consumer not found' } >>,
-or the status that ended a L</fetch>.
+C<< { code => 503, description => '' } >> for C<"no responders">, or the status that ended
+a L</fetch>.
 
 =head2 Stream management
 
@@ -374,7 +576,7 @@ without it the server omits that field for performance.
 
     stream_list($cb)
 
-List all streams' info.
+List all streams' info, every page of the API's reply merged.
 
 =head3 stream_purge
 
@@ -393,7 +595,29 @@ Fetch a single message from C<$stream>. C<\%opts> selects the message:
     { next_by_subj => $subject, seq => $start }  # next at-or-after $start
 
 The message body and headers in the response are base64-encoded
-under C<< $resp->{message}{data} >> and C<< $resp->{message}{hdrs} >>.
+under C<< $resp->{message}{data} >> and C<< $resp->{message}{hdrs} >>,
+so a message larger than about 3/4 of C<max_payload> cannot be read
+this way; see L</direct_get>.
+
+=head3 direct_get
+
+    direct_get($stream, \%opts, $cb)
+
+Fetch a single message with Direct Get, from a stream created with
+C<< allow_direct => true >>. Any replica may answer, so on a replicated
+stream the result can trail a write that came just before.
+C<\%opts> selects the message as for L</stream_msg_get>. Callback:
+C<($msg, $err)>, with C<$msg>
+
+    {
+        subject => 'orders.new',
+        seq     => 42,
+        time    => '2026-11-26T11:36:54.412Z',
+        data    => '...',     # raw bytes
+        headers => "...",     # raw NATS/1.0 block, Nats-* headers included
+    }
+
+or C<undef> for a missing message.
 
 =head2 Consumer management
 
@@ -416,6 +640,8 @@ ack semantics.
 =head3 consumer_list
 
     consumer_list($stream, $cb)
+
+Every page of the API's reply merged, as for L</stream_list>.
 
 =head2 Publishing and fetching
 
@@ -478,7 +704,8 @@ stream or consumer may get no answer at all: the fetch then ends with an
 empty batch.
 
 Returns a handle: C<< $fetch->cancel >> ends the fetch without calling
-C<$cb>; messages that still arrive for the pull are C<-NAK>ed.
+C<$cb>; messages that still arrive for the pull before it expires are
+C<-NAK>ed.
 
 =head3 ack
 
@@ -507,30 +734,16 @@ true once the acknowledgement is sent or queued, or false when it
 cannot be (C<$@> holds why). They die on a message without a reply
 subject.
 
-=head1 INTERNAL
+=head3 ack_sync
 
-These are exposed for sibling modules (L<EV::Nats::KV>,
-L<EV::Nats::ObjectStore>) -- not part of the end-user API and subject
-to change.
+    ack_sync($msg, $cb, [$timeout_ms])
 
-=head2 decode_json_or_error
-
-    decode_json_or_error($json)
-
-Decode C<$json>. Returns C<($decoded, $error_or_undef)>; the error
-string already includes a C<"JSON decode error: "> prefix when set.
-Gates on C<$@> so falsy-but-valid JSON (C<null>, C<0>, C<false>,
-empty string) is reported as a clean decode rather than a failure.
-
-=head2 msg_is_tombstone
-
-    msg_is_tombstone($msg)
-
-True if a C<STREAM.MSG.GET> response message carries a
-C<KV-Operation: DEL> or C<KV-Operation: PURGE> header. C<$msg> is the
-decoded C<message> hash from the response. Used by L<EV::Nats::KV>
-and L<EV::Nats::ObjectStore> to surface deleted/purged entries as
-clean misses rather than as malformed payloads.
+Acknowledge and wait for the server to confirm it applied the ack.
+Callback: C<($ok, $err)>; C<$err> is C<"request timeout"> when nothing
+answers (e.g. a server in lame duck mode, or a consumer that is gone),
+C<"no responders"> for a gone consumer when the connection has
+C<no_responders> enabled, or C<"disconnected">. C<$timeout_ms> defaults
+to the JetStream C<timeout>.
 
 =head1 SEE ALSO
 

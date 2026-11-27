@@ -1,5 +1,5 @@
 package Proc::ShellSubset::Small;  # Proc::ShellSubset with its options frozen (see doc/parsers/shell-subset-spec.md, section 9)
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use strict; use warnings;
 
 # Proc::ShellSubset::Small::parse($string) returns a List, or { error => '...', pos => N, last => N, tree => List }:
@@ -124,7 +124,8 @@ sub simple {
   if ($n eq 'exec') {
     shift @av; my $xp = shift @ap;
     @av or E("'exec' without a command", $p0);
-    E("unsupported 'exec' form", $ap[0]) if ref($av[0]) || $av[0] =~ /^-|^(?:cd|:|exit)\z/;
+    E("unsupported 'exec' form", $ap[0]) if ref($av[0]) || $av[0] =~ /^-|^(?:cd|:|exit|read|break|continue|exec)\z/
+      || $BI{$av[0]};   # X56: no exec of a builtin (V7): the shells look only for a program there, and find none
     $c->{exec} = P($xp) }   # its position, until xc() has checked it and made it 1
   else {
     E("keyword '$n'", $ap[0]) if $KW{$n} && $kw eq $n;

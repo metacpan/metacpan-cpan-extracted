@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -17,8 +18,11 @@ use Test::More;
 # claims below are kept, asserted on the plan now). With os/release/arch/
 # kernel injected into new() the plan reads nothing from the host, so it is
 # unit-testable offline. Claims asserted:
-#   * non-Blackwell GPU or no GPU => $plan->{cuda_repo} undef => the unchanged
-#     Debian non-free path, whatever the release or architecture
+#   * GPU without a branch bound or no GPU => $plan->{cuda_repo} undef => the
+#     unchanged Debian non-free path, whatever the release or architecture
+#   * a GPU with a branch floor (Ada and Hopper 520+, single later IDs; karr
+#     #107) takes non-free where the release's branch reaches the floor, the
+#     CUDA repo on Debian 12/13 where it does not, and dies elsewhere
 #   * Blackwell on Debian 12/13 amd64/arm64 => the right repo + package set
 #   * Blackwell on any other release/arch => dies (fail loud, before any
 #     host change) rather than falling back to a driver that cannot bind
@@ -51,6 +55,11 @@ my $b200    = { name => 'GB100 [B200]', vendor => 'nvidia',
                 pci_class => '0302', compute => 1, device_id => '2901' };
 my $rtx4000 = { name => 'AD104GL [RTX 4000 SFF Ada Generation]', vendor => 'nvidia',
                 pci_class => '0302', compute => 1, device_id => '27b0' };
+# k107: Ampere without a branch bound; RTX 4070 SUPER first listed in 550
+my $a100    = { name => 'GA100 [A100 SXM4 40GB]', vendor => 'nvidia',
+                pci_class => '0302', compute => 1, device_id => '20b0' };
+my $rtx4070s = { name => 'AD104 [GeForce RTX 4070 SUPER]', vendor => 'nvidia',
+                 pci_class => '0300', compute => 1, device_id => '2783' };
 
 subtest 'non-Blackwell / no GPU => undef (Debian non-free path unchanged)' => sub {
   is(repo($rtx4000, '12.11', 'amd64'), undef, 'RTX 4000 Ada on Debian 12 => undef');
@@ -58,9 +67,20 @@ subtest 'non-Blackwell / no GPU => undef (Debian non-free path unchanged)' => su
   is(repo(undef,    '13.1',  'amd64'), undef, 'no GPU passed => undef');
   is(repo({},       '13.1',  'amd64'), undef, 'GPU without device_id => undef');
   # A GPU without constraints takes non-free whatever its branch: an unknown
-  # release keeps today's behaviour instead of dying.
-  is(repo($rtx4000, 'forky/sid', 'ppc64el'), undef,
-    'non-Blackwell on unknown release/arch => undef, no die');
+  # release keeps today's behaviour instead of dying. (Was the RTX 4000 Ada
+  # until k107 gave Ada a floor; the A100 has none.)
+  is(repo($a100, 'forky/sid', 'ppc64el'), undef,
+    'GPU without a branch bound on unknown release/arch => undef, no die');
+};
+
+subtest 'GPU with a branch floor (k107)' => sub {
+  is(repo($rtx4070s, '13.1', 'amd64'), undef, 'RTX 4070 SUPER (550) on Debian 13 => non-free 550');
+  is((repo($rtx4070s, '12.11', 'amd64') // {})->{distro}, 'debian12',
+    'RTX 4070 SUPER (550) on Debian 12 => CUDA repo, non-free 535 is too old');
+  ok(!eval { repo($rtx4000, '11.11', 'amd64'); 1 }, 'RTX 4000 Ada on Debian 11 dies');
+  like($@, qr/debian-nonfree: branch 470 is older than 525/, '... naming non-free 470 against the floor');
+  ok(!eval { repo($rtx4000, 'forky/sid', 'amd64'); 1 }, 'RTX 4000 Ada on an unknown release dies');
+  like($@, qr/debian-nonfree: driver branch not known, 525 or newer is needed/, '... naming the unknown branch');
 };
 
 subtest 'Blackwell on Debian 13 amd64' => sub {

@@ -10,6 +10,7 @@ use English qw(-no_match_vars);
 use parent qw(Exporter);
 
 our @EXPORT_OK = qw(_cmd_dump_spec);
+our $VERSION   = '2.6.0';
 
 ########################################################################
 sub _cmd_dump_spec {

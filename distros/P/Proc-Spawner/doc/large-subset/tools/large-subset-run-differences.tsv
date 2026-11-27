@@ -15,9 +15,7 @@ NB:1248	neither	rec	-	mydir=$(mktemp -d "${TMPDIR:-/tmp/}$(basename $0).XXXXXXXX
 NB:1251	neither	rec	-	mktemp -dt "$(basename $0).XXXXXXXXXX"
 NB:1460	neither	status	X	history -d "$1"
 NB:1469	neither	status	X	for h in $(seq 1006 1008 | tac); do history -d $h; done
-NB:1756	msg-own		-	exec 1 | tee ${LOG_FILE}
 NB:1757	neither	out	-	exec 1 2>&1 | tee ${LOG_FILE}
-NB:1758	msg-own		-	exec 2 | tee ${LOG_FILE}
 NB:1859	neither	status	X	logout
 NB:1871	neither	out	-	set `od -j $o -N 8 -t u1 $pkg`
 NB:1872	neither	out	-	set `od -j $o -N 8 -t u1 $rpm`
@@ -34,17 +32,14 @@ NB:4569	neither	out+rec	-	basename -- $0
 NB:4570	neither	out+rec	-	basename $0
 NB:4623	neither	rec	-	ps -p $$ | awk '$1 == PP {print $4}' PP=$$
 NB:4624	neither	rec	-	ps | grep `echo $$` | awk '{ print $4 }'
-NB:4727	neither	status+out	-	cd -
 NB:4774	neither	rec	-	ps -o pid= --ppid $PPID | xargs kill -9
 NB:5137	neither	out	-	env | sed 's/;/\\;/g'
-NB:5152	chance	out	-	find . -print | xargs ls -gilds
 NB:5293	neither	out	-	ls -l /proc/self/fd/
 NB:5298	neither	status	X	bind -f ~/.inputrc
 NB:552	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | wc -l
 NB:557	msg-own		-	kill -0 1
 NB:562	msg-own		-	[ $(find your/dir -prune -empty) = your/dir ]
 NB:571	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | grep screen | wc -l
-NB:5763	msg-own		-	cat somedata.txt | "$outfile"
 NB:5939	neither	out	-	seq 2000 65000 | sort -R | head -n 1
 NB:6081	neither	rec	-	ps -ef | grep $$ | grep -v grep
 NB:6082	neither	rec	-	ps -p $$
@@ -75,7 +70,6 @@ NB:6843	neither	rec	-	pstree -sp $$
 NB:6844	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | less
 NB:6847	neither	rec	-	pstree -p $$
 NB:6848	neither	rec	-	pstree -s $$
-NB:685	chance	out	-	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
 NB:6855	neither	rec	-	$(readlink -f $(dirname "$0"))
 NB:6912	neither	rec	-	MY_DIR=$(dirname $(readlink -f $0))
 NB:6920	neither	status+out	X	bind -q complete
@@ -115,10 +109,6 @@ NB:9723	neither	out+files	-	./aaa.sh 2>&1 | tee -a log
 NB:9744	neither	out+files	-	progam.sh 2>&1 | tee -a log
 NB:9745	neither	out+files	-	someCommand 2>&1 | tee someFile
 NB:9746	neither	out+files	-	someCommand 2>&1 | tee -a someFile
-PB:README.md:1596	msg-own		-	# Right. var="$(command)" # Wrong. var=`command` # $() can easily be nested whereas `` cannot. var="$(command "$(command
-PB:README.md:1646	msg-own		-	"$EDITOR" "$file" # NOTE: This variable may be empty, set a fallback value. "${EDITOR:-vi}" "$file" 
-PS:README.md:965	msg-own		-	# Right. var="$(command)" # Wrong. var=`command` # $() can easily be nested whereas `` cannot. var="$(command "$(command
-PS:README.md:980	msg-own		-	"$EDITOR" "$file" # NOTE: This variable may be empty, set a fallback value. "${EDITOR:-vi}" "$file" 
 PS:README.md:997	msg-own		-	"$$" 
 SC:Analytics.hs:prop_checkAndEq11	msg-own		-	[ $x -eq 1 ] && [ $x -eq 2 ]
 SC:Analytics.hs:prop_checkAndEq12	msg-own		-	[ 1 -eq $x ] && [ $x -eq 2 ]
@@ -136,7 +126,6 @@ SC:Analytics.hs:prop_checkComparisonWithLeadingX3	msg-own		-	[ $foo = xbar ]
 SC:Analytics.hs:prop_checkComparisonWithLeadingX4	msg-own		-	test $foo = xbar
 SC:Analytics.hs:prop_checkConditionalAndOrs1	msg-own		-	[ foo && bar ]
 SC:Analytics.hs:prop_checkConstantIfs2a	msg-own		-	[ n -le 4 ]
-SC:Analytics.hs:prop_checkDollarQuoteParen3	msg-own		-	"$(foo)"
 SC:Analytics.hs:prop_checkNumberComparisons11	msg-own		-	[ $foo -eq 'N' ]
 SC:Analytics.hs:prop_checkNumberComparisons12	msg-own		-	[ x$foo -gt x${N} ]
 SC:Analytics.hs:prop_checkNumberComparisons16	msg-own		-	[ foo -eq 'y' ]
@@ -147,13 +136,10 @@ SC:Analytics.hs:prop_checkOrNeq6	msg-own		-	[ $a != a ] || [ $a != b ]
 SC:Analytics.hs:prop_checkOrNeq7	msg-own		-	[ $a != a ] || [ $a != b ] || true
 SC:Analytics.hs:prop_checkOrNeq9	msg-own		-	[ 0 -ne $FOO ] || [ 0 -ne $BAR ]
 SC:Analytics.hs:prop_checkQuotesInLiterals5	msg-own		-	param="--foo='lolbar'"; eval app $param
+SC:Analytics.hs:prop_checkRedirectToSame2	msg-own		-	cat lol | sed -e 's/a/b/g' > lol
 SC:Analytics.hs:prop_checkRedirectToSame5	neither	files	-	foo > bar 2> bar
 SC:Analytics.hs:prop_checkSingleBracketOperators1	msg-own		X	[ test =~ foo ]
 SC:Analytics.hs:prop_checkSpacefulnessCfg14	neither	out	-	foo=$3 env
-SC:Analytics.hs:prop_checkSpuriousExec1	msg-own		-	exec foo; true
-SC:Analytics.hs:prop_checkSpuriousExec3	msg-own		-	echo cow; exec foo
-SC:Analytics.hs:prop_checkSpuriousExec6	msg-own		-	exec foo > file; cmd
-SC:Analytics.hs:prop_checkSpuriousExec9	msg-own		-	for file in rc.d/*; do exec "$file"; done
 SC:Analytics.hs:prop_checkStderrRedirect6	neither	out	-	foo | bar 2>&1 > /dev/null
 SC:Analytics.hs:prop_checkStderrRedirect7	neither	out	-	{ cmd > file; } 2>&1
 SC:Analytics.hs:prop_checkTestArgumentSplitting13	msg-own		X	[ "$@" == "" ]
@@ -175,11 +161,11 @@ SC:Checks/Commands.hs:prop_checkPrintfVar19	neither	status+out	X	printf '%(%s)T'
 SC:Checks/Commands.hs:prop_checkPrintfVar20	neither	status+out	-	printf '%d %(%s)T' 42
 SC:Checks/Commands.hs:prop_checkPrintfVar21	neither	status+out	-	printf '%d %(%s)T'
 SC:Checks/Commands.hs:prop_checkPrintfVar23	neither	status	X	printf -vTODAY '%(%Y)T'
-SC:Checks/Commands.hs:prop_checkPrintfVar3	OURS	status+out	X	printf -v cow $(cmd)
+SC:Checks/Commands.hs:prop_checkPrintfVar3	SHELLSPAWN	status+out	X	printf -v cow $(cmd)
 SC:Checks/Commands.hs:prop_checkPrintfVar6	msg-own		-	printf foo bar baz
 SC:Checks/Commands.hs:prop_checkPrintfVar7	msg-own		-	printf -- foo bar baz
 SC:Checks/Commands.hs:prop_checkSourceArgs2	neither	rec	-	#!/bin/sh . script
-SC:Checks/ShellSupport.hs:prop_checkBashisms30	OURS	status+out	X	printf -v '%s' "$1"
+SC:Checks/ShellSupport.hs:prop_checkBashisms30	SHELLSPAWN	status+out	X	printf -v '%s' "$1"
 SC:Checks/ShellSupport.hs:prop_checkBashisms51	neither	out	-	#!/bin/sh cmd 2>&1
 SC:Checks/ShellSupport.hs:prop_checkBashisms6c	msg-own		X	[ foo =~ bar ]
 SC:Checks/ShellSupport.hs:prop_checkBashisms6d	msg-own		X	test foo =~ bar
@@ -189,7 +175,6 @@ TL:common/bind.md:12	neither	status	X	bind -q command
 TL:common/bind.md:24	neither	status+out	X	help bind
 TL:common/bind.md:8	msg-own		X	bind -p|-P
 TL:common/case.md:24	neither	status+out	X	help case
-TL:common/cd.md:24	neither	status+out	-	cd -
 TL:common/compopt.md:10	neither	status	X	compopt command
 TL:common/compopt.md:14	msg-own		X	compopt -o|+o option1 -o|+o option2 command
 TL:common/compopt.md:18	neither	status	X	compopt
@@ -197,11 +182,9 @@ TL:common/cppcheck.md:9	neither	files	-	cppcheck . 2>cppcheck.log
 TL:common/dmd.md:20	msg-own		X	dmd -check=h|help|?
 TL:common/enable.md:24	neither	status+out	X	help enable
 TL:common/env.md:8	neither	out	-	env
-TL:common/exec.md:8	OURS	status	-	exec command -with -flags
 TL:common/fc.md:33	neither	status	X	fc -s string1=string2
 TL:common/fc.md:37	neither	status+out	X	fc --help
 TL:common/function.md:21	neither	status+out	X	help function
-TL:common/gst-play-1.0.md:8	msg-own		-	gst-play-1.0 file1|directory1|uri1 file2|directory2|uri2
 TL:common/help.md:12	neither	status+out	X	help while
 TL:common/help.md:16	neither	status+out	X	help for
 TL:common/help.md:20	neither	status+out	X	help [[
@@ -212,21 +195,15 @@ TL:common/history.md:16	msg-own		X	history -d|f|i|E
 TL:common/history.md:24	neither	status+files	X	history -w
 TL:common/history.md:28	neither	status	X	history -d offset
 TL:common/kill.md:13	neither	out	-	kill -l
-TL:common/kubectl-run.md:17	msg-own		-	kubectl run nginx-dev --image nginx --dry-run=none|server|client
 TL:common/logout.md:12	neither	status	X	logout exit_code
 TL:common/logout.md:8	neither	status	X	logout
-TL:common/mh_metric.md:24	msg-own		-	mh_metric --html|json path/to/output_file
-TL:common/piactl.md:20	msg-own		-	piactl background enable|disable
 TL:common/printenv.md:8	neither	out	-	printenv
 TL:common/printf.md:29	neither	status	X	printf -v myvar "This is %s = %d\n" "a year" 2016
 TL:common/readarray.md:32	neither	status+out	X	help mapfile
 TL:common/shopt.md:25	neither	status+out	X	help shopt
 TL:common/test.md:34	neither	status+out	X	help test
 TL:common/times.md:10	neither	out	-	times
-TL:common/tsc.md:16	msg-own		-	tsc -t ES5|ES2015|ES2016|ES2017|ES2018|ESNEXT|... path/to/file.ts
 TL:common/ulimit.md:29	neither	status+out	X	help ulimit
 TL:common/volta.md:28	neither	status+out	X	volta help fetch|install|uninstall|pin|list|completions|which|setup|run|help
-TL:common/zeroclaw-channel.md:20	msg-own		-	zeroclaw channel add telegram|discord|whatsapp|slack|webhook|... 'json_config'
 TL:linux/dialog.md:13	neither	files	-	dialog --inputbox "Enter text:" 8 40 2>output.txt
 TL:linux/trap.md:36	neither	status+out	X	help trap
-TL:linux/zenity.md:25	OURS	rec	-	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress

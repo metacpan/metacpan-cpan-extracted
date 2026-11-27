@@ -8,14 +8,14 @@ use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
 
 # ncol: count columns across the Stats::LikeR frame forms.
-#   AoH -> distinct keys per row (rows must agree on count)
+#   AoH -> union of the rows' keys (a row without a key has a missing cell)
 #   AoA -> row length            (rows must agree on length)
 #   HoA -> number of keys (keys ARE the columns)
-#   HoH -> keys of a row hash    (rows must agree on count)
+#   HoH -> union of the rows' keys
 #   plain vector -> 1 column
 # die-based (no Carp); reftype => blessed frames count too.
 
-# AoH -- distinct keys per row
+# AoH -- union of the rows' keys
 is( ncol([ {a=>1,b=>2,c=>3}, {a=>4,b=>5,c=>6} ]), 3, 'AoH: three columns' );
 is( ncol([ {x=>1} ]),                             1, 'AoH: single row, one column' );
 is( ncol([ {}, {} ]),                             0, 'AoH: empty rows, zero columns' );
@@ -35,7 +35,7 @@ is( ncol({ a=>[1,2,3], b=>[4,5,6] }),             2, 'HoA: two columns' );
 is( ncol({ a=>[1,2,3] }),                         1, 'HoA: single column' );
 is( ncol({ a=>[], b=>[], c=>[] }),                3, 'HoA: columns exist with zero rows' );
 
-# HoH -- columns = keys of a row hash
+# HoH -- columns = union of the row hashes' keys
 is( ncol({ r1=>{a=>1,b=>2}, r2=>{a=>3,b=>4} }),   2, 'HoH: two columns' );
 is( ncol({ only=>{a=>1,b=>2,c=>3} }),             3, 'HoH: single row' );
 
@@ -76,9 +76,7 @@ throws_ok { ncol(\*STDOUT) }
 	'glob ref dies';
 
 # error paths -- ragged / mixed frames
-throws_ok { ncol([ {a=>1,b=>2}, {a=>1} ]) }
-	qr/ragged AoH — row 1 has 1 columns, but row 0 has 2/,
-	'ragged AoH dies';
+is( ncol([ {a=>1,b=>2}, {a=>1} ]), 2, 'sparse AoH: union of the row keys, not a ragged frame' );
 throws_ok { ncol([ {a=>1}, [1,2] ]) }
 	qr/AoH row 1 is not a hash ref/,
 	'AoH with a non-hash row dies';
@@ -93,13 +91,11 @@ throws_ok { ncol([ \1, \2 ]) }
 	'array of scalar refs dies';
 throws_ok { ncol({ a=>[1,2], b=>undef }) }
 	qr/HoA column 'b' is not an array ref/,
-	'HoA with a non-array column dies (probe is the defined array)';
-throws_ok { ncol({ r1=>{a=>1,b=>2}, r2=>{a=>1} }) }
-	qr/ragged HoH/,
-	'ragged HoH dies';
+	'HoA with a non-array column dies';
+is( ncol({ r1=>{a=>1,b=>2}, r2=>{a=>1} }), 2, 'sparse HoH: union of the row keys, not a ragged frame' );
 throws_ok { ncol({ r1=>{a=>1}, r2=>undef }) }
 	qr/HoH row 'r2' is not a hash ref/,
-	'HoH with a non-hash row dies (probe is the defined hash)';
+	'HoH with a non-hash row dies';
 throws_ok { ncol({ a=>1, b=>2 }) }
 	qr/neither ARRAY refs \(HoA\) nor HASH refs \(HoH\)/,
 	'hash of non-ref scalars dies';

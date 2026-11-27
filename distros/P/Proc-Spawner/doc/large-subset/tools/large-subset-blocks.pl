@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # large-subset-blocks.pl (post-0.08, 2026-11-07; known issue X27): cut every sample the large parser accepts into its
 # atomic blocks, and sort the blocks and the samples into three levels by whether the result of comparing dash,
-# bash --posix and ours on them can change with the environment:
+# bash --posix and ShellSpawn on them can change with the environment:
 #   strict     no, from the text alone, assuming only what any run needs: the shell started as in the run
 #              (descriptors 0-2 open, no signal from outside, enough memory, processes and disk), and the programs the
 #              subset runs in place of builtins (echo, printf, test, [, true, false; rule "the program beats", X21)
@@ -16,7 +16,7 @@
 # pass is meant to be definite (under the stated assumptions), a non-pass is not a verdict.  Programs are taken as
 # real and opaque: nothing here knows what a program does, only what the shell does with it.
 #
-# Usage: perl -Ilib large-subset-blocks.pl [-batch] [-o BLOCKS.jsonl] [-s SAMPLES.tsv] [-e PROVENANCE.tsv] [-d DEPS.jsonl] [-p STEP3.tsv] samples.jsonl samples.tsv
+# Usage: perl -Ilib large-subset-blocks.pl [-batch] [-o BLOCKS.jsonl] [-s SAMPLES.tsv] [-e PROVENANCE.tsv] [-d DEPS.jsonl] [-p STEP3.tsv [-full]] samples.jsonl samples.tsv
 #   -batch  first parse all the accepted samples one by one and joined into one text (one line apart), and compare
 #           each sample's part of the joined tree with its own tree; report what keeps them apart
 #   -o      one line per distinct block (with its place): its text (rebuilt from the tree), level, reasons, the samples
@@ -42,6 +42,8 @@
 #           builtin other than echo, printf, test takes it, arithmetic, ${x:?}, set -u, set -e, the shells' own variables;
 #           process IDs and the clock: $$, $SECONDS, kill and wait with operands).  pass and
 #           split are almost strict (assumptions passthrough, splitglob); control and not stay undecided.
+#           -full (post-0.14, 2026-11-26): with the text (column 6); without it that column is left out and the header
+#           says how to restore it (large-subset-restore.pl, from samples.jsonl).
 #
 # A block is a simple command (with its settings and redirections), the word list of a 'for', the word and the
 # patterns of a 'case', the redirections of a compound command; a command inside $( ) is a block of its own.
@@ -57,8 +59,8 @@
 # function's body or a trap action it is unknown: status); after set -e (until set +e) every status decides but the
 # text's last command's.  A function's name is a call of it only after the walk has passed its definition.
 use strict; use warnings; use JSON::PP; use Getopt::Long; use Proc::ShellSubset::Large; use Time::HiRes 'time';
-my ($BATCH, $OUTB, $OUTS, $OUTE, $OUTD, $OUTP, $AIF); GetOptions('batch' => \$BATCH, 'o=s' => \$OUTB, 's=s' => \$OUTS, 'e=s' => \$OUTE, 'd=s' => \$OUTD, 'p=s' => \$OUTP, 'ai=s' => \$AIF) && @ARGV == 2
-  or die "usage: $0 [-batch] [-o BLOCKS.jsonl] [-s SAMPLES.tsv] [-e PROVENANCE.tsv] [-d DEPS.jsonl] samples.jsonl samples.tsv\n";
+my ($BATCH, $OUTB, $OUTS, $OUTE, $OUTD, $OUTP, $AIF, $FULLP); GetOptions('batch' => \$BATCH, 'o=s' => \$OUTB, 's=s' => \$OUTS, 'e=s' => \$OUTE, 'd=s' => \$OUTD, 'p=s' => \$OUTP, 'ai=s' => \$AIF, 'full' => \$FULLP) && @ARGV == 2
+  or die "usage: $0 [-batch] [-o BLOCKS.jsonl] [-s SAMPLES.tsv] [-e PROVENANCE.tsv] [-d DEPS.jsonl] [-p STEP3.tsv [-full]] samples.jsonl samples.tsv\n";
 $ENV{HOME} //= '/root'; delete $ENV{CDPATH};
 my $J = JSON::PP->new->canonical->utf8;
 my ($SJ, $ST) = @ARGV;
@@ -95,7 +97,7 @@ my %OWNVAR = map +($_ => 1), qw(BASH BASHOPTS BASHPID BASH_ALIASES BASH_ARGC BAS
   BASH_LINENO BASH_LOADABLES_PATH BASH_REMATCH BASH_SOURCE BASH_SUBSHELL BASH_VERSINFO BASH_VERSION COLUMNS COMP_CWORD COMP_LINE
   COMP_POINT COMP_TYPE COMP_KEY COMP_WORDBREAKS COMP_WORDS DIRSTACK EPOCHREALTIME EPOCHSECONDS EUID FUNCNAME GROUPS HISTCMD HISTFILE
   HISTSIZE HOSTNAME HOSTTYPE LINES MACHTYPE MAILCHECK OLDPWD OPTERR OSTYPE PATH PIPESTATUS POSIXLY_CORRECT PWD RANDOM SHELL SHELLOPTS
-  SHLVL SRANDOM TERM UID _);   # set by dash, bash or ours themselves (env -i ... set), or bash's own
+  SHLVL SRANDOM TERM UID _);   # set by dash, bash or ShellSpawn themselves (env -i ... set), or bash's own
 our @DEPS;   # -d: [CODE, KIND, NAME, LITERAL, BLOCK] (see the header)
 sub dep { my ($r, $kind, $name, $lit, $b) = @_; $b //= $CUR; why($r, $b); push @DEPS, [$r, $kind, $name, $lit ? 1 : 0, $b] if $b }
 sub wlit { my $w = shift; !ref $w || !grep { ref && $$_[0] !~ /^(?:\*|')\z/ } @$w }   # no expansion in it (patterns allowed)
@@ -213,7 +215,8 @@ sub simple { my ($c, $cx) = @_;
     if (!@e && $k ne 'local') { why('listing') }
     while (@e) { my ($n, $v) = splice @e, 0, 2; word($n, $cx, 'argv') if ref $n; word($v, $cx, 'assign') if defined $v;
       vassign($n, $cx, !defined $v || safe_lit($v)) } }
-  if (exists $c->{cd}) { { local $PT = !defined $c->{cd} || (!ref $c->{cd} && $c->{cd} eq '-') ? 0 : 'a5'; dep('directory', 'cd', wtext($c->{cd}), !ref $c->{cd}) } $CUR->{kind} = 'cd'; word($c->{cd}, $cx, 'argv') if ref $c->{cd}; return }
+  if (exists $c->{cd}) { { local $PT = !defined $c->{cd} || (!ref $c->{cd} && $c->{cd} eq '-') ? 0 : 'a5'; dep('directory', 'cd', wtext($c->{cd}), !ref $c->{cd}) } $CUR->{kind} = 'cd'; word($c->{cd}, $cx, 'argv') if ref $c->{cd};
+    word($_, $cx, 'argv') for grep ref, @{$c->{cd_more} // []}; return }   # X80: the other operand words are expanded too
   my @a = @{$c->{argv} // []}; return unless @a;
   word($_, $cx, 'argv') for @a;
   my $n = $a[0];
@@ -404,7 +407,7 @@ if ($OUTB) { open my $o, '>', $OUTB or die; print $o $J->encode($_), "\n" for so
 if ($OUTS) { open my $o, '>:utf8', $OUTS or die; print $o "id\tlevel\treasons\ttext\n";
   for my $s (grep $SAMPLE{$_->{id}}, @S) { my ($lv, $rs) = @{$SAMPLE{$s->{id}}}; (my $x = $s->{text}) =~ s/\s*\n\s*/\\n/g; print $o join("\t", $s->{id}, $LN2[$DL{$s->{id}}], "@$rs", $x), "\n" } }
 if ($OUTP) { open my $o, '>:utf8', $OUTP or die;   # step 3: every sample undecided before it
-  print $o <<'H', "id\tclass\twhat keeps it\tunder control through\tthe undecided codes before\ttext\n";
+  print $o <<'H', $FULLP ? () : <<'N', "id\tclass\twhat keeps it\tunder control through\tthe undecided codes before", $FULLP ? "\ttext" : (), "\n";
 # large-subset-step3.tsv (X27, step 3; post-0.11, 2026-11-12): every corpus sample undecided by its codes alone, with
 # where its values from the environment land; written by large-subset-blocks.pl -p.  Columns (tab): id; class (pass:
 # they only pass through the shell; split: the same, some split and globbed into a program's words; both are almost
@@ -415,6 +418,11 @@ if ($OUTP) { open my $o, '>:utf8', $OUTP or die;   # step 3: every sample undeci
 # controls (CODE:PROGRAM for a program's answer, /tmp, /dev/urandom, the tree; ruling:A5, G2, program for a switch whose
 # other state the named ruling covers); the undecided codes; the text.  large-subset-environment.md, section 12.
 H
+# Column 6 (the text) is not shipped; to restore it: perl -Ilib doc/large-subset/tools/large-subset-restore.pl
+#   -samples corpus-work/samples.jsonl doc/large-subset/tools/large-subset-step3.tsv > WHOLE.tsv
+#   (from the distribution's directory; needs: corpus-work/samples.jsonl, made by make corpora corpus-samples; no shell
+#   snippet is run)
+N
   my %AI;   # -ai (post-0.11, 2026-11-13): samples classified by Claude reading them (large-subset-ai-classes.tsv): their category is
   if ($AIF) { open my $a, '<:utf8', $AIF or die "$AIF: $!";   # the class; each must be one the rules leave in control or affects-shell
     while (<$a>) { next if /^#/ || /^id\t/; chomp; my ($id, $cat, undef, undef, $rc) = split /\t/;
@@ -422,14 +430,14 @@ H
       defined $c && $c =~ /^(?:control|affects-shell)\z/ or die "$AIF: $id is not a sample of the class control or affects-shell\n";
       $c eq $rc or die "$AIF: $id: the rules give $c, the file says $rc\n"; $AI{$id} = $cat } }
   for my $s (grep { $SAMPLE{$_->{id}} && $SAMPLE{$_->{id}}[4] } @S) { my ($c, $why, $ctl, $u) = @{$SAMPLE{$s->{id}}[4]}; $c = $AI{$s->{id}} // $c;
-    (my $x = $s->{text}) =~ s/\s*\n\s*/\\n/g; print $o join("\t", $s->{id}, $c, $why, $ctl, join(',', @$u), $x), "\n" } }
+    (my $x = $s->{text}) =~ s/\s*\n\s*/\\n/g; print $o join("\t", $s->{id}, $c, $why, $ctl, join(',', @$u), $FULLP ? $x : ()), "\n" } }
 if ($OUTD) { open my $o, '>', $OUTD or die; print $o $J->encode($SAMPLE{$_->{id}}[3]), "\n" for grep { $SAMPLE{$_->{id}} && $SAMPLE{$_->{id}}[3] } @S }
 if ($OUTE) { open my $o, '>:utf8', $OUTE or die; print $o <<'H';
-# large-subset-provenance.tsv: every corpus sample the large parser accepts (40,410), one line each, by snippet ID.
+# large-subset-provenance.tsv: every corpus sample the large parser accepts, one line each, by snippet ID.
 # Columns (tab): ID CODE CALLS
 #   ID    where the text comes from: format in doc/parsers/shell-subset-test-provenance.md, section 2; the texts are
 #         remade from the pinned sources by doc/large-subset/tools/large-subset-extract.pl (doc/test-pools.md, 3).
-#   CODE  known issue X27: could the run-time comparison of dash, bash --posix and ours (large-subset-state.md,
+#   CODE  known issue X27: could the run-time comparison of dash, bash --posix and ShellSpawn (large-subset-state.md,
 #         section 7) come out otherwise in another environment?
 #           S                    strict: no; only how the shell is started is assumed
 #           H:a,b                held: no, under assumptions known to hold in every environment tested (devnull, heredoc)
@@ -443,7 +451,7 @@ if ($OUTE) { open my $o, '>:utf8', $OUTE or die; print $o <<'H';
 #         word of each command as written (builtins, functions and programs alike), after command or exec the name
 #         after its options, cd, export, readonly, local; ? where an expansion makes a command's name
 #         (large-subset-blocks.pl -e).  After the behaviour run, large-subset-calls.pl marks them shell by shell,
-#         NAME:DBO, a letter each for dash, bash and ours: p that shell's run started a program of that name (the
+#         NAME:DBO, a letter each for dash, bash and ShellSpawn: p that shell's run started a program of that name (the
 #         shell, or a program it ran: xargs, find -exec), ! that shell said it was not found, - neither; a name with
 #         neither in all three keeps no mark (a builtin, a function, or not reached); =NAME:DBO a program started, or
 #         a name not found, that the text does not write as a command (an expansion made it, or a program started it).
@@ -469,7 +477,7 @@ sub ctext { my $c = shift; return $c unless ref $c eq 'HASH';
   if ($c->{argv} || $c->{env} || (!grep exists $c->{$_}, qw(cd set export readonly local func sub group if while until for case))) {
     my @e = @{$c->{env} // []}; my @s; while (@e) { my ($n, $v) = splice @e, 0, 2; push @s, "$n=" . wtext($v) }
     return join ' ', @s, map(wtext($_), @{$c->{argv} // []}), @r }
-  if (exists $c->{cd}) { return join ' ', 'cd', ($c->{cd_p} ? '-P' : ()), (defined $c->{cd} ? wtext($c->{cd}) : ()), @r }
+  if (exists $c->{cd}) { return join ' ', 'cd', ($c->{cd_p} ? '-P' : ()), (defined $c->{cd} ? wtext($c->{cd}) : ()), map(wtext($_), @{$c->{cd_more} // []}), @r }
   for my $k (qw(set export readonly local)) { next unless exists $c->{$k}; my @e = @{$c->{$k}}; my @s;
     while (@e) { my ($n, $v) = splice @e, 0, 2; push @s, defined $v ? "$n=" . wtext($v) : $n } return join ' ', ($k eq 'set' ? () : $k), @s, @r }
   return "$c->{func}() {...}" if exists $c->{func};

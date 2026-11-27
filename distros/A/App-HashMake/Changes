@@ -3,3 +3,6 @@ Revision history for App-HashMake
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.02    November 26, 2026
+        Updated version after getting help on having the executable 'hashmake'
+        added to the EXE_FILES list.

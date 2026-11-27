@@ -1,5 +1,11 @@
 Revision history for Alien-libhisto
 
+0.4.2   2026-11-26
+        - Require FMA alongside AVX2/AVX-512F and verify OSXSAVE/XCR0 in SIMD CPUID checks
+          to prevent STATUS_ILLEGAL_INSTRUCTION on CPUs/VMs without full ISA/OS support.
+        - Guard SIMD batch dispatch behind n >= 8 for tiny batches.
+        - Guard <cpuid.h> inclusion on GCC >= 4.3 for legacy MinGW compatibility.
+
 0.4.1   2026-09-13
         - Synchronize bundled libhisto C library and build artifacts.
         - Synchronize versioning with Math::Histo 0.4.1 release.

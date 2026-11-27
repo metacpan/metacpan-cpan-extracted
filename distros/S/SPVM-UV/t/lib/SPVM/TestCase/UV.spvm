@@ -49,7 +49,15 @@ class TestCase::UV {
       
       Sys::Socket->send($fd2, "hello", 5, 0);
       
+      unless ($loop->alive) {
+        return 0;
+      }
+      
       $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      if ($loop->alive) {
+        return 0;
+      }
       
       unless ($status_ref->[0] == 0) {
         return 0;
@@ -1075,6 +1083,131 @@ class TestCase::UV {
     
     if (($events_ref->[0] & ($rename_const | $change_const)) == 0) {
       return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method tcp : int () {
+    
+    # $fd2 -> $fd1
+    {
+      my $loop = UV::Loop->new;
+      
+      my $fd1 = -1;
+      my $fd2 = -1;
+      Sys::Socket::Util->inet_socketpair(\$fd1, \$fd2, SOCKET_C->AF_INET, SOCKET_C->SOCK_STREAM, 0);
+      
+      Fn->defer([$fd1 : int, $fd2 : int] method : void () {
+        Sys::IO->close($fd1);
+        Sys::IO->close($fd2);
+      });
+      
+      Sys::Socket::Util->set_blocking($fd1, 0);
+      Sys::Socket::Util->set_blocking($fd2, 0);
+      
+      my $fd1_tcp = UV::Handle::TCP->new;
+      $loop->tcp_init($fd1_tcp);
+      $fd1_tcp->open(Sys::IO->dup($fd1));
+      
+      my $fd2_tcp = UV::Handle::TCP->new;
+      $loop->tcp_init($fd2_tcp);
+      $fd2_tcp->open(Sys::IO->dup($fd2));
+      
+      my $read_data = new_string_len 5;
+      my $read_length_ref = [-1];
+      my $status_ref = [-1];
+      
+      my $read_cb = [$fd1_tcp : UV::Handle::TCP, $read_data : mutable string, $read_length_ref : int[], $status_ref : int[]] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 5 ? 5 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $read_data->[$i] = $buf->[$i];
+          }
+          $read_length_ref->[0] = (int)$nread;
+        }
+        else {
+          $status_ref->[0] = (int)$nread;
+        }
+        $stream->read_stop;
+        $stream->close_safe;
+        $fd1_tcp->close_safe;
+      };
+      weaken $read_cb->{fd1_tcp};
+      
+      $fd1_tcp->read_start($read_data, 5, $read_cb);
+      
+      my $write_req = UV::Request::Write->new;
+      $write_req->write($fd2_tcp, "hello", 5, [$fd2_tcp : UV::Handle::TCP] method : void ($req : UV::Request::Write, $status : int) {
+        $req->set_write_cb(undef);
+        $fd2_tcp->close_safe;
+      });
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($read_length_ref->[0] == 5 && $read_data eq "hello") {
+        return 0;
+      }
+    }
+    
+    # $fd1 -> $fd2
+    {
+      my $loop = UV::Loop->new;
+      
+      my $fd1 = -1;
+      my $fd2 = -1;
+      Sys::Socket::Util->inet_socketpair(\$fd1, \$fd2, SOCKET_C->AF_INET, SOCKET_C->SOCK_STREAM, 0);
+      
+      Fn->defer([$fd1 : int, $fd2 : int] method : void () {
+        Sys::IO->close($fd1);
+        Sys::IO->close($fd2);
+      });
+      
+      Sys::Socket::Util->set_blocking($fd1, 0);
+      Sys::Socket::Util->set_blocking($fd2, 0);
+      
+      my $fd1_tcp = UV::Handle::TCP->new;
+      $loop->tcp_init($fd1_tcp);
+      $fd1_tcp->open(Sys::IO->dup($fd1));
+      
+      my $fd2_tcp = UV::Handle::TCP->new;
+      $loop->tcp_init($fd2_tcp);
+      $fd2_tcp->open(Sys::IO->dup($fd2));
+      
+      my $read_data = new_string_len 5;
+      my $read_length_ref = [-1];
+      my $status_ref = [-1];
+      
+      my $read_cb = [$fd2_tcp : UV::Handle::TCP, $read_data : mutable string, $read_length_ref : int[], $status_ref : int[]] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 5 ? 5 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $read_data->[$i] = $buf->[$i];
+          }
+          $read_length_ref->[0] = (int)$nread;
+        }
+        else {
+          $status_ref->[0] = (int)$nread;
+        }
+        $stream->read_stop;
+        $stream->close_safe;
+        $fd2_tcp->close_safe;
+      };
+      weaken $read_cb->{fd2_tcp};
+      
+      $fd2_tcp->read_start($read_data, 5, $read_cb);
+      
+      my $write_req = UV::Request::Write->new;
+      $write_req->write($fd1_tcp, "hello", 5, [$fd1_tcp : UV::Handle::TCP] method : void ($req : UV::Request::Write, $status : int) {
+        $req->set_write_cb(undef);
+        $fd1_tcp->close_safe;
+      });
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($read_length_ref->[0] == 5 && $read_data eq "hello") {
+        return 0;
+      }
     }
     
     return 1;

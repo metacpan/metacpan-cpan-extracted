@@ -4,12 +4,12 @@
 # (--posix) and the program alone, for every argument list that the corpus samples really give them.
 #
 # Usage (as root, with no network):
-#   unshare -n perl large-subset-runcompare.pl -q samples.jsonl samples.tsv QDIR     # ours only, these programs logged
+#   unshare -n perl large-subset-runcompare.pl -q samples.jsonl samples.tsv QDIR     # ShellSpawn only, these programs logged
 #   unshare -n perl large-subset-threeway.pl [-l LIST.tsv] [-db DB.jsonl] QDIR...
 # Several QDIRs (post-0.11): logging runs of several environments (large-subset-environment.md, section 11); a sample
-# counts once for each distinct call, however many of the runs make it.  The calls are those ours ran as programs
+# counts once for each distinct call, however many of the runs make it.  The calls are those ShellSpawn ran as programs
 # (kill) and, since 0.10 (IP1), inside Perl (echo, printf, test, [, pwd: logged as builtin calls of the handler
-# Proc::ShellSpawn::inproc).  -ours DIR (post-0.11): a fourth answer, ours alone (DIR holds blib/ and t/try.pl, as
+# Proc::ShellSpawn::inproc).  -shellspawn DIR (post-0.11; -ours before post-0.13): a fourth answer, ShellSpawn alone (DIR holds blib/ and t/try.pl, as
 # large-subset-runcompare.pl's BASE/dist: it is copied, world-readable), the call's words single-quoted.
 # Calls made by another program (xargs printf ..., env echo ...) are left out: there every shell runs the program.
 # Each distinct call (name and arguments, as logged) is run three ways, as the user rc9, in an empty directory,
@@ -19,24 +19,25 @@
 # -l lists the calls where the three do not agree.  The table counts calls and corpus samples (a sample may make
 # several calls).
 use strict; use warnings; use JSON::PP; use File::Path qw(make_path remove_tree); use Getopt::Long;
+sub ss { my $s = shift; $s->{shellspawn} //= delete $s->{ours} if ref $s eq 'HASH' && exists $s->{ours}; $s }   # records made before post-0.13's rename: ShellSpawn's result under the key ours
 sub records {   # (post-0.11) a log's records: one per line, but an argument or a variable may hold a newline; a record
   my ($t, $start) = @_; my @r;   # starts as $start says, a line that does not continues the record before it
   for (split /\n/, $t // '') { if (/$start/ || !@r) { push @r, $_ } else { $r[-1] .= "\n$_" } } @r }
-my ($LIST, $DB, $OURS); GetOptions('l=s' => \$LIST, 'db=s' => \$DB, 'ours=s' => \$OURS) && @ARGV >= 1 or die "usage: $0 [-l LIST.tsv] [-db DB.jsonl] [-ours DIST] QDIR...\n";
+my ($LIST, $DB, $SSDIR); GetOptions('l=s' => \$LIST, 'db=s' => \$DB, 'shellspawn|ours=s' => \$SSDIR) && @ARGV >= 1 or die "usage: $0 [-l LIST.tsv] [-db DB.jsonl] [-shellspawn DIST] QDIR...\n";
 $> == 0 or die "run as root\n";
 my %TOOL = map +($_ => 1), qw(echo printf test [ kill pwd);
 my %PROG = (map(+($_ => "/usr/bin/$_"), keys %TOOL));
 
 my (%calls, %samples, %byprog, %seen);   # "NAME\037ARG..." => number of samples; and the samples of each
 for my $f (map glob("$_/run-*.jsonl"), @ARGV) { open my $in, '<', $f or die;
-  while (<$in>) { my $s = eval { decode_json($_) } or next;
-    for my $l (records($s->{ours}{rec}, qr/^[^\035\037]*\035/)) {
+  while (<$in>) { my $s = eval { ss(decode_json($_)) } or next;
+    for my $l (records($s->{shellspawn}{rec}, qr/^[^\035\037]*\035/)) {
       my $who = $l =~ s/^([^\035\037]*)\035// ? $1 : 'perl';   # the caller: perl (our shell) or a program (xargs, env, ...)
       my ($n) = split /[\036\037]/, $l; next unless defined $n && $TOOL{$n};   # (\036: a stand-in's input, IN1)
       if ($who !~ /^perl/) { $byprog{$who}++; next }               # a program calls it so in every shell: no builtin involved
       next if $seen{$s->{id}}{$l}++;                               # a sample counts once per call, over all QDIRs
       $calls{$l}++; push @{$samples{$l}}, $s->{id} if @{$samples{$l} // []} < 3 }
-    for my $b (records($s->{ours}{builtins}, qr/^[^\035\036\037]*\035/)) {   # inside Perl (IP1): HANDLER \035 ENV \035 ARGV joined by \037; a record starts with any handler's name (2026-11-13: not only Proc::ShellSpawn::WORD, which glued the next Large::b_... or "not found" record to an inproc call)
+    for my $b (records($s->{shellspawn}{builtins}, qr/^[^\035\036\037]*\035/)) {   # inside Perl (IP1): HANDLER \035 ENV \035 ARGV joined by \037; a record starts with any handler's name (2026-11-13: not only Proc::ShellSpawn::WORD, which glued the next Large::b_... or "not found" record to an inproc call)
       my ($h, undef, $l) = split /\035/, $b, 3; next unless $h eq 'Proc::ShellSpawn::inproc' && defined $l;
       my ($n) = split /\037/, $l; next unless defined $n && $TOOL{$n};
       next if $seen{$s->{id}}{$l}++;
@@ -54,9 +55,9 @@ sub run1 { my @cmd = @_;
   waitpid $pid, 0; my $st = $? >> 8; system('pkill', '-9', '-u', $u);
   my %r = (status => $st); for my $p (qw(out err)) { open my $i, '<:raw', "$W/$p"; local $/; $r{$p} = <$i> // '' }
   \%r }
-my $OD = "$W-dist";   # -ours: a world-readable copy of ours
-if ($OURS) { remove_tree($OD); make_path("$OD/t"); system('cp', '-a', "$OURS/blib", "$OD/") == 0 && system('cp', "$OURS/t/try.pl", "$OD/t/") == 0
-    or die "-ours $OURS: cannot copy blib/ and t/try.pl\n"; system('chmod', '-R', 'a+rX', $OD) }
+my $OD = "$W-dist";   # -shellspawn: a world-readable copy of the distribution (blib, t/try.pl)
+if ($SSDIR) { remove_tree($OD); make_path("$OD/t"); system('cp', '-a', "$SSDIR/blib", "$OD/") == 0 && system('cp', "$SSDIR/t/try.pl", "$OD/t/") == 0
+    or die "-shellspawn $SSDIR: cannot copy blib/ and t/try.pl\n"; system('chmod', '-R', 'a+rX', $OD) }
 sub sq { my $x = shift; $x =~ s/'/'\\''/g; "'$x'" }
 sub norm { my ($e, $n) = @_; $e =~ s/^sh: (?:line \d+: |\d+: )?//mg; $e =~ s/^\S*\/\Q$n\E: /$n: /mg; $e }
 
@@ -67,16 +68,16 @@ for my $l (sort keys %calls) {
   my $d = run1('/usr/bin/dash', '-c', '"$@"', 'sh', $n, @a);
   my $b = run1('/usr/bin/bash', '--posix', '-c', '"$@"', 'sh', $n, @a);
   my $p = run1('/usr/bin/perl', '-e', 'exec { $ARGV[0] } @ARGV[1 .. $#ARGV] or exit 127', $PROG{$n}, $n, @a);   # argv[0] = NAME
-  my $o = $OURS && run1('/usr/bin/perl', "-I$OD/blib/lib", "-I$OD/blib/arch", "$OD/t/try.pl", join ' ', map sq($_), $n, @a);
+  my $o = $SSDIR && run1('/usr/bin/perl', "-I$OD/blib/lib", "-I$OD/blib/arch", "$OD/t/try.pl", join ' ', map sq($_), $n, @a);
   $_->{err} = norm($_->{err}, $n) for grep $_, $d, $b, $p, $o;
   my $eq = sub { my ($x, $y) = @_; $x->{status} eq $y->{status} && $x->{out} eq $y->{out} };
   my ($db_, $dp, $bp) = ($eq->($d, $b), $eq->($d, $p), $eq->($b, $p));
   my $c = $db_ && $dp ? (($d->{err} eq $b->{err} && $d->{err} eq $p->{err}) ? 'same' : 'messages only')
         : $db_ ? 'dash=bash, program differs' : $dp ? 'dash=program, bash differs' : $bp ? 'bash=program, dash differs' : 'all three differ';
   $cls{$c}{calls}++; $cls{$c}{samples} += $calls{$l}; $tool{$n}{$c} += $calls{$l};
-  if ($o) { my $op = $eq->($o, $p) ? 'ours=program' : 'ours differs from the program'; $ocl{$op}{calls}++; $ocl{$op}{samples} += $calls{$l};
-    push @olist, join "\t", $calls{$l}, join(' ', $n, @a) =~ s/\n/\\n/gr, "$o->{status} $o->{out}" =~ s/\n/\\n/gr, "$p->{status} $p->{out}" =~ s/\n/\\n/gr if $op ne 'ours=program' }
-  print $db $j->encode({ call => [$n, @a], samples => $calls{$l}, examples => $samples{$l}, class => $c, dash => $d, bash => $b, program => $p, $o ? (ours => $o) : () }), "\n" if $db;
+  if ($o) { my $op = $eq->($o, $p) ? 'ShellSpawn=program' : 'ShellSpawn differs from the program'; $ocl{$op}{calls}++; $ocl{$op}{samples} += $calls{$l};
+    push @olist, join "\t", $calls{$l}, join(' ', $n, @a) =~ s/\n/\\n/gr, "$o->{status} $o->{out}" =~ s/\n/\\n/gr, "$p->{status} $p->{out}" =~ s/\n/\\n/gr if $op ne 'ShellSpawn=program' }
+  print $db $j->encode({ call => [$n, @a], samples => $calls{$l}, examples => $samples{$l}, class => $c, dash => $d, bash => $b, program => $p, $o ? (shellspawn => $o) : () }), "\n" if $db;
   if ($c ne 'same') { my $f = sub { my $r = shift; (my $o = "$r->{status} $r->{out}|$r->{err}") =~ s/\n/\\n/g; substr($o, 0, 70) };
     push @list, join "\t", $c, $calls{$l}, join(' ', map { (my $x = $_) =~ s/\n/\\n/g; length $x > 30 ? substr($x, 0, 30) . '...' : $x } $n, @a),
       $f->($d), $f->($b), $f->($p), join(',', @{$samples{$l}}) } }
@@ -85,5 +86,5 @@ printf "%-28s %7s %8s\n", 'class', 'calls', 'samples'; printf "%-28s %7d %8d\n",
 print "\nsamples, by tool:\n"; printf "%-7s %s\n", '', join ' ', map sprintf('%10.10s', $_), @C;
 for my $t (sort keys %tool) { printf "%-7s %s\n", $t, join ' ', map sprintf('%10d', $tool{$t}{$_} // 0), @C }
 if ($LIST) { open my $o, '>', $LIST or die; print $o "class\tsamples\tcall\tdash\tbash\tprogram\texamples\n", map "$_\n", sort @list }
-if ($OURS) { print "\nours alone against the program (status and output):\n", map(sprintf("%-30s %7d calls %8d samples\n", $_, $ocl{$_}{calls}, $ocl{$_}{samples}), sort keys %ocl),
-    @olist ? ("\nwhere ours differs (samples, call, ours, program):\n", map "  $_\n", @olist) : () }
+if ($SSDIR) { print "\nShellSpawn alone against the program (status and output):\n", map(sprintf("%-30s %7d calls %8d samples\n", $_, $ocl{$_}{calls}, $ocl{$_}{samples}), sort keys %ocl),
+    @olist ? ("\nwhere ShellSpawn differs (samples, call, ShellSpawn, program):\n", map "  $_\n", @olist) : () }

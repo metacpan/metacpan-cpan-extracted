@@ -5,7 +5,7 @@ META.yml                                 Module YAML meta-data (added by MakeMak
 Makefile.PL
 README.md
 Spawner.xs
-TODO
+TODO.md
 doc/README.md
 doc/corpus.mk
 doc/docs-sync.pl
@@ -21,6 +21,7 @@ doc/large-subset/large-subset-environment.md
 doc/large-subset/large-subset-logical.md
 doc/large-subset/large-subset-match-raw.md
 doc/large-subset/large-subset-provenance.tsv
+doc/large-subset/large-subset-review.md
 doc/large-subset/large-subset-spec.md
 doc/large-subset/large-subset-state.md
 doc/large-subset/large-subset-state.md.html
@@ -41,6 +42,7 @@ doc/large-subset/tools/large-subset-env-control.tsv
 doc/large-subset/tools/large-subset-env-races.tsv
 doc/large-subset/tools/large-subset-env-setups.tsv
 doc/large-subset/tools/large-subset-env-variants.tsv
+doc/large-subset/tools/large-subset-envs.pl
 doc/large-subset/tools/large-subset-extract.pl
 doc/large-subset/tools/large-subset-features.pl
 doc/large-subset/tools/large-subset-ids.pl
@@ -50,15 +52,24 @@ doc/large-subset/tools/large-subset-match.tsv
 doc/large-subset/tools/large-subset-matchreport.pl
 doc/large-subset/tools/large-subset-noise.txt
 doc/large-subset/tools/large-subset-programs.txt
+doc/large-subset/tools/large-subset-rejected-envs.tsv
+doc/large-subset/tools/large-subset-rejected-setups.jsonl
+doc/large-subset/tools/large-subset-rejected.pl
+doc/large-subset/tools/large-subset-rejected.tsv
 doc/large-subset/tools/large-subset-remeasure.pl
 doc/large-subset/tools/large-subset-reparse.pl
 doc/large-subset/tools/large-subset-repeat.pl
+doc/large-subset/tools/large-subset-rereport.sh
+doc/large-subset/tools/large-subset-rerun.sh
+doc/large-subset/tools/large-subset-restore.pl
 doc/large-subset/tools/large-subset-run-differences.tsv
 doc/large-subset/tools/large-subset-runcompare.pl
 doc/large-subset/tools/large-subset-runreport.pl
 doc/large-subset/tools/large-subset-scan.pl
 doc/large-subset/tools/large-subset-setups.pl
+doc/large-subset/tools/large-subset-stamp.pl
 doc/large-subset/tools/large-subset-step3.tsv
+doc/large-subset/tools/large-subset-tables-used.tsv
 doc/large-subset/tools/large-subset-threeway-db.jsonl
 doc/large-subset/tools/large-subset-threeway-differences.tsv
 doc/large-subset/tools/large-subset-threeway.pl
@@ -97,6 +108,7 @@ doc/test-results/linux-flavors.txt
 doc/test-results/linux-missing-matrix.txt
 doc/test-results/wine-flavors-by-test.txt
 doc/test-results/wine-flavors.txt
+doc/test-results/wine-large-subset.txt
 doc/test-results/wine-missing-matrix.txt
 lib/Proc/ShellSpawn.pm
 lib/Proc/ShellSpawn/Builtins.pm
@@ -141,6 +153,7 @@ t/long-lists.t
 t/loop.t
 t/memory.t
 t/missing-matrix.pl
+t/options.t
 t/parser/large-subset-crosscheck.pl
 t/parser/large-subset-shells.tsv
 t/parser/large-subset-tests.pl
@@ -152,6 +165,7 @@ t/portable.t
 t/programs.t
 t/programs.txt
 t/recorder.t
+t/records.t
 t/sgraph/ex1.sg
 t/sgraph/ex2.sg
 t/sgraph/ex3.sg

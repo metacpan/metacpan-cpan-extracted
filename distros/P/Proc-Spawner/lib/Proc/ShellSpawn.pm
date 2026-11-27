@@ -24,7 +24,7 @@ use Proc::Spawner;
 use Proc::Spawner::Graph;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our $TRACE; *TRACE = \$Proc::Spawner::TRACE;   # undef, or a code ref given one line per fd or process operation
 our %PARSE = map +($_ => 1), qw(assign param_ops if while for case read empty);   # options for Proc::ShellSubset and
                                                                                   # Proc::ShellSubset::Large
@@ -196,7 +196,7 @@ my %JOBS;
 # them back by sigdefault; a background child keeps them ignored, as POSIX asks of an asynchronous list).
 sub ignoring_int { local @SIG{qw(INT QUIT PIPE)} = ('IGNORE') x 3; $_[0]->() }   # PIPE: a here-document's reader may go away
 sub wait_all { idle(0); ignoring_int(sub { loop_until(sub { !%JOBS }) }) if %JOBS }
-# At exit (post-0.12, K5, the user, 2026-11-15: "as shell"): the shells leave their background jobs running.  Ours
+# At exit (post-0.12, K5, the user, 2026-11-15: "as shell"): the shells leave their background jobs running.  ShellSpawn
 # starts every command of a job itself (no fork: a job's next command is started here when the one before ends), so
 # it waits while it has anything left to do for a job: a command still to start, a read or write of its own, a call
 # queued; then it exits, leaving the processes running, as the shells do.  PROC_SHELLSPAWN_END, or $END_WAIT at run
@@ -328,32 +328,40 @@ my %WINCLASH = map +($_ => 1), qw(sort find timeout expand);   # Windows' own pr
 sub win_clash { my ($name, $p) = @_; my $r = $ENV{SystemRoot} // return 0;
   $WINCLASH{lc $name} && lc(substr($p, 0, length $r) =~ tr{/}{\\}r) eq lc($r =~ tr{/}{\\}r) }
 
-sub find_cmd {   # the path to run for $name, or undef and the status (127, 126); Windows: PATHEXT's extensions first
-  my ($c, $name, $path) = @_;
+sub find_cmd {   # the path to run for $name, or undef and the status (127, 126); Windows: PATHEXT's extensions first.  With
+  my ($c, $name, $path) = @_;   # 127 a fourth value: the error the search met, as dash keeps it (X72), or undef: not found
   my @ext = ($WIN ? (grep length, split /;/, $c->{sh}{vars}{PATHEXT} // '.COM;.EXE;.BAT;.CMD') : (), '');
   if (has_dir($name)) { -f path_in($c, "$name$_") and return "$name$_" for @ext; return $name }
-  my $denied;
+  my ($denied, $err);
   for my $d (@BIN, path_list($path)) { for my $e (@ext) {   # (@BIN: BIN1, a temporary workaround)
     my $p = ($d eq '' ? '.' : $d) . ($WIN && $d =~ /\\/ && $d !~ m{/} ? '\\' : '/') . "$name$e";   # (Windows: as PATH writes it)
-    next unless -f path_in($c, $p);
+    unless (-f path_in($c, $p)) {   # dash: a name that cannot be looked at (a directory of PATH that may not be searched),
+      my $e = $! + 0;               # or is no regular file ($! taken before -e _, which sets it)
+      $err = -e _ ? POSIX::EACCES() : $e == POSIX::ENOENT() || $e == POSIX::ENOTDIR() ? $err : $e unless $WIN;
+      next }
     next if $WIN && win_clash($name, $p);
     return $p if -x _;
     $denied //= $p } }
-  defined $denied ? (undef, 126, $denied) : (undef, 127) }
+  defined $denied ? (undef, 126, $denied) : (undef, 127, undef, $err) }
+sub not_found { my $e = shift; $e ? do { local $! = $e; "$!" } : 'not found' }   # X72: the message for find_cmd's fourth value
 
 sub spawn {   # starts @$argv with $map; $k->(STATUS) when it has ended; returns its process node or undef
-  my ($c, $map, $argv, $env, $k, $search) = @_;   # $search: the PATH to look in, if not the command's own (command -p)
+  my ($c, $map, $argv, $env, $k, $search, $pre) = @_;   # $search: the PATH to look in, if not the command's own (command -p);
+                                                        # $pre: 'exec: ' before the message of exec's command that does not start
   my %e = (%{$c->{sh}{vars}}{grep $c->{sh}{exp}{$_} && /^[A-Za-z_][A-Za-z_0-9]*\z/, keys %{$c->{sh}{vars}}}, %$env);   # as dash:
     # names only
   return inproc($c, $map, $argv, \%e, $k) if $INPROC{$argv->[0]};
-  if (my $a = sh_argv($c, $argv, $search // $e{PATH})) { $argv = $a; undef $search }   # sh as Perl (SH1)
-  my ($path, $st, $what) = find_cmd($c, $argv->[0], $search // $e{PATH});
+  my $look = $search // (exists $env->{PATH} ? $env->{PATH} : $c->{sh}{vars}{PATH});   # X73: the shell's PATH, exported or not (or
+  if (my $a = sh_argv($c, $argv, $look)) { $argv = $a; undef $search }   # sh as Perl (SH1)       #  the command's own PATH=...)
+  my ($path, $st, $what, $serr) = find_cmd($c, $argv->[0], $look);
   $c->{sh}{hash}{$argv->[0]} = $path if defined $path && !defined $search && !has_dir($argv->[0]);   # remembered, as dash
     # (hash, type)
   my $no = sub {   # the command does not start: its message and the status, 127 (not found) or 126 ($why); with $log the
     my ($st, $why, $log) = @_;   # measuring hook is told too (no program runs)
     $ONBUILTIN->($st == 127 ? 'not found' : 'denied', $argv, {%$env}) if $log && $ONBUILTIN;
-    cmd_msg($c, $map, "$argv->[0]: " . ($st == 127 ? 'not found' : $why), done($k, $st)) };
+    cmd_msg($c, $map, ($pre // '') . "$argv->[0]: " . ($st == 127 ? not_found($serr) : $why), done($k, $st)) };
+  return $no->(126, not_found($serr), 1)   # exec, and the search met an error: 126, as dash (the plain command: 127)
+    if !defined $path && $pre && $serr && $serr != POSIX::ELOOP() && $serr != POSIX::ENAMETOOLONG();
   return $no->($st, 'Permission denied', 1) if !defined $path;
   return $no->(126, 'Permission denied', 1)   # Windows runs neither: as sh says it (CreateProcess: not found,
                                               # or "Exec format error")
@@ -390,23 +398,35 @@ sub inproc {   # a program of %INPROC, run here: its output and messages in the 
   my ($out, $err, $st, $seq) = Proc::ShellSpawn::Programs->can($argv->[0] eq '[' ? 'test' : $argv->[0])->($argv, $env, \%opt);
   my @seq = grep length $_->[1], @{$seq // [[2, $err], [1, $out]]};
   my $pipe_dfl = !$IGN0{PIPE} && ($c->{sh}{trap}{PIPE} // 1) ne '';   # (Windows: as POSIX, though it has no SIGPIPE)
+  my $pipe_dies = $pipe_dfl && !defined $c->{sh}{trap}{PIPE};   # D3: no trap of this shell's own either
   my $werr;
   loop_async(sub {
     my $next = shift;
     my $p = shift @seq;
     if (!$p) {
-      release($_) for values %$map; return $k->($st) unless $werr;
-      local $! = $werr; return write_fd($d, 2, "$argv->[0]: write error" . ($werr > 0 ? ": $!" : '') . "\n", done($k, 1)) }
+      unless ($werr) { release($_) for values %$map; return $k->($st) }
+      local $! = $werr;   # X81: the message first, then the holds go (a 2>/dev/null of this command alone was closed before)
+      return write_fd($d, 2, "$argv->[0]: write error" . ($werr > 0 ? ": $!" : '') . "\n", sub { release($_) for values %$map; $k->(1) }) }
     return $next->() if $p->[0] == 1 && $werr;
     write_fd($d, $p->[0], $p->[1], sub {
       my $e = shift;
       if ($e && $p->[0] == 1) {
-        if ($e == POSIX::EPIPE() && $pipe_dfl) { release($_) for values %$map; return $k->(128 + 13) }   # (SIGPIPE: 13)
+        if ($e == POSIX::EPIPE() && $pipe_dfl) { release($_) for values %$map;   # (SIGPIPE: 13)
+          return $pipe_dies ? sigpipe($c) : $k->(128 + 13) }
         # the reason only when it failed in the final flush (close_stream: errno 0 after an earlier failure): the last
         # piece for stdout, short enough for one write of the buffer (glibc's: st_blksize, 4096 for a pipe)
         $werr = !grep($_->[0] == 1, @seq) && length $p->[1] <= 4096 ? $e : -1 }
       $next->() }) });
   return }
+sub sigpipe {   # D3 (decided 2026-11-22; TODO A17): a command that dash and bash run as a builtin, in their own process, and
+  # ShellSpawn here, died of SIGPIPE: the shell running it dies with it, as in dash and bash.  A pipeline element or a
+  # subshell ends with status 141 and runs no EXIT trap (a death by a signal); the main shell ends the whole string, as
+  # kill -PIPE $$ would (b_kill), and the caller may die by the signal too ($SIGNALLED).  Only where SIGPIPE is neither
+  # ignored nor trapped in this shell (inproc's $pipe_dies); otherwise the command fails alone, as the shells' builtin.
+  my $c = shift; my $sh = $c->{sh};
+  $sh->{trap}{EXIT} = '' if exists $sh->{trap}{EXIT};
+  return leave($c, 128 + 13) if $sh->{main};
+  $SIGNALLED = 'PIPE'; $sh->{die}->(128 + 13); return }
 sub resume { my ($g, $node, $w, $k) = @_; $k->(defined $w ? status_of($w) : 1) }   # on_exit of our children
 
 # ------------------------------------------------------------------ redirections
@@ -434,13 +454,31 @@ sub redirect {
       elsif (visible($w)) { $m{$fd} = own_fd($w) }
       else { return $fail->("$w: Bad file descriptor") }
       return $next->() }
-    expand_str($c, $w, sub {
-      my $name = shift;
+    my $open = sub {
+      my $name = shift // return $fail->('ambiguous redirect');   # (X4, below)
       my $e = $name ne '' && open_end($c, $name, $op);
       if (!$e) {   # dash's wording
         my $err = $name eq '' || $!{ENOENT} ? ($op eq '<' ? 'No such file' : 'Directory nonexistent') : "$!";
         return $fail->(($op eq '<' ? 'cannot open' : 'cannot create') . " $name: $err") }
-      push @opened, $m{$fd} = $e; $next->() }) }) }
+      push @opened, $m{$fd} = $e; $next->() };
+    $c->{sh}{redir_strict} && ref $w ? strict_name($c, $w, $open) : expand_str($c, $w, $open) }) }
+sub strict_name {   # X4 (Q1, run's option redir_strict): a redirection's file name, $k->(NAME); $k->(undef) when an unquoted
+  my ($c, $w, $k) = @_; my ($name, $bad, $unq) = ('', 0, 0);   # expansion in it gives a character of IFS (a blank, by default)
+  my $ifs = $c->{sh}{vars}{IFS} // " \t\n";   # or a pattern character, or when it has one and the name comes out empty: where
+  each_async($w, sub { my ($p, $more) = @_;   # bash outside POSIX mode says "ambiguous redirect" (but bash takes a pattern that
+    return $name .= $p, $more->() unless ref $p;   # matches one file)
+    expand_str($c, [$p], sub { my $v = shift;
+      if ($p->[0] =~ /^(?:\$|ext\z)/) { $unq = 1; $bad ||= active($v) || length $ifs && $v =~ /[\Q$ifs\E]/ }
+      $name .= $v; $more->() }) },
+    sub { $k->($bad || $unq && $name eq '' ? undef : $name) }) }
+
+sub keep_map {   # exec's redirections: the map $m (made by redirect, with the ends @$opened) is the context's own from now on
+  my ($c, $m, $opened) = @_;
+  hold($_) for grep defined, values %$m; release($_) for @$opened;
+  my $old = $c->{held} && !$c->{released} ? $c->{map} : {};
+  $c->{map} = $m; release($_) for grep defined, values %$old;
+  push @{$c->{shell}{scope}}, $c unless $c->{held};   # released when the shell ends
+  @$c{qw(held released)} = (1, 0) }
 
 # Runs $body->(CONTEXT, K2) with @$redirs applied, then $k->(STATUS); status 2 if they fail.
 sub with_redirs {
@@ -496,9 +534,28 @@ sub quote_bracket { my $c = shift; $c =~ /[A-Za-z0-9]/ ? $c : "\\$c" }   # a mem
 # same as a glob pattern (quoted characters escaped); keep, true to keep the field even if it is empty (something quoted
 # was in it); glob, true if it has an active glob character; gone, true when "$@" stood for no parameters (L1).
 sub fresh_field { +{ text => '', pat => '', keep => 0, glob => 0, gone => 0 } }
+sub brace_seq {   # {FROM..TO} (the parser's option brace): integers, zero-padded to the longer one if either starts with 0, or
+  my ($f, $t) = @_;   # single characters, in their order or backwards, as bash
+  my @r = $f =~ /[0-9]/ ? ($f <= $t ? $f .. $t : reverse $t .. $f)
+        : map chr, ord $f <= ord $t ? ord $f .. ord $t : reverse ord $t .. ord $f;
+  return @r unless grep /^-?0[0-9]/, $f, $t;
+  my $w = length $f > length $t ? length $f : length $t; map sprintf('%0*d', $w, $_), @r }
+sub brace_words {   # X3: the words that brace expansion makes of a word, in bash's order (the last brace varies fastest)
+  my @w = ([]);
+  for my $p (@{$_[0]}) {
+    my @alt = !ref $p ? [$p] : $p->[0] eq '{..' ? map([$_ eq '\\' ? ["'", ''] : $_], brace_seq(@$p[1, 2]))   # (bash: the word that
+              # is a lone backslash, as in {X..b}, comes out empty)
+            : $p->[0] eq '{' ? map([ref $_ ? @$_ : length $_ ? $_ : ()], @$p[1 .. $#$p]) : [$p];   # (an empty alternative adds
+    @w = map { my $pre = $_; map [@$pre, @$_], @alt } @w }                                        #  nothing, as in f{,.bak})
+  @w }
 sub expand {
   my ($c, $word, $how, $k) = @_;
   return $k->([$word]) unless ref $word;
+  if (grep ref && $_->[0] =~ /^\{/, @$word) {   # X3: brace expansion comes first; each word it makes is then expanded as usual
+    my @all;
+    return each_async([brace_words($word)],
+      sub { my ($w, $more) = @_; expand($c, $w, $how, sub { push @all, @{$_[0]}; $more->() }) },
+      sub { $k->($how eq 'argv' ? \@all : [join ' ', @all]) }) }
   my @f; my $cur = fresh_field();
   my $add = sub {   # text; $pat: its glob characters are active; $split: an unquoted expansion
     my ($t, $pat, $split) = @_;
@@ -574,7 +631,6 @@ sub expand {
       return expand_str($c, $a[0], sub { my $v = arith($c, shift); return unless defined $v; $add->($v, 0, $split); $next->() }) }
     elsif ($q eq '$((')    { my $v = arith($c, $a[0]); return unless defined $v; $add->($v, 0, $split) }
     elsif ($q eq '$(')     { return subst($c, $a[0], sub { $add->(shift, 0, $split); $next->() }) }
-    elsif ($kind eq '{' || $kind eq '{..') { die "Proc::ShellSpawn: brace expansion is not implemented" }
     else { die "Proc::ShellSpawn: unknown part '$kind'" }
     $next->() }) }
 sub loop_async {   # JH1 (post-0.12, X60): $body->(NEXT) again each time it calls NEXT; it stops by not calling it.  A
@@ -807,16 +863,22 @@ sub x_cd {
   my ($c, $x, $k) = @_;
   my $go = sub {
     my @f = @_; $ONBUILTIN->('x_cd', ['cd', ($x->{cd_p} ? '-P' : ()), @f], {}) if $ONBUILTIN;   # (measurement)
+    my $phys = $x->{cd_p};
+    unless ($x->{cd_dd}) {   # X80: options made by an expansion are read from the fields, as both shells read them: -L, -P
+      while (@f && $f[0] =~ /^-./) {   # (the last counts), --; any other is an error, status 2, as both (bash's own -e, -@: as dash, A5)
+        my $o = shift @f; last if $o eq '--';
+        return msg($c, "cd: Illegal option -$1", done($k, 2)) if $o =~ /^-[LP]*([^LP])/;
+        $phys = substr($o, -1) eq 'P' } }
     my $d = @f ? $f[0] : var($c, 'HOME');
     my $dash = @f == 1 && $d eq '-' and $d = var($c, 'OLDPWD');   # cd -: back, and print where
-    return defer($k, 0) if @f == 1 && $d eq '';
-    return msg($c, "cd: too many arguments", done($k, 1)) if $x->{cd_extra} || @f > 1;   # as bash (rule E), also when
-      # an expansion gives the extra fields at run time (X54)
+    $d = '.' if @f == 1 && $d eq '';   # X74: an empty operand is '.', so OLDPWD becomes this directory, as both shells; so is
+      # cd - with OLDPWD empty or unset, which then prints the directory, as dash (A5; bash: "OLDPWD not set", status 1)
+    return msg($c, "cd: too many arguments", done($k, 1)) if @f > 1;   # as bash (rule E), also when an expansion gives the
+      # extra fields at run time (X54); counted after the expansion of every operand word and the options (X80)
     return msg($c, "cd: HOME not set", done($k, 1)) if !@f && !isset($c, 'HOME');   # as bash (rule E; N4)
-    return defer($k, 0) if !@f && $d eq '';   # HOME empty: nothing, as both shells (X45)
-    if ($d =~ /^-/ && !$dash) { return msg($c, "cd: bad argument", done($k, 2)) }
-    my $new = path_in($c, $d);
-    if ($x->{cd_p}) { $new = -d $new && Cwd::realpath($new) }   # cd -P: symbolic links resolved, '..' physical (P6)
+    $d = '.' if !@f && $d eq '';   # HOME empty: stays, as both shells (X45), and OLDPWD becomes this directory (X74)
+    my $new = path_in($c, $d);   # (an operand starting with - is a directory's name here: after --, as both shells)
+    if ($phys) { $new = -d $new && Cwd::realpath($new) }   # cd -P: symbolic links resolved, '..' physical (P6)
     else {   # (Windows: the drive or the //server/share stays in front)
       my ($pre, $rest) = $WIN && $new =~ m{^([A-Za-z]:|[/\\]{2}[^/\\]+[/\\][^/\\]+)(.*)}s ? ($1 =~ tr{\\}{/}r, $2) : ('', $new);
       my @p; for (split $SEP, $rest) { next if $_ eq '' or $_ eq '.'; $_ eq '..' ? pop @p : push @p, $_ }
@@ -824,11 +886,11 @@ sub x_cd {
     $new && -d $new && ($WIN || -x _) or return msg($c, "cd: can't cd to $d", done($k, 2));   # X44: and searchable, as both shells
     setvar($c, OLDPWD => $c->{sh}{cwd}) && setvar($c, PWD => $new) or return; $c->{sh}{cwd} = $new;
     $dash ? put($c, 1, "$new\n", done($k, 0)) : defer($k, 0) };
-  defined $x->{cd} ? expand($c, $x->{cd}, 'argv', sub { $go->(@{$_[0]}) }) : $go->() }
+  defined $x->{cd} ? expand_list($c, [$x->{cd}, @{$x->{cd_more} // []}], 'argv', sub { $go->(@{$_[0]}) }) : $go->() }   # X80
 
 sub x_simple {
   my ($c, $x, $tail, $k) = @_;
-  $k = sub { leave($c, shift) } if $x->{exec};   # exec cmd: then the shell ends
+  my $k0 = $k; $k = sub { leave($c, shift) } if $x->{exec};   # exec cmd: then the shell ends
   my @env = @{$x->{env} // []}; my %env;
   delete $c->{sh}{qsub};
   my $settings = sub {   # NAME=value before the command, left to right, each seeing the ones before
@@ -843,15 +905,19 @@ sub x_simple {
     redirect($c, $x->{redir} // [], sub {   # (JH2: one call; every word expanded to nothing, the redirections are still done)
       my ($m, $opened) = @_;
       if (!$m) { return @argv && $SPECIAL{$argv[0]} ? leave($c, 2) : defer($k, 2) }
+      if ($x->{exec} && !@argv) {   # X75: exec, and its words expanded to nothing: as exec alone; the redirections and
+        setvar($c, $_, $env{$_}) or return for sort keys %env;   # the settings stay, the shell goes on (both shells)
+        keep_map($c, $m, $opened); return defer($k0, 0) }
       unless (@argv) { release($_) for @$opened; return defer($k, $c->{sh}{qsub} // 0) }
-      if (my $e = $c->{sh}{cmd}{$argv[0]} // ($x->{fn} ? ['Proc::ShellSpawn::Large::b_late'] : cmd_of($argv[0]))) {   # a function
-        # or a builtin, in this process
+      if (my $e = !$x->{exec} && ($c->{sh}{cmd}{$argv[0]}   # a function or a builtin, in this process; not after exec, which
+                                  // ($x->{fn} ? ['Proc::ShellSpawn::Large::b_late'] : cmd_of($argv[0])))) {   # runs only a
+        # program, as both shells (X56)
         my $d = derive($c, $m); release($_) for @$opened;          # a context holds its fds until it is done
         $ONBUILTIN->($e->[0], \@argv, {%env}) if $ONBUILTIN;   # (measurement: doc/large-subset/tools/large-subset-builtins.pl)
         if ($SPECIAL{$argv[0]}) { setvar($c, $_, $env{$_}) or return for sort keys %env; %env = () }   # these settings stay
         return handler($e->[0])->($d, \@argv, \%env, sub { release_ctx($d); $k->(@_) }, $e->[1]) }
       @argv = printf_zero(@argv) if $argv[0] eq 'printf';
-      my $node = spawn($c, $m, \@argv, \%env, $k);
+      my $node = spawn($c, $m, \@argv, \%env, $k, undef, $x->{exec} && 'exec: ');
       $c->{sh}{job}{first} //= $node->{pid} if $node && $c->{sh}{job};
       release($_) for @$opened; after_start($tail) }) }) }) }
 
@@ -941,6 +1007,8 @@ sub start_pwd {
 # outside the subset.  The parser also reads the text of eval, . and trap actions (with the aliases defined so far:
 # parser->(TEXT, aliases => {NAME => VALUE})).  interactive: what history, fc, bind, help, compopt, logout and
 # set -o history do (B2): nothing (nop, the default; give the parser the same option) or as in dash (not found).
+# redir_strict => 1 (X4; Q1): a redirection whose file name comes from an unquoted expansion fails with "ambiguous redirect"
+# (status 2) when that expansion gives a blank (a character of IFS) or a pattern character, or the name is empty.
 require Proc::ShellSpawn::Builtins;
 # The variables a shell starts with: %ENV's.  On Windows Perl gives %ENV's names in upper case, so a shell started there
 # would see only Z for an inherited z (X65).  The names there (post-0.12, the user, 2026-11-15, A22 (a)): as the process's
@@ -953,6 +1021,8 @@ sub env_vars {
   return %ENV unless $WIN && $ENV_NAMES eq 'block' && defined &Proc::Spawner::__win_env_names;
   my %name = map +(uc($_) => $_), Proc::Spawner::__win_env_names(); $name{PATH} = 'PATH';
   map +(($name{uc $_} // $_) => $ENV{$_}), keys %ENV }
+our $PATH0 = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';   # X6: the shell's PATH when the environment has
+                           # none: dash's own default (bash's as Debian and Ubuntu build it).  $PATH itself is then outside the subset (V8)
 sub run {
   my ($s, %o) = @_; my $parse = $o{parser} // default_parser(); a4();
   my $tree = ref $s ? $s : $parse->($s);
@@ -965,8 +1035,9 @@ sub run {
              exp => { map +($_ => 1), keys %env, 'PWD' }, cwd => $cwd, q => 0,
              parse => $parse, args => [@{$o{args} // []}], arg0 => $o{arg0}, pid => $$, opt => {%{$o{opt} // {}}},
              cmd => {}, ro => {}, trap => {}, jobl => [], umask => umask,
-             alias => {}, hash => {}, intext => 0, interactive => $o{interactive} // 'nop' };
+             alias => {}, hash => {}, intext => 0, interactive => $o{interactive} // 'nop', redir_strict => $o{redir_strict} };
   my $st;
+  $sh->{vars}{PATH} = $PATH0 unless $WIN || exists $env{PATH};   # X6: not exported, as in both shells
   my $c = { sh => $sh, loops => [], map => { map +($_ => is_open($_) ? own_fd($_) : undef), 0 .. 2 } };
   my $scope = []; $c->{shell} = { scope => $scope, exit => shell_exit($c, $scope, sub { $st //= shift }) };
   $sh->{die} = sub { $st //= shift };   # kill ... $$ (Proc::ShellSpawn::Large::b_kill): the whole string ends

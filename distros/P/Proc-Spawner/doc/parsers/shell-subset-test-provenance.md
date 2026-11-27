@@ -1,11 +1,13 @@
 # Shell subset tests: snippet IDs and provenance
 
-Status: 2026-10-29. Covers the two test files of the shell-subset parser ([`ShellSubset.pm`](../../lib/Proc/ShellSubset.pm)):
+This document describes the two test files of the base parser `Proc::ShellSubset` ([`ShellSubset.pm`](../../lib/Proc/ShellSubset.pm)), as they were on 2026-10-29 unless a later date is given:
 
-- [`shell-subset-tests.pl`](../../t/parser/shell-subset-tests.pl): 222 hand-written tests (204 on 2026-10-29), one rule of [`shell-subset-spec.md`](shell-subset-spec.md) per line.
+- [`shell-subset-tests.pl`](../../t/parser/shell-subset-tests.pl): 222 hand-written tests (numbered up to `OWN:222`, checked 2026-11-19; 204 on 2026-10-29), one rule of [`shell-subset-spec.md`](shell-subset-spec.md) per line.
 - [`shell-subset-corpus-tests.pl`](../../t/parser/shell-subset-corpus-tests.pl): 612 tests taken from public collections of shell commands, one per group of very similar commands.
 
-Every test line carries a **snippet ID** that says where its text comes from. (The same IDs name the 40,410 corpus samples of the large parser's measurement: [`../large-subset/large-subset-provenance.tsv`](../large-subset/large-subset-provenance.tsv) has one line per sample, by ID, with what its run-time comparison may depend on, known issue [X27](../pspawn-known-issues.md#my-x27); the codes: [`../large-subset/large-subset-environment.md`](../large-subset/large-subset-environment.md).) With the pinned sources below, [`prov.pl`](tools/prov.pl) restores the text of every corpus test from its ID alone; on 2026-10-29 all 612 restored exactly.
+Every test line carries a **snippet ID** that says where its text (the *snippet*) comes from. With the pinned sources below, [`prov.pl`](tools/prov.pl) restores the text of every corpus test from its ID alone; on 2026-10-29 all 612 were restored exactly.
+
+IDs of the same form name the 40,410 corpus samples that the large parser, `Proc::ShellSubset::Large`, accepts in its own measurement (an extraction of its own: [`../test-pools.md`](../test-pools.md), pool B). [`../large-subset/large-subset-provenance.tsv`](../large-subset/large-subset-provenance.tsv) has one line per sample, by ID, with codes for what the comparison of its runs may depend on (known issue [X27](../pspawn-known-issues.md#my-x27); the codes are explained in [`../large-subset/large-subset-environment.md`](../large-subset/large-subset-environment.md#my-section-3), section 3).
 
 ## <a id="my-section-1"></a>1. Test line format
 
@@ -16,7 +18,7 @@ ok|rej  OPTIONS  ID  TEXT
 - `ok` / `rej`: the expected result (parsed, or rejected).
 - `OPTIONS`: parser options separated by commas, or `-` for none (`nocaret`, `nopwd`, `assign`, `param_ops`, `if`, `while`, `for`, `case`, `read`, `brace`, `empty`, `fdmulti`, `tilde_args`).
 - `ID`: the snippet ID ([section 2](#my-section-2)). It contains no blanks.
-- `TEXT`: the string given to the parser, after one or two blanks. `@N`, `@T` and `@R` stand for newline, tab and carriage return.
+- `TEXT`: the snippet given to the parser, after one or two blanks. `@N`, `@T` and `@R` stand for newline, tab and carriage return (a literal `@N`, `@T` or `@R` cannot be written).
 
 In the corpus file, the line before each test starts with `#` and names its group ([section 5](#my-section-5)).
 
@@ -29,28 +31,36 @@ An ID is `PREFIX:LOCATOR`. The prefix names the source:
 | `OWN` | written by hand for this project | test number in [`shell-subset-tests.pl`](../../t/parser/shell-subset-tests.pl) | `OWN:17` |
 | `TL` | tldr pages | page file under `pages/`, line number | `TL:common/abduco.md:8` |
 | `NB` | NL2Bash, `data/bash/all.cm` | line number | `NB:1499` |
-| `SC` | ShellCheck unit tests | file under `src/ShellCheck/`, test name, position in the test string | `SC:Analytics.hs:prop_checkSpuriousExec1:1e9` |
+| `SC` | ShellCheck unit tests | file under `src/ShellCheck/`, test name, position in the test text¹ | `SC:Analytics.hs:prop_checkSpuriousExec1:1e9` |
 | `BC` | bash Cookbook examples | file path, position | `BC:ch10/ad:103c9` |
 | `PS` | pure-sh-bible | `README.md`, position | `PS:README.md:426` |
 | `PB` | pure-bash-bible | `README.md`, position | `PB:README.md:558c5-559` |
-| `MK` | *Managing Projects with GNU Make*, 3rd ed. | kind, PDF page `.` line on that page | `MK:recipe:53.2` |
+| `MK` | *Managing Projects with GNU Make*, 3rd ed. | kind, PDF page `.` line on that page (both counted from 1) | `MK:recipe:53.2` |
 
-A **position** in a file or test string is
+¹ *Test text*: the shell text of a ShellCheck unit test, written in the Haskell source as a string literal.
+
+A **position** in a file or test text is
 
 ```
 LINE[cCOL][-ENDLINE][eLASTCOL]
 ```
 
-- `LINE`: the first line (1-based). For `SC`, lines of the test string after its Haskell escapes are undone; for `PS` and `PB`, lines of `README.md`.
+- `LINE`: the first line (1-based). For `SC`, lines of the test text after its Haskell escapes are undone; for `PS` and `PB`, lines of `README.md`.
 - `cCOL`: the snippet starts at this column of the first line (1-based); omitted when it starts at the line's first non-blank character.
 - `-ENDLINE`: the snippet ends on this line; omitted when it is a single line.
 - `eLASTCOL`: the snippet ends at this column of its last line; omitted when it runs to the end of the line.
 
-The snippet is that span with leading and trailing white space removed. Examples from the table: `BC:ch10/ad:103c9` is line 103 of `ch10/ad` from column 9 to the end of the line; `PB:README.md:558c5-559` runs from line 558, column 5, to the end of line 559; `SC:Analytics.hs:prop_checkSpuriousExec1:1e9` is the first line of that test's string, up to column 9.
+The snippet is that span with leading and trailing white space removed. Examples from the table: `BC:ch10/ad:103c9` is line 103 of `ch10/ad` from column 9 to the end of the line; `PB:README.md:558c5-559` runs from line 558, column 5, to the end of line 559; `SC:Analytics.hs:prop_checkSpuriousExec1:1e9` is the first line of that test's text, up to column 9.
 
-`MK` kinds: `prompt` (a line `$ command` in the book's text; the snippet is what follows `$ `), `recipe` (a recipe line of a makefile shown in the book, with its `\` continuation lines), `shell` (the argument of `$(shell …)`; `#K` after the locator counts the occurrences on that line). Page breaks are the form feeds that `pdftotext` writes; the line count restarts on each page.
+The `MK` kinds:
 
-When the same text occurs in several places, its ID names the first occurrence in this order: TL, NB, SC, BC, PS, PB, MK, and within a source the order in which [`extract.pl`](tools/extract.pl) reads the files.
+- `prompt`: a line `$ command` in the book's text; the snippet is what follows `$ `;
+- `recipe`: a recipe line of a makefile shown in the book, with its `\` continuation lines;
+- `shell`: the argument of `$(shell …)`; `#K` after the locator: the K-th `$(shell …)` on that line, from 1.
+
+An MK locator's page breaks are the form feeds that `pdftotext` writes; the line count restarts on each page.
+
+When a test's text occurs in several places (identical samples are dropped only within a source, [section 5](#my-section-5)), its ID names the first occurrence in this order: TL, NB, SC, BC, PS, PB, MK, and within a source the order in which [`extract.pl`](tools/extract.pl) reads the files.
 
 ## <a id="my-section-3"></a>3. Sources (pinned)
 
@@ -88,11 +98,11 @@ pdftotext -layout make3.pdf make3.txt
 sha256sum make3.txt          # 866d44b8…24d6 with poppler 24.02.0
 ```
 
-Then, with the scripts in [`doc/parsers/tools/`](tools) (formerly `corpus-run.tar.gz`; how to rerun them: [`doc/test-pools.md`](../test-pools.md)):
+Then, from the directory [`doc/parsers/tools/`](tools) of the distribution (its scripts were once shipped as an archive, `corpus-run.tar.gz`; how to rerun them: [`doc/test-pools.md`](../test-pools.md)), with the test file's path:
 
 ```sh
 perl prov.pl CORPORA_DIR TL:common/abduco.md:8      # print one snippet
-perl prov.pl CORPORA_DIR --check shell-subset-corpus-tests.pl   # restore and compare all IDs
+perl prov.pl CORPORA_DIR --check ../../../t/parser/shell-subset-corpus-tests.pl   # restore and compare all IDs
 ```
 
 The NL2Bash repository is large (about 220 MB, mostly other data); only `data/bash/all.cm` is used.
@@ -104,20 +114,20 @@ The scripts, in order (all in [`doc/parsers/tools/`](tools), formerly `corpus-ru
 1. [`extract.pl`](tools/extract.pl) `CORPORA_DIR samples.jsonl` collects samples:
    - TL: every line of `pages/common/*.md` and `pages/linux/*.md` that is a command in backquotes. Placeholders are filled in: `{{[-a|--all]}}` becomes `-a` (the first alternative), `{{text}}` becomes `text`.
    - NB: every line of `data/bash/all.cm`.
-   - SC: the test string of every line `prop_NAME = verify…` or `verifyNot…` (also `…Tree`) in the Haskell sources, with Haskell escapes undone. `verifyNot` tests are tagged "clean", `verify` tests "warned" (ShellCheck expects a warning).
+   - SC: the test text of every line `prop_NAME = verify…` or `verifyNot…` (also `…Tree`) in the Haskell sources, with Haskell escapes undone. `verifyNot` tests are tagged "clean", `verify` tests "warned" (ShellCheck expects a warning); the tags split ShellCheck's rows of the large parser's parse results (its corpus counts, pool B; section 3 of [`large-subset-state.md`](../large-subset/large-subset-state.md#my-section-3)).
    - BC: every file under a `chNN/` directory, as a script.
    - PS, PB: every fenced code block in `README.md` marked `sh`, `shell`, `bash` or nothing, as a script.
    - MK: prompt lines `$ command`; recipe lines (lines indented deeper than a preceding `target:` line, minus `endif`, `define`, assignments and similar make syntax), joined with their `\` continuations; and `$(shell …)` arguments. In recipes and `$(shell …)`, make syntax is replaced: leading `@`, `-`, `+` removed, every `$(…)`, `${…}` and automatic variable (`$@ $< $^ $? $* $+ $%`) replaced by the word `MAKEVAR`, and `$$` turned into `$`.
 2. [`run.pl`](tools/run.pl) `samples.jsonl` parses each sample. One-line samples are parsed whole. Scripts are cut into pieces: when parsing fails, the text up to the last top-level `;`, `&` or newline before the failure is kept as an accepted piece; the rest of the failing line (up to the end of a here-document, for those) is a rejected piece; parsing goes on after it. Identical samples within a source are dropped. Accepted pieces are also checked with `dash -n` and `bash -n`. Output: `results.jsonl`.
-3. [`group.pl`](tools/group.pl) forms the groups. Accepted one-liners, and each line of an accepted script piece that parses on its own, are grouped by their set of features: operators, subshells and groups, special command names, kinds of expansion in words, kinds of redirection. Rejected samples are grouped by error message (builtin, keyword and variable names collapsed), plus, for some messages, the shape of the text at the error. Each group keeps one test: the shortest sample that starts with a letter and has at least 6 characters, or else the shortest sample. Output: [`groups.tsv`](tools/groups.tsv) (result, size, sources, group, ID, text).
+3. [`group.pl`](tools/group.pl) forms the groups. Accepted one-liners, and each line of an accepted script piece that parses on its own, are grouped by their set of features: operators, subshells and groups, special command names, kinds of expansion in words, kinds of redirection. Rejected samples, and the rejected pieces of scripts, are grouped by error message (builtin, keyword and variable names collapsed), plus, for some messages, the shape of the text at the error. Each group keeps one test: the shortest sample that starts with a letter and has at least 6 characters, or else the shortest sample. Output: [`groups.tsv`](tools/groups.tsv) (result, size, sources, group, ID, text).
 4. [`gentests.pl`](tools/gentests.pl) writes [`shell-subset-corpus-tests.pl`](../../t/parser/shell-subset-corpus-tests.pl) from [`groups.tsv`](tools/groups.tsv), and gives the hand-written tests their `OWN:n` IDs.
-5. [`verify.pl`](tools/verify.pl) runs each accepted test under dash and bash with a recorder in place of every external command, and compares the recorded argv with the parse tree (see the report of 2026-10-29).
+5. [`verify.pl`](tools/verify.pl) runs each accepted test under dash and bash with a recorder in place of every external command, and compares the recorded argv with the parse tree (the report of 2026-10-29: [`verify.txt`](tools/verify.txt)).
 
-Counts on 2026-10-29: 29,672 TL one-liners, 10,624 NB, 330 MK, 81 BC scripts, 44 PS and 122 PB code blocks, 1,667 SC test strings (after removing duplicates within a source). They give 337 accepted and 275 rejected groups.
+Counts of this extraction (the base parser's, pool A's) on 2026-10-29, after removing duplicates within a source: 29,672 TL one-liners, 10,624 NB, 330 MK, 81 BC scripts, 44 PS and 122 PB code blocks, 1,667 SC test texts. They give 337 accepted + 275 rejected = 612 groups, one test each.
 
 ## <a id="my-section-6"></a>6. Limits
 
 - The MK extraction is heuristic: some "recipe lines" are prose or make syntax that the filter missed.
-- tldr examples contain notation that is not shell syntax (`on|off` for alternatives, `<Ctrl> + c` for keys); such strings are kept as found.
+- tldr examples contain notation that is not shell syntax (`on|off` for alternatives, `<Ctrl> + c` for keys); such snippets are kept as found.
 - NL2Bash commands are cut out of larger scripts, so many use `$1` and similar.
-- The IDs of the hand-written tests (`OWN:n`) number the lines of [`shell-subset-tests.pl`](../../t/parser/shell-subset-tests.pl); a new hand-written test gets the next free number, and numbers are never reused.
+- The IDs of the hand-written tests (`OWN:n`) number the tests of [`shell-subset-tests.pl`](../../t/parser/shell-subset-tests.pl): `gentests.pl` numbered them once, in order; a test added since gets the next free number by hand, and numbers are never reused (so after a deletion they no longer follow the lines).

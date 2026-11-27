@@ -22,7 +22,7 @@ use utf8;
 use open qw(:std :encoding(UTF-8));
 
 package App::PDFLibrarian::QueryDialog;
-$App::PDFLibrarian::QueryDialog::VERSION = '6.3.3';
+$App::PDFLibrarian::QueryDialog::VERSION = '6.3.4';
 use parent 'Exporter';
 
 use Carp;

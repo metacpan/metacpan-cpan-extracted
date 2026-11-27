@@ -238,6 +238,41 @@ subtest 'loop option tolerates undef and rejects garbage' => sub {
     like $@, qr/loop/i, 'loop => 123 croaks';
 };
 
+subtest 'options and arguments are validated instead of misread' => sub {
+    plan tests => 8;
+    for my $bad ({}, \1) {
+        eval { EV::Nats->new(loop => $bad, on_error => sub {}) };
+        like $@, qr/loop/, 'a reference that is no EV::Loop croaks';
+    }
+    my $nats = dead_nats();
+    $nats->connect_timeout(2**32 + 10);
+    is $nats->connect_timeout, 2**31 - 1, 'an int option clamps instead of wrapping';
+    $nats->ping_interval(2**32 + 50);
+    is $nats->ping_interval, 2**31 - 1, 'so does ping_interval';
+    eval { $nats->subscribe('s', 'not code'); 1 };
+    like $@, qr/code reference/, 'a non-code callback croaks';
+    my $sid = $nats->subscribe_max('s', sub {}, 2**31);
+    ok $sid, 'a huge auto-unsubscribe count is accepted';
+    is $nats->subscription_count, 1, 'and does not remove the subscription';
+  SKIP: {
+        skip 'built without OpenSSL', 1 unless EV::Nats::HAS_TLS();
+        my @warn;
+        local $SIG{__WARN__} = sub { push @warn, @_ };
+        $nats->tls(1, undef, 1);
+        is_deeply \@warn, [], 'tls() takes an undef CA file quietly';
+    }
+    $nats->disconnect;
+};
+
+subtest 'a build without OpenSSL refuses TLS instead of falling back to plaintext' => sub {
+    plan skip_all => 'built with OpenSSL' if EV::Nats::HAS_TLS();
+    plan tests => 3;
+    for my $opt ([tls => 1], [tls_ca_file => '/x'], [nkey_seed => 'SUAX']) {
+        eval { EV::Nats->new(@$opt, on_error => sub {}) };
+        like $@, qr/OpenSSL/, "$opt->[0] croaks";
+    }
+};
+
 subtest 'reconnect buffer is capped' => sub {
     plan tests => 7;
     my $nats = dead_nats(reconnect_buf_size => 100);
@@ -266,13 +301,14 @@ subtest 'lowering the reconnect cap below queued bytes blocks further writes' =>
         sub { $nats->publish('s', 'y') },
         sub { $nats->hpublish('s', "NATS/1.0\r\n\r\n", 'y') },
         sub { $nats->request('s', 'y', sub {}) },
-        sub { $nats->subscribe('s', sub {}) },
     ) {
         eval { $send->(); 1 };
         like $@, qr/reconnect buffer/, 'write refused after lowering the cap';
     }
     is $nats->waiting_count, 1, 'existing backlog retained without new writes';
     is $nats->subscription_count, 0, 'refusals created no subscriptions';
+    ok eval { $nats->subscribe('s', sub {}); 1 }, 'subscribe needs no buffer: CONNECT replays it';
+    is $nats->waiting_count, 1, 'and queues nothing';
     $nats->skip_waiting;
     $nats->reconnect_buf_size(100);
     $nats->publish('s', 'y');
@@ -513,7 +549,7 @@ subtest 'failed drain leaves no ghost marker behind' => sub {
         my ($c, $report) = @_;
         MockNats->handshake($c, { server_id => 'mock2', version => '2.10.0',
                                   max_payload => 1048576 }) or return;
-        select undef, undef, undef, 6.0;
+        select undef, undef, undef, 10;   # outlives the run_guarded(6) below
     })->start;
     my $mock2port = $mock2->port;
     my $mock1 = MockNats->new(on_accept => sub {
@@ -546,11 +582,11 @@ subtest 'failed drain leaves no ghost marker behind' => sub {
 };
 
 subtest 'KV delete/purge while down report async errors' => sub {
-    plan tests => 8;
-    # The flush fence waits for the reconnect attempt and fails with it.
+    plan tests => 10;
+    # The tombstone waits for a connection up to the timeout, then leaves the queue.
     my $nats = dead_nats(reconnect_delay => 100, max_reconnect_delay => 200);
     my $js = EV::Nats::JetStream->new(nats => $nats);
-    my $kv = EV::Nats::KV->new(js => $js, bucket => 'bkt');
+    my $kv = EV::Nats::KV->new(js => $js, bucket => 'bkt', timeout => 300);
 
     for my $op (qw(delete purge)) {
         my ($after, $fired, $err);
@@ -563,7 +599,8 @@ subtest 'KV delete/purge while down report async errors' => sub {
         $after = 1;
         run_guarded(2);
         ok $fired, "$op cb fired";
-        like $err, qr/\A(?:not connected|disconnected)\z/, "$op cb reports the outage";
+        is $err, 'request timeout', "$op cb reports the timeout";
+        is $nats->waiting_count, 0, 'and its tombstone will not be sent later';
     }
     $nats->disconnect;
 };
@@ -636,14 +673,13 @@ subtest 'KV watch rejects a broken pattern' => sub {
 subtest 'refused request leaves no stranded timer' => sub {
     plan tests => 3;
     my $nats = dead_nats(reconnect_buf_size => 100);
-    $nats->publish('s', 'x' x 50);   # 62B accepted
+    $nats->publish('s', 'x' x 60);   # 72B accepted; the ~38B request PUB is not
     my $spurious = 0;
-    # Inbox SUB (~33B) fits; the PUB on top exceeds the cap.
     eval { $nats->request('s', 'y', sub { $spurious++ }, 200); 1 };
     like $@, qr/reconnect buffer/, 'request past the cap croaks';
     run_guarded(0.6);   # past the 200ms timeout
     is $spurious, 0, 'no spurious timeout callback fired';
-    is $nats->waiting_count, 2, 'publish and inbox SUB stayed queued';
+    is $nats->waiting_count, 1, 'only the publish stayed queued';
     $nats->disconnect;
 };
 
@@ -656,25 +692,29 @@ subtest 'refused inbox setup leaves no orphan subscription' => sub {
     $nats->disconnect;
 };
 
-subtest 'refused subscribe leaves no ghost subscription' => sub {
-    plan tests => 3;
+subtest 'a subscription made while connecting is sent once' => sub {
+    plan tests => 2;
     my $mock = MockNats->new(on_accept => sub {
         my ($c, $report) = @_;
-        MockNats->handshake($c) or return;
-        my $buf = MockNats->read_until($c, qr/[A-Z]/, 3);
-        print $report ($buf =~ /SUB/ ? "GHOST-SUB\n" : "CLEAN\n");
+        my $buf = MockNats->handshake($c) or return;
+        my $rin = '';
+        vec($rin, fileno($c), 1) = 1;
+        if (select(my $rout = $rin, undef, undef, 1)) {   # a duplicate follows the PONG
+            sysread($c, my $more, 65536);
+            $buf .= $more // '';
+        }
+        my $n = () = $buf =~ /^(?:SUB early\.subj |UNSUB )/mg;
+        print $report "$n\n";
     })->start;
     my $nats = EV::Nats->new(
         host => '127.0.0.1', port => $mock->port,
-        reconnect => 1, reconnect_buf_size => 10,
         on_error => sub { diag "error: $_[0]" },
     );
-    # Still connecting: the 18-byte SUB exceeds the 10-byte cap.
-    eval { $nats->subscribe('ghost.subj', sub {}); 1 };
-    like $@, qr/reconnect buffer/, 'subscribe past the cap croaks';
-    is $nats->subscription_count, 0, 'nothing registered';
-    run_guarded(5);   # handshake; a ghost would resubscribe here
-    is $mock->report(5), 'CLEAN', 'no ghost SUB reached the server';
+    $nats->subscribe('early.subj', sub {});
+    $nats->subscribe_max('early.subj', sub {}, 3);
+    is $nats->subscription_count, 2, 'registered before the handshake';
+    run_guarded(2);
+    is $mock->report(5), 3, 'CONNECT carried two SUBs and one UNSUB, no duplicates';
     $mock->stop;
 };
 
@@ -771,7 +811,7 @@ subtest 'NKey seeds are validated up front' => sub {
 subtest 'refused fetch tears down its inbox sub' => sub {
     plan tests => 3;
     my $nats = dead_nats(reconnect_buf_size => 100);
-    $nats->publish('s', 'x' x 16);   # inbox SUB fits, fetch PUB will not
+    $nats->publish('s', 'x' x 16);   # the fetch PUB will not fit
     my $js = EV::Nats::JetStream->new(nats => $nats);
     my $calls = 0;
     eval { $js->fetch('s', 'c', { batch => 1, expires => 100_000_000 }, sub { $calls++ }); 1 };
@@ -782,7 +822,7 @@ subtest 'refused fetch tears down its inbox sub' => sub {
     $nats->disconnect;
 };
 
-subtest 'refused KV create leaves only the shared request inbox' => sub {
+subtest 'refused KV create leaves no subscription' => sub {
     plan tests => 3;
     my $nats = dead_nats(reconnect_buf_size => 100);
     $nats->publish('s', 'x' x 16);
@@ -792,19 +832,19 @@ subtest 'refused KV create leaves only the shared request inbox' => sub {
     eval { $kv->create('k', 'v', sub { $calls++ }); 1 };
     like $@, qr/reconnect buffer/, 'create past the cap croaks';
     run_guarded(0.6);   # past the 200ms timer
-    is $nats->subscription_count, 1, 'no subscription beyond the request inbox';
+    is $nats->subscription_count, 0, 'not even the shared request inbox';
     is $calls, 0, 'no stray callback after the croak';
     $nats->disconnect;
 };
 
-subtest 'unsubscribe past the cap still removes the sub' => sub {
-    plan tests => 2;
+subtest 'unsubscribe while down needs no buffer space' => sub {
+    plan tests => 3;
     my $nats = dead_nats(reconnect_buf_size => 100);
     my $sid = $nats->subscribe('s', sub {});
-    $nats->publish('s', 'x' x 76);   # pack the cap: UNSUB will not fit
-    eval { $nats->unsubscribe($sid); 1 };
-    like $@, qr/reconnect buffer/, 'unsub past the cap croaks';
-    is $nats->subscription_count, 0, 'sub removed despite the croak';
+    $nats->publish('s', 'x' x 76);   # the cap is full
+    ok eval { $nats->unsubscribe($sid); 1 }, 'unsubscribe succeeds';
+    is $nats->subscription_count, 0, 'sub removed';
+    is $nats->waiting_count, 1, 'nothing queued for it';
     $nats->disconnect;
 };
 
@@ -830,13 +870,32 @@ subtest 'oversize CONNECT fields fail fast instead of truncating' => sub {
     $mock->stop;
 };
 
-subtest 'refused subscribe_max removes its partial subscription' => sub {
-    my $subject = '_INBOX.test.123';
-    my $nats = dead_nats(reconnect_buf_size => length("SUB $subject 1\r\n"));
-    eval { $nats->subscribe_max($subject, sub {}, 1); 1 };
-    like $@, qr/reconnect buffer/, 'auto-unsubscribe setup exceeded the cap';
-    is $nats->subscription_count, 0, 'partial subscription removed';
-    $nats->disconnect;
+subtest 'unsubscribe at or below the received count removes the sub' => sub {
+    plan tests => 2;
+    my $mock = MockNats->new(on_accept => sub {
+        my ($c, $report) = @_;
+        MockNats->handshake($c) or return;
+        my $buf = MockNats->read_until($c, qr/SUB s 1\r\n/) or return;
+        syswrite $c, MockNats->msg_frame('s', 1, undef, "m$_") for 1 .. 5;
+        sleep 2;
+    })->start;
+    my ($nats, $got);
+    $nats = EV::Nats->new(
+        host => '127.0.0.1', port => $mock->port,
+        on_error   => sub { diag "error: $_[0]" },
+        on_connect => sub {
+            my $sid;
+            $sid = $nats->subscribe('s', sub {
+                return unless ++$got == 5;
+                $nats->unsubscribe($sid, 3);
+                EV::break;
+            });
+        },
+    );
+    run_guarded(3);
+    is $got, 5, 'all five delivered';
+    is $nats->subscription_count, 0, 'a limit already reached removes it now';
+    $mock->stop;
 };
 
 subtest 'reply inbox timeouts complete even when reconnect buffer is full' => sub {
@@ -867,7 +926,7 @@ subtest 'reply inbox timeouts complete even when reconnect buffer is full' => su
         }
         $nats->disconnect;
         $nats->connect('127.0.0.1', dead_port());
-        $nats->publish('s', 'x' x 80);   # leaves no room for the UNSUB
+        $nats->publish('s', 'x' x 80);   # fills the buffer
         run_guarded(2);
         is $calls, 1, "$op callback fired exactly once";
         is $err, 'disconnected', "$op in flight failed with the dropped connection";
@@ -877,7 +936,7 @@ subtest 'reply inbox timeouts complete even when reconnect buffer is full' => su
     }
 
     # Started while reconnecting, with the buffer then filled: the timeout
-    # path must complete although its UNSUB cannot be queued.
+    # path must still complete.
     for my $op (qw(js_publish_h create update fetch)) {
         my $nats = EV::Nats->new(
             reconnect => 1, reconnect_delay => 10_000, reconnect_buf_size => 400,
@@ -897,7 +956,7 @@ subtest 'reply inbox timeouts complete even when reconnect buffer is full' => su
         } else {
             $js->fetch('S', 'C', { expires => 10_000_000 }, $cb);
         }
-        1 while eval { $nats->unsubscribe(9); 1 };   # no room left for an UNSUB
+        1 while eval { $nats->publish('s', 'x'); 1 };   # fill the buffer
         run_guarded(1.5);
         is $calls, 1, "$op (reconnecting) callback fired exactly once";
         if ($op eq 'fetch') {
@@ -957,16 +1016,16 @@ subtest 'JetStream and KV timers use the connection loop' => sub {
     $mock->stop;
 };
 
-subtest 'refused js_publish_h leaves only the shared request inbox' => sub {
+subtest 'refused js_publish_h leaves no subscription' => sub {
     plan tests => 3;
     my $nats = dead_nats(reconnect_buf_size => 100);
-    $nats->publish('s', 'x' x 16);
+    $nats->publish('s', 'x' x 50);   # 62B; the ~53B HPUB does not fit
     my $js = EV::Nats::JetStream->new(nats => $nats, timeout => 200);
     my $calls = 0;
     eval { $js->js_publish_h('s', "NATS/1.0\r\n\r\n", 'x', sub { $calls++ }); 1 };
     like $@, qr/reconnect buffer/, 'js_publish_h past the cap croaks';
     run_guarded(0.6);
-    is $nats->subscription_count, 1, 'no subscription beyond the request inbox';
+    is $nats->subscription_count, 0, 'not even the shared request inbox';
     is $calls, 0, 'no stray callback after the croak';
     $nats->disconnect;
 };
@@ -981,8 +1040,9 @@ subtest 'ObjectStore put mid-flight disconnect reports, never dies' => sub {
             my $buf = MockNats->read_until($c, qr/PUB (\S+) (\S+) \d+\r\n/, 5)
                 or last;
             my ($subj, $reply) = $buf =~ /PUB (\S+) (\S+) \d+\r\n/;
-            if ($subj =~ /STREAM\.MSG\.GET/) {
-                syswrite($c, "MSG $reply 1 " . length($miss) . "\r\n$miss\r\n");
+            if ($subj =~ /STREAM\.(MSG\.GET|INFO)/) {
+                my $body = $1 eq 'INFO' ? '{"config":{"name":"OBJ_bkt"}}' : $miss;
+                syswrite($c, "MSG $reply 1 " . length($body) . "\r\n$body\r\n");
                 next;
             }
             last;
@@ -1014,6 +1074,38 @@ subtest 'ObjectStore put mid-flight disconnect reports, never dies' => sub {
     ok $fired, 'put cb fired after the RST';
     like $err, qr/chunk\(s\) failed/, 'chunk failure reported, process alive';
     ok !$nats->is_connected, 'connection down as expected';
+};
+
+subtest 'subjects that would break the frame croak' => sub {
+    plan tests => 5;
+    my $nats = dead_nats();
+    for my $subj ('a..b', '.a', 'a.') {
+        eval { $nats->subscribe($subj, sub {}); 1 };
+        like $@, qr/subject/, "subscribe '$subj' croaks";
+    }
+    eval { $nats->publish('a' x 5000, " 0\r\n\r\nPUB inj 2\r\nhi"); 1 };
+    like $@, qr/subject too long/, 'an over-long subject is refused, not truncated';
+    is $nats->waiting_count, 0, 'nothing queued';
+    $nats->disconnect;
+};
+
+subtest 'an explicitly destroyed object croaks instead of reaching freed memory' => sub {
+    plan tests => 3;
+    my $nats = dead_nats();
+    $nats->DESTROY;
+    eval { $nats->is_connected };
+    like $@, qr/already destroyed/, 'a method after DESTROY croaks';
+    ok eval { $nats->DESTROY; 1 }, 'a second DESTROY is a no-op';
+    eval { EV::Nats::is_connected(bless {}, 'Other') };
+    like $@, qr/not an EV::Nats object/, 'a foreign invocant croaks';
+};
+
+subtest 'new blesses into the calling subclass' => sub {
+    plan tests => 2;
+    @My::Nats::ISA = ('EV::Nats');
+    my $nats = My::Nats->new(on_error => sub {});
+    isa_ok $nats, 'My::Nats';
+    like $nats->new_inbox, qr/\A_INBOX\./, 'methods dispatch';
 };
 
 done_testing;

@@ -499,6 +499,46 @@ subtest 'a process whose code is older than the schema retires' => sub {
 
 # Runs last: deleting channels raises the number that new channels start
 # from, which the subtests above take to be zero.
+subtest 'a graceful stop closes the connections' => sub {
+    my $loop = Mojo::IOLoop->singleton;
+    my $app  = build_app();
+    my $tm   = Test::Mojo->new($app);
+    # Opens a connection, joins a channel and records what the server does to it.
+    my $open = sub {
+        my $seen  = { messages => [] };
+        my $ready = Mojo::Promise->new;
+        $tm->ua->websocket('/boardstreams' => sub ($ua, $tx) {
+            $tx->on(json => sub ($tx, $message) {
+                push $seen->{messages}->@*, $message->{type};
+                $ready->resolve if $message->{type} eq 'joined';
+            });
+            $tx->on(finish => sub ($tx, $code, @) { $seen->{code} = $code });
+            $tx->send({ json => { type => 'join', channel => 'counter:stopping' } });
+        });
+        $ready->wait;
+        return $seen;
+    };
+
+    my $before = scalar $loop->subscribers('finish')->@*;
+    my $first  = $open->();
+    is scalar $loop->subscribers('finish')->@*, $before + 1, 'the hub listens for the stop once it holds a connection';
+    $open->();
+    is scalar $loop->subscribers('finish')->@*, $before + 1, '...and only once';
+
+    # What Mojo::IOLoop->reset does to subscribers, as in a freshly forked worker.
+    $loop->unsubscribe('finish');
+    my $second = $open->();
+    is scalar $loop->subscribers('finish')->@*, 1, 'it subscribes again after the loop has forgotten it';
+
+    # What stop_gracefully does, short of stopping this test's own loop.
+    $loop->emit('finish');
+    Mojo::Promise->timer(0.3)->wait;
+    is $_->{code}, 1001, 'the connection is closed as "going away"' for $first, $second;
+    is_deeply $_->{messages}, ['heartbeat', 'joined'], '...without the message that tells a client to stay away' for $first, $second;
+    is probe($tm), 1001, 'a connection that arrives during the stop is turned away';
+    $loop->unsubscribe('finish');
+};
+
 subtest 'deleting a channel' => sub {
     my ($near, $far, $other) = (Test::Mojo->new($t->app), Test::Mojo->new($t2->app), Test::Mojo->new($t->app));
     my $hub = $t->app->boardstreams;

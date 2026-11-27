@@ -62,7 +62,7 @@
             "DBI" : "0",
             "Data::Dumper" : "0",
             "Digest::SHA" : "0",
-            "Ekorn::Pipeline" : ">= v0.4.0, < v0.5.0",
+            "Ekorn::Pipeline" : ">= v0.4.3, < v0.5.0",
             "Exporter" : "0",
             "List::Util" : "0",
             "Ref::Util" : "0",
@@ -83,75 +83,75 @@
    "provides" : {
       "DBIx::Squirrel" : {
          "file" : "lib/DBIx/Squirrel.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Context" : {
          "file" : "lib/DBIx/Squirrel/Context.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Errors" : {
          "file" : "lib/DBIx/Squirrel/Errors.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Gather" : {
          "file" : "lib/DBIx/Squirrel/Gather.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Iterator" : {
          "file" : "lib/DBIx/Squirrel/Iterator.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Placeholders" : {
          "file" : "lib/DBIx/Squirrel/Placeholders.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Result" : {
          "file" : "lib/DBIx/Squirrel/Result.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Results" : {
          "file" : "lib/DBIx/Squirrel/Results.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Stages::Batch" : {
          "file" : "lib/DBIx/Squirrel/Stages/Batch.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Stages::Flow" : {
          "file" : "lib/DBIx/Squirrel/Stages/Flow.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Stages::Rows" : {
          "file" : "lib/DBIx/Squirrel/Stages/Rows.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Stages::Taps" : {
          "file" : "lib/DBIx/Squirrel/Stages/Taps.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Stop" : {
          "file" : "lib/DBIx/Squirrel/Stop.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Sugar" : {
          "file" : "lib/DBIx/Squirrel/Sugar.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Tooling" : {
          "file" : "lib/DBIx/Squirrel/Tooling.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::Util" : {
          "file" : "lib/DBIx/Squirrel/Util.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::db" : {
          "file" : "lib/DBIx/Squirrel/db.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       },
       "DBIx::Squirrel::st" : {
          "file" : "lib/DBIx/Squirrel/st.pm",
-         "version" : "v4.1.1"
+         "version" : "v4.2.0"
       }
    },
    "release_status" : "stable",
@@ -166,7 +166,7 @@
          "web" : "https://github.com/nukopian/DBIx-Squirrel"
       }
    },
-   "version" : "v4.1.1",
+   "version" : "v4.2.0",
    "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 1
 }

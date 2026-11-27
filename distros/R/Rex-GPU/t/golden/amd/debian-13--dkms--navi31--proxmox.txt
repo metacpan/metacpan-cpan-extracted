@@ -1,0 +1,7 @@
+# golden: amd/debian-13--dkms--navi31--proxmox
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: dpkg-query -W -f='${Status}\n' pve-firmware 2>/dev/null
+DIE: install_driver: this is a Proxmox VE host (pve-firmware is installed): pve-firmware brings the amdgpu firmware itself and conflicts with firmware-amd-graphics, which apt would install only by removing proxmox-ve and the Proxmox kernel, so install_driver installs no AMD driver on Proxmox VE (a working amdgpu of the Proxmox kernel is answered with present). Nothing was changed on the host

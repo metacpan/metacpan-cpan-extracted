@@ -14,7 +14,7 @@ use Ekorn::Pipeline::Stage  qw();
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.5';
 
 our @EXPORT = qw(peek count_into);    ## no critic (Modules::ProhibitAutomaticExportation)
 

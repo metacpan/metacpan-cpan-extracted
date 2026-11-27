@@ -22,6 +22,12 @@ t/11_timeout.t
 t/12_list_query.t
 t/13_stored_message.t
 t/14_error_response.t
+t/15_domain_webhook.t
+t/16_suppressions.t
+t/17_templates.t
+t/18_api_version.t
+t/19_analytics.t
+t/20_all_logs.t
 t/corpus/msg1.mime
 t/lib/t/Form.pm
 META.yml

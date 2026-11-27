@@ -1,10 +1,1743 @@
 Revision history for Proc-Spawner (EXPERIMENTAL)
 
+0.14  2026-11-27
+      - Six records no longer ship a column that the tools make again from
+        the corpora: what each setup did (large-subset-env-setups.tsv,
+        -env-control.tsv, -env-affects-shell.tsv) and the snippet's text
+        (large-subset-step3.tsv, -rejected.tsv, -rejected-envs.tsv); 2.50
+        MB to 0.96 MB.  large-subset-restore.pl (new) restores them from
+        corpus-work/samples.jsonl alone (make corpora corpus-samples; the
+        setups remade by large-subset-blocks.pl -d and large-subset-
+        setups.pl, the accepted samples taken from the provenance, so no
+        scan; no snippet runs); each record's header gives the command.
+        The writers (large-subset-matchreport.pl -record, large-subset-
+        blocks.pl -p, large-subset-rejected.pl -o and -envs) leave the
+        column out unless -full.  Checked: each record restored, from
+        corpora fetched again and samples made again, equals the record as
+        it was, byte for byte; the writers' reports are the same.  Step 3's
+        setups read this system's files for absolute names (here /* matched
+        only /container_info.json, in 2 rows of -env-affects-shell.tsv), so
+        on another system those rows could come out otherwise: the two
+        records' headers say so.  The six records stamped again (tools
+        f54b18c); the document parts drawing on them marked in line (their
+        counts are the same); doc/large-subset/README.md and
+        large-subset-environment.md, section 12, say which columns are
+        restored on demand.
+      - The missing-settings matrix under Wine (Wine 9, Strawberry Perl
+        5.38.2.2, the seven Windows test files), run on 0.14's code and
+        still running at the release: 14 of 14 entries pass, the same 8
+        settings skipped as missing already (doc/test-results/
+        wine-missing-matrix.txt).
+      - large-subset-builtins-differences.tsv lists only the builtin calls
+        whose result differs beyond the messages, or that ShellSpawn alone
+        rejects (174); the calls that differ in the messages only (24,600
+        worded as dash's, in 26,541 samples; 1 as neither shell's) are
+        counted in its header, not listed (large-subset-builtins.pl -l;
+        each with its answers in the stored runs' builtins.jsonl).  The
+        record went from 5.1 MB (24,776 lines, 38% of the unpacked
+        distribution, there since 0.12, when A23 made every program not on
+        the runner's list "not found") to 34 KB.  Made again from the
+        stored runs of 2026-11-22 (-reuse): its 174 lines are byte for byte
+        the old record's; stamped again (large-subset-tables-used.tsv).
+        large-subset-state.md, section 7 (and its html), says so.
+      - The work list's 34 candidates (the 9 that came out alike and the 25
+        that differ, that no decision keeps out) in example environments
+        written by reading them (record large-subset-rejected-setups.jsonl,
+        kept by hand; make corpus-rejected-envs, new, with
+        large-subset-rejected.pl -split and -envs; record
+        large-subset-rejected-envs.tsv, stamped with the new collection
+        2026-11-26-post-0.13-rejected-envs).  25 read something from their
+        environment and ran in one to three environments: 5 alike in every
+        one, 8 in some, 12 in none; 9 read nothing.  So 8 of the 9 alike
+        remain candidates (ls ~- differs once OLDPWD is set); of the 25
+        that differ, 7 come out alike in some environments.  README.md,
+        large-subset-state.md section 4 (and its html), TODO A27.
+      - README.md, the rejected snippets, cut from 1,218 words to 377: the
+        groups, one table of the run in dash and bash, what the parser could
+        accept and why none is ready; the whole account (every list, the
+        reasons, the run) moved into large-subset-state.md, section 4, new
+        subsection "The rejected samples, run in dash and bash".
+      - TODO is TODO.md: each item keeps its plain text, in a code block
+        after its own anchor (my-aN for part A's item N, my-part-a to
+        my-part-d, my-b- and the first words for the others, my-f1); every
+        reference to a TODO item in the .md documents is a link to it (69
+        in 11 documents, none to an item that no longer exists).  MANIFEST,
+        CLAUDE.md.
+      - Proc-Spawner-results made ready to be public: names of the run
+        machine's own files that snippets listing the whole file system had
+        put into three collections (session identifiers, two private
+        repositories' trees) replaced by placeholders, and its history
+        replaced by one commit.  The collection 2026-11-22-post-0.13 has a
+        new archive (SHA-256 a9983eb1...; the same members, metadata and
+        order, packed in one xz block, so 7.6 MB, not 7.9): its row in
+        large-subset-tables-used.tsv changed accordingly, and make
+        corpus-rereport from it gave every record byte for byte.  X86
+        (open): a new run would catch such names again.
+      - README.md after the author's reading of the run of the rejected
+        snippets: a prominent link to the repository Proc-Spawner-results
+        (the records of every run); one term, "did not end", where the
+        README said also endless, ran out of time and timeout (the group
+        of the accepted snippets renamed so); "the parser could learn"
+        said as what it means (the large parser accepts the form, and
+        ShellSpawn runs it doing what both shells do, or what dash does,
+        A5); every rejected snippet that came out alike needs runs in
+        example environments, made by reading it, before the parser
+        accepts it (TODO A27, rewritten).  large-subset-state.md, section
+        1: the yardsticks are judged from the text, not from runs (30 of
+        the 45 of the work list differ when run); section 4's "should
+        learn" reworded.
+      - README.md, the work list: why one run is not enough, with the
+        example found by hand: ls ~- (one of the 9 that came out alike)
+        differs as soon as OLDPWD is set (bash lists the directory, dash
+        does not expand ~-); what example environments are, said plainly.
+      - The 1,543 snippets the large parser rejects run in dash and bash
+        alone (2026-11-26; make corpus-rejected, new: large-subset-
+        rejected.pl prepares the run and compares dash with bash as the
+        match compares; record large-subset-rejected.tsv, stamped with the
+        new collection proc-spawner/2026-11-26-post-0.13-rejected of
+        Proc-Spawner-results).  Work list 45: 15 alike (6 of them kept
+        rejected by B1, B3, D1 and the set of other programs; 9 the parser
+        could learn), 30 differ (19 both fail with different statuses, 6
+        one fails, 5 other output).  Subtle 40: 20 alike, 20 differ.
+        Foreign 1,458: 313 alike (123 of them refused by both), 1,138
+        differ, 7 time out.  Corrected by it: README.md said the 12
+        expansion errors of the work list fail alike in both shells
+        (copied from large-subset-state.md, section 4): 9 fail with
+        different statuses (dash 2, bash 127), bash 5.2 runs ${args[@]@Q}
+        (2), ${1~~} stands in a function never called (1); section 4 also
+        listed export ${foo?} among the forms the shells agree on (2/127).
+        README.md (the rejected snippets), large-subset-state.md section 4
+        (and its html), TODO A27 (what to do with them) and A3.
+      - X85 fixed (known issues): the runner waited for ever for a run
+        that stops its own process group (bash's suspend -f stops timeout
+        with it); now killed after 15 s, status 124, "hung" in the record.
+        Checked on suspend -f and BC:ch10/hard_to_kill; a run that ends by
+        itself is not changed (timeout ends every shell within 6 s), so no
+        record is made again (environment.md section 12 marked in line).
+      - README.md: the level partially decided says which program finds
+        the dependences (large-subset-blocks.pl) and what they are.
+      - README.md, the rejected snippets, after a test by a reader without
+        context: the yardsticks said to be the detector's (from the text,
+        not runs); "alike" defined; a decision can keep out what the shells
+        agree on; every foreign subgroup's outcome given (2 time-outs and
+        the 2 of the 125 that differ had been left out); the 19 that both
+        fail counted out plainly (10 expansion errors); of the 30 of the
+        work list that differ, 5 are kept out by decisions (B3's three
+        ulimit, the two set -o), so TODO A27 (b) asks about 25.
+      - README.md, "Threads" rewritten after the author's reading: no longer
+        "use the modules from one thread only", but what a start and a run
+        change in Perl's process, when and for how long, so that a program
+        with threads can keep the damage local.  A table per setting and
+        approach (POSIX) with three marks: C made by the call (given to the
+        primitive), A around the call (Perl's process changed and put
+        back), R refused (start returns undef, spawn the empty list, $! =
+        ENOTSUP; or dropped, per setting, with unsupported => 'drop' or
+        %Proc::Spawner::UNSUPPORTED); notes for each mark that depends on
+        the C library or the value; Windows in a paragraph; what
+        ShellSpawn's starts ask for (umask, sigdefault, chdir) and what
+        run() changes.  Taken from lib/Proc/Spawner.pm (spawn,
+        spawn_windows, %MISSING's comment, the POD of spawn) and
+        lib/Proc/ShellSpawn.pm (the start of a program, ignoring_int,
+        open_end).  Approach 1 no longer said to make settings "in the
+        child".
+      - README.md, "Threads", after a test by a reader without context: the
+        exceptions to C (note 2, Windows' handles) and to "every thread
+        sees" (the mask and nice value per thread) named where C and A are
+        defined; starts whose settings are all C may be made in several
+        threads at once, the others and runs of snippets from one thread
+        at a time; the list of what other threads should not use made
+        complete (every A row); $PRIMITIVE and %MISSING to learn the
+        approach at run time; %UNSUPPORTED's keys; Windows' closefrom,
+        sigmask, sigdefault, resetids; not tested with threads.  The
+        approaches part: why a new group cannot be made around the call.
+      - README.md after the author's second reading: the ways of starting a
+        child are called approaches, no longer levels (which also named
+        the levels of agreement of the corpus snippets), in README.md,
+        doc/README.md, pspawn-spawner.md, pspawn-known-issues.md (X64),
+        t/missing-matrix.pl's comment, TODO (A26, F1); the anchor
+        my-the-levels is my-the-approaches.  "Threads" says per approach,
+        in a table for POSIX and a list for Windows, which settings of a
+        child are made in the child and which around the call, and apart
+        what running a snippet changes at every approach.  The date of the
+        runs moved from the section's opening into the parts it holds for.
+        Every "mostly" of README.md made a count, from the stored runs of
+        2026-11-22 (runreport -c over corpus-work/run, the match, the
+        threeway tables): the messages 23,135 of 23,391 not found / command
+        not found; neither 150 = $0 41, process IDs 25, times 15, the
+        interactive builtins 36, 33 others; the calls 66+14+13+12+7+2=114;
+        dash's side 1,268 of 1,798 in the opening; the 20 skipped tests
+        under Wine said not recorded by kind.  A new part, "Counts that do
+        not match", with an apology: 2+1 against 4 (NB:9614, A4, differs
+        only in an example environment), 1,221 against 1,798 (1,206 + 592;
+        the 15 more are messages in output or files, which the match
+        drops: checked snippet by snippet), 1,333 against 1,154 (not
+        reconciled), messages in the flipped assumptions, Windows' 131;
+        TODO, part B.  B1, B3, D1 said in words; "values passed on" two
+        levels; the further measurements say what each shows.  TODO A27:
+        whether to run the rejected snippets in dash and bash.
+      - README.md after a test by a reader without context: "we" for
+        ShellSpawn replaced by its name in How close (D4's checklist); the
+        1,798 split by the shell ShellSpawn follows (1,268+355+128+47,
+        match.txt), so that the 1,268 of the opening and the 1,248
+        legalized are told apart; Threads: approaches 1 and 2 both make
+        settings in the child, the exception of Windows' handles named;
+        the 650 calls and xargs; NB:9614 named with its text.
+      - README.md, "How close", rewritten for its readers; the counts are
+        still those of the runs of 2026-11-22 (no newer runs exist).  The
+        1,543 rejected snippets named and split, from the stored
+        samples.tsv of Proc-Spawner-results (2026-11-22-post-0.13): foreign
+        1,458 = 389 only bash parses + 938 both parse, a feature dash lacks
+        or runs otherwise (833 by the parser's detector, 105 by ShellCheck
+        alone) + 125 neither + 6 only dash; subtle 40 = 26 listings + 7
+        traces + 2 $PS1 + 1 x=$@ + 1 local x + 3 $- (open); the work list
+        45.  Corrected: README said all 45 of the work list are forms both
+        shells run alike, 44 of them for the parser to learn; section 4 of
+        large-subset-state.md says 12 fail alike at run time, 11 stay
+        rejected by decisions (B3, set, B1, D1), 3 are bash's arrays, and 19
+        are to be judged.  The accepted snippets named alike, different
+        (legalized, chance, open) and endless; "mostly by A5" replaced by the
+        counts per shell followed and per ruling (match.txt); the chance
+        snippets: 38 by the codes of their text, not run again, 5 by
+        repeated runs (README said only the races were run again); the 8 of
+        rule E said plainly; the 88 of A12 not reviewed yet (README said
+        each of the 126 had been looked at); error messages: a run that
+        differs only in them counts as agreement (README said they were not
+        compared, against its own table).  A new part, "Other ways of
+        starting a child, and Windows": through Run on Linux (2026-11-18),
+        levels 2 and 3 not run over the snippets, and the Wine runs
+        (2026-11-18/19) from doc/test-results/wine-large-subset.txt, every
+        difference with its cause (TODO's item on a footnote for them
+        done).  "Threads" says per level which settings are made around
+        the call (README said posix_spawn as if every level used it).
+      - The measurement tools' names for ShellSpawn, decided 2026-11-23
+        (D5): the record key shellspawn (was ours), the class SHELLSPAWN
+        (OURS), the options -shells shellspawn of large-subset-runcompare.pl,
+        -shellspawn-from and -shellspawn-vs of large-subset-runreport.pl,
+        -shellspawn of large-subset-threeway.pl, and the verdict shellspawn
+        of large-subset-repeat.pl.  The old names are still read and
+        accepted: every stored run in Proc-Spawner-results has the key ours
+        (each tool that reads run or call records renames it on reading).
+        The records made again from the runs of 2026-11-22 with the renamed
+        tools (make corpus-rereport, and large-subset-threeway.pl
+        -shellspawn for the three *-calls.jsonl, commit 35d1f49): the 11
+        records that carried the old names are the same as before with only
+        the names changed (the class, the verdict, the key), but for four of
+        bash's answers to printf '%(%s)T' in two call records, which print
+        the clock and so hold the time of the remaking (2026-11-23); the 7
+        other records byte for byte; stamped again
+        (large-subset-tables-used.tsv).  The reports: the same with the
+        names (runreport's class columns wider; builtins.txt's rows come in
+        another order at each making, with either version of the tool).
+        The 13 document parts drawing on these records and tools marked in
+        line after that check (no document quotes a class name).
+        doc/corpus.mk,
+        test-pools.md, large-subset-environment.md, -state.md (and its
+        html), -review.md, doc/large-subset/README.md, CLAUDE.md.  The
+        module's files (lib/, t/) are untouched.
+      - X84 recorded (open; known issues): step 3's stand-ins, and the
+        environment variants fail and output, cannot reach a program not
+        on large-subset-programs.txt (every other name is "not found").
+        In the runs of 2026-11-22, 31 control snippets of step 3 (20
+        programs, 167 runs) gave the same dash and bash results in every
+        setup, and 58 snippets of -env fail and 59 of -env output the same
+        as in the base run; the runs of 2026-11-17 have the same 31.  Found
+        while turning the stored runs into busybox tests, checked against
+        the records.  TODO, part A, item 27: how to fix.
+      - X84 fixed in the runner, decided 2026-11-23 (D6):
+        large-subset-runcompare.pl -calls FILE (large-subset-provenance.tsv)
+        takes the programs each snippet calls from the classifier's column
+        CALLS (large-subset-blocks.pl -e), and a setup's standin; each one
+        not on the list and no builtin of dash, bash or ShellSpawn (time,
+        a keyword, gets one) gets a stand-in for that snippet's runs alone,
+        made before and removed after them, seen through an overlay in the
+        run's own mount namespace (with -env cowroot: in its own root), so
+        that PATH and the other workers' runs stay as they were; the run
+        record names them (standin_added), OUTDIR/calls.txt the file.
+        doc/corpus.mk passes -calls in corpus-step3, corpus-step3-class,
+        corpus-races, and in corpus-env-variants for fail, output, mtime
+        and their base runs.  Checked by 7 runs of the runner on 4
+        snippets (NB:4728, NB:782, NB:6760, NB:8026: -env cowroot with and
+        without -q, fail, tmp), outside the records.  Not run again: step
+        3, its races and the variants; the runs of 2026-11-22 and their
+        records stand (TODO, part B).  Documents: known issues (X84 now
+        under Fixed), large-subset-environment.md (the programs; sections
+        9 and 12), -state.md (and its html), doc/large-subset/README.md,
+        CLAUDE.md.
+      - Which runs made each record: doc/large-subset/tools/
+        large-subset-tables-used.tsv names, for each of the 18 records of the
+        corpus runs, the collection of Proc-Spawner-results it was made
+        from (with its archive's SHA-256), the commit of the runs' code,
+        the commit of the tools that wrote it, its own SHA-256, and the make
+        target that writes it again.  make corpus-stamp writes it
+        (large-subset-stamp.pl, whose %RECORD lists the records);
+        t/records.t checks it in every make test (an installation's too;
+        make docs-check runs it as well):
+        the records always, the commits in a git clone, the collections
+        with a clone of Proc-Spawner-results beside this one (or
+        PROC_SPAWNER_RESULTS=DIR); a failure names the make target to run,
+        and a level it cannot check is skipped with the reason (no git, a
+        clone of another repository, a directory given that does not exist
+        or is not such a clone, nothing beside it) and the command that
+        would let it check: printed in a git clone of Proc-Spawner or with
+        RELEASE_TESTING or PROC_SPAWNER_RESULTS set, elsewhere (an
+        installation) only with prove -v.  About 0.15 s.  Its git commands
+        are written for cmd.exe too (the null device of File::Spec, double
+        quotes).  make corpus-rereport
+        (large-subset-rereport.sh, from the collection's rereport.sh of
+        2026-11-22): the reports and records of stored runs made again
+        with this tree's tools, no shell run.  The first table: the runs
+        of 2026-11-22 (collection 2026-11-22-post-0.13, code f781213).  The
+        11 records the reports write were made again from that collection
+        with make corpus-rereport (7 min 38 s): 10 byte for byte as on
+        main, large-subset-endmodes.tsv with the same rows in another order
+        (X83); the 5 records the runs write themselves (the three-way
+        comparison's two, the three *-calls.jsonl) are as the run wrote
+        them (f781213); the 2 lists read (-ai-classes, -match-known) as
+        they were.
+      - X83 (the measurement tools; fixed): large-subset-repeat.pl sorted a
+        snippet's environments by the number in their names, so the end
+        modes shell, all and none came in Perl's hash order and
+        large-subset-endmodes.tsv changed its order from one making to the
+        next.  Names without a number now sort by name; the record made
+        again from the runs of 2026-11-22: the same 132 rows, the report's
+        tallies the same.  The two document parts drawing on it marked in
+        line after that check; docs-sync.tsv's label "section 7: ours at
+        exit (K5)" is now "section 7: ShellSpawn at exit (K5)", the
+        heading's words (the noun "ours", missed before).
+      - large-subset-review.md, section 1: the repository it is run from
+        is marked as not public; t/records.t and the table's header no
+        longer send anyone to it, and say that without it the records' and
+        the archives' SHA-256 are what can be checked.
+      - The corpus runs made again: make corpus-all from an empty work
+        directory, with the code of main after X80, D3 and X81 (f781213;
+        branch corpus-run-2026-11-22; 3 h 39 min; the spawn primitive as
+        built, posix_spawn), over the 40,409 snippets accepted since D1.
+        The match (README, How close): alike in every environment 38,594
+        (38,593 on 2026-11-17); ShellSpawn not as both shells 1,802
+        (1,804): legalized 1,633 (1,629), awaiting A12 88, chance 43 (45),
+        not legalized 38 (42); timeouts 13.  Snippet by snippet against
+        2026-11-17: exec command -with -flags no longer accepted (D1), and
+        find . -print | xargs ls -gilds alike (chance before); the two
+        cd - with OLDPWD unset and the zenity subshell legalized by A5
+        (they were not legalized), echo $(date) "0" | tee -a log.csv
+        legalized by builtin-vs-coreutils (chance before); nothing new.
+        The 38 not legalized are exactly groups G1-G3 of the review.  The
+        one run (state.md section 7): ShellSpawn differs 2 (4: printf -v
+        twice; exec command and zenity gone), known chance 1 (3), messages
+        as neither 55 (66 as reported after X82: exec's message, the empty
+        command name).
+        The calls: three-way 650 (653), builtins 25,452 (25,455); the end
+        modes (K5) the same, sample by sample.  Step 2 takes 2,901 (NB:10012
+        reads PWD since X80, left out); step 3: control 2,474, affects-shell
+        1,034 (NB:10012 moved).  The variants (section 9): sigpipe 22 class
+        changes (+10 noisy), output 62 (+1); its old text counted NB:550
+        twice (47+14 then, really 46+15).  Reported with the tools after
+        X82: the run was made on a branch from before X82, then merged into
+        a branch from main, and every record re-reported from the run's own
+        records (corpus-work/), no shell run again (builtins with -reuse;
+        the three-way records, made by tools X82 did not touch, kept).  X82
+        moved, against the old tools' report of this run: 2 tldr snippets
+        from messages as neither to as dash, 7 + 7 class changes of the
+        messages out of the variant sigpipe, 1 snippet of step 2 and 2 of
+        step 3's control from changed to unchanged, the noise between the
+        variants' base runs (99 / 11, were 112 / 24); no count of the match.
+        large-subset-blocks.pl writes the provenance's header without the
+        count of samples (it said 40,410); large-subset-match-raw.md's intro
+        no longer says the trees call ShellSpawn "ours".  Documents brought in line:
+        README How close, large-subset-state.md (sections 3, 7, the html),
+        large-subset-environment.md (sections 1-3, 9-12), match-raw.md,
+        the review, pspawn-shell-windows.md (a note: the Wine runs were not
+        made again).  Not run: t/flavors.pl (no Run clone here), anything
+        under Wine; the races (corpus-races had no snippet to repeat: none
+        is called chance by the code race, so its record stays empty, as
+        before).  The run records (corpus-work/, without the corpora;
+        with the run's log, the re-report script and the reports from
+        before X82): repository ilyaz-ai/Proc-Spawner-results,
+        proc-spawner/2026-11-22-post-0.13/ (checked: unpacked, it gives
+        runreport.txt again); the provisional collection of 2026-11-21
+        there is marked replaced.
+      - "ours" as a noun, a name of ShellSpawn, out of the measurement
+        tools and the documents; it came from the tools, which named the
+        third shell ours from the first comparison scripts of the old
+        Project (2026-11-02) on and printed it in every report.  The tools'
+        comments and printed text say ShellSpawn (the trees of the match,
+        runreport's -ours-vs lines, the classes of large-subset-builtins.pl,
+        large-subset-threeway.pl's, large-subset-repeat.pl's lines and the
+        header of its records, the runner's run.txt and end.txt, the probe's
+        lines); the records made again from the runs of 2026-11-17 (match,
+        env-setups, env-control, env-affects-shell, builtins-differences;
+        the headers of endmodes, env-races, provenance), every count the
+        same.  The documents (README.md, TODO, Changes, CLAUDE.md,
+        large-subset-environment.md, -match-raw.md, -state.md and its
+        anchor of K5, pspawn-design.md, corpus.mk's help), and
+        large-subset-match-known.tsv's texts.  Kept: the pronoun ("a bug of
+        ours", the mark "(ours; ...)"); the identifiers: the record key
+        ours, the class OURS, the options -shells ours, -ours-from,
+        -ours-vs, -ours, the verdict ours of large-subset-repeat.pl (renamed
+        since: D5, above).  In
+        the module's own files, the noun out of comments, and out of the
+        label t/dash.t prints for a difference from dash, nothing else
+        changed: lib/Proc/ShellSpawn.pm (K5), t/at-exit.t, t/dash.t,
+        t/dash-known.txt (a reason, which the test only prints),
+        t/portable.t, t/programs.t.
+      - pspawn-shell-windows.md, (s1): both test runners stop a file at 20
+        MB; under Wine the same limit stops a Windows program (Git's yes
+        writing into a file: 20,000,000 bytes, 0.17 s, status 153), but a
+        pipe of Git's programs passed 15.6 to 17.1 MB in 5 seconds (three
+        runs, Wine 9.0, PortableGit 2.47.1, 2026-11-22), so those snippets
+        run out of time first.  It said that only the Linux runner limits
+        the size of a file.
+      - X82 (the measurement tools; fixed): taking dash's and bash's
+        prefix off the messages, large-subset-runreport.pl's pattern
+        (?:\S*\/)?dash: \d+:  (anywhere in a line) also took the word
+        glued before the shell's path, as in "not found/usr/bin/dash: 1: ";
+        the same pattern in large-subset-matchreport.pl,
+        large-subset-builtins.pl and large-subset-repeat.pl.  Now the path
+        begins with "/".  Made again from the runs of 2026-11-17 (no run
+        made again): the base run's classes, 6 tldr snippets from messages
+        as neither to messages as dash (23,287 and 72 became 23,293 and
+        66; large-subset-state.md, section 7, and its .html); the variant
+        sigpipe, 9 class changes of the messages only gone (38 + 15 noisy
+        became 34 + 10; large-subset-environment.md, section 9; README.md,
+        "Three further measurements": 34 of 5,742); the records
+        large-subset-run-differences.tsv (6 lines fewer),
+        large-subset-env-variants.tsv (9 fewer), large-subset-match.tsv (3
+        labels), large-subset-env-setups.tsv (1 label),
+        large-subset-env-control.tsv (TL:common/pamfix.md:17 from changed to
+        unchanged, 2 labels; no count of section 12 moves).  Unchanged: every
+        count of the match (match.txt, match-raw.txt), the builtins' record
+        (made again with -reuse), the end modes' record.
+      - X80 fixed (cd took its operands apart before they were expanded):
+        the large parser keeps every operand word (cd_more; cd_dd after
+        --); ShellSpawn expands them all as arguments, reads -L, -P, --
+        from the fields as both shells do (any other option an error,
+        status 2, with dash's message; bash's own -e, -@ too: A5), then
+        counts the operands ("too many arguments", status 1, as bash,
+        X54); an operand starting with - after -- is a directory's name.
+        large-subset-blocks.pl counts the other operand words' expansions.
+        t/programs.t: 12 lines (X54's x=-n now "Illegal option -n").
+      - D3, decided 2026-11-22 (TODO A17): a command that dash and bash run
+        as a builtin and ShellSpawn runs inside Perl (echo, printf, test,
+        [, pwd, true, false) and that writes into a pipe whose reader has
+        gone ends the shell running it, as SIGPIPE does in the shells: a
+        pipeline element or subshell with status 141 and no EXIT trap
+        (bash runs the subshell's own EXIT trap there, dash not: as dash,
+        A5); the main shell ends the whole string, as kill -PIPE $$.  Not
+        where SIGPIPE is ignored or trapped in that shell.  The zenity
+        snippet now runs one sleep 1, as the shells.  ShellSpawn's own
+        printing builtins (jobs, type, ...) unchanged (TODO A17).
+        t/programs.t: 5 lines.
+      - X81 (ours, found testing D3; fixed): an in-Perl command whose
+        standard output failed with SIGPIPE ignored and whose standard
+        error was redirected for it alone (echo a 2>/dev/null) never
+        ended: its message went to the descriptor it had just let go.
+      - large-subset-match-known.tsv: the four snippets marked open there
+        (cd - twice, exec command, zenity) taken out: fixed by the merge
+        and D3.  The 42 of TODO A13 run again with this code
+        (large-subset-rerun.sh): 30 with no ruling but X54's question, 8
+        that rule E's rows cover (TODO A13), 3 legalized by A5; the exec
+        snippet no longer accepted.
+      - The parse results measured again (the stored scan reparsed): every
+        verdict as with the digest of 2026-11-21 (40,409 accepted); new
+        digest d4e0ac534d2f4cfff827eaedb866a8a91f57ae8b475628f5c2351930b3faeaec.
+        make test: 288 pass.  Not run again yet: make corpus-all (the
+        documents' run counts are still those of 2026-11-17).
+      - The branch post-0.13-todo (X30, X72, X6, X73, cd - with OLDPWD
+        unset, X74, X56 in the executor and in every grammar (D1), X75,
+        X76 recorded, X3, X4, closefrom where it alone is missing, X72
+        worded as dash (D2)) merged into main, its entries below.  make
+        test passes (271 tests); make docs-check names 9 parts not in line
+        (the runs of 2026-11-17 against the changed lib/), owed to make
+        corpus-all.
+      - doc/large-subset/large-subset-review.md (new): the 130 differences
+        of README's "How close" that may be bugs of ShellSpawn, reviewed
+        snippet by snippet; the 42 without a ruling (TODO A13) done.  Each
+        run again in every environment of the match (base run, steps 2 and
+        3) with the code of main after 0.13 (the match the same as
+        large-subset-match.tsv in columns 1 to 10 for all 42) and, to
+        compare, of the branch post-0.13-todo (3 of the 42 change there:
+        G4 below).  They sort into (26+4+8+3+1=42): 26
+        where X80 shows (below); 4 with only cd's extra operands made at run
+        time, the open question of X54; 8 that decided rows of rule E cover
+        (cdargs, caret, returnout, fdmulti, lineno) while
+        large-subset-match-known.tsv lacks their lines; 3 that
+        post-0.13-todo settles (cd - twice, exec command); the zenity
+        snippet (TODO A17, found wider: any builtin run in Perl, in ( ),
+        { } or a function, writing into a pipe whose reader has gone).
+        Proposals P1 to P5, also in TODO (A12, A13, A17, B).  Not done: the
+        88 of TODO A12 (the review's section 0 says how to go on).
+        New tools: large-subset-rerun.sh (some samples run again in every
+        environment of the match, and matched, without corpus-all) and
+        large-subset-envs.pl (each environment where ShellSpawn is not as
+        both shells, with what the three did).  No code of lib/ changed:
+        the corpus results were not made again.
+      - X80 (ours, found by that review; open): cd takes its operands apart
+        before they are expanded.  The large parser keeps only the first
+        operand word and a flag for more; ShellSpawn reads no option from
+        an expansion (x="-n d"; cd $x: both shells refuse the option,
+        status 2, ShellSpawn says "too many arguments", status 1;
+        x="-P d"; cd $x: both go to d), counts a word that expands to
+        nothing (cd $x d, x unset), and never expands the words after the
+        first (cd d $(cmd): cmd does not run).  In the corpus: 64
+        environments of 26 snippets, cd $(...) where step 3's stand-ins
+        answer "-n a\b %s".  The same on post-0.13-todo.  README's "How
+        close" names it beside X56.
+      - X79 (ours, the runner large-subset-runcompare.pl): each worker's run
+        directory, the run's record in it (log, blog, out, err), is the
+        worker's user's, so a snippet can change or remove its own record.
+        Checked as such a user: kill is refused against root's and other
+        workers' processes, and nothing but its own directories and the
+        sticky /tmp, /var/tmp, /dev/shm, /run/lock is writable; no corpus
+        snippet names ../log, ../out, ../err or ../blog.  Open.  The
+        runner's comments corrected: rm, mv, cp, ln are only logged as a
+        choice for the measurement, not for safety; every command, kill
+        and rm alike, is held by the user.  Comments only: the run results
+        were not made again.
+      - pspawn-loop.md and TODO no longer say that the snippet library has
+        not run under Wine: it ran on 2026-11-18/19 (pspawn-shell-windows.md,
+        "The large subset under Wine").
+      - doc/pspawn-shell-windows.md, section 2: the large subset under Wine.
+        Its 40,410 snippets run by Proc::ShellSpawn under Wine 9.0 with
+        Strawberry Perl 5.38.2.2 (code of post-0.12, the base run's), both
+        ways (win_spawn.h; system1 through Run), against the base run on
+        Linux of 2026-11-17, sorted by what each result says about Windows:
+        the same 39,837 and 39,484 (15 and 13 of them as Linux run again on
+        the machine Windows ran on: the base run's machine differs); the
+        same apart from how paths are written 357 and 348; nothing, as Linux
+        itself gives no stable result, 131 in both ways (the project's 45
+        chance and 13 never-ending snippets, and 73 that differ between
+        Linux runs of one setup in any record kept); differences made by the
+        test setup 6 and 5 (the test runners: 4 and 4; under Wine, MSYS2's
+        fork does not work, so Git's xargs hangs: 1 and 1; after the
+        72 snippets of that row ran again with Git for Windows' programs,
+        PortableGit 2.47.1, in place of the Linux ones behind the stand-ins;
+        environment variables only the Windows runs had: 1 and 0, after the
+        15 snippets of that row ran again with the runner's environment
+        trimmed; the 1 needs ProgramFiles and ProgramW6432 only because of
+        X77); differences found on Windows 79 and 442 (Windows behaves
+        otherwise: 50 and 46; the module's own design for Windows: 10 and
+        10; Perl's own system: 0 and 368; Git for Windows' kill and comm:
+        18 and 17; X71, ours: 1 and 1).  Only X71 a
+        bug of
+        Proc::ShellSpawn among them.  The counts:
+        doc/test-results/wine-large-subset.txt (new; docs-sync.tsv, with
+        large-subset-match.tsv as an input); the records, tables and tools:
+        repository ilyaz-ai/Proc-Spawner-results,
+        proc-spawner/2026-11-19-post-0.12-wine/ (tools/regroup.pl).
+      - X78: ❰BUG❱ Wine 9.0: appending to a file (FILE_APPEND_DATA) is not
+        atomic between processes; 4 processes appending 2,000 lines each
+        kept 5,039 to 7,355 of 8,000.  The large subset's stand-ins log
+        that way: one snippet lost a line (in (s1) now).  Not reported.
+      - X77 (ours, found reading the code; not fixed): on Windows, BIN1's
+        search creates %ProgramFiles% and %ProgramW6432%, where unset, in
+        %ENV as undef (grep over a hash slice), so children get them empty
+        and every start warns under -w.  Seen under Wine too (2026-11-21).
+        TODO B.
+      - After X72 and X56's change of the grammar (2026-11-21, this code):
+        the tests at the four levels of the spawn primitive pass, 271
+        tests each (doc/test-results/linux-flavors.txt); the per-test
+        record made again (linux-flavors-by-test.txt, and the paragraph
+        "Per test" of pspawn-spawner.md: ok and skipped, 267 and 4, 255
+        and 16, 253 and 18, 243 and 28).  Under Wine 9.0 with Strawberry
+        Perl 5.38.2.2, built there from make distdir: the six Windows
+        test files and t/options.t pass at the three levels (227, 227 and
+        231 tests).
+        ShellSpawn alone over the 40,410 snippets of the runs of
+        2026-11-17 again, with this code, against the run with 0.13's
+        code of 2026-11-20: 72 differ; those 72 run again twice with each
+        code: 46 differ between two runs of one code (noise); 8 are the
+        same in every rerun (5 read /etc/group, /usr or /etc, changed by
+        an installation of packages between the runs; 3 differed in their
+        messages in the full runs only); 18 differ between the two codes
+        in both reruns and never within one: the 11 of the comparison of
+        2026-11-20 (exec command -with -flags now refused by the grammar,
+        status 255 from the test driver, where it was 248), and 7 whose
+        message alone changed, by X72: a command whose name is empty
+        ("$outfile" with the variable unset) now says "Permission
+        denied", as dash says for it (each directory of PATH is the name
+        looked at), where it said "not found"; the status is 127 as
+        before.  46+8+18=72.  The records of both comparisons are kept
+        in the repository of results, marked provisional (dash and bash
+        were not run again).
+      - X72, decided 2026-11-21 (D2): for a command found nowhere the
+        message is worded as dash words it.  The search keeps the error
+        it met (find_cmd, as dash's find_command): a name that cannot be
+        looked at because a directory of PATH may not be searched, or
+        that is there and is no regular file, gives "Permission denied"
+        where ShellSpawn said "not found"; status 127, and 126 after exec,
+        as in dash; hash words its message the same way.  Not on Windows.
+        t/dash.t and t/programs.t compare with PATH as it is again (the
+        filter of 2026-11-20 is gone).
+        X56, decided 2026-11-21 (D1): the base grammar and
+        Proc::ShellSubset::Small refuse exec followed by a builtin's name
+        (they refused cd, : and exit only), as the large grammar does and
+        as V7 of shell-subset-spec.md says.  The parse results measured
+        again from the stored scan: one sample changes, tldr's exec
+        command -with -flags, now rejected; 40,409 accepted; in section
+        3's table tldr has 8 rejected within lower (7); section 4's work
+        list has 45 (44).  Every other sample: the same tree or rejection
+        as with 0.13's parsers.  Digest:
+        a741109fd8206da2aeec7e2c09492517aea16889f5d4aba3cd48a699987bb853.
+        Two battery lines of 2026-11-20 that the grammar now refuses
+        (exec umask, exec command -v) are gone; t/parsers.t has the
+        refusals for the three grammars.
+        Tests: prove -b t/, 271 tests pass; as a user made with useradd,
+        with root's PATH, 271 tests pass, and six commands with an
+        unsearchable directory in PATH give what dash gives; a line in
+        t/batteries/largebattery.txt (a directory named as the command);
+        t/batteries/portable.txt recorded again, the same file (250 of
+        458 lines).  Not run again yet when this was written: the levels
+        of the spawn primitive, Wine, the corpus.
+      - Under Wine 9.0 with Strawberry Perl 5.38.2.2 (2026-11-20; the
+        distribution directory of this code built there with Strawberry's
+        own gcc and gmake, Run 0.07 in blib/lib; perl t\flavors.pl with
+        the six Windows test files and t/options.t): the six files pass
+        at the three levels there (as built; the redirections only;
+        system1), 183, 183 and 187 tests.  t/options.t failed in 2 of its
+        41 tests at each level, by the test's own file names, which
+        Windows cannot make (a*, and a:b, which names a stream of the file
+        a): the test now uses a[b] and a,b, and passes there at the three
+        levels (and on Linux).  So brace expansion and redir_strict work
+        on Windows as on Linux, and the 250 lines of t/portable.t are
+        unchanged by the changes of post-0.13.  Not made again: the
+        per-test record under Wine (TODO B), the missing-matrix.
+      - The tests at each level of the spawn primitive (2026-11-20, Run
+        0.07): perl t/flavors.pl, 4 of 4 levels pass, 268 tests each
+        (doc/test-results/linux-flavors.txt).  Per test, recorded again
+        (TODO B; doc/test-results/linux-flavors-by-test.txt, and the
+        paragraph "Per test" of pspawn-spawner.md, section 8): ok and
+        skipped, as built 264 and 4, the redirections only 252 and 16,
+        fork 250 and 18, system1 240 and 28; no test fails.  At the level
+        with the redirections only, where closefrom counts as missing, the
+        12 tests of closefrom as closes run and pass.
+        make disttest: 268 tests pass; with /proc hidden, 265.
+        The fuzzer (large-subset-difffuzz.pl), 3 seeds of 600 strings
+        each, 1,645 accepted, with 0.13's code and with this one: every
+        string in the same class but one, whose background job's EXIT
+        trap printed in one of dash's two runs and not in the other
+        (chance; ShellSpawn the same in both).
+      - The shell layer's changes of post-0.13 up to X4 (X6, X73, cd -,
+        X74, X56, X75, the exec messages, X3, X4) measured over the
+        corpus: ShellSpawn alone on the 40,410 snippets, once with the
+        code of 0.13 and once with this code, on the same day, each
+        snippet in the worker it had in the run of 2026-11-17
+        (large-subset-runcompare.pl -shells ours -workers-from; 28 and 30
+        minutes).  62 snippets differed.  Those 62 were run again, twice
+        with each code:
+          45 differ between two runs of one code (process IDs, dates,
+             random numbers, races, listings of / and /proc);
+           6 are the same in every rerun (5 read /etc/group, /usr or /etc,
+             which an installation of packages changed during the second
+             run; 1 is a race);
+          11 differ between the two codes in both reruns, and never
+             between two runs of one code: the 2 snippets with cd - (the
+             directory printed, as dash), exec command -with -flags
+             (status 127, as both shells; it was 248: X56), and 8 more
+             with exec, whose message alone changed ("exec: " in front).
+        45+6+11=62.  No other snippet changed.  dash and bash were not run
+        again, so the documents' counts are still those of the runs of
+        2026-11-17 (make docs-check: 8 parts not in line, by the changes
+        to lib/); they wait for make corpus-all.  The records of these
+        runs are not kept.
+      - doc/pspawn-known-issues.md, the rows written post-0.13 (X3, X4, X6,
+        X30, X56, X70, X72 to X75): sentences given their verb (X73, X74),
+        X30's two measurements said to be of two texts, X4 with IFS
+        empty (nothing is split; a pattern still fails: checked), X56's
+        two later cases told from its first finding, V7 named, X6's
+        "$PATH is refused by the parsers", which refusals X3's tests
+        hold, what X72's 218 tests are.  No fact changed.
+      - Where the C library's posix_spawn lacks closefrom alone (glibc
+        before 2.34, musl), a call that asks for it no longer has its fd
+        actions done in Perl's own process (TODO B, the next cycle's item
+        1): closefrom N becomes a close of each fd from N up that the
+        child has at that point (this process's fds without
+        close-on-exec, and the targets of the call's earlier dup2 and
+        open, less what it closed: closefrom_as_closes), and posix_spawn
+        does them all in the child.  Not on Windows.  Unlike the
+        library's closefrom it misses an fd that another thread opens
+        meanwhile.  The fds without close-on-exec are read from
+        /proc/self/fd where it is there (inheritable_from), not found by
+        one fcntl for each number up to the limit on open files; system1
+        (run_redirs) and the emulation (emulate_actions) use the same
+        list.  Measured, with closefrom taken as missing and a limit of
+        20,000 open files: a spawn with closefrom 3, 5.7 ms before, 1.3 ms
+        now (1.3 to 1.6 ms with the library's own closefrom); through
+        Run, 6.8 ms before, 2.4 ms now.
+        Tests: t/spawner.t, 8 more (the call leaves everything to
+        posix_spawn; an fd inherited from this process is closed; the
+        list of closes; with dup2 missing too, done in this process as
+        before); t/spawner.t passes as built, with closefrom missing,
+        with posix_spawn missing (fork), and through Run (system1).
+      - The parse results, measured again with the changed parsers
+        (2026-11-20; the run records of 2026-11-17 from the repository of
+        results): the stored scan (42,204 lines) reparsed is the same
+        file byte for byte; each of the 45,479 samples gives the same
+        tree, or the same rejection, as with 0.13's parsers; samples.tsv
+        made again is the stored one byte for byte.  So the parse results
+        of 0.13 hold.
+        X70 (ours; a label): the detector's feature scope names its probe
+        localout (it said local).  It changes one line of the parse
+        report, the label in 16 samples, and 3 lines of
+        t/parser/large-subset-shells.tsv (made again, make corpus-shells);
+        no count.  large-subset-yardsticks.pl lists features of equal
+        count by name (their order changed from run to run, so the report
+        was not the same file twice; now it is).
+        Digest of the files the parse results depend on:
+        2da8f5e8793437e083b3da701f08165a58420d9405b40b58b4defe0b64e9a9c3
+        (0.13: 9c6511c7...; changed by X30, X3's two changes for the
+        option brace, X70 and the order of ties).
+      - X4: run's option redir_strict (Q1), which was specified and never
+        built: Proc::ShellSpawn::run(STRING, redir_strict => 1) makes a
+        redirection fail with "ambiguous redirect", status 2, when an
+        unquoted expansion in its target gives a character of IFS or a
+        pattern character, or the name comes out empty.  Compared with
+        bash 5.2.21 outside POSIX mode on 16 strings: its refusals, and,
+        as specified, every pattern and blanks at the ends too.  Without
+        the option nothing changes.  Tests: t/options.t, 11 strings, each
+        with the option and without (6 fail with the option's code off).
+      - X3: brace expansion (the base parser's option brace) in the shell
+        layer, which died on it: a word with {a,b,...} or {x..y} becomes
+        the words that bash makes of it, in bash's order, each then
+        expanded as usual; numbers zero-padded as in bash.  In the parser,
+        with the option only: an alternative of empty quotes ({a,""}) is a
+        part of its own (["'", '']), so that its empty word stays; a brace
+        right after $NAME is refused ($x{a,b} is $xa $xb in bash, which
+        expands braces in the text).  Without the option nothing changes.
+        Tests: t/options.t (new; in MANIFEST), 16 strings with what bash
+        5.2.21 printed (compared with bash itself once more, by a one-off
+        script), the two refusals, one tree.  Not run under Wine.
+      - X56 (ours): after exec only a program is looked up, as in both
+        shells: "exec umask" says "exec: umask: not found", status 127,
+        where ShellSpawn ran its builtin.  Fixed in the executor, not in
+        the base grammar as TODO planned, since no grammar could refuse
+        the two cases found now: a name from an expansion (c=umask; exec
+        $c) and a function's name (exec f ran the function).  The grammars
+        are unchanged, so no parse result changes.
+        X75 (ours, found on the way): exec whose words expand to nothing
+        (c=; exec $c) ended the shell; now it is exec alone, as in both
+        shells: redirections and settings stay, status 0, the shell goes
+        on.  The message of exec's command that does not start begins
+        with "exec: ", as in both shells.
+        cd - with OLDPWD unset or empty prints the directory and stays, as
+        dash (A5; it printed nothing).  X74 (ours, found on the way): cd
+        with an empty operand, and cd alone with HOME empty, left OLDPWD
+        as it was; in both shells OLDPWD becomes the current directory.
+        X76 (ours, found, open): cd with OLDPWD or PWD read-only ends the
+        shell; both shells go on.
+        Tests: 7 lines in t/batteries/largebattery.txt, compared with dash
+        (all 7 fail without the fixes).  32 other strings (21 with exec, 11
+        with cd) compared by hand with dash and bash --posix: as dash, but
+        for exec "" (not found, 127, as bash), cd with extra words (2;
+        as bash, rule E) and X76.  prove -b t/: 219 tests pass.  t/batteries/portable.txt recorded again: the same
+        file (250 of now 459 lines).  Not run again: the corpus (its
+        counts in the documents are of the code before these fixes, with
+        "exec command -with -flags" and the 2 snippets with cd - as
+        differences), Wine.
+      - X6: with no PATH in the environment ShellSpawn searched no
+        directory for a command; now the shell's PATH starts as dash's own
+        default (/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:
+        /bin; bash's too as Debian and Ubuntu build it), not exported, as
+        in both shells.  $PATH in the text is then still outside the
+        subset (V8).  Not on Windows.
+        X73 (ours, found on the way): a command was looked up in the
+        exported PATH only, so "unset PATH; PATH=/usr/bin:/bin; ls" found
+        nothing where both shells run ls; now in the shell's PATH,
+        exported or not, or in the command's own setting (PATH=/dir ls).
+        Tests: t/dash.t, 5 strings run by dash and ShellSpawn without PATH
+        in the environment; a line in t/batteries/largebattery.txt (both
+        fail without the fixes).  t/batteries/portable.txt recorded again:
+        the same file (250 of now 452 lines).
+      - X72 (a message of dash's; found running the tests as a user other
+        than root with root's PATH): for a command found nowhere dash says
+        "Permission denied" when it may not search a directory of PATH, or
+        when the name is there as a directory; bash and ShellSpawn say
+        "not found"; status 127 in all.  By it 5 of the 14 tests of
+        t/dash.t failed for such a user, and the 10 strings with sh of
+        t/programs.t (TODO's watched failure of 2026-11-10, now explained).
+        The two test files take the directories that the user may not
+        search out of PATH before they compare.  Tested: prove -b t/ as a
+        user made with useradd, with root's PATH (218 tests pass; before, 6
+        failed), and as root.
+      - X30 (ours; found 2026-11-07): a text with $LINENO anywhere parsed
+        in a time that grew with the square of its length, since each
+        command's line was counted from the start of the text.  Now the
+        text's newlines are found once, and a line is looked up among them
+        (lineof in Proc::ShellSubset::Large); no parse tree changes.
+        Measured: 20,000 lines of commands and one $LINENO, 50.7 s before,
+        17.4 to 19.5 s now (7.1 s for the base grammar, which rejects the
+        text at its $LINENO, and 11.3 s for the wider one, which then
+        parses all of it); the same text without $LINENO, 8.4 s.
+        Checked: the old count and the new lookup give the same line in
+        17,030 calls over 1,650 texts made from the test files (a one-off
+        comparison); t/parsers.t: each command's line in a text of 600
+        lines, also with an alias expanded.
+      - perl-win32-system-bugs.md, report 1: what an argument becomes, by
+        whether it has blanks and a " (with blanks and no ": whole; with
+        both: split, the " dropped; with " alone: the " dropped), from
+        win32.c and the checks under Wine; section 5 says why exactly the
+        three sh -c lines are TODO under system1.
+      - doc/perl-win32-system-bugs.md, report 6: ❰BUG❱ (Perl) every failure
+        of CreateProcess in Perl's spawn on Windows (do_spawnvp_handles in
+        win32/win32.c) is reported as ENOENT, whatever GetLastError says, and
+        that ENOENT starts report 2's retry through the shell.  Found in the
+        corpus run under Wine (system1: a command line over 32,767
+        characters "not found"; win_spawn.h says "Argument list too long");
+        checked in the source of perl v5.38.2 and blead, and under Wine.
+        Section 5's table has its row (nothing done in the module); the
+        lists of these reports in doc/README.md, TODO and CLAUDE.md.
+      - TODO A22: four questions asked 2026-11-18 and not yet answered (the
+        "core README", W2's java list, N1 and N4, X63's "provisionally").
+      - CLAUDE.md (not shipped): session notes go to the tricks repository
+        again, as its README says (the user, 2026-11-18, lifting the rule of
+        2026-11-13); the repository's new name ilyaz-ai/Proc-Spawner.
+      - X67 (ours, found reading the code): where the C library's
+        posix_spawn lacks one fd action (closefrom before glibc 2.34, musl;
+        t/flavors.pl's level 2), every fd action of every spawn was done in
+        Perl's own process; now only for a call that asks for one of the
+        missing kind (spawn_unsupported).  t/spawner.t: the first test of
+        closefrom (natively, emulated, through Run), and X67 with closefrom
+        taken as missing (failed before the fix).
+      - X68 (ours, found by that test): without posix_spawn and fork
+        (system1), closefrom N closed only Perl's own inheritable fds from
+        N up, not those the call's earlier dup2 or open gave the child;
+        fixed in run_redirs.
+        Tested (2026-11-18): t/flavors.pl with Run 0.07, 4 of 4 levels pass
+        (216 tests each); not run again: Wine, the missing-matrix, the
+        corpus (the shell layer asks for no closefrom).
+      - README.md after the user's reading: the ways of starting a program
+        besides posix_spawn; the modules' table in sentences; "How close"
+        opens with what was done and what came out (38,593 as both shells;
+        1,629 allowed by rulings, 45 chance, 130 awaiting a ruling, 13 that
+        never end; X56 the one open bug of ours these runs found); "What is
+        open" near the end, with the known issues.
+      - README.md, "Our tests" after the user's second reading: the levels
+        defined before use; where the tests ran and what is modeled on Linux
+        (an older C library, no posix_spawn, no /proc) in sentences; what
+        is skipped under Wine and why; threads: what is made around the
+        call, and what belongs to the Perl process itself; the test files
+        as a table; the batteries explained.
+        The modules' table: Proc::Spawner's settings beyond posix_spawn's
+        name the umask too (the user).
+      - README.md, the user's third reading: "How close": the three groups
+        of the 1,804 said to be exhaustive; "chance" said for what it is
+        (results that change from run to run; nothing compared otherwise);
+        the 13 that never end (11 time out in all three; 2 stopped in dash,
+        once in bash too, by the run's file-size limit first); the
+        assumptions of "almost strict" named with their counts; the levels
+        "values passed on" as one level of two kinds; the three checks
+        beyond the one run as questions; no history of earlier runs.  "Our
+        tests": "platform"; the skips of each level with its definition;
+        level 3 a level for tests (a POSIX system without posix_spawn would
+        define it); Threads its own section after Dependencies, and a fork
+        could move both kinds of process-wide state into a child.
+      - README.md, "Three more checks" (was "Beyond the one run") rewritten
+        after the user's fourth reading: what each check is for, what was
+        run and what came out, with section 9's counts for the assumptions
+        switched (POSIXLY_CORRECT 36 of 443, SIGPIPE 38 of 5,742, locale 1
+        of 25, /proc 2 of 13).
+        The snippets that do not end: 14 in the one run (12 time out in
+        all three, 2 stopped in dash first by the file-size limit), 13 over
+        all runs (grep -Ril ... / ended alike in step 3's runs); the 3 of
+        known chance against the other 42 of the 45 (checked in the run
+        records and large-subset-match.tsv).
+        The user's fifth reading: the assumptions of "almost strict" in
+        plainer words; why messages are not compared; what "came out
+        otherwise" means for the assumptions flipped, and each one's change;
+        the six commands: five as Perl functions behaving as coreutils, kill
+        as the program.
+        The sixth reading: 13 = 11 + 2 and 14 = 12 + 2; the 45 of chance
+        said to be judged mostly from their text; the footnote on known
+        chance without the comparison with the 45; the further measurements
+        named A, B, C instead of "checks"; plainer words for the levels'
+        footnotes and the six commands.  TODO: A25 (to consider: error
+        messages not compared), A26 (rename the levels?), and in B chance
+        decided from every run of a snippet (the user).
+        "ours" for the shell layer replaced by its name, ShellSpawn
+        (Proc::ShellSpawn), throughout README.md (the user).
+        Measurement B: what it asks (does the agreement survive with the
+        switch flipped?); the sentence on the levels dropped.  "We" for
+        ShellSpawn where it cannot mean the authors (the user).
+      - doc/large-subset/large-subset-environment.md read by two fresh
+        readers given only the file (about 80 points); each fix taken from
+        the records (the tools, tools/*.tsv, corpus-work/), then read again.
+        Wrong before, now right: "the class held for all 2,475" (2,472: NB:6724
+        not legalized, NB:4904 and NB:9728 chance); "All 1,033 got setups"
+        (922; 111 none, and in control 18 none, not said before); the
+        sigpipe variant's 28 "as neither" (27; zenity counted twice);
+        fail's "nothing beyond the messages" (one loop that never ends);
+        35 and 511 "and the 578 missing" (35 of 113, 511 of 1,014; 670 of
+        1,248); "141 + 76" (the totals' 78 hold 2 timeouts); the runner
+        names the shells alike (each has its own $0 but with samearg0);
+        limits "the runner sets them" (prlimit; the mask is inherited);
+        printf '%q' "TODO A13" (legalized by builtin-vs-coreutils); ShellSpawn's
+        kill "as coreutils, IP1" (the procps program); AI-strict 15 succeed
+        (16); the bugs found by step 2, X39 to X55 (X39 to X47); a here-
+        document's bound (bash 5.2.21 measured with strace: a pipe up to
+        65,536 bytes, with or without expansions); the CALLS counts (10
+        names dash = bash != ShellSpawn not said).  Added: the class labels
+        of the records (msg=dash, msg-own, OURS, ...), the fixture, the
+        snippet ID prefixes, the decisions named in the text, which
+        programs run for real, what counts the rulings' table holds (A5
+        1,303 = 1,250 + 23 + 30), the counts of the not legalized rows.
+      - X69 (ours, open; found by that reading, checked by running the
+        tool): large-subset-blocks.pl counts a variable as set by an
+        assignment in a function body (even if not called first), a
+        subshell, a pipeline element or $( ); f() { a=1; }; echo "$a" and
+        ( a=1 ); echo "$a" are almost strict.  For the functions alone 3
+        samples of the corpus change; a fix changes the levels and the
+        corpus results (make corpus-all): the user's decision (TODO B).
+      - large-subset-environment.md, the second readers (their summaries
+        right): the strict example x=1; echo "$x" is A:echo (now printf);
+        every level also assumes ShellSpawn's kill, procps' (kill -l is
+        strict); which runs had -env tmp,random,mtime; why a class's tree
+        in section 12 and the match of section 11 put a sample in other
+        boxes (NB:5776; agree 1,847 against 1,912); the rulings' table
+        names builtin-vs-coreutils only where no ruling comes first
+        (141+3-16=128); output's 511 = 509 + 2 inside passthrough(...);
+        the six commands' calls of step 3 counted by command.
+      - large-subset-state.md read by two fresh readers; fixed from the
+        records: section 3's table recomputed from the samples.tsv of
+        make corpus-all (post-0.12, 2026-11-17): the same as post4-0.04's,
+        and the title says so (no "0.12, 2026-11-13"); section 6 now
+        1,461 = 520 + 941 outside the upper yardstick (0.04: 1,455);
+        section 5 now 52 subtle and 3 open (0.04: 58 and 4); 339 accepted
+        with class X only, again; the work list said for what it is
+        (within the lower yardstick: some failures at run time and some
+        differences the detector does not see, exit -1, NAME[); the 4
+        bracket samples (2 accepted, 2 unsetarr); post4-0.04's 7: 3 by
+        chance, not 4 (Z0); which programs are only logged (sh among
+        them); the "(15: ...)" of 2026-11-16/17 is 14 (14+3+1+1=19).
+        What the records no longer settle: TODO B (the run history).
+
+      - pspawn-shell-windows.md, section 2, measured again under Wine 9.0
+        with Strawberry Perl 5.38.2 (a Windows-way build of post-0.13,
+        2026-11-19): t/portable.t compares 250 lines (not 223): all the
+        same through win_spawn.h; through system1 248, and the 2 lines of
+        %SYSTEM1 TODO; the 19 Windows-only lines pass (through system1 one
+        TODO).  Without the machine filter 327 of the 451 battery lines
+        are kept (not 304): 297 the same and 30 others with the test's
+        directory on C:, 310 and 17 with it on Z:, by cause; the old 23 had
+        no record and its causes added up to more.  Found on the way: a
+        trap on USR1 is kept on Windows but nothing sends it (kill -USR1 $$
+        goes to the program kill, not found there).  Not the page's error
+        but ours: known issue X71, a regression of post-0.12 (JH4, part c:
+        "a signal that exists" taken from Perl's sig_name, which lacks
+        USR1 on Windows), against WS1; 0.11 took kill ... $$ for any name
+        (checked in CPAN's 0.11).  Then a second reader: the rows added
+        after WS1 dated; Cygwin among SH1's places for sh; Perl splits an
+        argument with blanks only when it has a " too (win32.c); the 17 of
+        the Z: run also among the 77; the signal lines one by one.
+        pspawn-graph.md, pspawn-loop.md, perl-win32-system-bugs.md,
+        parsers/shell-subset-test-provenance.md, metacpan-tables.md; fixed
+        from the code and the shells: Perl's create_command_line quotes an
+        empty argument too (perl v5.38.2's win32.c read), and the block
+        form's retry starts the same program with cmd.exe's words before
+        its arguments (Perl_do_aspawn), so system1's lookup is first
+        posix_spawnp's meaning of FILE; with HOME empty, dash drops the
+        word of ~ and bash keeps it (set -- ~: 0 and 1), not "an empty ~
+        as both"; the loop's wait returns as soon as the signal is pending
+        (200 ms at most; Spawner.xs); the graph's never set by run, + only
+        drawn, Perl's >END; an MK locator's #K is the K-th $(shell) of the
+        line; rejected script pieces are grouped too.
+      - Second readers of doc/README.md, large-subset/README.md,
+        perl-signals-findings.md, large-subset-dialect-features.md and
+        pspawn-extensions.md; fixed from the records: the terms of the
+        version table said (both shells, the detector, class X, batteries,
+        decision pages, Run, the atomic calls, the digest); 0.13's parse
+        results hold (digest 9c6511c7...); the two P1s told apart; what the
+        checks of 2026-11-03 found (0.03's ceiling page: tldr 123 against
+        126); step 3's 5,741 samples by class; dialect-features: three
+        parser test files, not four (283 + 612 + 222 = 1,117); J said for
+        what it is (one detector feature, dashflags, open; the J rows of
+        sections 5 and 6 are no features); dash's manual does not document
+        $LINENO (Ubuntu's 0.5.12 package, checked); the 108 of the work
+        list: three cases, deliberate rejections among them.
+        pspawn-extensions: the user's two decisions of 2026-11-01; the
+        approval of 2026-11-02 and what it leaves; dash's OPTIND inside
+        -ab (2, bash 1; checked); the bundle said once.
+        perl-signals-findings: who "we" and "the user" are; I2 and I3 not
+        candidates; where C4 was tested.
+      - X70 (ours, found by a reader, checked): the detector's feature
+        scope names the probe local, not localout; a label only, open
+        until the next change of the detector (the digest).
+      - large-subset-logical.md after a fresh reader, checked with dash
+        and bash: G15's feature is uidassign (roassign is EUID, PPID, ...);
+        "same" shown by G4's form (G12's descriptor 10 is posix); dash's
+        $- for -c is empty; H1-H14 and R1 are outside the table.  X24
+        again with dash 0.5.12 and bash 5.2.21: both crash (status 139,
+        segmentation fault, the default 8 MB stack), not "bash stops
+        quietly" (large-subset-logical.md, pspawn-known-issues.md).
+      - large-subset-match-raw.md after a fresh reader, recomputed with
+        large-subset-matchreport.pl -raw -o: the 11 that agree only with
+        messages left out are 8 legalized by "messages" and 3 by A5 (not
+        7 and 4); the rulings' table counts every snippet whose record names
+        a ruling, whatever its group (A5 1,303 = 1,244 + 23 + 5 + 31; G16
+        214 = 126 + 88 awaiting A12, ...), and the tool's heading says so
+        now; footnotes count a snippet under each ruling; the timeout row
+        is in the column totals; A12 and the ruling messages said.
+      - perl-win32-system-bugs.md after a fresh reader: system1 and M2
+        said; report 2 not among those to file; the one result from real
+        Windows; the block form's retry; win_find makes dir not found.
+      - pspawn-shell-windows.md after a fresh reader, checked against the
+        code: a script on Windows gets Permission denied, 126, with #! or
+        without (not "not found"); the five follow-ups (a)-(e) of WS1;
+        PROC_SHELLSPAWN_BIN on every platform, its defaults on Windows
+        only; how Windows' own sort and find are skipped; what decides
+        when no file ID can tell; SH1's auto looks in BIN1's directories
+        too; P2 was the wrong reference (the line numbers: pspawn-design.md
+        section 8); the 7 UNC lines and the line with ~nosuch and ~...
+      - pspawn-extensions.md after a fresh reader: the parser rejects
+        settings before export and readonly (checked), which section 5
+        lists among special builtins; E21 found by the memory test, flat
+        once fixed; X15's cycles left in the shell layer; later notes,
+        the IDs, the bundle said.
+      - large-subset-dialect-features.md after a fresh reader, checked
+        against dash, bash and the detector: the row of functions named
+        local and source (special in one shell each); dupnum's J beside the
+        decision "both shells refusing"; the class-X rows of the blatant
+        tables; a test's verdict from several features (B, then O, S, X);
+        LS:299's note; the names (the user, the page's items, rule E,
+        R-refuse, the detector).
+      - perl-signals-findings.md after a fresh reader: C3 and C4 run again
+        on Perl 5.38.2 (both hold; a wait on a non-child returns -1, $? -1);
+        what the document holds besides Perl's defects; written 2026-11-01
+        with later notes; who "we", the user, the executor are; S6 while
+        they wait; interposing waitpid catches what goes through it.
+        large-subset/README.md: where the other words are explained, the
+        CALLS column, blocks.pl's -p and -ai, the dated runs moved to
+        Changes.
+      - doc/README.md after a fresh reader: what besides the three groups
+        it lists; which documents are dated; the decisions and the
+        executor said; 0.02's date; 0.07's settings (what a C library's
+        posix_spawn lacks) told apart from 0.09's (M1, what it has no option
+        for), checked in Changes; the large parser's removed documents of
+        0.03 placed there; E1-E5 of the extensions apart from the known
+        issues' E and rule E.
+      - pspawn-spawner.md after its second reader (its summary right),
+        checked against the code: win_spawn.h quotes the command line
+        itself (create_command_line() was only at first); parent ends are
+        not close-on-exec; on Windows only win_spawn.h's children keep
+        their status from other code; W4's approximate mappings beside the
+        rule "no approximate category"; W1 to W7; the M1 settings are set
+        by the XSUB around the call, in C.
+      - The second readers of test-pools.md, pspawn-design.md,
+        large-subset-spec.md and shell-subset-spec.md (their summaries
+        right), checked against corpus.mk, the parsers and dash: corpus-all
+        keeps what CORPUS has, so after a change make corpus-clean first;
+        corpus-calls rewrites the provenance in place (record); gentests.pl
+        writes into the current directory; newlines after for's in end the
+        word list (rejected, as dash), after the other reserved words they
+        are ignored (corrects post-0.13's own wording); exit up to 9 digits
+        (P4) beside V4; run-time differences follow dash but where rule E
+        chose bash's; design's status says which sections are dated, and
+        names W5, the old Project, the bundle; :SECONDS is a suffix.
+      - pspawn-spawner.md after a fresh reader, checked against the code
+        and the test records: spawn wraps the XSUB (not an alias); the
+        graph's states (pending, lost, never too); the example reads pipe 2
+        (as t/spawner.t); W4 mapped nice and rlimit (post-0.09), sigignore
+        of PIPE and of INT in a new group was accepted in 0.09; reaped is
+        called by start's watch since post-0.12 (X59); the Windows column
+        is win_spawn.h's, umask around the call everywhere; the matrix's
+        19 settings include M1's, and 14 and 23 are the entries run; the
+        flavors' sums differ as their tests do; four modules over one loop.
+        Left unclear: TODO B.
+      - pspawn-design.md after a fresh reader: section 1's scenario of
+        2026-11-01 against the per-pid reaping since; ends close-on-exec
+        but fds 0-2; why yes | head ends (sigdefault); the review's 15
+        problems are E4-E18; 40/43 once (X13); addfchdir_np's row; a
+        background job's command started between run() calls also has
+        SIGINT and SIGQUIT ignored (checked through /proc/self/status).
+      - parsers/shell-subset-spec.md after a fresh reader, each rule checked
+        by parsing it with the base parser: kill ... $$ is the large
+        grammar's ($$ rejected here); IFS: a setting before a command does
+        not change its splitting, only read's; >$OUT unquoted allowed too;
+        exit without leading zeros; backslash-newline at a word's end
+        rejected; newlines after then, do, else, in ignored; a variable's
+        value from the snippet's own table first; echo and pwd behave as
+        the programs (run, or inside Perl); the statuses that follow dash
+        among the accepted differences; the bare C-numbers of section 9.
+      - large-subset-spec.md after a fresh reader, each rule checked by
+        parsing or running it: ${#} of special parameters accepted (and
+        ${#*} rejected); unalias anywhere since 0.05; compopt is B2's, not
+        left to sh; <file alone rejected too; a ^ not first in a bracket
+        expression rejected; A4's example: ${x}let gives 248, while a name
+        that becomes fc (B2) runs it; cd -P, -L; the statuses that follow
+        bash by rule E; the names of the decision pages, and where B2, B3,
+        P1 mean other items.
+      - test-pools.md after a fresh reader, checked against corpus.mk and
+        the scripts: corpus-provenance also writes large-subset-step3.tsv;
+        stress.t and memory.t run only with RELEASE_TESTING=1; features.pl
+        reads large-subset-verdicts.txt; the record C counts 1,117 tests,
+        the same on 2026-11-13; the races are section 12's; corpus-all
+        about 4½ hours; the terms (labels, ShellSpawn and "ours", the
+        user, X27, steps) said or pointed to; the match of 2026-11-11 said
+        in words.
+      - pspawn-known-issues.md, after two second readers (their summaries
+        right): X7 also SIGPIPE (ignoring_int); X10's FIFOs only for the
+        library's own pipes; X26 in the CPAN releases up to 0.04; X43, an
+        empty "$o" is a word, an unquoted empty $o none (checked); X53's
+        check in the builtin also catches X56's literal form (248,
+        checked); X14's deferred handler also serves between run() calls;
+        X23's Q1 is "Shell Corpus Gaps"'s, X4's the base parser's option
+        item; X2's K4 and TODO A5; who "the user" is; a fix labelled
+        post-N is in every release after N.  TODO B: what is left unclear.
+      - pspawn-known-issues.md, from the start to X43, after a fresh reader;
+        checked against the code and the records: the Where of X29, X34,
+        X38 (spawner), X31 (spawner, Windows), X10 (the distribution);
+        L10's fallback without /proc was X28's non-blocking shared file
+        (Graph.pm's perl_write); X1's choices A and C of K3 (the 0.03
+        checklist "Run Graph API", from branch project-copy-0.01), and that
+        K5 there is another item than the user's K5; the fuzzer of L1-L10
+        and of X2 the same, ported post-0.11 with bash; X10, X27 and X8
+        say what is open or watched; the intro defines the six collections'
+        prefixes, M1, M2, A4, A5, rule E, and how ❰BUG❱ marks others' bugs.
+      - pspawn-known-issues.md, X40 to the end, after a fresh reader;
+        each fix checked by running the shells or reading the code: X40,
+        in UTF-8 it is bash, not dash, whose [[:alpha:]] matches é; X46,
+        bash's two answers (status 1, goes on); X53, command -v a b looks
+        up only a in dash too, each name in bash; X50, before a special
+        builtin the shell still ends (as dash); X58, Windows and getenv
+        take a name's first entry, %ENV the last; X67 and X68 say what the
+        code does (per call: fd actions, chdir, fchdir; closefrom closes
+        the earlier targets from N up); X51 against X19, X55's handler,
+        t/flavors.pl's level 2, TODO A21 and A22 (d) linked.
+      - large-subset-state.md after A16, the second reader (its summary
+        right): the two printf -v where dash and bash agree (both fail,
+        status 2); 14 timeouts = 12 in all three + 2 stopped first by the
+        file-size limit, and the two bullets after them not among the 14;
+        kill's message is procps'; the exclusions of post4-0.03 but the
+        noise (post2-0.04); what a label such as post-0.09 names; the
+        builtins' row "messages as bash's" (0, it was missing); "Samples" of
+        the atomic calls a sum over calls (1,156); B1, B3, F9, Y3, A4's 248,
+        K5, M2, Run, A24 (b), ShellCheck clean and warned, samples.tsv,
+        the base parser said where first used.
+      - doc/large-subset/large-subset-state.md rewritten as the current state
+        (TODO A16, the user, 2026-11-18): what it held of earlier versions and
+        of the runs that later runs replaced follows here, as it stood, by the
+        part it was in (links reduced to their text; "above" and "below" are
+        in that document).
+        * The versions (the preamble):
+          **Versions.** Every parse result here is of post4-0.04, unless it
+          names another version (the version labels: `../README.md`, last
+          section). What changed in the parser and the detector from 0.03 to
+          post4-0.04 (every change: `../../Changes`):
+          - from 0.03 to 0.04: item P6, `pwd`, rule E and its first choices,
+            more forms both shells run alike, X19 fixed, detector fixes;
+          - from 0.04 to post-0.04: 3A, functions before regular builtins; the
+            rule-E choices G4, G8, G15, G16 and `break`/`continue` in a
+            subshell; `jobs %N`; X25 fixed;
+          - from post-0.04 to post2-0.04: `read` with a name from an
+            expansion, `${##}`, 14 noise samples left out by hand, the
+            detector's rows N1–N3;
+          - from post2-0.04 to post3-0.04: aliases known only when they run
+            (P1), `[ s1 \< s2 ]` (rule F);
+          - from post3-0.04 to post4-0.04: bracket expressions with quotes,
+            expansions or `/`, `* ? [` in a `${x:-word}`, `unset NAME[…]`
+            rejected and the detector's feature `unsetarr`.
+        * Section 3: the count rejected within the lower yardstick, by version, and the comparison with 0.03:
+          **The count of samples rejected within the lower yardstick, by
+          version:**
+          - early-post-0.02 (2026-11-02): 304;
+          - 0.03: 163;
+          - post-0.03: 117;
+          - post3-0.03: 106;
+          - 0.04: 95;
+          - post-0.04: 91 (functions named `cd`, `continue` in a subshell in a
+            loop);
+          - post2-0.04: 72 (14 samples marked as noise; `read` with a name
+            from an expansion and `${##}` accepted; and the detector counts
+            the decided rows N1–N3 of `large-subset-logical.md` (`${x:?}`, a
+            special builtin's error, `command -v`) as class X, which brings a
+            few samples inside the lower yardstick);
+          - post3-0.04: 49 (aliases known only when they run, `[ s1 < s2 ]`);
+          - post4-0.04: 44 = 49−3−2 (bracket expressions with quotes,
+            expansions or `/` and `${1:-sure? [y/N]}` accepted, 3 samples;
+            `unset foo[$i]`, 2 samples, now seen by the detector as blatant
+            (feature `unsetarr`), and rejected). The ShellCheck percentages
+            fall a little: 5 more `unset NAME[…]` samples, which the parser
+            accepted until post3-0.04 (wrongly: known issue X26), are now
+            outside the upper yardstick and rejected.
+          Compared with 0.03, rule E settles more samples as class X (the
+          choices of `large-subset-logical.md`; detector basis `E:CATEGORY`),
+          and the detector sees three blatant differences it missed in 0.03:
+          `set -euo pipefail`, `cd a b`, `jobs` in a pipeline (the last two
+          now class X, settled by rule E). The parser accepts 339 samples
+          whose only differences are class X: programs, the interactive
+          builtins of B2, and rule E (339 with post4-0.04 and again
+          2026-11-17; with post3-0.04, counted again: 338).
+        * Section 5: the counts of 0.04:
+          **Between the shells.** Measured 2026-11-17 (`samples.tsv`): 52
+          samples have a subtle difference as their worst one, and 3 an open
+          verdict (with 0.04: 58 and 4). The counts per feature below are of
+          0.04, and include samples that also have a blatant difference, so
+          they add up to more:
+          - listings (`set`, `export -p`, `trap` alone), also the order of the
+            `alias` listing: 33;
+          - `local x` without a value: 18;
+          - traces (`set -x`): 7;
+          - `${x:?}` statuses, `command -v` statuses, `$PS1`: a few each (the
+            first two class X since post2-0.04, rows N1–N3 of
+            `large-subset-logical.md`).
+        * Section 6:
+          With 0.04, 1,455 samples were outside the upper yardstick (0.03:
+          1,463).
+        * Section 7: the list of its parts:
+          - The run of every accepted sample in dash, `bash --posix` and
+            ShellSpawn, in a controlled environment: how it is made, its
+            table, and what the classes hold. The table counts the runs of
+            post-0.12 of 2026-11-17: the first, and for the 4,060 samples that
+            A24 (b) concerns the second ("A24 (b)", below). Its code had the
+            review of the executor's code built in; ShellSpawn ran the
+            programs inside Perl (IP1) and waited at exit as the shells do
+            (K5); the runner waited for background jobs (A18), offered only
+            the programs of its fixed list (A23), and compared what a sample
+            feeds a program that is only logged (IN1). It replaced the run of
+            2026-11-16, which had replaced that of 2026-11-15, which had
+            replaced that of 2026-11-14, before K5, which had replaced
+            post-0.11's of 2026-11-13 and post-0.09's. How the counts changed
+            between these runs: How the counts changed between runs.
+          - "ShellSpawn at exit": the modes of K5 (`PROC_SHELLSPAWN_END`) on
+            the samples with a background job, 5 runs each.
+          - "The run of post-0.09": the table it replaced (2026-11-08:
+            ShellSpawn with the coreutils programs).
+          - "With the programs inside Perl": that table for the default since
+            0.10 (IP1), rebuilt from the run of post-0.09; known issue X37.
+          - "W5": the event loop of post-0.10 measured over the library on
+            Linux, and what could run under Wine before the shell layer's port
+            to Windows (ported later that day: `../pspawn-shell-windows.md`;
+            the library has not yet been run there since).
+          - "Through Run": ShellSpawn starting every process through `Run.pm`
+            (M2), against posix_spawn.
+          - The atomic calls: of `echo`, `printf`, `test`, …, of external
+            programs, and where no program runs (all three from the run of
+            post-0.12, 2026-11-17).
+          - "Which samples depend on the environment": known issue X27, the
+            levels from the parse trees, and the runs with the environment
+            varied (section 9 of `large-subset-environment.md`).
+        * Section 7, where dash and bash agree and ShellSpawn differs: how this class came out in other runs:
+          How this class came out in other runs:
+          - in the `zenity` subshell dash came out otherwise too in the run of
+            2026-11-16, bash in the first of 2026-11-17, so ShellSpawn was as
+            one of them there;
+          - in the run of 2026-11-15 also the race `{ echo foo; cat bar; } |
+            tee bar` (section 12 of `large-subset-environment.md`; as neither
+            in the run of 2026-11-14, ShellSpawn as dash in this one) and the
+            `zenity` subshell;
+          - in post-0.11's run also `ls -l -- "$dir/$file"`, that is `ls -l /`
+            (times of directories outside the run's copy); as neither since.
+        * Section 7, known chance:
+          (of the race `ls -a | tee output.file`:) as in the run of 2026-11-16
+          (ShellSpawn as dash in the first run of 2026-11-17, and in the run
+          of 2026-11-14).
+        * Section 7, ShellSpawn as neither: the counts of other runs:
+            Since then, `v=5 env | less` (a listing) and `ls -lR / | tee
+            output.file` (a listing of `/`) were added: 150 + 2 = 152. The
+            counts of the other runs: in the run of 2026-11-16, 150, without
+            those two; the 150 of 2026-11-14 were post-0.11's 150 with `{ echo
+            foo; cat bar; } | tee bar` and `ls -l -- "$dir/$file"` in, from
+            ShellSpawn differs, and `ls -lR / | tee output.file` out, to the
+            timeouts; in the run of 2026-11-15, 151, with `find . -print |
+            xargs ls -gilds` (the inode numbers of the run's copy), the same
+            in this one.
+        * Section 7, timeouts:
+          - `ls -lR / | tee output.file` ... In the runs of 2026-11-17 it
+            ended in all three (timing). In the run of 2026-11-16 dash ran out
+            of time, in that of 2026-11-14 dash and bash, in post-0.11's none.
+        * Section 7: how the counts changed between runs (from post-0.09's run to the second run of 2026-11-17):
+          How the counts changed between runs
+          The run in the table replaced earlier runs. Below, each is compared
+          with the run before it, newest first.
+          From the run of 2026-11-16 to the first run of 2026-11-17 (IN1)
+          The run of 2026-11-16 had the same code, but the recorders did not
+          read their input. 27 samples changed class, none by a difference of
+          ShellSpawn. We traced them sample by sample: the same run's records
+          were also reported with the input's size and SHA-256 taken out of
+          every log (the recorders still reading), and the 147 samples where a
+          logged program read some input ran again with the recorder of
+          2026-11-16 and with the new one.
+          - **7 by what the programs are fed, which is now compared:**
+            - `echo -e …` into a program (5: `| tsort`, `| nc host 80`, `|
+              sudo tee -a …` twice, `| grep -v … | tail -1`), where dash's
+              `echo` prints `-e` and interprets the backslashes, bash's and
+              ShellSpawn's do not (from same to ShellSpawn as bash, as `echo
+              -e` alone does);
+            - `bind -P | grep … | perl …`: only bash has `bind`, so only bash
+              feeds `perl` something (from messages only to ShellSpawn as
+              dash, B2);
+            - `v=5 env | less` (from same to ShellSpawn as neither): bash adds
+              `SHLVL` and `_`, and the order of the variables differs, as for
+              `env` alone (code `listing`). We compared the lists: dash's and
+              ShellSpawn's hold the same variables.
+          - **1 by the reading itself:** `md5sum * | sed -e '…/e'`, whose `e`
+            command runs `mv` through `sh`. `mv`'s recorder reads sed's own
+            input, a race with sed (from same to ShellSpawn as bash; with the
+            recorder of 2026-11-16 the same in 5 runs of 5; named chance in
+            `tools/large-subset-match-known.tsv`).
+          - **The other 19 by timing,** as between earlier runs:
+            - the messages of pipeline elements that mix otherwise (14: the
+              tldr alternatives `a|b|c` 10, in both directions; `find … |
+              xargs ls -lrt | awk …`, `find … | xargs ls -ld | more` and `sed
+              … index.html | tee index.html`, from messages as neither to the
+              same; `echo "fifo forever" | cat - fifo | tee fifo`, from
+              messages as bash to as dash);
+            - the races `ls -a | tee output.file` (from ShellSpawn differs to
+              ShellSpawn as dash), `{ echo foo; cat bar; } | tee bar` and two
+              `head` reading one pipe (from ShellSpawn as dash to as bash);
+            - the `zenity` subshell (bash came out otherwise in the first run
+              of 2026-11-17, so ShellSpawn as bash);
+            - `ls -lR / | tee output.file`, which ended in dash too in the
+              first run of 2026-11-17 (from timeout to ShellSpawn as neither);
+            - 14+3+1+1=19.
+          Beyond the classes, the reading changed, in those 147 samples:
+          - the calls of one sample, `grep -L -r … | while read f; do mv "$f"
+            out; done`, in all three alike: 10 calls before, 2 in the first
+            run of 2026-11-17, because the first `mv`'s recorder reads the
+            rest of the loop's input, so the loop ends;
+          - the messages of 5: `xargs: …: terminated by signal 13` no more, as
+            the program reads its input since IN1; the order of mixed
+            messages.
+          A24 (b): the second run of 2026-11-17
+          A24 (b) (the same day, the user): a recorder no longer reads the
+          input of a program that never reads its standard input (`rm`, `mv`,
+          `cp`, `ln` unless asked to prompt, `mkdir`, `touch`, `chmod`, `ls`,
+          `sleep`, `seq`, …: the list in `tools/large-subset-runcompare.pl`;
+          those that really run, such as `ls`, matter only where a setup makes
+          them stand-ins), nor that of `zcat` naming a file (not `-`). As a
+          stopgap (the user), only the 4,060 samples that mention one of those
+          programs, or call one, ran again; the lines of the others are kept
+          from the first run. Against the first run, 5 = 1 + 4 samples changed
+          class, none by a difference of ShellSpawn:
+          - the race `md5sum * | sed '…/e'` that the recorder made is gone
+            (from ShellSpawn as bash to the same);
+          - the other 4 came out otherwise by timing, each already named
+            chance or open in `tools/large-subset-match-known.tsv`:
+            - `find . -print | xargs ls -gilds` (the inode number of the run's
+              copy: from the same to ShellSpawn differs);
+            - `ls -a | tee output.file` (from ShellSpawn as dash to ShellSpawn
+              differs, K6);
+            - two `head` reading one pipe (from ShellSpawn as bash to
+              ShellSpawn differs: dash came out as bash in that run); these
+              three are known chance since 2026-11-18;
+            - the `zenity` subshell (from ShellSpawn as bash to ShellSpawn
+              differs: bash ended its subshell in that run, as dash does; TODO
+              A17).
+          What A24 (b) gave back beyond the classes:
+          - `grep -L -r … | while read f; do mv "$f" out; done` makes its 10
+            calls again in all three (the first `mv`'s recorder no longer
+            takes the loop's input);
+          - in `zcat number.txt.gz | { zcat xxx.txt.gz | comm -12 /dev/fd/3 -
+            ; } 3<&0` the inner `zcat`, which names its file, no longer races
+            with `comm` for the outer pipe (the same in all three, as in the
+            first run, and, since A24 (b), in every environment of step 3:
+            section 12 of `large-subset-environment.md`).
+          From the run of 2026-11-15 to that of 2026-11-16 (A23)
+          The run of 2026-11-15 had the code without the changes of the review
+          named above since (JH1, JH2, JH5, JU1 to JU5, JB1 to JB3, X60, X61,
+          X65), and the runner offered every program installed. 109 = 94 + 15
+          samples changed class, none by the changes of the code:
+          - **94 by A23:** they call a program the container has installed and
+            the list leaves out (`wine` 55, `wineboot` 7, `winepath` 6,
+            `wineserver` 5, `winedbg` 5, `shellcheck` 5, `regedit` 4,
+            `faketime` 4, `winecfg` 3), not found in all three from 2026-11-16
+            on: from same to messages only, as dash (as foreseen: What the
+            container had installed counted, below).
+          - **The other 15 by timing,** in both directions:
+            - the messages of pipeline elements that mix otherwise (10: the
+              tldr alternatives `a|b|c` 7, `cliphist list | fzf | cliphist
+              decode | wl-copy`, `find … | xargs ls -ld | more`, `sed …
+              index.html | tee index.html`);
+            - the races `{ echo foo; cat bar; } | tee bar` (from ShellSpawn
+              differs to ShellSpawn as dash), two `head` reading one pipe
+              (from same to ShellSpawn as dash) and `echo "fifo forever" | cat
+              - fifo | tee fifo` (from same to messages as bash);
+            - the `zenity` subshell (What the classes hold, above: bash came
+              out otherwise too, so ShellSpawn as dash);
+            - inode numbers (`find . -print | xargs ls -gilds`, the same in
+              the run of 2026-11-16).
+          From the run of 2026-11-14 to that of 2026-11-15 (K5)
+          The same code, but for K5. 17 = 1 + 16 samples changed class:
+          - **1 by K5:** `tail -F xxxx | tee -a yyyy &`, a timeout of
+            ShellSpawn alone (it waited for the endless job, the shells had
+            exited), the same in all three from 2026-11-15 on.
+          - **The other 16 = 10+1+2+1+2 by timing,** in both directions:
+            - the messages of pipeline elements that mix otherwise (10: the
+              tldr alternatives `a|b|c` 6, `cliphist list | fzf | cliphist
+              decode | wl-copy`, `echo 'ee' | tee /dev/stderr | foo`, `echo
+              "fifo forever" | cat - fifo | tee fifo`, `{ echo 1 2 3; cat; } |
+              ttyplot`);
+            - the clock (``touch filename_`/bin/date …`.txt``, the same in the
+              run of 2026-11-15);
+            - `sort inputfile | uniq | sort -o inputfile` and `sed …
+              index.html | tee index.html` (a file read and written at once);
+            - inode numbers (`find . -print | xargs ls -gilds`, as neither in
+              the run of 2026-11-15);
+            - two races where ShellSpawn differs (What the classes hold,
+              above).
+          What the container had installed counted (before A23)
+          Before A23 the runner gave every run a recorder for each program on
+          the system's `PATH`. So a sample that called a program the container
+          lacked got "not found" in all three (and dash's and bash's messages
+          differ in their words: messages only, as dash). With the program
+          installed, the call ran, or was only logged, and the sample usually
+          came out the same.
+          - The container of the run of 2026-11-15 had the programs installed
+            that the project's sessions use for the Windows tests and the
+            parse results (Wine, MinGW-w64, faketime, ShellCheck). 106 samples
+            call one of them (`wine` 62, `shellcheck` 9, `wineboot` 7,
+            `winepath` 6, `winedbg` 5, `wineserver` 5, `faketime` 4, `regedit`
+            4, `winecfg` 4), and in 94 of these none of the three said "not
+            found" then.
+          - The run of post-0.11 (2026-11-13, another session's container) had
+            them not installed (its record of the builtins lists `wine`,
+            `regedit` and `faketime` as not found).
+          - That accounts for most of the difference between the two runs
+            (checked: the samples and the programs above; not traced sample by
+            sample, as that run's records were not kept). Post-0.11's run had:
+            same 15,786 (87 fewer), messages only as dash 23,277 (84 more), as
+            bash 35, as neither 78, ShellSpawn differs 6, the shells differing
+            with ShellSpawn as dash 965, as bash 98, as neither 150, timeout
+            15.
+          - The rest, from the record
+            (`tools/large-subset-run-differences.tsv`): `{ echo foo; cat bar;
+            } | tee bar` (a race) and `ls -l -- "$dir/$file"` (times outside
+            the run's copy) moved from ShellSpawn differs to the shells
+            differing, ShellSpawn as neither; `ls -lR / | tee output.file` is
+            near the 5-second limit and timed out in dash and bash in the run
+            of 2026-11-15 ("Timeouts", above); the other changes there are
+            messages of pipeline elements that mix by timing (the tldr
+            alternatives `a|b|c`).
+          - A23 fixed which programs the runs see (decided (b), the user,
+            2026-11-15): the runner makes recorders only for the names of
+            `tools/large-subset-programs.txt`, installed or not (1,404: this
+            container's, without the 93 of what the project's sessions
+            install). So Wine, faketime, ShellCheck and the like are "not
+            found" in every run. The run of 2026-11-16 was the first with the
+            fixed list (those 94 samples moved from same to messages only, as
+            dash, as foreseen; `-programs system` gives the old behaviour).
+          - A23 (c) is decided and done (the user, 2026-11-17): what each
+            sample calls is kept for later use, each program marked by the
+            shells that used it, in the column `CALLS` of
+            `large-subset-provenance.tsv` (section 2 of
+            `large-subset-environment.md`).
+          From post-0.09's run to post-0.11's
+          Post-0.11's run against the run of post-0.09 (below): same 75 fewer,
+          messages only as dash 89 more, messages as neither 10 fewer,
+          ShellSpawn differs 3 more, the shells differing 7 fewer. For the
+          samples the record lists:
+          - `shift $(($#-1))` and two more `shift`, `set -o "$opt"` (X46, X43
+            fixed) and `{ time find / 2>/dev/null; } 2>time.txt` moved from
+            ShellSpawn as neither to ShellSpawn as dash;
+          - `exec command -with -flags` came out as ShellSpawn differs (What
+            the classes hold, above).
+        * Section 7: the run of post-0.09 (2026-11-08), its rebuild with the programs inside Perl (IP1, 2026-11-09), and W5 over the library (2026-11-09):
+          The run of post-0.09 (2026-11-08), which the run above replaced
+          The columns are the classes of The classes and the table, above.
+          | Samples | Run | Same | Messages only: as dash | as bash | as neither | **ShellSpawn differs** | Shells differ: ShellSpawn as dash | as bash | as neither | Timeout |
+          |---|---|---|---|---|---|---|---|---|---|---|
+          | coreutils involved | 1,344 | 895 | 265 | 0 | 46 | **3** | 47 | 59 | 26 | 3 |
+          | no coreutils | 39,066 | 14,966 | 22,923 | 35 | 42 | **0** | 913 | 45 | 130 | 12 |
+          | all | 40,410 | 15,861 | 23,188 | 35 | 88 | **3** | 960 | 104 | 156 | 15 |
+          The run used the code of post-0.09 (X33 and X35 fixed). That code
+          ran `echo`, `printf`, `test`, `[`, `true` and `false` as the
+          coreutils programs: the run predates IP1 (later that day, and in
+          0.10, ShellSpawn runs them inside Perl by default). So it measured
+          what `PROC_SHELLSPAWN_INPROC=none` gives in later versions. With the
+          default, as in 0.10: "With the programs inside Perl", below.
+          By source (all samples): tldr 29,232 run, 1 where ShellSpawn
+          differs; ShellCheck 1,021, 2; NL2Bash 10,039, the bash Cookbook 26,
+          pure-sh-bible 43, pure-bash-bible 49: none.
+          Earlier runs:
+          - the first run (before the fixes of post4-0.04) found 57 where
+            ShellSpawn differs; K0 alone removed 29 of them;
+          - the run of post4-0.04 (2026-11-05, without the environment of
+            `-env`, above) found 7, with same 15,751, messages only 23,396,
+            the shells differing 1,239, timeouts 17
+            (15,751+23,396+7+1,239+17=40,410).
+          **Where dash and bash agree and ShellSpawn differs (3):**
+          - `printf -v` (2; legalized by Q2, choice B: the program runs it);
+          - `(echo …; sleep 1; echo …) | zenity`, where `zenity` is missing
+            and exits at once: in the shells the builtin `echo` writing to the
+            broken pipe kills the whole subshell; in ShellSpawn only the
+            program `echo` dies and the subshell goes on (a consequence of
+            running the program).
+          The other 4 of post4-0.04's 7 (7 = these 3 + 4):
+          - `printf '%0.s-'` agrees since Z0;
+          - `/dev/urandom` agrees (the fixed file);
+          - `{ echo foo; cat bar; } | tee bar` (a race) came out as dash's;
+          - `ls -l -- "$dir/$file"` (that is `ls -l /`: times of directories
+            outside the run's copy) came out as neither.
+          **Messages worded as neither (88 = 46 + 42):**
+          - with coreutils (46): the programs' own messages (`[: missing ']'`
+            against dash's `[: missing ]`, `printf: warning: ignoring excess
+            arguments`, `kill: (1): Operation not permitted`);
+          - without coreutils (42): the interactive builtins (B2: nothing,
+            where dash says "not found" and bash complains), `exec foo` (dash:
+            `exec: foo: not found`, ShellSpawn: `foo: not found`, of the kind
+            of known issue X5), an empty command name (dash: `: Permission
+            denied`, bash: `: command not found`, ShellSpawn: `: not found`),
+            and messages of pipeline elements that mix otherwise (timing).
+          **Where the shells differ:**
+          - **ShellSpawn as dash (960):** most are statuses of errors at run
+            time (rule A5, as dash), above all a redirection into a directory
+            that does not exist (`> path/to/out.html`: dash 2, bash 1); the
+            rest are features legalized by rulings already (`time`, `[ -v ]`,
+            `${x:?}`, …).
+          - **ShellSpawn as bash (104):** the interactive builtins (B2), `echo
+            -e` and `echo 'a\nb'` (the program), rule-E choices (`return`
+            outside a function, `[^…]`, `.*`, `$LINENO`), `kill` with a word
+            that is no process ID (the program's status 1, as bash; dash 2).
+          - **ShellSpawn as neither (156 = 37+27+16+3+32+41):**
+            - mostly runs that cannot agree: `$0` (`dash`, `bash`, `sh`; 37),
+              process IDs (`$$`, `ps`, `pstree`; 27), times (`time`, `times`,
+              `ls -l` of places outside the run's copy; 16), `sort -R`,
+              `mktemp` (3);
+            - the interactive builtins (B2; 32: `history`, `bind`, `help`);
+            - 41 others where the shells themselves differ.
+            (With the fresh `/tmp`, `mkdir /tmp/x` no longer finds the
+            previous shell's directory.)
+          **Timeouts (15 = 14 + 1):** 14 never end, in all three shells
+          (endless loops, `tail -F`, `grep -R … /`, `yes | sed -n
+          '200000000,…'`; `cat /dev/urandom | …` ends, at the end of the fixed
+          file); in 2 of them dash, or dash and bash, ended by the file-size
+          limit first (signal 25), as they write their endless output faster.
+          In one only ShellSpawn ran out of time: `tail -F xxxx | tee -a yyyy
+          &` (at the end of the snippet Perl waited then for background jobs,
+          until K5: known issue X1).
+          With the programs inside Perl (IP1; the code of 0.10; 2026-11-09)
+          This table was rebuilt from the run of post-0.09 (above) rather than
+          run again (2026-11-08/09; the join is `large-subset-runreport.pl
+          -ours-from`). It could be rebuilt because:
+          - dash's and bash's results do not depend on ShellSpawn's code;
+          - between that run's code and 0.10, ShellSpawn changed only in the
+            six programs it runs inside Perl since then (read in the diff; the
+            rest passes a write's error number to callbacks that ignore it).
+          How it was rebuilt:
+          - The logging run (`-q`) shows the samples where ShellSpawn itself
+            ran one of them: 1,050, and 9 more whose logs were cut at 4,000
+            characters.
+          - ShellSpawn alone ran again on those 1,055
+            (`large-subset-runcompare.pl -shells ours -workers-from`, each
+            sample in the worker, so the directory and user, it had; the code
+            of 0.10, before W5 changed the event loop), and on 300 random
+            others as a control: those came out the same as before, all 300.
+          - These results were joined with the run above (dash and bash, and
+            ShellSpawn elsewhere):
+          | Samples | Run | Same | Messages only: as dash | as bash | as neither | **ShellSpawn differs** | Shells differ: ShellSpawn as dash | as bash | as neither | Timeout |
+          |---|---|---|---|---|---|---|---|---|---|---|
+          | coreutils involved | 1,344 | 894 | 265 | 0 | 46 | **4** | 46 | 60 | 26 | 3 |
+          | no coreutils | 39,066 | 14,966 | 22,923 | 35 | 42 | **0** | 913 | 45 | 130 | 12 |
+          | all | 40,410 | 15,860 | 23,188 | 35 | 88 | **4** | 959 | 105 | 156 | 15 |
+          Against the table of post-0.09, 2 samples changed class:
+          - `printf "\u20AC %.2f\n" 123.4` ("same" to "ShellSpawn differs"):
+            the in-process `printf` printed `€` in the C locale, where
+            coreutils prints `\u20AC`. This is **known issue X37** (our bug),
+            fixed since: run again in the same run's conditions, ShellSpawn
+            then prints `\u20AC 123.40`, as both shells do.
+          - `{ echo foo; cat bar; } | tee bar` (a race, "ShellSpawn as dash"
+            to "as bash").
+          The external calls are the same as in the run of post-0.09 (its
+          count is in "The atomic calls of external programs", below). Of the
+          1,055, ShellSpawn's results changed in 5: X37, the race, and 3 that
+          change between any two runs (process IDs, a pipe's inode number).
+          The "coreutils involved" split is the logging run's: which samples
+          hand such a call does not change, as the call goes inside Perl
+          instead of to a program.
+          W5: the event loop over the library (after 0.10; 2026-11-09), on
+          Linux and under Wine
+          Measured 2026-11-09, after W5 and its Windows follow-up (on Linux
+          only its documentation changed), with X37 fixed.
+          **On Linux.** ShellSpawn alone ran over the whole library (`-shells
+          ShellSpawn -workers-from`, the same environment), compared with the table
+          of the previous part sample by sample (`large-subset-runreport.pl
+          -ours-from … -ours-vs …`). ShellSpawn changed in 55 = 52 + 2 + 1:
+          - 52 also change between two runs of the same code (process IDs,
+            times, `sort -R`, races);
+          - 2 more by timing (whether `echo` dies of SIGPIPE first; `tee
+            /dev/stderr` truncating the messages file before or after a
+            message);
+          - X37's sample, now as both shells.
+          Joined with the run above, 17 samples changed class. All 17, run
+          again with the three shells at once, came out as in the table above,
+          but for timing in messages and one inode number (`ls -i`). The
+          changes came from joining runs of different days (`ls -la` shows the
+          date of `..`, the worker's directory, which `-env mtime` now fixes
+          too) and from the load of the Wine measurement below. So W5 changes
+          nothing over the library on Linux.
+          **Under Wine** (Strawberry Perl 5.38.2.2, the DLL built from the
+          same code). The library could not run there, as `Proc::ShellSpawn`
+          was not yet ported to Windows (it was later that day:
+          `../pspawn-shell-windows.md`; the library has not been run there
+          since). Every `run()` died at once, first at `getppid`
+          (unimplemented in Windows Perl; `$PPID`), then, past that in a
+          scratch copy, at `fcntl` with `F_GETFL` in `Proc::Spawner::Graph`.
+          What did run there:
+          | What | Result |
+          |---|---|
+          | `t/loop.t` | 17 passed, 1 skipped (no console for Ctrl-C) |
+          | `t/windows.t` | 14 passed |
+          | `t/parsers.t` | 4 passed, 2 skipped (no dash or bash) |
+          | `t/programs.t` | 3 passed, 1 skipped (no coreutils) |
+          | the parser over every extracted sample | all 45,501 trees (or rejections) the same as on Linux |
+        * Section 7, through Run:
+          The run "as usual" above is the one of post-0.09's table (it
+          replaced post4-0.04's: the user, 2026-11-08, A1(b)).
+        * Section 7, the atomic calls of echo, printf, ...: other runs:
+          - The second run of 2026-11-17 (A24 (b)) gave the same calls and
+            results, but for the time `printf '%(%s)T'` prints.
+          - In the run of 2026-11-16 there were 650: since IN1 the recorder
+            tests its input with `[`, and `. script`, which finds the recorder
+            of the program `script` on `PATH` and reads it as a script in all
+            three shells, makes ShellSpawn run 4 such tests and 2 `printf`
+            calls fewer; the rest are process IDs, `echo $$`.
+          - Before, from the logging run of post4-0.04: 757 calls, 1,268
+            samples; not traced call by call.
+        * Section 7, the atomic calls of external programs: other runs:
+          The other runs:
+          - the first run of 2026-11-17: 16,272 the same, as bash 15 (`md5sum
+            * | sed '…/e'` and the `zenity` subshell as bash), `grep -L -r … |
+            while read f; do mv "$f" out; done` with 2 calls of 10;
+          - 2026-11-16: 16,279 the same, as dash 16, as bash 8, as neither 64,
+            timeout 9; the 7 samples that moved by the input, the race `md5sum
+            * | sed '…/e'` the recorder makes, the `zenity` subshell and `ls
+            -lR / | tee output.file`: above;
+          - 2026-11-15: 16,480 samples, 16,383 the same, ShellSpawn differing
+            1, as dash 15. The 104 samples more called `wine` and the like,
+            installed in that run's container and offered to the samples,
+            which since A23 they are not (section 7 above);
+          - 2026-11-14, before K5: 16,380 the same, as bash 10, timeout 10;
+          - post-0.11's: 16,383 samples, 16,286 the same, as bash 8, timeout
+            9: 97 samples fewer than the run of 2026-11-15, whose container
+            had `wine` and the others installed (section 7 above);
+          - post-0.09's: 16,476 samples, 16,376 the same; neither traced
+            sample by sample.
+        * Section 7, external calls: the zenity subshell in other runs:
+          (the extra call of the zenity subshell:) also in the run of
+          2026-11-15. In the run of 2026-11-16 dash went on too, so ShellSpawn
+          as dash there.
+        * Section 7, external calls, ShellSpawn as dash:
+          In the run of 2026-11-16 that `zenity` subshell instead (of `bind -P
+          | grep … | perl …`).
+        * Section 7, external calls, ShellSpawn as bash in other runs:
+            - In the first run of 2026-11-17 also the race `md5sum * | sed
+              '…/e'` and the `zenity` subshell.
+            - In the run of 2026-11-14 also 2 by timing, which agree in the
+              run of the table: `` touch filename_`/bin/date
+              +%Y%m%d%H%M%S`.txt ``, where the clock had not yet reached the
+              next second in dash's run, and `{ echo 1 2 3; cat; } | ttyplot`
+              with `ttyplot` missing, where dash's `cat` had not yet started
+              when the pipeline ended.
+            - The 3 background jobs at the end of the snippet that post-0.09's
+              run counted here agree since A18, as the runner waits for the
+              shells' jobs too.
+        * Section 7, the atomic calls where no program runs: other runs:
+          The table counts the run of post-0.12 of 2026-11-17, with A24 (b).
+          The other runs:
+          - the first run of 2026-11-17: 24,597 calls worded as dash's. The 3
+            more are the same calls with another worker's directory in their
+            words, `/runcompare/w0/…` for `/runcompare/w2/…`, as the samples
+            run again landed with other workers; with those directories made
+            alike, both runs have the same calls in the same classes;
+          - 2026-11-16: the same but for 674 calls in 1,129 samples alike in
+            all three (process IDs);
+          - 2026-11-15: the same but for 24,491 calls in 26,431 samples worded
+            as dash's, 106 calls fewer: `wine`, `shellcheck`, `faketime` and
+            the like, installed in that run's container and offered to the
+            samples, which since A23 they are not (section 7 above).
+            (`large-subset-builtins.pl` runs a call that was not found in the
+            run with only the run's list of programs on `PATH`, else the real
+            `wine` would run);
+          - post-0.11's: 24,588 calls in 26,528 samples, with those programs
+            not installed in that run's container;
+          - post4-0.04's: all three 722 calls in 1,178 samples, the rest
+            within one or two of the counts above.
+      - The parse results' digest (CLAUDE.md, "The parse results") is
+        e1923995b6a4f39c0de93bd6ab4d6963743860bea32efe3294bd65a37d36b9b5;
+        it differs from post-0.13's, d4e0ac53..., only in $VERSION, so the
+        parse results of 2026-11-22 hold.  Since the corpus runs of
+        2026-11-22 (commit f781213) the library changed in one comment only:
+        their counts hold for 0.14 too.  The 10 document parts whose inputs
+        changed only in $VERSION were marked in line (make docs-check).
+      - Tested for the release, on its code: on Linux make test (334
+        tests), make disttest, also with /proc hidden, the four approaches
+        (t/flavors.pl) and each test's outcome in each, the missing-settings
+        matrix (23 of 23); under Wine 9 with Strawberry Perl 5.38.2.2, built
+        with its own gcc and gmake, the seven Windows test files (244
+        tests), the three approaches and each test's outcome in each
+        (doc/test-results/), and the missing-settings matrix (14 of 14).
+        README.md's counts for Windows brought up to date (seven files, 244
+        tests, 25 skipped).  First made on 2026-11-26 (commit c9df2e4) and
+        not uploaded; made again on 2026-11-27 with the smaller records
+        above: since c9df2e4 no module, XS file or test changed, only the
+        measurement tools, the records and the documents, so only make
+        disttest (with t/records.t) ran again.
+      - Since 0.13: in Proc::ShellSpawn, exec followed by a builtin's name
+        refused by every grammar (X56, D1), cd's operands taken apart after
+        expansion (X80), a command run inside Perl that writes into a pipe
+        whose reader has gone ends its shell as SIGPIPE does (D3), X81, X72
+        (D2), X6, X30, X3, X4; in Proc::Spawner, closefrom done as closes
+        where it alone is missing, and the fd actions emulated per call
+        (X67, X68); the corpus runs made again (2026-11-22) and kept in the
+        repository Proc-Spawner-results (made ready to be public: the run
+        machine's own file names redacted), with a table of which runs and
+        code made each record and t/records.t; the measurement tools name
+        ShellSpawn so (D5); X82 to X85 fixed in them, X86 open; the snippets
+        the parser rejects run in dash and bash (make corpus-rejected), the
+        work list's candidates also in example environments; README.md's
+        "How close" rewritten (the rejected snippets, the groups of the
+        accepted ones, the counts that do not match, the other approaches
+        and Windows) and "Threads" (what a start and a run change, per
+        approach); the ways of starting a child called approaches; TODO is
+        TODO.md, its items linked from every document; the shipped records
+        leave out what the tools make again (the message-only builtin calls,
+        counted; six columns restored from the corpora by
+        large-subset-restore.pl): the distribution 6.9 MB unpacked, not 13.5.
+
 0.13  2026-11-18
+      - Every document rewritten for readers by the rules learned from the
+        user's readings of README.md (CLAUDE.md, "Writing documents"): terms
+        defined at first use, sums shown, long paragraphs itemized under new
+        subheadings with anchors of ours, "we" or the module's name for
+        "ours", "snippet" for "string"; no count changed (each file's
+        numbers, links and anchors compared before and after by script;
+        every link resolves; every table's rows have its header's cells).
+        Facts put right on the way, each checked: U3 in large-subset-spec.md
+        (dash turns the escaped quote into a quote, bash keeps it: run in
+        both); the subs Proc::ShellSubset::Large replaces (11, not 8);
+        X30's timings (8.4 s without the one $LINENO snippet, 89 s with
+        it); Proc::Spawner::Docs lists the four documents it lacked; the
+        snippet printf "\u20AC %.2f\n" 123.4, shown with the character
+        instead of its escape in README.md, large-subset-environment.md and
+        X37 (the tool layer decodes \u: tricks topic); three tables whose
+        code had an unescaped | (cells split on GitHub).  Places the
+        rewrite could not make clear: TODO, B.
+      - README.md read by a helper given only that file, restating each
+        passage (CLAUDE.md, the first cause): fixed what it could not
+        restate or found contradictory.  The one run's table gets the
+        column "Did not end" (3+11=14), so its rows add up; the 7 where dash
+        and bash agree and we do not are placed; "legalized" and the names
+        of decisions and known issues defined before use; which programs
+        really run in the runs (about 40, from large-subset-runcompare.pl);
+        measurement B ran every snippet a switch could affect, whatever its
+        level (443 with echo, 5,742 with a pipeline), not only almost strict
+        ones; the two meanings of "levels" told apart; level 3 against
+        "the most capable one the platform has", level 4 on Windows, level
+        2 refusing what M1 sets; Run named among the dependencies, the
+        umask among the settings made around the call; threads against
+        level 3's fork.
+        A second reader, given only the new file: its summary of the
+        distribution was right; fixed what it still found (each checked in
+        large-subset-match.tsv, the threeway database, the runner):
+        1,542 = 1,458 outside the upper yardstick + 40 subtle or open + 44;
+        a "run" defined; the 7 where the shells agree placed (3 legalized,
+        2 chance, 2 without a ruling: X56 and TODO A17's, both among the
+        42); rulings named apart from TODO's open questions; the six
+        commands (kill is no coreutils program) named so in the table;
+        1,156 summed over calls; 270+950=1,220; level 2 and level 3's
+        limits explained; the further measurements named, not lettered.
       - Since 0.12: the review of the executor's code (decision page
         "Executor Idiom Review", 21 items: one loop helper, the shell's
         options read once, signal names from %Config, Windows' variable
-        names (X65), …); ours at exit waits only while it has something
+        names (X65), …); ShellSpawn at exit waits only while it has something
         left to start for a background job, as the shells (K5,
         PROC_SHELLSPAWN_END); on Windows a child gets a process group of its
         own only where it would ignore SIGINT (W7) and no job object (W6),
@@ -44,7 +1777,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         t/programs.t's symbolic-link test checks that the link is there
         (Wine's symlink makes none).  make corpus-all 2026-11-14: of what
         was to be looked at (read, kill with $$, test -ef, pwd -L) none
-        where ours differs from both shells; echo -e '\u...' (JC2) in no
+        where ShellSpawn differs from both shells; echo -e '\u...' (JC2) in no
         sample.  After JH1, JH2, JH5 (a), JU1 to JU5, JB1 to JB3, X60, X61,
         X65 (2026-11-16 and 17): make test (189 tests); t/flavors.pl and
         t/missing-matrix.pl, Linux 4 of 4 and 23 of 23, Wine 3 of 3 and 14
@@ -70,11 +1803,11 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         now compared (echo -e ... | prog, where dash's echo prints -e, 5;
         bind -P | ... | perl; v=5 env | less), 1 a race the recorder makes
         (md5sum * | sed '.../e'), 19 by timing as between earlier runs;
-        ours differs 3 (4 before: the race ls -a | tee output.file came out
+        ShellSpawn differs 3 (4 before: the race ls -a | tee output.file came out
         as dash).  Traced by reporting the same runs with the field taken
         out of the logs, and by running the 147 samples that fed a logged
         program some input with the recorder before IN1 and after it.
-        Across environments: alike 38,592 (38,604), ours not as both 1,805
+        Across environments: alike 38,592 (38,604), ShellSpawn not as both 1,805
         (1,793): legalized 1,629, A12 88, chance 46, not legalized 42 (the
         same 42); 10 snippets moved by the input, all legalized; 2 races
         the recorder makes, named chance in large-subset-match-known.tsv.
@@ -95,8 +1828,8 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         pspawn-known-issues.md (my-xNN); 268 links point at them ("section
         N of", "known issue XNN"), every one checked to resolve.
       - The library through Run (system1) on Linux again (the user,
-        2026-11-18, for a release in a tested configuration): ours alone,
-        joined with the run of 2026-11-17; ours changed in 60 samples, all
+        2026-11-18, for a release in a tested configuration): ShellSpawn alone,
+        joined with the run of 2026-11-17; ShellSpawn changed in 60 samples, all
         by process IDs, times, races and the other container of that run
         (checked: the 60 again here, through posix_spawn twice and through
         Run: 45 differ between the primitives, 44 of them between two runs
@@ -160,11 +1893,11 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         setting in the child).
       - The run table (large-subset-state.md, section 7; README.md) shows
         known chance apart (the user, 2026-11-18): a sample where dash and
-        bash agreed in the run and ours did not, which
+        bash agreed in the run and ShellSpawn did not, which
         large-subset-match-known.tsv names chance (they give other results
-        in other runs), was counted under "ours differs"; now in a column
+        in other runs), was counted under "ShellSpawn differs"; now in a column
         of its own (large-subset-runreport.pl -known, in make
-        corpus-runreport).  Ours differs 4 (printf -v 2, X56, the zenity
+        corpus-runreport).  ShellSpawn differs 4 (printf -v 2, X56, the zenity
         subshell, TODO A17), known chance 3 (ls -gilds, ls -a | tee
         output.file, two head reading one pipe).  Reported again from the
         stored runs; nothing run.
@@ -192,14 +1925,14 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         make corpus-all, which then runs only what is missing and redoes
         every report.  Done (2026-11-17, END 0; compared sample by sample
         with the run of that day with IN1 alone, kept): the base run's
-        table: ours differs 7 (3; counted since 2026-11-18 as 4 and 3
+        table: ShellSpawn differs 7 (3; counted since 2026-11-18 as 4 and 3
         known chance), as dash 965 (966), as bash 103 (106);
         5 samples changed class, none by a difference of ours: the race
         md5sum * | sed '.../e' gone (to the same), and 4 by timing, each
         named chance or open before (ls -gilds, ls -a | tee output.file,
         two head reading one pipe, the zenity subshell, TODO A17).  The
         while-read loop around mv: 10 calls again.  Across environments:
-        alike 38,593 (38,592), ours not as both 1,804 (1,805): legalized
+        alike 38,593 (38,592), ShellSpawn not as both 1,804 (1,805): legalized
         1,629, A12 88, chance 45 (46), not legalized 42; both races gone
         (step 2: split 949 of 950; step 3: chance 10, 11 before).  K5's
         modes, the atomic calls and the builtins: the same results.  The
@@ -230,7 +1963,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         (large-subset-blocks.pl -e), marked shell by shell after the
         behaviour run by the new large-subset-calls.pl (make corpus-calls,
         part of corpus-all): NAME:DBO, p started as a program, ! not found,
-        - neither, for dash, bash and ours.  Run of 2026-11-16: 48,811
+        - neither, for dash, bash and ShellSpawn.  Run of 2026-11-16: 48,811
         names marked, 26,019 !!!, 22,024 ppp, 759 where dash and bash
         differ (bash's own builtins, time, names with a slash).  The levels
         and the other columns unchanged (checked).  Section 2 of
@@ -255,10 +1988,10 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         changed: under A23 programs not on the list are not found (more
         messages of echo into a pipe whose reader is gone, under sigpipe;
         regedit -? and set -e shellcheck now not found); two races came out
-        with ours otherwise in a setup of step 2 (cat ... | tee -a, NB:6406;
+        with ShellSpawn otherwise in a setup of step 2 (cat ... | tee -a, NB:6406;
         xargs ls -lhrt, NB:4904): named chance in
         large-subset-match-known.tsv; the rest timing.  Match: 38,604
-        alike; of 1,793 where ours differs from a shell, legalized 1,621,
+        alike; of 1,793 where ShellSpawn differs from a shell, legalized 1,621,
         awaiting A12 88, chance 42, not legalized 42 (before: 1,622, 88,
         41, 42).  K5's end modes: the same results, sample by sample.
       - large-subset-builtins.pl: a call not found in the run now runs alone
@@ -269,7 +2002,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         find what it runs); section 7 of large-subset-state.md, the
         README's run table and the HTML copy in line with the run: 94
         samples from same to messages only, as dash (A23), 15 by timing;
-        ours differs in 4 (was 6: two races and the zenity subshell moved); large-subset-runcompare.pl: no "Deep
+        ShellSpawn differs in 4 (was 6: two races and the zenity subshell moved); large-subset-runcompare.pl: no "Deep
         recursion" warning from its walk of a run's files (a sample that
         leaves deep directories).
       - Windows tests under Wine on the tree of 2026-11-16: the spawn
@@ -357,7 +2090,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         above_normal, -13 and below high; before: our own table).
       - At exit, as the shells (K5, the user, 2026-11-15: "as shell"):
         Proc::ShellSpawn's END no longer waits for every background job to
-        end.  The shells leave their jobs running; ours starts each command
+        end.  The shells leave their jobs running; ShellSpawn starts each command
         of a job itself (no fork), so it waits only while it has something
         left to do for a job (a command still to start, a read or write of
         its own, a call queued), then exits and leaves the running processes
@@ -370,9 +2103,9 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         as before), none (exit at once: a job's commands not yet started
         never start); SECONDS: wait at most that long.  Proc::Spawner's
         loop: wait_until(CODE, TIMEOUT), true if CODE came true; queued().
-        t/at-exit.t (11 tests).  The runner: -end MODE (ours' mode, hidden
+        t/at-exit.t (11 tests).  The runner: -end MODE (ShellSpawn's mode, hidden
         from the samples).
-      - large-subset-repeat.pl (make corpus-races): where ours varies, the
+      - large-subset-repeat.pl (make corpus-races): where ShellSpawn varies, the
         pairs of a sample and an environment are split by whether each
         shell repeated, only one, or neither (the user, 2026-11-15): only
         where a shell repeats is it a difference of ours; where both vary
@@ -387,17 +2120,17 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         as the environment).  Result (2026-11-15): in 43 of the 44 the
         three modes give the same, in every run; `all' is worse in one
         (NB:9731 times out), better in none (large-subset-state.md, section
-        7, "Ours at exit").
+        7, "ShellSpawn at exit").
       - make corpus-all again with K5 (2026-11-15), the documents in line
         (sections 7, 9 to 12, the match without compensation, README):
         against the run of 2026-11-14, 17 samples changed class, one by K5
-        (NB:9731 alike now), 16 by timing; ours differs 6 (4 before: two
+        (NB:9731 alike now), 16 by timing; ShellSpawn differs 6 (4 before: two
         races came out so, NB:5776 and NB:6795, `ls -a | tee output.file',
         checked by hand and named chance in large-subset-match-known.tsv;
-        ours starts tee later after ls than the shells, by the Perl work
-        between two spawns: strace, dash 1.4 ms, ours 4.7 ms; kept so, K6,
+        ShellSpawn starts tee later after ls than the shells, by the Perl work
+        between two spawns: strace, dash 1.4 ms, ShellSpawn 4.7 ms; kept so, K6,
         the user, 2026-11-15: "no need to nitpick startup delays");
-        the match: alike 38,604, ours differing from at least one shell
+        the match: alike 38,604, ShellSpawn differing from at least one shell
         1,793 (6 where dash = bash, 1,787 where they differ; legalized
         1,622, awaiting A12 88, chance 41, not legalized 42).
       - large-subset-bgjobs.pl took the samples of column `both' of
@@ -439,11 +2172,11 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         broke on the empty set (its loop took the unmatched glob for a
         file); now it skips, and large-subset-repeat.pl writes a record of
         no samples.  The documents in line with the records (make
-        docs-check: all 11 parts): the run table (ours differs 4: printf -v
+        docs-check: all 11 parts): the run table (ShellSpawn differs 4: printf -v
         2, the zenity subshell, X56; the race and ls -l / of 2026-11-13 now
         as neither), the variants, step 2 (NB:6406, cat $F | tee -a $F, a
         race: by hand dash read tee's output in 6 runs of 20, bash in 1,
-        ours in none of 40), the trees (alike 38,601; ours not as both
+        ShellSpawn in none of 40), the trees (alike 38,601; ShellSpawn not as both
         1,795: legalized 1,623, awaiting A12 88, chance 41, not legalized
         43), step 3.  Found: what the container has installed counts.  The
         runner makes a recorder for every program on PATH, and this
@@ -535,7 +2268,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         is none ends the shell, where dash and bash print an error and go
         on: kill -FOO $$, kill -s FOO $$, kill -l $$; and kill - TERM $$
         ends it by SIGTERM.  Found by the table for JH4, part c, of the
-        same review (the forms in dash, bash and ours); it waits for the
+        same review (the forms in dash, bash and ShellSpawn); it waits for the
         user's choice of the one reading of kill's options.
       - JQ1 of the review of the executor's code (the user: "B"): no line
         of the nine executor modules is longer than 132 columns.  73 lines
@@ -622,7 +2355,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         ruling allows is "legalized", not "decided" (README.md explains
         the word); README.md's notes under the run table said plainly (what
         the levels mean, the runs with the environment varied, the six
-        commands ours does as coreutils), every section it names a link;
+        commands ShellSpawn does as coreutils), every section it names a link;
         "section N there" in the documents a link too.
       - README is README.md: links to the files it names (relative, as
         in the other documents), the run table a table with its notes as a
@@ -641,7 +2374,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         classes: pass and split almost strict under passthrough and
         splitglob, LV1 rows of their own; control and affects-shell run in
         a root of their own; the 93 left out classified by reading, AI-);
-        the match of dash, bash and ours over every environment, messages
+        the match of dash, bash and ShellSpawn over every environment, messages
         counted nowhere, each difference with the ruling that allows it
         (section 11: alike 38,603, legalized 1,620, awaiting A12 88, chance
         40, not legalized 45); the runner waits for background jobs (A18);
@@ -664,7 +2397,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         scan and the figures the same), with the code of post-0.11 (X39 to
         X55 fixed) and the runner waiting for background jobs (A18), which
         changes dash's and bash's results too.  Section 7 of
-        large-subset-state.md and README's run table: ours differs 6 (was
+        large-subset-state.md and README's run table: ShellSpawn differs 6 (was
         3; with the programs inside Perl, 4): printf -v 2, the zenity
         subshell, a race, ls -l of /, and exec command -with -flags (X56);
         same 15,786, messages only 23,390, the shells differing 1,213;
@@ -680,10 +2413,10 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         over all the environments it ran in: the base run, step 2's setups
         and step 3's (large-subset-matchreport.pl -run FAMILY/LABEL=DIR,
         -setups FAMILY=FILE; make corpus-match; corpus-all now runs
-        corpus-step3 and corpus-races too): alike 38,603, ours not as both
+        corpus-step3 and corpus-races too): alike 38,603, ShellSpawn not as both
         1,793: legalized 1,620, awaiting A12 88, chance 40, not legalized 45
         (of them 30 cd with extra words and 2 new races, TODO A13).
-      - X56 (open): exec with a builtin's name runs ours' builtin; dash and
+      - X56 (open): exec with a builtin's name runs ShellSpawn's builtin; dash and
         bash look only for a program (not found, 127).  The base grammar
         refuses after exec only cd, : and exit.  Found by the run.
       - The tables of levels count the samples classified by reading as
@@ -714,11 +2447,11 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         missed 578 samples, the report 48 legalizations by B2 and $0);
         large-subset-match-known.tsv marks X56's sample and the zenity
         subshell open.
-      - X55 fixed (found by the races run many times): ours' deferred
+      - X55 fixed (found by the races run many times): ShellSpawn's deferred
         SIGCHLD handler between run() calls (K3) did not keep the
         program's $? and $!; its waitpid set $? (-1 when nothing had
         ended), so a job ending while the program ran its own code changed
-        $?, seen as ours' status 255 without a message in about 1 run of
+        $?, seen as ShellSpawn's status 255 without a message in about 1 run of
         200 of samples with a background job.  Test in t/between.t.
       - large-subset-runcompare.pl -after SECONDS (default 5; A18, the
         user, 2026-11-12: the runner waits for every process of the run,
@@ -727,10 +2460,10 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         with -env pidns, process 1 of the namespace reaps and waits.
         -after 0: as before.
       - X27, step 3: the 33 races of the class affects-shell run 20 times
-        each in every environment where ours was not as both shells
+        each in every environment where ShellSpawn was not as both shells
         (make corpus-races; large-subset-repeat.pl, record
         large-subset-env-races.tsv).  First round: 14 were not races but a
-        background job still running when the text ends, which ours
+        background job still running when the text ends, which ShellSpawn
         finishes before it ends and the run killed in the shells (A18,
         decided: the runner waits, -after).  Second round, with the wait
         and X55 fixed: 27 the same in every run, 6 races (chance).  The
@@ -759,12 +2492,12 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         The 54 samples of both classes whose cd operand holds an
         expansion ran again.  Test in t/programs.t.
       - X27, step 2 for the class affects-shell, done (section 12): 948
-        samples (-env samearg0, pidns); of the 410 where ours is not as
+        samples (-env samearg0, pidns); of the 410 where ShellSpawn is not as
         both shells: legalized 301, awaiting A12 67, chance 39 (33 races;
         6 persistent results without a ruling: TODO A17), not
         legalized 3 ([^...], A13).  Partially decided 3,389 of the 3,601
         undecided.  Records large-subset-env-affects-shell.tsv and its
-        calls.  The match report knows A4 by ours' status 248 and its
+        calls.  The match report knows A4 by ShellSpawn's status 248 and its
         message; NB:685 (two readers of one pipe) as chance.
       - X53 fixed (found by step 2 on the class affects-shell): a form of
         command the parser refuses, made only by expansions at run time
@@ -851,7 +2584,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         signal was lost).  Tests in t/programs.t (8 of the 12 new ones
         fail before the fixes).  The fuzzer's run: 315,187 strings,
         285,676 accepted; same 251,243, OURS 826, =dash 27,358, =bash
-        5,792, neither 456, timeout 1 (TODO B; return || shift, ours as
+        5,792, neither 456, timeout 1 (TODO B; return || shift, ShellSpawn as
         neither shell, joins the not legalized of section 11 and TODO A13).
       - MetaCPAN experiments for 0.12 (TODO A15): Proc::Spawner::Docs links
         each document twice: its name to the rendered file of the newest
@@ -880,9 +2613,9 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         empty, x1, "two  words *"; input of two lines, ...);
         large-subset-runcompare.pl -setup applies one.  Run on the 2,478
         samples that depend only on these by exact names, against two base
-        runs: 1,349 kept their class, 1,106 changed it with ours still on
+        runs: 1,349 kept their class, 1,106 changed it with ShellSpawn still on
         a shell's side (nearly all the A5 status of a failed redirection
-        coming and going), 15 moved to where ours agrees with neither:
+        coming and going), 15 moved to where ShellSpawn agrees with neither:
         five bugs of ours and explained noise.  Record:
         tools/large-subset-env-setups.tsv.
       - X39 (ours, found by it; fixed): '.' of an empty file or a directory
@@ -918,8 +2651,8 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         large-subset-runcompare.pl -setup gives the shells arguments after
         the text, with $0 as each has it, and unsets a variable given as
         null; t/try.pl takes $0 and arguments after the text, as sh -c.
-        In all 2,901 samples, 1,549 unchanged, 1,307 changed with ours on a
-        shell's side, 25 moved to where ours agrees with neither, none a
+        In all 2,901 samples, 1,549 unchanged, 1,307 changed with ShellSpawn on a
+        shell's side, 25 moved to where ShellSpawn agrees with neither, none a
         bug (coreutils' messages, decided; known message prefixes; a
         timeout).  The 267 samples with two dependences got every
         combination of their states, 9 setups (large-subset-setups.pl
@@ -943,23 +2676,23 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         state (3 + 3m setups; the user: "3+3*m where 3^m is too large").
       - large-subset-matchreport.pl (new) and large-subset-match-known.tsv:
         the match of the three shells across the environments a sample ran
-        in (shells agree, some, differ; ours as them, with dash, bash,
+        in (shells agree, some, differ; ShellSpawn as them, with dash, bash,
         neither; justified by a rule, presumed, or not), beside the
         snippet's level, with the new level "partially decided" (the user,
         2026-11-10): an undecided snippet whose every dependence was named
         exactly and tried in example environments.
       - With HOME empty, dash drops the word ~ (and ~/x loses its
         prefix): ❰BUG❱ dash (POSIX: the result of ~ is as if quoted; bash
-        and ours give an empty field).
+        and ShellSpawn give an empty field).
       - X27, step 2 complete for the codes inside the run, and the match
         across environments (large-subset-environment.md, sections 10 and
         11, rewritten): every partially decided sample ran again with all
         fixes, in 3, 9 or 3 + 3m setups (10,719 in all): 1,547 unchanged,
-        1,350 changed with ours on a shell's side, 4 to neither
-        (explained).  The whole library's ours ran again with the fixes
-        (ours changed in 82 samples: 33 by X43, X46, X47, the rest by
+        1,350 changed with ShellSpawn on a shell's side, 4 to neither
+        (explained).  The whole library's ShellSpawn ran again with the fixes
+        (ShellSpawn changed in 82 samples: 33 by X43, X46, X47, the rest by
         chance), joined with the full run's dash and bash.  The match:
-        every sample where ours is not as both shells has a rule (1,199
+        every sample where ShellSpawn is not as both shells has a rule (1,199
         A5, 170 G16, 67 B2, ...), is unchecked (51: "the program beats"
         not checked call by call), proposed (62: the ~ rule), chance (79)
         or open (2: cd - with OLDPWD unset); none without.  Section 1's
@@ -970,23 +2703,23 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         tools/large-subset-match.tsv.  TODO A12, A13: the ~ rule, the
         unchecked cases.  The tables list every case, 0 included; N/A where
         a level ran in one environment only (the user, 2026-11-11).
-      - X27, section 11: builtin-vs-coreutils (ours does echo, printf,
+      - X27, section 11: builtin-vs-coreutils (ShellSpawn does echo, printf,
         test, [, kill, pwd as coreutils, dash and bash by their builtins) is
         now a checked reason, no longer guessed from the text (TODO A13;
         the user, 2026-11-11: "do both").  large-subset-runcompare.pl -q
-        reran ours in every environment of the 1,635 samples where ours is
+        reran ShellSpawn in every environment of the 1,635 samples where ShellSpawn is
         not as both shells (base and setups, about 5 minutes);
         large-subset-threeway.pl takes several logging runs, the calls
         made inside Perl (IP1: logged as builtin calls of
         Proc::ShellSpawn::inproc; it read only the program calls before),
-        and -ours DIR, a fourth answer: ours alone.  All 156 distinct calls:
-        ours = coreutils in status and output.  large-subset-matchreport.pl
+        and -ours DIR, a fourth answer: ShellSpawn alone.  All 156 distinct calls:
+        ShellSpawn = coreutils in status and output.  large-subset-matchreport.pl
         -calls DB -q LABEL=DIR: the reason holds in an environment when a
         call there has coreutils' answer differing from the builtin of
-        each shell ours differs from, ours alone answering as coreutils; it
+        each shell ShellSpawn differs from, ShellSpawn alone answering as coreutils; it
         goes before chance by the snippet's codes (a guess from the text;
         20 samples moved from chance to it); a column says per sample
-        whether it holds.  -o again lists only the samples where ours is
+        whether it holds.  -o again lists only the samples where ShellSpawn is
         not as both shells everywhere (it listed all).  Draft figures:
         the reason holds in 80 samples (64 by it alone); no reason in 7.
       - X27, section 11: messages count nowhere now, wherever a
@@ -1092,10 +2825,10 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         as POSIX and both shells, neither now.  X2: two more effects noted
         (wait $! after a job of builtins; their output comes first).
         Tests: t/programs.t.  The fuzzer, seed 2, 2,000 strings: where
-        dash and bash agree and ours not, or all differ, 14 before, 6
+        dash and bash agree and ShellSpawn not, or all differ, 14 before, 6
         after (TODO B).  The map of make docs-check now has the executor's
         modules as inputs of the parts that show run results: those 7
-        parts are not in line until ours is run again (TODO B).
+        parts are not in line until ShellSpawn is run again (TODO B).
 
 0.11  2026-11-10
       - Since 0.10: Proc::ShellSpawn on Windows (WS1: paths with drives,
@@ -1168,7 +2901,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         heeds POSIXLY_CORRECT), dash or bash (their builtins: dash 0.5.12,
         escapes always but not \x, options only a first -n; bash 5.2.21 as
         bash --posix, escapes with -e, also \E, \u, \U); neither builtin
-        changes with POSIXLY_CORRECT, so with dash or bash ours keeps
+        changes with POSIXLY_CORRECT, so with dash or bash ShellSpawn keeps
         matching that shell where X27's run found the program differing
         (large-subset-environment.md, section 9).  $Proc::ShellSpawn::ECHO
         holds it; an unknown value dies at load.  The program echo (outside
@@ -1176,7 +2909,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         random calls (C and C.UTF-8, with and without POSIXLY_CORRECT).
         Tests: t/programs.t, 732 runs against t/echo-shells.txt (recorded
         from dash and bash: perl t/programs.t --record-shells) and the
-        shell layer; t/dash.t runs ours with PROC_SHELLSPAWN_ECHO=dash,
+        shell layer; t/dash.t runs ShellSpawn with PROC_SHELLSPAWN_ECHO=dash,
         with a new battery t/batteries/echo.txt (12 strings; 11 of them
         differ from dash with the default echo).
       - UNC names with backslashes tested (the user's follow-up (e) to WS1):
@@ -1245,16 +2978,16 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         options.  pspawn-spawner.md, section 8: Proc::ShellSpawn on Windows,
         not ported, with what blocks it and what passes under Wine;
         pspawn-loop.md: the library under Wine.  test-pools.md: how to rerun
-        ours alone after a change, the environment varied, and through Run.
-        large-subset-runreport.pl -ours-from DIR (join ours of a later run
-        with dash and bash of an earlier one) and -ours-vs DIR (ours of two
+        ShellSpawn alone after a change, the environment varied, and through Run.
+        large-subset-runreport.pl -ours-from DIR (join ShellSpawn of a later run
+        with dash and bash of an earlier one) and -ours-vs DIR (ShellSpawn of two
         runs, sample by sample), which the IP1 and W5 checks had done by
         hand; checked to give the same results.
       - doc/pspawn-loop.md: the event loop (W5) on its own page: how it works
         on each platform (the completion port, Ctrl-C, alarm), what was
         checked (a table), the known limits; linked from doc/README.md, the
         POD of Proc::Spawner::Loop and pspawn-spawner.md, section 8.
-      - W5 checked over the library (2026-11-09): on Linux, ours alone at
+      - W5 checked over the library (2026-11-09): on Linux, ShellSpawn alone at
         main against the rebuilt table, sample by sample: no change from W5
         (55 changed, all timing, process IDs, inode numbers, or X37's fix).
         Under Wine the library cannot run: Proc::ShellSpawn is not ported
@@ -1266,7 +2999,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         differ.
       - Section 7 of large-subset-state.md with the in-process programs
         (IP1, the code of 0.10), rebuilt from the run of post-0.09 rather
-        than run again: dash and bash unchanged; ours run again on the 1,055
+        than run again: dash and bash unchanged; ShellSpawn run again on the 1,055
         samples where it ran echo, printf, test, [, true or false itself
         (and on 300 others as a check: the same, all 300), in the same
         workers.  2 samples change class: printf "\u20AC" (X37, fixed) and a
@@ -1360,7 +3093,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         conversions in double (coreutils: long double), and %q, where
         coreutils 9.4 has a ❰BUG❱ (gnulib's quotearg keeps a stale state when
         it starts a word over: an extra '', or a missing $' that makes the
-        shell read the word back wrong); ours follows gnulib's fixed rule
+        shell read the word back wrong); ShellSpawn follows gnulib's fixed rule
         (decision IP2, the user: "Use the builtin").
       - Proc::Spawner::on_write: the callback gets the errno of a failed
         write (it got nothing); Proc::Spawner::Graph's perl_write passes it
@@ -1401,11 +3134,11 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         private (empty /home, /root, /mnt, /media, /srv, /var), dev (a
         private /dev); the mounts in a mount namespace of each run's own.
         -base (the mounting variants need one outside what they hide),
-        -only @FILE; ours runs from a copy of lib/, blib/, t/try.pl.
+        -only @FILE; ShellSpawn runs from a copy of lib/, blib/, t/try.pl.
         large-subset-runreport.pl -b BASE (each sample's class against a base
         run's, and what changed) and -c.  Each variant on its code's samples
         against two base runs (the noise): POSIXLY_CORRECT turns the
-        program echo from bash's side to dash's (29) and makes ours differ
+        program echo from bash's side to dash's (29) and makes ShellSpawn differ
         from both for \x (2); C.UTF-8 changes one printf "\u20AC"; SIGPIPE
         ignored changes only messages and 6 timeouts; /proc hidden makes the
         3 samples using /dev/stdin, /dev/stderr fail alike; a fresh /tmp
@@ -1434,7 +3167,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         runner's own environment, recorded in OUTDIR/env.txt.  Run on the
         samples of prog-status (113), prog-output (1,014) and time (223)
         against two base runs: status 1 changes nothing beyond the messages;
-        the chosen output parts dash and bash in 47 samples, none with ours
+        the chosen output parts dash and bash in 47 samples, none with ShellSpawn
         against both (cd and kill given several words, test ==, all decided
         or known; and X35); fixed times cut the changes between two runs of
         those samples from 50 to 32 (the rest: the shells' own clocks,
@@ -1446,15 +3179,15 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         "unset: WORD: bad variable name" and status 2, the names before it
         already unset; unset -f takes any word.  bash takes such a word for a
         function's name.  6 strings in t/batteries/largebattery.txt.
-      - large-subset-runcompare.pl -run RUNLIB: ours goes through Run (as
+      - large-subset-runcompare.pl -run RUNLIB: ShellSpawn goes through Run (as
         where there is neither posix_spawn nor fork: M2, the primitive
-        system1), PROC_SPAWNER_MISSING="posix_spawn fork" for ours alone;
+        system1), PROC_SPAWNER_MISSING="posix_spawn fork" for ShellSpawn alone;
         t/try.pl takes the names in TRY_HIDE out of the environment once the
         modules are loaded, so that the samples do not see it.
       - The whole snippet library through Run (the user, 2026-11-08): run
-        twice in the same environment (-env tmp,random,mtime), ours through
-        posix_spawn and ours through Run 0.07 (-run): the tables agree, and
-        sample by sample ours changed in 53, all by timing, process IDs or
+        twice in the same environment (-env tmp,random,mtime), ShellSpawn through
+        posix_spawn and ShellSpawn through Run 0.07 (-run): the tables agree, and
+        sample by sample ShellSpawn changed in 53, all by timing, process IDs or
         clocks (49 of them with the shells changing too); no difference comes
         from Run, so no Run bug to fix.  Run's tests and Proc-Spawner's suite
         through Run (also RUN_AS_WIN32=1) pass.  large-subset-state.md,
@@ -1462,7 +3195,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
       - A1(b) (the user, 2026-11-08): the run-time comparison redone with a
         fresh /tmp, a fixed /dev/urandom and fixed file times (-env
         tmp,random,mtime) replaces post4-0.04's table: same 15,861 (15,751),
-        messages only 23,311 (23,396), ours differs 3 (7), the shells differ
+        messages only 23,311 (23,396), ShellSpawn differs 3 (7), the shells differ
         1,220 (1,239), timeouts 15 (17).  The 3: printf -v (2, Q2) and echo
         into a broken pipe in a subshell (1); of post4-0.04's other 4,
         printf '%0.s-' now agrees (Z0), /dev/urandom agrees, the other 2 were
@@ -1590,7 +3323,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         decide (the user, 2026-11-07); absolute paths are told apart by the
         area they are in (path-tmp, path-system, ...), and whether the run
         could control it; /dev/null is an assumption known to hold in every
-        environment tested (the level "held": dash and bash have it, ours on
+        environment tested (the level "held": dash and bash have it, ShellSpawn on
         Windows gets NUL, X31).  The record,
         one line per sample by snippet ID with a short code, is
         doc/large-subset/large-subset-provenance.tsv; the codes, how to
@@ -1690,7 +3423,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         quoted, and plain names after export, readonly, unset, local stay bare
         (else the call is no longer the one that ran); -reuse OLD.jsonl.
         Results in large-subset-state.md section 7: of 25,490 atomic calls
-        where no program runs, none where dash and bash agree and ours
+        where no program runs, none where dash and bash agree and ShellSpawn
         differs; the external calls: one (the broken pipe of echo).
         doc/large-subset/tools/large-subset-builtins-differences.tsv.
 
@@ -1768,7 +3501,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
       - Proc::ShellSpawn: $ONBUILTIN, a code ref called before each builtin
         or function runs (for measurement; t/try.pl logs to the file named by
         RECBUILTIN); doc/large-subset/tools/large-subset-builtins.pl runs every
-        builtin call of the corpus alone in dash, bash and ours;
+        builtin call of the corpus alone in dash, bash and ShellSpawn;
         large-subset-runreport.pl -x compares the external calls one by one.
       - The behaviour figures in separate tables, with and without a
         coreutils program involved (large-subset-runreport.pl -q), and the
@@ -1776,7 +3509,7 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         kill or pwd, run as dash's builtin, bash's builtin and the program
         (large-subset-threeway.pl; the database large-subset-threeway-db.jsonl,
         757 calls; calls made by xargs are left out).  With K0, dash and bash
-        agree and ours differs in 7 samples of 40,410 (first run: 57).  The
+        agree and ShellSpawn differs in 7 samples of 40,410 (first run: 57).  The
         messages are compared as multisets of characters (the shells' messages
         of pipeline elements mix).  README: a summary, near the top.
       - The Git history now has the CPAN releases 0.01 to 0.04 (tags v0.01 to
@@ -1793,10 +3526,10 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         decisions (K0, rule F, Q2).  Known issue X27 (TODO): which samples of
         the run-time comparison depend on the environment.
       - New: the behaviour of the accepted samples, run in dash, bash --posix
-        and ours (tools/large-subset-runcompare.pl, large-subset-runreport.pl;
+        and ShellSpawn (tools/large-subset-runcompare.pl, large-subset-runreport.pl;
         large-subset-state.md section 7): of 40,410, all three agree in
         15,760, only the messages differ in 23,368, and dash and bash agree
-        while ours differs in 33 (29: kill with no process ID, the program's
+        while ShellSpawn differs in 33 (29: kill with no process ID, the program's
         status 1 against the shells' 2; question for the user).
       - Fixed, found so: a string with no command, or only comments, was
         rejected by run() (the parser option 'empty' was missing from

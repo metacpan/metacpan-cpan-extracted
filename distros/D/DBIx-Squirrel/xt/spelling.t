@@ -12,9 +12,10 @@ use Test2::Plugin::NoWarnings;
 # file it's in: in docs/REFERENCE.md and docs/HOWTO.md, the
 # <!-- stopwords: ... --> comment at the top, which scripts/manuals
 # makes the manual's =for stopwords; in a module, its =for stopwords
-# line. CI's coverage job runs it, as it installs the cpanfile's develop
-# modules, Test::Spellunker among them; elsewhere it's skipped without
-# that module, saying so.
+# line. README.pod is checked too (roadmap 2026-0052). CI's coverage
+# job runs it, as it installs the cpanfile's develop modules,
+# Test::Spellunker among them; elsewhere it's skipped without that
+# module, saying so.
 
 
 BEGIN {
@@ -27,4 +28,8 @@ BEGIN {
 # minil.toml, of which there are none.
 add_stopwords('DBIx-Squirrel');
 
-all_pod_files_spelling_ok('lib');
+pod_file_spelling_ok($_) for Test::Spellunker::all_pod_files('lib');
+
+pod_file_spelling_ok('README.pod');
+
+done_testing;

@@ -1,3 +1,7 @@
+0.04  2026-11-26
+    - require XSLoader 0.14 as older versions don't support load() without
+      arguments
+
 0.03  2026-11-26
     - work around perl bug GH #25120, fixing Windows/Solaris builds
 

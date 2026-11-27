@@ -1,0 +1,17 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class UV::Handle::TCP extends UV::Handle::Stream {
+  
+  version_from UV;
+  
+  use Resource::UV;
+  use UV::Resource::UV;
+  
+  # Class methods
+  native static method new : UV::Handle::TCP ();
+  
+  # Instance methods
+  native method open : void ($fd : int);
+  
+}

@@ -1,5 +1,167 @@
 Revision history for Stats-LikeR
 
+0.3431 2026-11-26 CST
+
+ [read_table(): OpenDocument spreadsheets, and skiprows]
+
+ - read_table() reads an .ods (and an .ots template) as it reads an
+   .xlsx, with the same options, sheet selection, blank-row rule and fast
+   path: content.xml is parsed in XS by a scanner that hands its rows to
+   the .xlsx machinery. A cell reads as pandas 3.0.4's odf reader reads
+   it, by office:value-type: a number as office:value, a date as
+   office:date-value's text, a time as the text shown, a boolean as 1 or
+   0 as an .xlsx's does, and text with <text:s>, <text:tab> and
+   <text:line-break> expanded and OpenDocument's white-space rule
+   applied. Comments on a cell are left out, repeated rows and cells are
+   expanded, and LibreOffice's trailing runs of empty rows and cells are
+   never built. Unlike pandas, two paragraphs of one cell are joined with
+   a newline, an error value reads as its text (#N/A) as an .xlsx's does,
+   and a cell with no value-type reads as its text. A value past row
+   16,777,216 or column 16,384 dies, rather than building millions of
+   blank rows ahead of it.
+ - skiprows, pandas' read_csv() and read_excel() argument, leaves rows
+   out before the header is looked for: a count of leading rows, an array
+   reference of 0-based indices, or a code reference passed each index.
+   A sheet's rows are its row numbers less one, blank rows included, and
+   a delimited file's are records, so a quoted field across lines is one
+   row and is kept or left out whole, and a blank or comment line is a
+   row. A sub is asked once per row, in order, even across a sheet's two
+   passes and the look for a commented-out header. A skipped row is not
+   parsed, so it cannot be ragged, and does not widen a sheet.
+ - The message for 'sheet' on a file that is no workbook now names .ods
+   too, and a file named .ods that is not a zip archive is "not a
+   readable .ods spreadsheet".
+
+ [Tests]
+
+ - New t/read_table.skiprows.pandas.t and t/read_table.ods.pandas.t take
+   pandas 3.0.4's own tests: every test in tests/io/parser/
+   test_skiprows.py, the skiprows tests of tests/io/excel/test_readers.py
+   on both testskiprows.ods and testskiprows.xlsx, and the odf reader's
+   tests in test_odf.py and test_readers.py. pandas' wheel does not ship
+   its workbooks, so the parts read_table reads are in each test's
+   __DATA__, byte for byte, from pandas' v3.0.4 tag, written by the new
+   t/read_table.pandas.fixtures.pl. New t/read_table.ods.t and
+   t/read_table.skiprows.t cover what pandas does not: validation, every
+   output type and option, the parser's paths, the bounds and leaks.
+
+ [Bug fixes]
+
+ - nrow() and ncol() chose a hash's form from its first defined value in
+   hash order, so a hash holding both HASH and ARRAY values was counted on
+   some PERL_HASH_SEEDs and refused on the others: nrow({ a => { x => 1 },
+   b => [1, 2, 3] }) returned 2 on 20 of 40 seeds, and an undef or plain
+   value among HASH rows was likewise counted on some seeds. Both now
+   check every value first, in one pass, and only on the way to dying
+   sort the keys, so a message names the same keys on every run. nrow()
+   also checks every row of a HoH, as ncol() does, and its messages end
+   in a newline, so they no longer carry " at .../LikeR.pm line N".
+ - ncol() of an AoH or HoH counted row 0's keys and required every row
+   to have as many, so [{a, b}, {c, d}] was two columns and the sparse
+   [{a}, {a, b}] died, though colnames() and the rest of the module take
+   a missing key as a missing cell. It now counts the union of the rows'
+   keys, scalar colnames($df): 4 and 2 there. A ragged AoA still dies.
+ - drop_cols() and select_cols() checked an AoA position with /^\d+$/,
+   which takes "1\n" and non-ASCII digits. drop_cols() then validated such
+   a call and dropped nothing. Positions must now be ASCII digits only.
+ - concat() of HoH frames could give a suffixed name to a row that another
+   frame really has: { a } then { a, 'a.1' } named the second 'a' 'a.1'
+   and pushed the real 'a.1' out to 'a.1.1'. Real names are reserved
+   first, so that call now gives 'a', 'a.1' and 'a.2'.
+ - qcut() read a word in an explicit probability vector as 0 and let a
+   NaN reach an (IV) cast of NaN in the XS, which C leaves undefined. Both
+   now die naming the index; out-of-range numbers are still clamped. On a
+   long-double or __float128 perl the cutpoint index was floored after a
+   cast to double, which could carry it up to the next order statistic.
+ - qcut(labels => 'interval') labeled the stretched end bins of a
+   probability vector without 0 or 1 by their cutpoints, so
+   qcut([1 .. 10], [0.25, 0.75], labels => 'interval') put 1 and 10 in
+   '[3.25, 7.75]'. Such a bin is now open on that side: '(-Inf, Inf)'
+   there, '(5.5, Inf)' for the top bin of [0, 0.5, 0.9].
+ - seq()'s integer path cast 'by' to an IV without bounding it, which is
+   undefined behavior for seq(0, 10, 1e20) and, on a 32-bit-IV perl,
+   seq(-2e9, 2e9, 4e9). The step is now cast only when it is used and
+   below IV_MAX; the values returned are unchanged.
+ - dropna({}, cols => [...]) died with "column 'A' not found", though the
+   README promises an empty HoA returns empty, as [] and { A => [] } did.
+ - melt() melted a column named twice in value_vars twice, emitting each
+   of its rows two times; pandas melts it once, and melt() already kept a
+   repeated id_vars name once. A repeated value_vars name is now used once,
+   at its first place.
+ - concat() read a hash of scalars as a HoA whose columns were all absent:
+   concat({ a => 1, b => 2 }, { a => 3 }) returned { a => [], b => [] },
+   losing the data, where pandas refuses an all-scalar dict. A defined HoA
+   value that is not an array reference now dies, naming the column.
+ - dnorm() with a negative sd warned once per element of x, so
+   dnorm([1 .. 1e6], sd => -1) printed a million warnings. It warns once
+   per call, as pnorm() and R do.
+ - value_counts() with a key or index that no row has returned {}, so a
+   misspelled column looked like a column of missing values, where dropna()
+   and drop_duplicates() die on an absent column. It now dies too, naming
+   it; a key some rows have still skips the others, and an empty frame is
+   still {}.
+
+ [Distribution functions]
+
+ - dnorm(), pnorm(), qnorm(), pt(), qt(), pchisq(), qchisq(), pf(), qf()
+   and pbinom() take an array reference for any distribution parameter, as
+   R does, and recycle x and the parameters to the longest by R's rule
+   (arithmetic.c, math2() and math3()): a shorter one is reused from its
+   start with no warning, an empty one gives an empty answer, and an undef
+   element is NaN there. pt(2, df => [1, 2, 3]) is three values. Up to
+   0.3430 a vector parameter died with "mean is not a number". A negative
+   sd warns once for the call however many there are. lower and log stay
+   single flags, as R uses only their first element.
+
+ [Tests]
+
+ - New t/dist.recycle.R.t, with t/dist.recycle.R.R, takes R 4.6.1's
+   TDist.Rd vector-df example, tests/d-p-q-r-tst-2.R's pf(1, 1, nu) over a
+   vector nu with R's own three assertions, and calls of all ten functions
+   for each part of the recycling rule.
+ - New tests taking their cases from R 4.6.1's, pandas 3.0.4's, NumPy
+   2.4.6's, SciPy 1.18.1's and statsmodels 0.14.6's own test suites and
+   documented examples, for 35 functions whose tests were all hand-written,
+   each with its generator beside it: t/median.R.numpy.t,
+   t/skew_kurtosis.scipy.t, t/dnorm.R.t, t/uniq.R.numpy.t,
+   t/summary.R.t, t/frame.cleaning.R.pandas.t (fillna, ffill, bfill,
+   dropna, drop_duplicates, value_counts), t/frame_reshape.R.pandas.t
+   (concat, rbind, melt, pivot_table, transpose, assign),
+   t/frame_ops_sets.R.pandas.t (drop_cols, select_cols, rename_cols,
+   csort, ljoin, rownames and the set functions), t/cramers_v.R.scipy.t,
+   t/epi_2x2.R.statsmodels.t, t/age_standardize.R.fayfeuer.t,
+   t/table_one.R.datasets.t, t/filter.R.pandas.t and
+   t/group_by.R.pandas.t. They found the dropna(), melt(), concat() and
+   dnorm() bugs above. Each lists the differences from R or pandas that
+   the README documents, so that changing one is a decision.
+ - New t/nrow.ncol.R.pandas.t, with t/nrow.ncol.R.pandas.py, takes R
+   4.6.1's nrow.Rd examples and pandas 3.0.4's DataFrame constructor cases
+   for the four frame shapes (test_constructors.py, test_from_dict.py);
+   t/nrow.t and t/ncol.t were hand-written and never took them. Five of
+   its 40 subtests fail on 0.3430, among them pandas' GH10056 records of
+   differing keys, on which ncol() died.
+ - t/audit.2026-11-26.regressions.t has 59 subtests for the fixes above,
+   and 33 of them fail on 0.3430. The seq() cases pin values instead,
+   since the old cast did no visible harm on a normal build.
+
+ [Distribution]
+
+ - README.md no longer ships. It is the source md2pod.pl turns into the
+   POD in lib/Stats/LikeR.pm, which carries the same text; the plain-text
+   README stays.
+
+ [Documentation]
+
+ - README: ncol() counts the union of an AoH's or HoH's keys, qcut()
+   rejects non-numeric and NaN probabilities and opens stretched interval
+   labels, and sample()'s cost is proportional to n only for an array
+   draw under a twentieth of its elements; a larger draw, and any hash
+   draw, costs time in proportion to the population.
+ - README: median([]) dies, where R gives NA; pivot_table() keeps a row
+   whose index key is NA and an all-NA output column, which pandas'
+   default dropna=True drops; value_counts() dies on a column no row has;
+   the distribution functions recycle vector parameters.
+
 0.3430 2026-11-23 CST
 
  [Bug fixes]

@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
-# Log aggregator — fan-in: many sources publish, one collector subscribes
+# Log aggregator -fan-in: many sources publish, one collector subscribes
 # Usage:
-#   perl eg/log_aggregator.pl collect          — run collector
-#   perl eg/log_aggregator.pl emit <source>    — emit logs from a source
+#   perl eg/log_aggregator.pl collect          -run collector
+#   perl eg/log_aggregator.pl emit <source>    -emit logs from a source
 use strict;
 use warnings;
 use EV;

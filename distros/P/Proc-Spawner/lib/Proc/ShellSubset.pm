@@ -1,5 +1,5 @@
 package Proc::ShellSubset;  # Parser for the Bourne-shell subset of doc/parsers/shell-subset-spec.md
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use strict; use warnings; use List::Util qw(pairs pairvalues);
 
 # Proc::ShellSubset::parse($string, %opt) returns a List, or { error => '...', pos => N, last => N, tree => List }:
@@ -16,7 +16,7 @@ use strict; use warnings; use List::Util qw(pairs pairvalues);
 # Pipeline = [ '!' (only if negated), Command, ... ]
 # Command  = { argv => [Word, ...], env => [NAME, Word, ...], redir => [Redir, ...], exec => 1 }
 #          | { sub => List, redir => [...] } | { group => List, redir => [...] } | { cd => Word | undef }
-#          (Proc::ShellSubset::Large adds cd_p => 1 for 'cd -P')
+#          (Proc::ShellSubset::Large adds cd_p => 1 for 'cd -P', cd_dd => 1 after '--', cd_more => [Word...] for more operands)
 #          | { set => [NAME, Word, NAME, Word, ...] }   (option assign)
 #          | { if => [Cond, Then, Cond, Then, ..., Else (if present)] }   (Cond, Then, Else: Lists; option if)
 #          | { while => Cond, do => List } | { until => Cond, do => List }   (option while)
@@ -30,7 +30,7 @@ use strict; use warnings; use List::Util qw(pairs pairvalues);
 #          | [ '${', NAME, ':-' | '-' | ':+' | '+', Word ] | [ '${#', NAME ]   (option param_ops)
 #          | the same five with '"' in front ('"$' ...) when inside double quotes
 #          | [ '~', 'user' or '' ] | [ '*', 'pattern text' ]
-#          | [ '{', Word, Word, ... ] | [ '{..', from, to ]
+#          | [ '{', Word, Word, ... ] | [ '{..', from, to ]   (option brace; an alternative of empty quotes is [[ "'", '' ]])
 
 our ($CUT, $SRC, $LOFF, @ASH) = (0, '', 0);   # P1, set by Proc::ShellSubset::Large: stop after this line; the text; lines before
 sub opos { my $q = shift; $q -= $$_[1] for grep $$_[0] <= $q, @ASH; P($q) }   #   it; [where, how much] alias values moved the rest (B1)
@@ -185,7 +185,8 @@ sub simple {
   if ($n eq 'exec') {
     shift @av; my $xp = shift @ap;
     @av or E("'exec' without a command", $p0);
-    E("unsupported 'exec' form", $ap[0]) if ref($av[0]) || $av[0] =~ /^-|^(?:cd|:|exit)\z/;
+    E("unsupported 'exec' form", $ap[0]) if ref($av[0]) || $av[0] =~ /^-|^(?:cd|:|exit|read|break|continue|exec)\z/
+      || $BI{$av[0]};   # X56: no exec of a builtin (V7): the shells look only for a program there, and find none
     $c->{exec} = P($xp) }   # its position, until xc() has checked it and made it 1
   else {
     E("keyword '$n'", $ap[0]) if $KW{$n} && $kw eq $n;
@@ -232,6 +233,8 @@ sub word {   # $x: a(rgument), e(nv value), r(edirection target), b(race alterna
           ? E('bracket expression with a quote, expansion or slash', $p) : [g => '['] },
     cb  => sub {   # a '{' not followed by '}'
       $O{brace} && $x eq 'a' or E("unquoted '{'", $p);
+      E('brace expansion right after $NAME', $p)   # X3: bash expands braces in the text, so $x{a,b} is $xa $xb there
+        if @s && $s[-1][0] eq 'x' && substr($_, 0, $p) =~ /\$$NM\z/;
       if (/\G(-?[0-9]+|[A-Za-z])\.\.(-?[0-9]+|[A-Za-z])\}/gc) {
         my ($f, $t) = ($1, $2);
         E('mixed brace sequence', $p) if $f =~ /[0-9]/ xor $t =~ /[0-9]/;
@@ -251,6 +254,7 @@ sub word {   # $x: a(rgument), e(nv value), r(edirection target), b(race alterna
                    // sprintf('control character \\x%02x', ord shift), $p) });
   until (/$STOP{$x}/) { $p = pos; /$PIECE/gc; my ($k, $v) = %+; $do{$k}($v) }
   @s or $x =~ /[eb]/ or E('missing word', $p0);
+  return [["'", '']] if $x eq 'b' && @s && !grep $$_[0] ne 'q' || length $$_[1], @s;   # X3: {a,""}: an empty word that stays
   my $k = join '', map $$_[0], @s; my @v;    # kinds: u(nquoted) q(uoted) g(lob char) x(pansion)
   push @v, defined $1 ? ['*', join '', map $$_[1], splice @s, 0, length $1] : (shift @s)->[1]
     while $k =~ /([ug]*g[ug]*)|./g;           # unquoted text next to a pattern character joins it

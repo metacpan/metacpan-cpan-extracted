@@ -60,46 +60,50 @@
    "provides" : {
       "BoardStreams" : {
          "file" : "lib/BoardStreams.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
       },
       "BoardStreams::Client" : {
          "file" : "lib/BoardStreams/Client.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
       },
       "BoardStreams::Client::Channel" : {
          "file" : "lib/BoardStreams/Client/Channel.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
       },
       "BoardStreams::Client::Error" : {
          "file" : "lib/BoardStreams/Client/Error.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
+      },
+      "BoardStreams::Client::Membership" : {
+         "file" : "lib/BoardStreams/Client/Membership.pm",
+         "version" : "v0.0.58"
       },
       "BoardStreams::Context" : {
          "file" : "lib/BoardStreams/Context.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
       },
       "BoardStreams::Diff" : {
          "file" : "lib/BoardStreams/Diff.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
       },
       "BoardStreams::Hub" : {
          "file" : "lib/BoardStreams/Hub.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
       },
       "BoardStreams::Hub::Duplicate" : {
          "file" : "lib/BoardStreams/Hub.pm"
       },
       "BoardStreams::Rejection" : {
          "file" : "lib/BoardStreams/Rejection.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
       },
       "BoardStreams::Update" : {
          "file" : "lib/BoardStreams/Update.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
       },
       "Mojolicious::Plugin::BoardStreams" : {
          "file" : "lib/Mojolicious/Plugin/BoardStreams.pm",
-         "version" : "v0.0.56"
+         "version" : "v0.0.58"
       }
    },
    "release_status" : "stable",
@@ -109,7 +113,7 @@
          "url" : "ssh://git@codeberg.org/gandalf/boardstreams-perl.git"
       }
    },
-   "version" : "v0.0.56",
+   "version" : "v0.0.58",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

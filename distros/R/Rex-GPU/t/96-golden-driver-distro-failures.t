@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -33,7 +34,7 @@ use lib "$Bin/lib";
 # -----------------------------------------------------------------------------
 
 use Test::RexGPU::Golden qw(
-  record_host golden_is host_profile gpu_fixture
+  record_host golden_is host_profile gpu_fixture dpkg_l
 );
 use Rex::GPU::NVIDIA;
 
@@ -87,7 +88,7 @@ sub installs { grep { / install -y / } @{ $_[0]{lines} } }
 
 {
   my $rec = driver_on(host_profile('debian-12', responses => [
-    [ q{dpkg -l cuda-keyring 2>/dev/null | grep -q '^ii'} => '', 1 ]
+    dpkg_l('cuda-keyring' => 'un')
   ]), gpu_fixture('blackwell'));
   like($rec->{error},
     qr{^cuda-keyring not installed .* cannot add NVIDIA's CUDA repo \(https://developer\.download\.nvidia\.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1\.1-1_all\.deb\)$},

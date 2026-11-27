@@ -26,14 +26,12 @@ WriteMakefile(
       'File::Compare'      => '1.00',
       'Carp'               => '0',
       'Storable'           => '2.00',
-      'Data::Dumper'       => '2.183',
-#      'File::Remove'       => '1.42',
-#      'Module::Install'    => '1.19',
-#      'Module::Build'      => '0.29',
-#      'Module::ScanDeps'   => '1.09',
+      'Data::Dumper'       => '2.183', # for tests only
+      'Path::Tiny'         => '0.10', # for File::ShareDir...
     },
     TEST_REQUIRES      => { # for tests only
       'Test::More'          => '0.96',
+      'Test::Number::Delta' => '1.04',
       'Test::More::UTF8'   => '0.05',
       'Test::File::ShareDir' => '1.001000',
       'Test::Pod'          => '1.22',
@@ -44,6 +42,8 @@ WriteMakefile(
       'Text::Hyphen::RU'   => '0.12',
       'Storable'           => '2.00',
       'Data::Dumper'       => '2.183',
+      'Test::Spelling'     => '0.12',
+      'Pod::Wordlist'      => '1.15',
     },
     test => {
       TESTS => 't/*.t t/*/*.t',

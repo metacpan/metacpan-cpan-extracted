@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -42,6 +43,7 @@ use Test::RexGPU::Golden qw(
   record_host golden_is host_profile gpu_fixture mutating_lines working_driver
 );
 use Rex::GPU;
+use Rex::GPU::AMD;
 use Rex::GPU::Detect;
 use Rex::GPU::NVIDIA;
 use Rex::GPU::NVIDIA::Setup::RHEL;
@@ -52,7 +54,7 @@ my @NVSWITCH_LINES = map {
 } 5 .. 8;
 
 my $LSPCI_PROBE   = 'command -v lspci >/dev/null 2>&1';
-my $DISPLAY_READ  = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]|\[0380\].*\[1002:'};
+my $DISPLAY_READ  = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]|\[(0380|1200)\].*\[1002:'};
 my $NVSWITCH_READ = q{lspci -nn -d 10de: 2>/dev/null | grep -F '[0680]'};
 
 # detect() with run() answering per command; records the commands. lspci is
@@ -118,7 +120,10 @@ subtest 'no NVIDIA GPU => no NVSwitch probe' => sub {
     display  => '0a:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 31 [Radeon RX 7900 XTX] [1002:744c] (rev c8)',
     nvswitch => join("\n", @NVSWITCH_LINES)
   );
-  is_deeply($cmds, [ $LSPCI_PROBE, $DISPLAY_READ ], 'only the probe and the display lspci ran');
+  # k1: an AMD GPU makes detect() read the AMD driver state (read-only sysfs
+  # / KFD builtins) -- the only command that is new; still no NVSwitch probe
+  is_deeply($cmds, [ $LSPCI_PROBE, $DISPLAY_READ, Rex::GPU::AMD->state_script ],
+    'only the probe, the display lspci and the AMD state read ran (no NVSwitch probe)');
   is_deeply($r->{nvswitch}, [], 'nvswitch => []');
   ( $r ) = detect_on(display => '', nvswitch => '');
   is_deeply($r->{nvswitch}, [], 'empty lspci => nvswitch => []');
@@ -209,11 +214,15 @@ golden_is(hgx_on(host_profile('rocky-10', responses => [ @RHEL_FM ])), 'driver/r
 }
 
 # No source with a Fabric Manager: dies in plan, read-only probes only.
-for my $case ([ 'debian-12', release => '11.11' ], [ 'leap-15.6' ], [ 'leap-16.0' ]) {
-  my ( $os, @over ) = @$case;
+# Debian 11 dies one step earlier since k107: its non-free 470 is older
+# than the H100's floor (525), so no source fits the GPU itself.
+my $NO_FM = qr/no NVIDIA Fabric Manager package for the NVSwitch on this host.*No driver package was installed and no package source was added/;
+for my $case ([ $NO_FM, 'leap-15.6' ], [ $NO_FM, 'leap-16.0' ],
+              [ qr/debian-nonfree: branch 470 is older than 525;.*No driver package was installed and no package source was added/,
+                'debian-12', release => '11.11' ]) {
+  my ( $re, $os, @over ) = @$case;
   my $rec = hgx_on(host_profile($os, @over));
-  like($rec->{error}, qr/no NVIDIA Fabric Manager package for the NVSwitch on this host.*No driver package was installed and no package source was added/,
-    "$os @over HGX H100: dies naming the missing Fabric Manager");
+  like($rec->{error}, $re, "$os @over HGX H100: dies naming what is missing");
   is_deeply([ mutating_lines(@{ $rec->{lines} }) ], [], '... only read-only probes');
 }
 

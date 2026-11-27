@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "1.25";
+our $VERSION = "1.26";
 
 1;
 =encoding utf-8
@@ -29,6 +29,8 @@ nup - n-up, multi-column paged output for commands and files
      -C  --pane=#[,#]       number of columns, and rows (e.g., 2,2)
      -P  --page=#           page height in lines
      -S  --pane-width=#     pane width (default: 85)
+     -w  --width=#          output width
+    --ac --column-opts      options for ansicolumn
     --bs --border-style=#   border style (default: heavy-box)
     --ls --line-style=#     line style (none/truncate/wrap/wordwrap)
          --runin=#          run-in width for line breaking
@@ -54,7 +56,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.25
+Version 1.26
 
 =cut
 =head1 DESCRIPTION
@@ -79,11 +81,12 @@ file name and hands the file names and everything after them to
 L<ansicolumn> unchanged.  Options of C<ansicolumn> that C<nup> does
 not provide can therefore be given after the file names:
 
-    nup -C2 file1.txt file2.txt -w 170
+    nup -C2 file1.txt file2.txt --tabstop 4
 
-Here C<-w 170> sets the output width for C<ansicolumn>.  To set the
-width when no terminal is available, the C<COLUMNS> environment
-variable works in both modes; see L</Terminal Size>.
+They can be given by C<--column-opts> as well, which works in command
+mode too:
+
+    nup -C2 --column-opts --tabstop 4 -- file1.txt file2.txt
 
 =head1 OPTIONS
 
@@ -289,6 +292,24 @@ Set the page height in lines.
 
 Set the pane width in characters. Default is 85.
 
+=item B<-w> I<N>, B<--width>=I<N>
+
+Set the output width in characters.  It is given to C<ansicolumn>.
+To set the width when no terminal is available, the C<COLUMNS>
+environment variable works as well; see L</Terminal Size>.
+
+=item B<--ac> I<OPTIONS> ... B<-->, B<--column-opts> I<OPTIONS> ... B<-->
+
+Give other options to L<ansicolumn>.  The arguments up to C<--> are
+taken as they are, and the C<--> is removed:
+
+    nup --column-opts --tabstop 4 -s : -- file
+    nup --column-opts --tabstop 4 -- man nup
+
+The options after the C<--> are those of C<nup> again.  To end the
+options there, give another C<-->.  A single option can be given
+without C<--> as C<--column-opts=--tabstop=4>.
+
 =back
 
 =head2 Style Options
@@ -473,10 +494,9 @@ C<tty> or C<pdf>, and exit.  No file is read and no command is run.
     275 80 pdf
 
 For a paper, the size is that of a sheet, which follows C<-T>, C<-o>,
-C<-P>, the number of rows, C<--pdf-opts> and C<-w> of C<ansicolumn>
-given after the file names.  For the terminal, it is the size of the
-terminal.  This is for a program that formats text before giving it
-to C<nup>, as L<mdee(1)|App::mdee> does.
+C<-P>, C<-w>, the number of rows and C<--pdf-opts>.  For the terminal,
+it is the size of the terminal.  This is for a program that formats
+text before giving it to C<nup>, as L<mdee(1)|App::mdee> does.
 
 =item B<--pdf-opts>=I<OPTIONS>
 
@@ -489,15 +509,14 @@ they take precedence.
 =back
 
 The C<-P> option sets the number of lines of a page for PDF as well:
-a sheet has that many lines for each row.  The C<-w> option of
-C<ansicolumn>, given after the files or the command, sets the number
-of columns of a sheet.  The font size follows them, and the one that
-is not given is decided to fill the sheet.  With neither of them, a
+a sheet has that many lines for each row.  The C<-w> option sets the
+number of columns of a sheet.  The font size follows them, and the one
+that is not given is decided to fill the sheet.  With neither of them, a
 sheet has 60 lines.
 
     nup -o nup.pdf -P 80 man nup         # 80 lines on a sheet
     nup -o nup.pdf -C2,2 -P 40 man nup   # 2x2 pages of 40 lines
-    nup -o nup.pdf -C3 file -w 300       # 300 columns on a sheet
+    nup -o nup.pdf -C3 -w 300 file       # 300 columns on a sheet
 
 =head2 Terminal Size
 
@@ -678,7 +697,7 @@ Typical n-up usage:
     nup -L -C4 man perl        # four pages on the screen at a time
     nup -L *.txt               # files side by side, scrolled sideways
     nup file1.txt file2.txt    # view files side by side
-    nup -C2 a.txt b.txt -w 170 # 2 columns, width 170 (ansicolumn -w)
+    nup -C2 -w 170 a.txt b.txt # 2 columns, width 170
     nup -e ./script.sh         # force command mode for a file
     nup -o nup.pdf man nup     # print to PDF (requires ansi2pdf)
     nup -T a4p -C1 file | lpr  # print on A4 in portrait

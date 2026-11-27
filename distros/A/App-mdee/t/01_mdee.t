@@ -585,7 +585,7 @@ subtest q(parallel option) => sub {
     like($catv, qr/run_cat_v/, q(--cat-v still works without a short option));
 
     my $two = `COLUMNS=200 $mdee -ddn --parallel $test_md $test_md 2>&1`;
-    like($two, qr/debug: nup .*-V .*--pane=2 .*- --pages/, q(--parallel runs nup -V with one pane per file));
+    like($two, qr/debug: nup .*-V .*--pane=2 .*--column-opts --pages .*--$/m, q(--parallel runs nup -V with one pane per file));
     like($two, qr/fold_width=93\b/, q(--parallel folds to the pane width));
 
     my $three = `COLUMNS=300 $mdee -ddn --parallel $test_md $test_md $test_md 2>&1`;
@@ -596,7 +596,7 @@ subtest q(parallel option) => sub {
     like($three, qr/fold_width=93\b/, q(fold width follows the pane count));
 
     my $pane = `COLUMNS=200 $mdee -ddn --parallel -C1 $test_md $test_md 2>&1`;
-    like($pane, qr/-V .*--pane=1 .*- --pages/, q(-C overrides the pane count));
+    like($pane, qr/-V .*--pane=1 .*--column-opts --pages/, q(-C overrides the pane count));
 
     my $one = `COLUMNS=200 $mdee -ddn --parallel $test_md 2>&1`;
     unlike($one, qr/debug: nup .*-V/, q(--parallel with a single file is ignored));
@@ -834,7 +834,7 @@ subtest q(pane option with rows) => sub {
     like($cr, qr/fold_width=93\b/, q(-C2,2 folds for two columns));
 
     like($run->('-C3'), qr/debug: nup .*--pane=3(?: |$)/m, q(-C3 is the columns alone));
-    like($run->('-C2,2 -w 180'), qr/debug: nup .*--pane=2,2 - -w 180/,
+    like($run->('-C2,2 -w 180'), qr/debug: nup .*--pane=2,2 -w 180 /,
          q(the rows are kept with -w));
     like($run->('-C2,3 -R1'), qr/debug: nup .*-R 1 .*--pane=2,3/,
          q(-R is given to nup with -C C,R));
@@ -849,16 +849,16 @@ subtest q(output width option) => sub {
     like($help, qr/--fold-width/, q(--help shows --fold-width option));
 
     my $two = `COLUMNS=300 $mdee -ddn -w 180 $test_md 2>&1`;
-    like($two, qr/debug: nup .*--pane=2 .*- -w 180/, q(-w gives nup the pane count and ansicolumn -w));
+    like($two, qr/debug: nup .*--pane=2 -w 180 /, q(-w gives nup the pane count and the width));
     like($two, qr/fold_width=83\b/, q(fold width is derived from -w and the pane count));
     like($two, qr/table_width=86\b/, q(table width is the fold width and the run-in width but one));
 
     my $one = `COLUMNS=300 $mdee -ddn -w 100 $test_md 2>&1`;
-    like($one, qr/debug: nup .*--pane=1 - --pages -w 100/, q(single column passes -w after --pages));
+    like($one, qr/debug: nup .*--pane=1 -w 100 --column-opts --pages .*--$/m, q(single column passes -w and --pages));
     like($one, qr/fold_width=93\b/, q(single column fold width is -w minus 7));
 
     my $par = `COLUMNS=300 $mdee -ddn -V -w 180 $test_md $test_md 2>&1`;
-    like($par, qr/debug: nup .*-V --pane=2 - --pages -w 180/, q(--parallel passes -w to ansicolumn));
+    like($par, qr/debug: nup .*-V --pane=2 -w 180 --column-opts --pages .*--$/m, q(--parallel passes -w));
     like($par, qr/fold_width=83\b/, q(--parallel fold width follows -w));
     like(`COLUMNS=300 $mdee -ddn -V -w 140 $test_md $test_md 2>&1`, qr/-V --pane=1 /,
          q(--parallel with -w 140 gives one pane));
@@ -869,7 +869,7 @@ subtest q(output width option) => sub {
     my $fold = `COLUMNS=300 $mdee -ddn -w 180 --fold-width=60 $test_md 2>&1`;
     like($fold, qr/fold_width=60\b/, q(--fold-width overrides the derived fold width));
     like($fold, qr/table_width=60\b/, q(--fold-width also sets the table width));
-    like($fold, qr/debug: nup .*- -w 180/, q(--fold-width keeps the output width));
+    like($fold, qr/debug: nup .* -w 180 /, q(--fold-width keeps the output width));
 
     my $plain = `COLUMNS=300 $mdee -ddn $test_md 2>&1`;
     unlike($plain, qr/debug: nup .*-w /, q(without -w nup gets no width));
@@ -879,9 +879,9 @@ subtest q(output width option) => sub {
 subtest q(tables kept intact) => sub {
     my $nup = `COLUMNS=300 $mdee -ddn -w 180 $test_md 2>&1`;
     like($nup, qr/intact=table\b/, q(with nup the md module joins the rows of tables));
-    like($nup, qr/debug: nup .* - -w 180 --intact/, q(with nup ansicolumn gets --intact));
+    like($nup, qr/debug: nup .* -w 180 --column-opts --intact --$/m, q(with nup ansicolumn gets --intact));
     my $plain = `COLUMNS=300 $mdee -ddn $test_md 2>&1`;
-    like($plain, qr/debug: nup .* - --intact/, q(--intact is given after "-" when there is no other option));
+    like($plain, qr/debug: nup .* --column-opts --intact --$/m, q(--intact is given by --column-opts when there is no other option));
 
     for my $opt (q(-s cat), q(--cat-v), q(--no-fold), q(--no-table)) {
         my $out = `COLUMNS=300 $mdee -ddn -w 180 $opt $test_md 2>&1`;

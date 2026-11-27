@@ -1,60 +1,115 @@
 # ShellSpawn: extension points, and the large subset (2026-11-01)
 
-**Status: EXPERIMENTAL; approved experimentally by the user on 2026-11-02 (00:24): "I (experimentally) endorsed every choice of yours."** On 2026-11-01 (16:08) the user decided one thing: handlers in the parse tree are named by **sub names**, not code references. He left everything else to Claude ("decide yourself"), and asked that those decisions be marked experimental and awaiting his approval. They include D1–D3, first proposed on the page "Child Exit Wake-up" (removed since; it is in Proc-Spawner 0.03 on CPAN). Section 6 lists every such decision in one place.
+**Status: EXPERIMENTAL; approved experimentally by the user on 2026-11-02 (00:24): "I (experimentally) endorsed every
+choice of yours."**
+
+- On 2026-11-01 the user decided two things: (16:08) handlers in the parse tree are named by **sub names**, not code
+  references; (19:39) the caller passes the parser ([section 1](#my-section-1)).
+- The user (the distribution's author) left everything else to Claude ("decide yourself"), and asked that those decisions be marked experimental and
+  awaiting the user's approval. That approval came on 2026-11-02 (above), experimentally: they stand until the user
+  rejects one ([section 6](#my-section-6) says what each rejection means). They include D1–D3, first proposed on the page "Child Exit Wake-up" (removed since; it is in
+  Proc-Spawner 0.03 on CPAN).
+- [Section 6](#my-section-6) lists every such decision in one place.
+
+This page describes the code of 2026-11-01, with the names of that day (`ShellSpawn`, `ShellSubsetLarge`, ...; the
+names since 2026-11-02 are in [`pspawn-spawner.md`](pspawn-spawner.md)); later notes name their date or version (labels such as post-0.12, the work after a release: [`README.md`](README.md#my-version-labels-of-the-results)). The IDs not in the list below (JU3, L1–L5, X13, …) are rows of [`pspawn-known-issues.md`](pspawn-known-issues.md) (L1–L5: [one row](pspawn-known-issues.md#my-l1-l5)) or items of the review of the executor's code (J…, `Changes`, post-0.12). *The old Project* is the shared workspace of the claude.ai app where the code was first written; its `claude/` directory held the working files, and *the bundle* is the archive of the code kept there, `claude/pspawn-tree.tar.gz-base64.txt`.
 
 **Words and IDs used here.**
-- The *binding* is `PosixSpawn`, the project's XS module for posix_spawn.
-- The *loop* is the executor's one place that waits (in `select`) for children to end and for pipes Perl itself reads or writes. A *reaction* is one continuation that the loop takes from its queue and runs; reactions run one at a time.
+- The *binding* is `PosixSpawn`, the project's XS module for posix_spawn (today part of `Proc::Spawner`).
+- The *loop* is the one place of the executor that waits (in `select`) for children to end and for pipes Perl itself
+  reads or writes. A *reaction* is one continuation that the loop takes from its queue and runs; reactions run one at
+  a time.
 - A handler's arguments:
-  - CONTEXT: the executor's per-command state (the fd table, and in `{sh}` the shell's variables, functions and options);
+  - CONTEXT: the executor's per-command state (the fd table, and in `{sh}` the shell's variables, functions and
+    options);
   - NODE: the parse-tree node;
   - TAIL: the contexts to release once the last process this node may start has started (or undef);
   - K: the continuation, called with the exit status;
   - ARGV and ENV: the expanded words and the settings written before the command;
   - DATA: what the command table stored with the name.
 - IDs from other documents:
-  - A4, A5 and U2: the run-time rules and a parser rule of [`large-subset/large-subset-spec.md`](large-subset/large-subset-spec.md);
+  - A4 and A5 (the run-time rules) and U2 (a parser rule: no pattern that can match `.` or `..`) of [`large-subset/large-subset-spec.md`](large-subset/large-subset-spec.md);
   - B1, D1–D3 and R2: items of the page "Child Exit Wake-up";
   - E21, X2 and X15: [`pspawn-known-issues.md`](pspawn-known-issues.md).
-- Files named in [section 7](#my-section-7) are in the bundle's top directory.
+- The scripts of [section 7](#my-section-7) without a link (`compare.pl`, `hyg.pl`, `mem.pl`) were in the bundle's top directory, and `sigprobe/…` in that directory of it; the linked ones are shipped now.
 
-Code: `lib/ShellSpawn.pm` (the executor, also `claude/pspawn-ShellSpawn.pm`) and the new `lib/ShellSpawn/Large.pm` (also `claude/pspawn-ShellSpawn-Large.pm`), in the bundle `claude/pspawn-tree.tar.gz-base64.txt`. The bundle's `parser/` now holds `ShellSubsetLarge.pm` too.
+**Code, as of 2026-11-01.** `lib/ShellSpawn.pm` (the executor; also `claude/pspawn-ShellSpawn.pm`) and the new
+`lib/ShellSpawn/Large.pm` (also `claude/pspawn-ShellSpawn-Large.pm`), in the bundle. The bundle's `parser/` now holds `ShellSubsetLarge.pm` too. Today these are
+[`lib/Proc/ShellSpawn.pm`](../lib/Proc/ShellSpawn.pm) and [`lib/Proc/ShellSpawn/Large.pm`](../lib/Proc/ShellSpawn/Large.pm).
 
 ## <a id="my-section-1"></a>1. What the executor runs now
 
-`ShellSpawn::run(STRING, parser => CODE)` parses STRING with CODE, which returns a tree or an error hash; the same CODE reads the text of `eval`, `.` and trap actions. `run(TREE)` takes a ready tree. The user's decision of 2026-11-01 (19:39): the caller passes the parser, with a reasonable default. The default (Claude's choice, EXPERIMENTAL): the largest of `ShellSubsetLarge`, `ShellSubset`, `ShellSubsetSmall` that the caller has already loaded; if none is, `ShellSubset` is loaded. The executor loads no parser otherwise, and none of the three parsers needs a larger one (`ShellSubsetLarge` builds on `ShellSubset`). [`try.pl`](../t/try.pl) takes `PARSER=small`, `base` or `large` (default `large`). The large subset is [`large-subset/large-subset-spec.md`](large-subset/large-subset-spec.md): functions, `local`, `return`, `export`, `readonly`, `exec` anywhere and with redirections only, here-documents, positional parameters, `$#`, `$@`, `$*`, `$$`, the `${N=w} ${N?w} ${N%p} ${N#p}` forms, assignments in `$(( ))`, and the builtins `set shift eval . trap wait umask command getopts unset`, `cd -`, `kill … $$`.
+- `ShellSpawn::run(STRING, parser => CODE)` parses the snippet STRING with CODE, which returns a tree or an error
+  hash. The same CODE reads the text of `eval`, `.` and trap actions.
+- `run(TREE)` takes a ready tree.
+- The caller passes the parser, with a reasonable default (the user's decision of 2026-11-01, 19:39).
+- The default (Claude's choice, EXPERIMENTAL) is the largest of `ShellSubsetLarge`, `ShellSubset`, `ShellSubsetSmall`
+  that the caller has already loaded; if none is loaded, `ShellSubset` is loaded. The executor loads no parser
+  otherwise, and none of the three parsers needs a larger one (`ShellSubsetLarge` builds on `ShellSubset`).
+- [`try.pl`](../t/try.pl) takes `PARSER=small`, `base` or `large` (default `large`).
+
+The large subset is defined in [`large-subset/large-subset-spec.md`](large-subset/large-subset-spec.md). It adds:
+functions, `local`, `return`, `export`, `readonly`, `exec` anywhere (and `exec` with redirections only, which changes the shell's own descriptors), here-documents,
+positional parameters, `$#`, `$@`, `$*`, `$$`, the `${N=w} ${N?w} ${N%p} ${N#p}` forms, assignments in `$(( ))`, and
+the builtins `set shift eval . trap wait umask command getopts unset`, `cd -`, `kill … $$`.
 
 ## <a id="my-section-2"></a>2. The extension points
 
-A handler is a sub named by its fully qualified name, such as `ShellSpawn::Large::b_shift`. The name is looked up at first use, and its module is loaded then (`ShellSpawn::handler`). A name, unlike a code reference, prints readably in a dumped tree, can be passed to another `perl` process, and cannot capture the tree, so it cannot form a reference cycle.
+A handler is a sub named by its fully qualified name, such as `ShellSpawn::Large::b_shift`. The name is looked up at
+first use, and its module is loaded then (`ShellSpawn::handler`). Unlike a code reference, a name prints readably in a
+dumped tree, can be passed to another `perl` process, and cannot capture the tree, so it cannot form a reference
+cycle.
 
 There are three kinds:
 
-1. **Command nodes.** A node `{ ext => NAME, … }`, or a node with one of the keys of `%ShellSpawn::KIND` (`func export readonly local exec`, mapped to `ShellSpawn::Large::x_func` and so on). Called as `NAME->(CONTEXT, NODE, TAIL, K)`, like the executor's own `x_…` subs.
-2. **Command names.** `%ShellSpawn::CMD` maps a name to `[NAME, DATA]`. The shell's own table `$context->{sh}{cmd}` is searched before `%ShellSpawn::CMD`; it holds the functions defined so far. Called as `NAME->(CONTEXT, ARGV, ENV, K, DATA)`, where CONTEXT holds the command's redirections. The old builtins (`: exit break continue read`) are in the table too. Every builtin left to sh mapped to `ShellSpawn::Large::b_unsupported` (A4). Today a name is looked up in the list of tables `@Proc::ShellSpawn::CMDS`, and only builtins none of them has fall to `Proc::ShellSpawn::Large::b_unsupported` (the table `%A4`, last): `alias` and `unalias` are built (`Proc::ShellSpawn::Builtins`), and `fc`, `history` and the other interactive-only builtins go to `b_interactive`.
-3. **Word parts.** A Part `[ext => NAME, …]`, called as `NAME->(CONTEXT, PART, K)` with `K->(TEXT)`. No parser emits these yet. The limit of word parts: a handler passes one string to K, so it cannot make several fields, as `"$@"` must; that is why `$@` is in the core ([section 3](#my-section-3)).
+1. **Command nodes.** A node `{ ext => NAME, … }`, or a node with one of the keys of `%ShellSpawn::KIND` (`func export
+   readonly local exec`, mapped to `ShellSpawn::Large::x_func` and so on). Called as `NAME->(CONTEXT, NODE, TAIL, K)`,
+   like the executor's own `x_…` subs.
+2. **Command names.** `%ShellSpawn::CMD` maps a name to `[NAME, DATA]`. Called as `NAME->(CONTEXT, ARGV, ENV, K, DATA)`,
+   where CONTEXT holds the command's redirections.
+   - The shell's own table `$context->{sh}{cmd}`, which holds the functions defined so far, is searched before
+     `%ShellSpawn::CMD`.
+   - The old builtins (`: exit break continue read`) are in the table too.
+   - Every builtin of sh that the executor does not implement (*left to sh*) is mapped to `ShellSpawn::Large::b_unsupported` (A4).
+   - Today a name is looked up in the list of tables `@Proc::ShellSpawn::CMDS`. Only the builtins that none of them
+     has fall to `Proc::ShellSpawn::Large::b_unsupported` (through the table `%A4`, which stays the last of `@CMDS`). `alias` and `unalias` are built
+     (`Proc::ShellSpawn::Builtins`), and `fc`, `history` and the other interactive-only builtins go to
+     `b_interactive`.
+3. **Word parts.** A part `[ext => NAME, …]`, called as `NAME->(CONTEXT, PART, K)` with `K->(TEXT)`. No parser emits
+   these yet. Their limit: a handler passes one piece of text to K, so it cannot make several fields, as `"$@"` must; that is
+   why `$@` is in the core ([section 3](#my-section-3)).
 
 The rules for every handler:
-- It calls K exactly once, now or later, or it ends the shell instead (`ShellSpawn::leave`, or `ShellSpawn::fail` after a message).
+- It calls K exactly once, now or later, or it ends the shell instead (`ShellSpawn::leave`, or `ShellSpawn::fail`,
+  which first prints the message it is given).
 - It never waits (D2): it starts what it needs and continues in a callback.
 
-The functions a handler may use (the "context API") are the executor's own: `var setvar expand expand_str each_async x_list x_cmd redirect spawn find_cmd msg defer leave fail hold release release_ctx release_all on_read on_write`. Since post-0.12 they can be called through the short alias `ProcSS` (`ProcSS::fail($c, 2, $text)`), which [`Proc::ShellSpawn`](../lib/Proc/ShellSpawn.pm) sets for `Proc::ShellSpawn` and which its own modules use (JU3).
+The functions a handler may use (the "context API") are the executor's own: `var setvar expand expand_str each_async
+x_list x_cmd redirect spawn find_cmd msg defer leave fail hold release release_ctx release_all on_read on_write`.
+Since post-0.12 they can be called through the short alias `ProcSS` (`ProcSS::fail($c, 2, $text)`), which
+[`Proc::ShellSpawn`](../lib/Proc/ShellSpawn.pm) sets for `Proc::ShellSpawn` and which its own modules use (JU3).
 
 ## <a id="my-section-3"></a>3. What went into the core, and why
 
 These change behaviour in many places, not at one node, so they are hooks in [`ShellSpawn.pm`](../lib/Proc/ShellSpawn.pm):
-- **Parameters:** `$0` (`sh`), `$1`…, `$#`, `$$` (the PID of the Perl process, read once at the start of `run()`, the same in subshells), `$*`, and `"$@"`, which makes one field per parameter. A function call gets its own parameters.
-- **The new `${…}` forms.** `${N%p}` and the like use the same pattern code as `case`. In an unquoted `${N:-w}`, quoted text (`["'", …]` parts) is not split.
+- **Parameters:** `$0` (`sh`), `$1`…, `$#`, `$$` (the PID of the Perl process, read once at the start of `run()`, the
+  same in subshells), `$*`, and `"$@"`, which makes one field per parameter. A function call gets its own parameters.
+- **The new `${…}` forms.** `${N%p}` and the like use the same pattern code as `case`. In an unquoted `${N:-w}`,
+  quoted text (`["'", …]` parts) is not split.
 - **`$(( ))`:** assignments (`= += -= *= /= %= <<= >>= &= ^= |=`), positional parameters, `$#`, `$$`.
-- **Here-documents:** Perl writes the body into a pipe that the command reads. This uses the new loop primitive `on_write`, the counterpart of `on_read`; it never blocks.
+- **Here-documents:** Perl writes the body into a pipe that the command reads. This uses the new loop primitive
+  `on_write`, the counterpart of `on_read`; it never blocks.
 - **`set` options:**
-  - `-e` acts after an and-or list, not for conditions, the left side of `&&` and `||`, or `!` (a context flag `cond`);
+  - `-e` acts after an and-or list, not for conditions, the left side of `&&` and `||`, or `!` (a context flag
+    `cond`);
   - `-u` on reading a variable;
   - `-f` in globbing;
   - `-C` in `>`;
   - `-a` in every assignment.
-- **`readonly`:** checked in every assignment. A failing assignment ends the shell with status 2 (A5), and the commands after it do not run.
-- **`umask`:** the shell keeps its own. The executor sets it only around each spawn and each file it opens, so Perl's own umask stays as it was.
+- **`readonly`:** checked in every assignment. A failing assignment ends the shell with status 2 (A5), and the
+  commands after it do not run.
+- **`umask`:** the shell keeps its own. The executor sets it only around each spawn and each file it opens, so Perl's
+  own umask stays as it was.
 - **Other changes:**
   - `cd -` uses and sets `OLDPWD`.
   - `exec cmd` ends the shell after the command.
@@ -64,61 +119,93 @@ These change behaviour in many places, not at one node, so they are hooks in [`S
 
 ## <a id="my-section-4"></a>4. What went into the plug-in module `ShellSpawn::Large`
 
-- **Command nodes:** `x_func`, `x_export`, `x_readonly`, `x_local`, and `x_exec`, which applies the redirections to the current shell for the rest of the string.
-- **Functions:** `call` runs the body in the current shell, with a frame. The frame holds the variables to put back (those of `local`, and the temporary assignments written before the call, as in `x=1 f`) and its return continuation. A `break` in a function body does not leave a loop that encloses the call. `b_return` uses the frame.
-- **Builtins:** `b_shift`, `b_set`, `b_eval`, `b_dot`, `b_trap`, `b_wait`, `b_umask`, `b_command`, `b_getopts` (dash's `OPTIND` inside grouped options), `b_unset`, `b_kill`, `b_unsupported`.
+- **Command nodes:** `x_func`, `x_export`, `x_readonly`, `x_local`, and `x_exec`, which applies the redirections to the
+  current shell for the rest of the snippet.
+- **Functions:** `call` runs the body in the current shell, with a frame. The frame holds the variables to put back
+  (those of `local`, and the temporary assignments written before the call, as in `x=1 f`) and the continuation to
+  return to. A `break` in a function body does not leave a loop that encloses the call. `b_return` uses the frame.
+- **Builtins:** `b_shift`, `b_set`, `b_eval`, `b_dot`, `b_trap`, `b_wait`, `b_umask`, `b_command`, `b_getopts`
+  (`OPTIND` inside grouped options as dash sets it: after the `a` of `-ab`, already the next argument's index, 2, where bash keeps 1), `b_unset`, `b_kill`, `b_unsupported`.
 
 ## <a id="my-section-5"></a>5. Choices of behaviour (all as dash; checked against dash 0.5.12)
 
-- Settings before a special builtin (`: . eval exec exit export readonly return set shift trap unset`, …) stay set afterwards. Before a function, they hold for the call only, and are exported to its commands. Before other builtins and programs, they are for that command only.
+- Settings written before a command:
+  - before a special builtin (`: . eval exec exit export readonly return set shift trap unset`, …; the parser rejects them before `export` and `readonly`; section 7 has the case of `export`), they stay set
+    afterwards;
+  - before a function, they hold for the call only, and are exported to its commands;
+  - before other builtins and programs, they are for that command only.
 - `kill -SIG … $$`:
   - a trap for SIG runs it;
   - `trap '' SIG` ignores it;
-  - otherwise the whole string ends: `run()` returns 128 + the signal number and sets `$ShellSpawn::SIGNALLED`. [`try.pl`](../t/try.pl) then kills itself with that signal, so its caller sees a death by the signal, as with `sh -c`.
-- Traps for real signals are installed in `%SIG` while `run()` runs, as deferred handlers. They queue the action, which runs between two reactions. `run()` puts the old settings back.
+  - otherwise the whole snippet ends: `run()` returns 128 + the signal number and sets `$ShellSpawn::SIGNALLED`.
+    [`try.pl`](../t/try.pl) then kills itself with that signal, so its caller sees a death by the signal, as with
+    `sh -c`.
+- Traps for real signals are installed in `%SIG` while `run()` runs, as deferred handlers. They queue the action,
+  which runs between two reactions. `run()` puts the old settings back.
 - A signal ignored with `trap '' SIG` stays ignored in children.
-- Error messages follow dash's wording ("x: is read only", "shift: can't shift that many", "x: parameter not set", "Illegal option -x", …), with the prefix `sh:`.
+- Error messages follow dash's wording ("x: is read only", "shift: can't shift that many", "x: parameter not set",
+  "Illegal option -x", …), with the prefix `sh:`.
 
 ## <a id="my-section-6"></a>6. Decisions taken by Claude (all EXPERIMENTAL; endorsed experimentally by the user, 2026-11-02)
 
 | ID | Decision | Where |
 |---|---|---|
-| D1 | Option A: a C handler for SIGCHLD in the binding (`PosixSpawn::chld_to_fd`, `chld_restore`) writes the wake-up byte; `select` waits without a timeout. B1's stop-gap (a deferred Perl handler, and `select` waking every 50 ms) stays as the fallback, used only if the binding lacks the function. | `loop_until`, `turn` (today `wait_until` and `turn` of `Proc::Spawner::Loop`; the handler is set and put back in `Proc::Spawner::Loop::POSIX`) |
+| D1 | Option A of item D1 on that page: a C handler for SIGCHLD in the binding (`PosixSpawn::chld_to_fd`, `chld_restore`) writes the wake-up byte; `select` waits without a timeout. B1's stop-gap (a deferred Perl handler, and `select` waking every 50 ms) stays as the fallback, used only if the binding lacks the function. | `loop_until`, `turn` (today `wait_until` and `turn` of `Proc::Spawner::Loop`; the handler is set and put back in `Proc::Spawner::Loop::POSIX`) |
 | D2 | A wait started inside a reaction (a call into the loop, such as `run()`, from a queued continuation) dies: "ShellSpawn: wait inside a reaction". Before, it was allowed. | `loop_until` |
 | D3 | No change: the SIGCHLD handler is installed only while the loop waits, and the previous one is put back when the loop returns. | `loop_until` |
 | E1 | Three kinds of extension point, and their calling conventions ([section 2](#my-section-2)). That they are named by sub names is the user's decision, not Claude's. | [section 2](#my-section-2) |
-| E2 | The split between core hooks ([section 3](#my-section-3)) and the plug-in module ([section 4](#my-section-4)). | |
+| E2 | The split between hooks in the core ([section 3](#my-section-3)) and the plug-in module ([section 4](#my-section-4)). | |
 | E3 | Replaced by the user's decision of 19:39: the caller passes the parser (`run(STRING, parser => CODE)`). Claude's part: the default is the largest parser already loaded ([section 1](#my-section-1)). A4 (stop with status 2 when something unsupported shows up only at run time) then applies only where the caller chose `ShellSubsetLarge`, or loaded it. | `run`, `default_parser` |
 | E4 | `run()` reports a death by `kill … $$` as 128 + N plus `$SIGNALLED`, not by killing Perl. | `run`, `b_kill` |
 | E5 | Signal traps act only between reactions, and only while `run()` runs. | `b_trap` |
 
-To reject one of these, say which. D1 falls back to B1's stop-gap by removing the C handler; D2 to allowing nested waits; E3 to `ShellSubset::parse`. The others need a new design.
+To reject one of these, say which. Rejecting D1 means falling back to B1's stop-gap by removing the C handler; D2,
+allowing nested waits again; E3, the default `ShellSubset::parse`. The others need a new design.
 
 ## <a id="my-section-7"></a>7. Tests (2026-11-01)
 
-This section is of 2026-11-01. The current tests: [`t/dash.t`](../t/dash.t) (with the known differences in [`t/dash-known.txt`](../t/dash-known.txt)), [`t/memory.t`](../t/memory.t) and the other files of `t/`; what did not pass at each level of the spawn primitive: [`test-results/`](test-results).
+This section records the tests of 2026-11-01. The current tests are [`t/dash.t`](../t/dash.t) (with the known
+differences in [`t/dash-known.txt`](../t/dash-known.txt)), [`t/memory.t`](../t/memory.t) and the other files of `t/`;
+what did not pass at each level of the spawn primitive is in [`test-results/`](test-results).
 
-- **[`largebattery.txt`](../t/batteries/largebattery.txt):** 103 lines of the new constructs, compared with dash by `compare.pl`. `compare.pl` now reads `@N` as a newline and `@T` as a tab, for here-documents. **99 agree** (evening, after the fixes L1–L5 and the parser's `for NAME` without `in`, `claude/large-subset-forall.patch`). The other 4:
-  - two strings the parser rejects: `$((y=2, 3))`, and settings before `export`;
+- **[`largebattery.txt`](../t/batteries/largebattery.txt):** 103 lines of the new constructs, compared with dash by
+  `compare.pl`. `compare.pl` now reads `@N` as a newline and `@T` as a tab, for here-documents. **99 agree** (in the
+  evening, after the fixes L1–L5 and the parser's `for NAME` without `in`, `claude/large-subset-forall.patch`). The
+  other 4:
+  - two snippets the parser rejects: `$((y=2, 3))`, and settings before `export`;
   - `$0` is `sh` by the spec, while dash names itself;
   - a builtin left to sh, named only at run time, stops with status 2 (A4).
-- **The older batteries, with the large grammar** (pre-0.01; the counts of 0.03 are in [`pspawn-spawner.md`](pspawn-spawner.md#my-section-5), section 5):
+- **The older batteries, with the large grammar** (pre-0.01; the counts of 0.03 are in
+  [`pspawn-spawner.md`](pspawn-spawner.md#my-section-5), section 5):
   - [`battery.txt`](../t/batteries/battery.txt) 42/43 (was 41: `wait` now works);
   - [`sigenv.txt`](../t/batteries/sigenv.txt) 12/12 (was 11: `umask`);
   - [`t1.txt`](../t/batteries/t1.txt) 39/45 (was 35);
-  - [`fdbattery.txt`](../t/batteries/fdbattery.txt) 14/14, [`t2.txt`](../t/batteries/t2.txt) 42/44 (the known flaky order), [`t3.txt`](../t/batteries/t3.txt) 16/17 (`echo .*`, U2).
-- **Other checks:**
+  - [`fdbattery.txt`](../t/batteries/fdbattery.txt) 14/14, [`t2.txt`](../t/batteries/t2.txt) 42/44 (the known
+    varying order), [`t3.txt`](../t/batteries/t3.txt) 16/17 (`echo .*`, U2).
+- **Other measurements:**
   - `hyg.pl`: parent fds unchanged, no zombies.
-  - `mem.pl`: flat.
-  - [`sigprobe/mem-large.pl, now t/memory.t`](../t/memory.t): 1,500 runs of functions, `local`, traps, here-documents, `eval`, `getopts`, `wait` and arithmetic assignment, with RSS flat (12,176 → 12,196 kB). This found the arithmetic leak E21 of [`pspawn-known-issues.md`](pspawn-known-issues.md).
+  - `mem.pl`: memory flat.
+  - [`sigprobe/mem-large.pl, now t/memory.t`](../t/memory.t): 1,500 runs of functions, `local`, traps,
+    here-documents, `eval`, `getopts`, `wait` and arithmetic assignment, with RSS flat (12,176 → 12,196 kB) once
+    the arithmetic leak E21 of [`pspawn-known-issues.md`](pspawn-known-issues.md), which this test found, was fixed.
   - [`sigprobe/exec-stress.pl, now t/stress.t`](../t/stress.t): passes.
-  - `large-subset-difffuzz.pl` (the ShellSubsetLarge session's random strings, run under dash and the executor): 1,800 strings, 1,636 in the subset, 7 differ. Five differ only in the order of lines from parallel pipeline elements (X13), one only in a message prefix in the middle of a line (the script strips prefixes only at line starts), and one is X2 (`$!` of a job that starts no process).
-  - Parser tests (pre-0.01): 222/0, 612/0, 142/0.
+  - `large-subset-difffuzz.pl` (random snippets of the large subset, from the old Project's session that wrote the large parser, run under dash and the executor):
+    1,800 snippets, 1,636 in the subset, 7 differ:
+    - 5 only in the order of lines from parallel pipeline elements (X13);
+    - 1 only in a message prefix in the middle of a line (the script strips prefixes only at line starts);
+    - 1 is X2 (`$!` of a job that starts no process).
+  - Parser tests (pre-0.01), passed/failed: 222/0, 612/0, 142/0 (222 and 612 are today's counts of
+    `shell-subset-tests.pl` and `shell-subset-corpus-tests.pl`; which file the 142 were is not recorded).
 
 ## <a id="my-section-8"></a>8. Not done, limits
 
-- **Reference cycles broken by hand.** The executor still breaks some of its own cycles by hand at the end of a run (`release_all`, `%$c = ()` in `run`), against the user's rule (known issue [X15](pspawn-known-issues.md#my-x15)). They go away in the restructuring below.
-- **The restructuring:** a minimal `Proc::Spawner` with the executable graph in a companion module (page "Child Exit Wake-up", R2). Done 2026-11-02: [`pspawn-spawner.md`](pspawn-spawner.md).
-- **Word-part handlers** return one string ([section 2](#my-section-2)).
-- **`exec` with redirections only,** inside a group or `if` that has redirections of its own, changes only that group's fds; in dash it changes the shell's.
-- **`$!`** is empty when a background job starts no process before the `&` returns (X2). So `(exit 3) & wait $!` differs from dash.
+- **Reference cycles broken by hand.** The executor still breaks some of its own cycles by hand at the end of a run
+  (`release_all`, `%$c = ()` in `run`), against the user's rule that every cycle must go through weakened references (known issue [X15](pspawn-known-issues.md#my-x15)).
+  The restructuring below removed them from `Proc::Spawner` and the graph; those of the shell layer are left (X15, open).
+- **The restructuring:** a minimal `Proc::Spawner` with the executable graph in a companion module (page "Child Exit
+  Wake-up", R2). Done 2026-11-02: [`pspawn-spawner.md`](pspawn-spawner.md).
+- **Word-part handlers** return one piece of text ([section 2](#my-section-2)).
+- **`exec` with redirections only,** inside a group or `if` that has redirections of its own, changes only that
+  group's fds; in dash it changes the shell's.
+- **`$!`** is empty when a background job starts no process before the `&` returns (X2). So `(exit 3) & wait $!`
+  differs from dash.

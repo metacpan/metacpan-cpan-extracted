@@ -1,22 +1,12 @@
 use strict;
 use warnings;
 use Test::More;
-use IO::Socket::INET;
+use lib 'xt/lib';
+use EVNatsHelpers qw(nats_or_skip);
 use EV;
 use EV::Nats;
 
-my $host = $ENV{TEST_NATS_HOST} || '127.0.0.1';
-my $port = $ENV{TEST_NATS_PORT} || 4222;
-
-my $sock = IO::Socket::INET->new(
-    PeerAddr => $host,
-    PeerPort => $port,
-    Timeout  => 1,
-);
-unless ($sock) {
-    plan skip_all => "NATS server not available at $host:$port";
-}
-close $sock;
+my ($host, $port) = nats_or_skip();
 
 plan tests => 3;
 

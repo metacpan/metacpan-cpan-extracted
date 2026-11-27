@@ -1,7 +1,7 @@
 # ABSTRACT: GPU detection from sysfs, without lspci or pciutils
 
 package Rex::GPU::Detect::Sysfs;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use v5.14.4;
 use warnings;
 
@@ -35,9 +35,9 @@ sub detect {
   my %virtual = map { lc($_) => 1 } $class->virtual_display_vendor_ids;
   my $virtual = 0;
   for my $dev (@$devices) {
-    # Class 0380 (AMD Instinct, karr #75) counts for vendor 1002 only.
+    # Classes 0380 (karr #75) and 1200 (karr k1) count for vendor 1002 only.
     next unless $dev->{class} eq '0300' || $dev->{class} eq '0302'
-      || ( $dev->{class} eq '0380' && $dev->{vendor} eq '1002' );
+      || ( $dev->{class} =~ /\A(?:0380|1200)\z/ && $dev->{vendor} eq '1002' );
     if ($dev->{vendor} eq '10de') {
       push @{$result->{nvidia}}, $class->_nvidia_gpu_from_sysfs($dev);
     }
@@ -53,6 +53,9 @@ sub detect {
 
   Rex::Logger::info('Virtual GPU detected (virtio/QEMU/VMware/VBox) -- skipping')
     if $virtual && !@{$result->{nvidia}} && !@{$result->{amd}};
+
+  # As with lspci: the AMD driver state only where there is an AMD GPU.
+  $class->_resolve_amd($result->{amd}) if @{$result->{amd}};
 
   # As with lspci: NVSwitches only where there is an NVIDIA GPU.
   $result->{nvswitch} = $class->_nvswitches_from_sysfs($devices) if @{$result->{nvidia}};
@@ -144,16 +147,16 @@ sub _nvidia_compute_by_name {
   return;
 }
 
+# The same element as the lspci path (Rex::GPU::Detect::_amd_gpu); the status
+# line comes from _resolve_amd, once the driver state is read.
 sub _amd_gpu_from_sysfs {
   my ( $class, $dev ) = @_;
-  my $name = 'AMD GPU [1002:'.( $dev->{device} // '????' ).']';
-  Rex::Logger::info('  [info] AMD: '.$name.' (PCI class '.$dev->{class}.', '.$dev->{slot}.')');
-  return {
-    name      => $name,
-    vendor    => 'amd',
+  return $class->_amd_gpu(
+    name      => 'AMD GPU [1002:'.( $dev->{device} // '????' ).']',
     pci_class => $dev->{class},
-    compute   => 0   # AMD compute support not yet implemented
-  };
+    slot      => $class->amd_class->normalize_slot($dev->{slot}),
+    device_id => $dev->{device},
+  );
 }
 
 sub _nvswitches_from_sysfs {
@@ -195,7 +198,7 @@ Rex::GPU::Detect::Sysfs - GPU detection from sysfs, without lspci or pciutils
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -239,8 +242,10 @@ What it shares with the C<lspci> detection, as one source: the generation
 table (L<Rex::GPU::NVIDIA::Requirement>, through
 L<Rex::GPU::Detect/requirement_class>), the vGPU table
 (L<Rex::GPU::Detect/vgpu_class>), the NVSwitch device IDs
-(L<Rex::GPU::Detect/nvswitch_device_ids>) and the virtual display vendors
-(L<Rex::GPU::Detect/virtual_display_vendor_ids>). A subclass overrides
+(L<Rex::GPU::Detect/nvswitch_device_ids>), the virtual display vendors
+(L<Rex::GPU::Detect/virtual_display_vendor_ids>) and the AMD device table
+and driver state (L<Rex::GPU::Detect/amd_hardware_class>,
+L<Rex::GPU::Detect/amd_class>). A subclass overrides
 those, or any helper, as for L<Rex::GPU::Detect> (see
 L<Rex::GPU/CLASSES OF YOUR OWN>).
 
@@ -277,8 +282,9 @@ is as documented for L<Rex::GPU::Detect/detect>.
       }
     ],
     amd => [
-      { name => "AMD GPU [1002:744c]", vendor => "amd",
-        pci_class => "0300", compute => 0 }
+      { name => "AMD GPU [1002:1586]", vendor => "amd",
+        pci_class => "0380", slot => "0000:95:00.0", device_id => "1586",
+        gfx_target => "gfx1151", compute => 1, integrated => 1 }
     ],
     nvswitch => [
       { name => "NVIDIA NVSwitch [10de:22a3]", vendor => "nvidia",
@@ -326,8 +332,15 @@ GPU was found.
 =item * B<Virtual displays> (L<Rex::GPU::Detect/virtual_display_vendor_ids>)
 are skipped per device, never hiding a real card next to them, as with
 C<lspci>. Only class C<0300> and C<0302> devices are display devices here
-too, plus class C<0380> for vendor C<1002> (AMD Instinct); an NVIDIA device
-at C<0380> is not listed.
+too, plus classes C<0380> (AMD Instinct MI100/MI210/MI250, the Strix Halo
+APU) and C<1200> (the AMD Instinct MI300 and MI350 series) for vendor
+C<1002>; an NVIDIA device at C<0380> or C<1200> is not listed.
+
+=item * B<AMD.> The elements have the same keys and the same C<gfx_target>,
+C<compute> and C<integrated> as with C<lspci> (L<Rex::GPU::Detect/AMD
+compute classification>): they are decided by device ID and the running
+driver, never by name. As there, a host with an AMD GPU runs one more
+read-only command, L<Rex::GPU::AMD/state_script>.
 
 =item * B<Order.> Devices are reported in the order of their PCI address.
 
@@ -363,7 +376,7 @@ L<Rex::GPU::Detect>, L<Rex::GPU>, L<Rex::GPU::NVIDIA/install_driver>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

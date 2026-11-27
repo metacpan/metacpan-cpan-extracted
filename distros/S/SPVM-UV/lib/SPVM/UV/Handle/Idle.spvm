@@ -3,6 +3,8 @@
 
 class UV::Handle::Idle extends UV::Handle {
   
+  version_from UV;
+  
   use UV::Callback::Idle;
   use Resource::UV;
   use UV::Resource::UV;

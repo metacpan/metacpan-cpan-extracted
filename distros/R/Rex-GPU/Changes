@@ -1,5 +1,101 @@
 Revision history for Rex-GPU
 
+0.006     2026-11-26 18:33:58Z
+  - New Rex::GPU::AMD (experimental): install_driver(gpus =>, method =>
+    auto|inbox|dkms, reboot =>) makes the distribution kernel's amdgpu
+    usable (plus firmware or linux-modules-extra where missing) or installs
+    amdgpu-dkms 31.60 from repo.radeon.com with a pinned key fingerprint, on
+    Ubuntu 22.04/24.04/26.04, Debian 12/13 (inbox and dkms, only on the
+    release's own amd64 kernel) and RHEL-family 8/9/10. A working driver is
+    left alone ('present'); every refusal of install_driver itself dies
+    before any change ("Nothing was changed on the host"), among them a
+    Proxmox VE host (pve-firmware installed), where firmware-amd-graphics
+    would remove proxmox-ve and its kernel. Under gpu_setup, gpu_detect
+    (which installs pciutils where lspci is missing) and, on a host with a
+    CUDA-capable NVIDIA GPU, all NVIDIA steps run before it and are not
+    undone; there such a refusal ends "Nothing was changed for the AMD GPU"
+    ("GPUs" for several); so do the dies after apt-get update, which end
+    "Nothing was installed for the AMD GPU" or say "No driver package was
+    installed for the AMD GPU". Radeon GPUs (the Radeon table of AMD's ROCm 10.1
+    matrix, new field matrix in the Hardware rows) get either driver only
+    where that table lists them: Ubuntu 26.04 GA kernel 7.0, 24.04 HWE 7.0,
+    22.04 HWE 6.8, RHEL-family 10.2 and 9.8 with their kernel build, never
+    Debian; elsewhere install_driver dies before any change (a working
+    driver is still 'present'). For dkms the running kernel's headers and
+    amdgpu-dkms need an installation candidate (installed or offered by the
+    sources; on RHEL checked with dnf repoquery), else it dies with no
+    driver package installed, for headers gone from the mirror with the
+    advice to upgrade the kernel and reboot. By then the apt timers are
+    stopped and apt-get update ran (apt) and, for dkms, curl and gpg are
+    installed where missing and AMD's signing key and repository file are in
+    place (a re-run accepts them). With an APU next to a dGPU, method =>
+    'auto' names method => 'inbox' only where the inbox driver is supported
+    for the APU, else the reason and gpus => with the dGPUs; under gpu_setup
+    with amd_integrated => 1 it names gpu_setup's own ways out instead
+    (leave amd_integrated out, or call install_driver directly with method
+    => or gpus =>). verify_amd(gpus =>) reports per GPU from sysfs/KFD.
+    install_rocm(release =>, gpus =>) installs the ROCm Core SDK from
+    stable.repo.amd.com (apt only) and dies before any change when rocm-core
+    of an older ROCm line is on the host, also held (apt-mark hold) or half
+    installed. install_rocm follows AMD's ROCm 10.1 matrix for Radeon GPUs
+    and Ryzen APUs as install_driver does (Ryzen APUs on Ubuntu 26.04 GA 7.0
+    and 24.04 HWE 7.0, Radeon also 22.04 HWE 6.8, never Debian; a ROCm
+    already installed stays 'present'); Instinct targets are unchanged. On
+    apt hosts a held package counts as installed for the driver, firmware
+    and ROCm checks; a half installed one does not. gpus => [] is refused.
+  - gpu_setup installs the AMD driver for ROCm-capable discrete AMD GPUs;
+    an APU only with the new option amd_integrated => 1; amd => or
+    set gpu_amd_class picks a custom class. Rex::GPU->can('amd_class') is
+    the feature flag for Rex::Rancher's gpu => 1.
+  - gpu_detect lists AMD GPUs at PCI class 1200 (MI300/MI350) too, and every
+    AMD entry carries slot, device_id, gfx_target, compute and integrated.
+    compute is no longer always 0: it comes from the new
+    Rex::GPU::AMD::Hardware tables (gfx targets, PCI IDs) or, when the
+    running amdgpu reports one, from the KFD topology. An unknown GPU stays
+    compute undef and gets no driver. A placeholder name "Device" becomes
+    "AMD GPU [1002:XXXX]". The lspci read command string changed.
+  - AMD support is experimental: only detection, verify_amd, the no-op
+    paths and the refusals ran, read-only, on one Ryzen AI Max+ PRO 495 host.
+    No AMD install, modprobe, reboot or install_rocm has run on hardware.
+  - On Debian and Ubuntu a held (apt-mark hold) driver, Fabric Manager,
+    NVLink fabric, container toolkit or helper package and a held
+    cuda-keyring count as installed, as on the AMD apt layer; a half
+    installed or half configured one does not. A Fabric Manager held at
+    another version than the driver still dies at the version check.
+  - install_driver (dkms) names a package manager hold or lock in the way of
+    the install as the cause when no amdgpu module is built or a package is
+    still missing afterwards, with the way out. Debian and Ubuntu (apt-mark
+    hold; apt-get install -y leaves a held package alone and aborts the
+    install where it would have to change it): a held package of the
+    install that is missing or not at its candidate version, or a held
+    amdgpu-dkms-firmware that is missing; unhold is the way out. RHEL
+    family (dnf versionlock): a lock on amdgpu-dkms, or on a kernel header
+    package or amdgpu-dkms-firmware that is missing; versionlock delete is
+    the way out, and without the versionlock plugin no lock is named. The
+    hold is looked up only on that failure path; new methods blocking_holds,
+    hold_note and hold_advice in the AMD setup package layer.
+  - Ada and Hopper GPUs (GH200 aside) need driver branch 520 or newer, and
+    88 single Turing, Ampere, Ada and Hopper device IDs the branch whose
+    NVIDIA supportedchips list first names them (510 to 580; among them
+    A800, RTX A1000/A400, late RTX 3050/3060 variants, L40S, L20, RTX 40xx
+    SUPER, H20, H200, H200 NVL, H20 NVL16). On Debian 11 (non-free 470) and
+    on a Debian release without a known non-free branch (sid; override
+    nonfree_branch) such a GPU now dies before any driver package is
+    installed, instead of getting a non-free driver that does not list it.
+    On Debian 12, and on 13 for 10de:2689, H200 NVL and H20 NVL16, one
+    floored above the non-free branch now gets NVIDIA's CUDA repository
+    with the open kernel module. Ubuntu, RHEL and openSUSE choose as before.
+  - gpu_setup and install_driver check the installed driver branch after the
+    install where the package name does not carry it: Debian (11 non-free
+    nvidia-driver; 12 and 13 also nvidia-kernel-open-dkms from the CUDA
+    repository) and the RHEL family's cuda-open-dkms. A branch that does not
+    fit the GPUs (a held, pinned or locked package, an older module stream)
+    dies with the driver packages installed, before Fabric Manager, the
+    nouveau blacklist, the initramfs and the reboot; an older branch that
+    still fits passes. New experimental Setup step verify_driver_branch and
+    source key driver_version_from.
+  - Recommends Rex::LibSSH 0.006.
+
 0.005     2026-10-21 20:21:08Z
   - detect (lspci and sysfs) now lists AMD Instinct accelerators, which
     enumerate as PCI class 0380, under "amd" (compute 0, still no driver

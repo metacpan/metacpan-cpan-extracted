@@ -26,7 +26,7 @@ for my $case ( $data->@* ) {
 
     subtest $key->{kid} => sub {
 
-        skip_all "unsupported algorithm" unless $key->{kty} eq "OKP" && $key->{crv} eq "Ed25519";
+        # skip_all "unsupported algorithm" unless $key->{kty} eq "OKP" && $key->{crv} eq "Ed25519";
 
         my $req = HTTP::Request->new(
             GET => $case->{target_url},
@@ -44,14 +44,17 @@ for my $case ( $data->@* ) {
             require_tag => 'web-bot-auth',
         );
 
-        # Change this to the actual keyid
-        $key->{kid} = unquote( $sig->signature_input->{keyid} );
+        ok my ($label) = $sig->signature_labels, "got label";
+        ok my $input = $sig->signature_input->get($label), "got input";
+        ok my $keyid = $input->params->get("keyid")->value, "got keyid";
+
+        $key->{kid} = unquote( $keyid );
 
         ok lives {
             ok $sig->verify, "verify"
                 or note( explain($case) );
             ok !$sig->is_expired, "not expired";
-        }, 'verify lives';
+        }, "verify did not throw an exception";
 
     };
 

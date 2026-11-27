@@ -26,13 +26,10 @@ my $nats = EV::Nats->new(
 );
 my $js = EV::Nats::JetStream->new(nats => $nats);
 
-# 1. Ensure the stream exists (idempotent — create_or_update would be
-#    nicer; here we just try create and ignore "already exists").
 $js->stream_create({ name => $stream, subjects => [ $subject ] }, sub {
     my (undef, $err) = @_;
     warn "stream_create: $err\n" if $err && $err !~ /already in use|already exists/i;
 
-    # 2. Ensure the durable consumer exists.
     $js->consumer_create($stream, {
         durable_name => $consumer,
         ack_policy   => 'explicit',
@@ -47,48 +44,36 @@ $js->stream_create({ name => $stream, subjects => [ $subject ] }, sub {
     });
 });
 
-# 3. Pull-fetch loop. After each batch, immediately re-fetch.
 sub loop_fetch {
     $js->fetch($stream, $consumer, { batch => $batch, expires => 5_000_000_000 }, sub {
         my ($msgs, $err) = @_;
         if ($err) {
-            warn "[worker] fetch error: $err — retrying in 1s\n";
+            warn "[worker] fetch error: $err - retrying in 1s\n";
             my $rt; $rt = EV::timer(1, 0, sub { undef $rt; loop_fetch() });
             return;
         }
-        for my $msg (@$msgs) {
-            process($msg);
-        }
+        process($_) for @$msgs;
         loop_fetch();
     });
 }
 
 sub process {
     my ($msg) = @_;
-    my $reply = $msg->{reply};
 
-    # Demonstrate the +WPI ("work in progress") ack: keeps the server
-    # from redelivering while we're still working on a long task.
-    my $progress; $progress = EV::timer(10, 10, sub {
-        $nats->publish($reply, '+WPI');
-    }) if $reply;
+    # in_progress keeps the server from redelivering a long task
+    my $progress = EV::timer(10, 10, sub { $js->in_progress($msg) });
 
-    eval {
+    my $ok = eval {
         # ... your work here ...
         warn "[worker] $msg->{subject}: " . substr($msg->{payload} // '', 0, 60) . "\n";
         die "demo: payload says 'fail'\n" if ($msg->{payload} // '') =~ /\bfail\b/;
+        1;
     };
+    undef $progress;
 
-    undef $progress if $progress;
-
-    if ($reply) {
-        if ($@) {
-            warn "[worker] -> -NAK ($@)";
-            $nats->publish($reply, '-NAK');
-        } else {
-            $nats->publish($reply, '+ACK');
-        }
-    }
+    return $js->ack($msg) if $ok;
+    warn "[worker] -> nak ($@)";
+    $js->nak($msg);
 }
 
 EV::run;

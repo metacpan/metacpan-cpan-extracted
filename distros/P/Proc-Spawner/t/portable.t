@@ -80,7 +80,7 @@ my @WINONLY = (
   [q{cd '\\\\.\C:\windows' && perl -e 'print(-d(q(system32))?q(yes):q(no))'}, 'yes<0>', 'a child starts in the UNC directory'],
     # (no " in the argument: Perl's own spawn, system1, drops it, and splits the argument at blanks; a ❰BUG❱ in Perl)
 );
-if ($WIN) {   # sh as Perl (SH1): Windows has no sh, so auto runs ours
+if ($WIN) {   # sh as Perl (SH1): Windows has no sh, so auto (the default of PROC_SHELLSPAWN_SH) runs it with ShellSpawn
   push @WINONLY, [q{sh -c 'exit 7'; echo st=$?}, 'st=7|<0>', 'sh -c: as Perl'],
     [q{echo 'echo stdin $1' | sh -s x}, 'stdin x|<0>', 'sh -s: the text from stdin'],
     [q{sh -c "sh -c 'echo nested'"}, 'nested|<0>', 'sh -c inside sh -c'],

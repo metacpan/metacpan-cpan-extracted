@@ -7145,7 +7145,7 @@ static void qn_format_vec(const double *restrict x, const bool *restrict ok,
 	for (size_t i = 0; i < n; i++) {
 		if (!ok[i]) continue;
 		int kpower = 0, nsig = 1;
-		bool widens = 0;
+		bool widens = FALSE;
 		if (x[i] != 0.0) {
 			char e[64];
 			snprintf(e, sizeof e, "%.*e", digits - 1, x[i]); //d.dddddde+XX
@@ -7166,7 +7166,7 @@ static void qn_format_vec(const double *restrict x, const bool *restrict ok,
 		if (sleft > mxsl) mxsl = sleft;
 		if (nsig > mxns) mxns = nsig;
 	}
-	bool sci = 0;
+	bool sci = FALSE;
 	int d = 0;
 	if (mxns != INT_MIN) {
 		if (mxl < 0) mxsl = 1;
@@ -7176,7 +7176,7 @@ static void qn_format_vec(const double *restrict x, const bool *restrict ok,
 		const int dE = mxns - 1;
 		const int wE = (dE > 0) + dE + 4 + e;
 		if (wF <= wE) d = rgt;
-		else { sci = 1; d = dE; }
+		else { sci = TRUE; d = dE; }
 	}
 	for (size_t i = 0; i < n; i++) {
 		if (!ok[i]) { out[i][0] = '\0'; continue; }
@@ -14161,10 +14161,9 @@ __float128 too, which was the whole error of dnorm() there.*/
 static NV c_dnorm(NV x, NV mu, NV sigma, bool give_log) {
  // Propagate NaNs
 	if (nv_isnan(x) || nv_isnan(mu) || nv_isnan(sigma)) return x + mu + sigma;
-	if (sigma < 0.0) {
-		warn("dnorm: standard deviation must be non-negative");
-		return NV_NAN;
-	}
+	/*NaN, and no warning here: dnorm() warns once per call, as R does, where
+	this warned once per element of x.*/
+	if (sigma < 0.0) return NV_NAN;
 	if (nv_isinf(sigma)) return DN_ZERO;
 	if ((nv_isnan(x) || nv_isinf(x)) && mu == x) return NV_NAN; // x-mu is NaN
  // Dirac delta behavior for zero variance
@@ -15700,6 +15699,66 @@ static bool S_csv_rx_find(pTHX_ REGEXP *restrict rx, SV *line_sv, char *line,
 	*ms = CSV_RX_START(rx);
 	*me = CSV_RX_END(rx);
 	return TRUE;
+}
+
+/*Whether a line of a row that read_table's skiprows leaves out ends inside a
+quoted field, so that the row runs on to the next line and that line is left
+out with it; open says the line starts inside one.
+
+pandas reads the quoting of a row it skips, so a quoted field that runs across
+lines takes them with it (pandas 3.0.4, tests/io/parser/test_skiprows.py,
+test_skip_row_with_newline), but there a '"' that does not start its field
+opens nothing (test_skiprows_infield_quote, gh-14459), where the parse of a
+row that is read would open one.  Nothing else about the line is read: only
+where each field starts, so that a quote there can be followed.  With a regex
+sep the separators are found by the regex (rx_ok and line_utf8 as the parse
+works them out), and on a line it cannot be matched against only the first
+field is looked at.*/
+static const char *xlsx_find(const char *restrict p, const char *restrict end,
+	const char *restrict needle, size_t nlen); //defined with the .xlsx reader
+
+static bool S_skip_line_quoted(pTHX_ char *line, size_t len, bool open,
+	const char *restrict sep_str, size_t sep_len, REGEXP *restrict rx, SV *line_sv,
+	bool rx_ok, bool line_utf8, bool sep_ws){ //line and line_sv not restrict: line points into line_sv's buffer
+	size_t i = 0;
+	bool inq = open;
+	for (;;) {
+		if (inq) {
+			for (;;) {
+				const char *q = (const char *)memchr(line + i, '"', len - i);
+				if (!q)
+					return TRUE;
+				i = (size_t)(q - line) + 1;
+				if (i < len && line[i] == '"') { //a doubled quote is text
+					i++;
+					continue;
+				}
+				break;
+			}
+			inq = FALSE;
+		} else {
+			if (sep_ws)
+				while (i < len && isSPACE(line[i]))
+					i++;
+			if (i < len && line[i] == '"') {
+				i++;
+				inq = TRUE;
+				continue;
+			}
+		}
+		if (rx) { //on to the next field's start
+			size_t ms, me;
+			if (!rx_ok || !S_csv_rx_find(aTHX_ rx, line_sv, line, i, len, &ms, &me, line_utf8)
+			    || me <= ms)
+				return FALSE;
+			i = me;
+		} else {
+			const char *h = sep_len ? xlsx_find(line + i, line + len, sep_str, sep_len) : NULL;
+			if (!h)
+				return FALSE;
+			i = (size_t)(h - line) + sep_len;
+		}
+	}
 }
 
 /*\s of a byte string under the default rules, on the running perl: [\t\n\f\r ],
@@ -18282,6 +18341,132 @@ a segfault -- SvCUR() dereferences SvANY(), which is NULL on the immortal undef
 can be a cell this parser stored, so testing for both is the whole of it.*/
 #define XLSX_IS_HOLE(sv) (!(sv) || (sv) == &PL_sv_undef)
 
+/*read_table's skiprows: which rows of a file or a sheet are left out, by
+0-based index, in pandas' three spellings (pandas 3.0.4, read_csv() and
+read_excel()): a count of leading rows, a list of indices, or a sub asked of
+each index.  read_table validates the argument and hands the list over sorted
+and without repeats.
+
+An index is a UV, not a size_t: it is a row of the input, not a count of
+anything in memory, and on a 32-bit -Duse64bitint perl a size_t would truncate
+a caller's skiprows => 2**32 + 1 that the IV holds whole.
+
+A worksheet is scanned twice (xlsx_ws_scan(), ods_scan()), and both passes
+need the answer for a row, so a sub's answers are kept ('memo') and it is asked
+once per row, in order of the rows: asking for row ix asks every row before it
+that has not been asked yet.  A delimited file is read once, in order, and its
+rows are asked as they come, with nothing kept.*/
+typedef struct {
+	UV lead; //skiprows => N: rows 0 .. N - 1 are left out
+	UV *at; //skiprows => [...]: the indices, ascending and distinct, owned; NULL = none
+	size_t nat; //how many indices 'at' holds
+	SV *cb; //skiprows => sub {...}, borrowed from read_table, which holds it for the parse; NULL = none
+	bool memo; //keep cb's answers, for a sheet's two passes
+	unsigned char *seen; //memo: bit ix is set when row ix is left out, owned; a sheet stops at ODS_MAX_ROWS, so at most 2 MB
+	UV nseen; //memo: rows 0 .. nseen - 1 have been asked
+	size_t cap; //memo: bytes allocated to 'seen'
+} rowskip;
+
+static void S_rowskip_free(pTHX_ void *v){
+	rowskip *s = (rowskip*)v;
+	Safefree(s->at);
+	Safefree(s->seen);
+	Safefree(s);
+}
+
+/*A rowskip from read_table's normalized skiprows -- a non-negative integer, an
+ARRAY reference of ascending distinct non-negative integers, or a CODE
+reference -- or NULL for undef.  It is freed on the scope's LEAVE, or on a
+croak's unwind; the caller must have done an ENTER.*/
+static rowskip *S_rowskip_new(pTHX_ SV *sv, bool memo){ //sv not restrict: read_table's own SV, which a perl callback could reach
+	rowskip *s;
+	if (!SvOK(sv))
+		return NULL;
+	Newxz(s, 1, rowskip);
+	SAVEDESTRUCTOR_X(S_rowskip_free, s);
+	s->memo = memo;
+	if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVCV)
+		s->cb = sv;
+	else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
+		AV *av = (AV*)SvRV(sv);
+		const SSize_t top = av_len(av);
+		if (top >= 0) {
+			Newx(s->at, (size_t)top + 1, UV);
+			for (SSize_t k = 0; k <= top; k++) {
+				SV **e = av_fetch(av, k, 0);
+				const UV v = e ? SvUV(*e) : 0;
+				if (!e || (k && v <= s->at[k - 1]))
+					croak("read_table: skiprows list is not ascending and distinct");
+				s->at[k] = v;
+			}
+			s->nat = (size_t)top + 1;
+		}
+	} else if (!SvROK(sv))
+		s->lead = SvUV(sv);
+	else
+		croak("read_table: skiprows must be a count, an ARRAY reference or a CODE reference");
+	return s;
+}
+
+/*The skiprows sub's answer for row ix, which it is passed as its one argument,
+as pandas passes it.  It may die, which unwinds the parse.*/
+static bool S_rowskip_ask(pTHX_ SV *cb, UV ix){ //cb not restrict: the sub it calls may reach it
+	dSP;
+	bool r = FALSE;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSVuv(ix)));
+	PUTBACK;
+	{
+		const I32 n = call_sv(cb, G_SCALAR);
+		SPAGAIN;
+		if (n >= 1) {
+			SV *const res = POPs; //popped first: before 5.18 SvTRUE() reads its argument more than once
+			r = cBOOL(SvTRUE(res));
+		}
+		PUTBACK;
+	}
+	FREETMPS;
+	LEAVE;
+	return r;
+}
+
+// Is row ix left out?  s may be NULL, for no skiprows at all.
+static bool S_row_skipped(pTHX_ rowskip *restrict s, UV ix){
+	if (!s)
+		return 0;
+	if (ix < s->lead)
+		return TRUE;
+	if (s->nat) {
+		size_t lo = 0, hi = s->nat; //binary search of at[lo, hi)
+		while (lo < hi) {
+			const size_t mid = lo + (hi - lo) / 2;
+			if (s->at[mid] == ix) return TRUE;
+			if (s->at[mid] < ix) lo = mid + 1;
+			else hi = mid;
+		}
+		return 0;
+	}
+	if (!s->cb)
+		return 0;
+	if (!s->memo)
+		return S_rowskip_ask(aTHX_ s->cb, ix);
+	while (s->nseen <= ix) {
+		const UV r = s->nseen;
+		if ((size_t)(r >> 3) >= s->cap) {
+			const size_t want = s->cap ? s->cap * 2 : 64;
+			Renew(s->seen, want, unsigned char);
+			Zero(s->seen + s->cap, want - s->cap, unsigned char);
+			s->cap = want;
+		}
+		if (S_rowskip_ask(aTHX_ s->cb, r))
+			s->seen[r >> 3] |= (unsigned char)(1u << (r & 7));
+		s->nseen = r + 1;
+	}
+	return cBOOL(s->seen[ix >> 3] & (1u << (ix & 7)));
+}
+
 /*The state one worksheet parse carries between its two passes and across the
 callback that reads the header.  Nothing in here is owned except 'row'.
 
@@ -18310,6 +18495,8 @@ typedef struct {
 	csv_plan *plan;
 	SV       *callback;
 	HV       *plan_hv; //the plan hash, until the callback has filled it in
+	rowskip  *skip; //read_table's skiprows, freed with the scope; NULL = none
+	AV       *tpl; //ods_row_end(): a repeated row's cells, copied for each repetition after the first; owned
 	bool     in_row, any; //the current row has at least one non-empty cell
 } xlsx_ws;
 
@@ -18403,15 +18590,30 @@ write_table() lost a row of undef on the way back.
 
 The cost of a gap is a row of 'width' cells for each row number it skips, so
 a file of two cells, XFD1 and A1048576, asks for 16384 x 1048575 of them, as
-it does of openpyxl and pandas.*/
+it does of openpyxl and pandas.
+
+A row that skiprows leaves out is not there at all: it is not emitted, it
+does not widen the sheet, and it is not one of the blank rows emitted ahead of
+a later row, whether it holds values or not.  Its index is its row number less
+one, counting the blank rows before it, as pandas' read_excel() counts them
+(pandas 3.0.4 tests/io/excel/test_readers.py, test_read_excel_skiprows: rows 0
+and 2 of testskiprows are blank).  pandas does let a skipped row widen the
+table, with an "Unnamed" column of NaN for each cell past the header; a title
+row above a table is what skiprows is for, and its width is not the table's.
+
+A skipped row is asked about only when it matters: pass 1 asks of a row that
+would widen the sheet, and pass 2 of a row with a value and of each blank row
+it emits.  A sub is then asked of every row up to the last one with a value
+(S_row_skipped()), and never of the empty rows after it.*/
 static void xlsx_ws_row_end(pTHX_ xlsx_ws *restrict w, bool measure){
 	w->next = 0;
 	if (measure) {
-		if (w->maxc > w->gmax) w->gmax = w->maxc;
+		if (w->maxc > w->gmax && !S_row_skipped(aTHX_ w->skip, (UV)(w->rnum - 1)))
+			w->gmax = w->maxc;
 		w->maxc = 0;
 		return;
 	}
-	if (!w->any) { //blank: free what it holds and reuse the buffer; emitted only if a row with a value follows
+	if (!w->any || S_row_skipped(aTHX_ w->skip, (UV)(w->rnum - 1))) { //blank: free what it holds and reuse the buffer; emitted only if a row with a value follows
 		SV **ary = AvARRAY(w->row);
 		for (SSize_t j = 0; j <= AvFILLp(w->row); j++) {
 			if (!XLSX_IS_HOLE(ary[j])) SvREFCNT_dec(ary[j]);
@@ -18419,6 +18621,7 @@ static void xlsx_ws_row_end(pTHX_ xlsx_ws *restrict w, bool measure){
 		}
 		AvFILLp(w->row) = -1;
 		w->maxc = 0;
+		w->any  = 0;
 		return;
 	}
 /*A hash of hashes keys each row by its first column, which a blank row does not
@@ -18426,8 +18629,17 @@ have, and read_table() refuses an undefined row name.  So a blank row is still
 left out of one, as it was up to 0.3425, rather than making every sheet with a
 spacer row unreadable as a hash of hashes; a CSV record of empty fields, which
 is a row and not a blank line, is refused there.*/
-	if (w->last && w->rnum > w->last + 1 && !(w->plan->active && w->plan->mode == 2))
-		xlsx_ws_blank_rows(aTHX_ w, w->rnum - w->last - 1);
+	if (w->last && w->rnum > w->last + 1 && !(w->plan->active && w->plan->mode == 2)) {
+		size_t n = w->rnum - w->last - 1; //the blank rows between, less any skiprows leaves out
+		if (w->skip) {
+			n = 0;
+			for (size_t r = w->last + 1; r < w->rnum; r++)
+				if (!S_row_skipped(aTHX_ w->skip, (UV)(r - 1)))
+					n++;
+		}
+		if (n)
+			xlsx_ws_blank_rows(aTHX_ w, n);
+	}
 	w->last = w->rnum;
 	xlsx_ws_emit(aTHX_ w);
 }
@@ -18735,6 +18947,7 @@ static void S_xlsx_ws_free(pTHX_ void *v){
 	xlsx_ws *w = (xlsx_ws*)v;
 	SvREFCNT_dec((SV*)w->row);
 	SvREFCNT_dec((SV*)w->held); //the row xlsx_ws_blank_rows() set aside, when it was cut short
+	SvREFCNT_dec((SV*)w->tpl); //a repeated .ods row, when a repetition croaked
 	Safefree(w);
 }
 
@@ -18825,6 +19038,743 @@ static AV *xlsx_sst_parse(pTHX_ const char *restrict xml, STRLEN xlen){
 		av_push(sst, xlsx_sst_entry(aTHX_ buf));
 	}
 	return sst;
+}
+
+/*read_table: parsing an OpenDocument spreadsheet (.ods).
+
+An .ods is a zip archive like an .xlsx, and its cells are all in one part,
+content.xml: <office:spreadsheet> holds one <table:table> per sheet, a table
+holds <table:table-row> elements (possibly inside <table:table-header-rows>,
+<table:table-rows> or <table:table-row-group>, which are only wrappers), and a
+row holds <table:table-cell> and <table:covered-table-cell> elements.  The
+format is OASIS OpenDocument 1.2, part 1, sections 9.1 (tables) and 19.385
+(office:value-type); what a cell reads as follows pandas 3.0.4's reader,
+pandas/io/excel/_odfreader.py (ODFReader.get_sheet_data(), _get_cell_value()
+and _get_cell_string_value()), except where ods_cell_value() says otherwise.
+
+The rows go through the .xlsx machinery: xlsx_ws holds the row being built,
+xlsx_ws_row_end() emits it, pads it, emits the blank rows before it and applies
+skiprows, and the csv_plan fast path builds the caller's table.  So an .ods
+reads as an .xlsx does in every respect that is not the cells: blank rows
+between rows of values come back as rows of undef, the rows before the first
+one with a value are not there, a cell with no value does not widen the sheet,
+and 'drop_cols' leaves a column's cells unbuilt.
+
+Two things are the format's own.  A row or cell may stand for several,
+table:number-rows-repeated and table:number-columns-repeated, and LibreOffice
+ends every sheet with a run of empty rows a million long and every row with a
+run of empty cells to column 16384; neither is ever built.  And a row has no
+number of its own, so its number is its position, counting each repetition.
+
+The element and attribute prefixes are the ones content.xml binds to the
+OpenDocument namespaces on its root element (ods_bind()), so a writer that
+binds them to other prefixes is read as one that does not.*/
+
+/*A sheet's rows stop here.  LibreOffice's sheets have 1,048,576 rows, as
+Excel's do, or 16,777,216 with its "very large spreadsheets" option; this is
+the second.  The bound is what keeps a repeat count from asking for an
+unbounded number of rows: a row with a value past it croaks, rather than
+emitting billions of blank rows ahead of it or being dropped without a word.
+Empty rows past it are only counted, and LibreOffice writes some in every file.*/
+#define ODS_MAX_ROWS ((size_t)16777216)
+//The last column, which is LibreOffice's (since 7.4) and Excel's, and the cap xlsx_ref_col() puts on an .xlsx.
+#define ODS_MAX_COLS ((size_t)16384)
+#define ODS_PFX_MAX 64 //a namespace prefix longer than this is not taken from the file; see ods_bind()
+
+/*The prefixes content.xml binds to the four namespaces read here, each with
+its colon, and the file and sheet the messages name.*/
+typedef struct {
+	char pfx[4][ODS_PFX_MAX + 1]; //office, table, text, calcext (LibreOffice's extension namespace)
+	STRLEN plen[4]; //each one's length, with its colon; 0 = the default namespace
+	const char *file;
+	SV *sheet; //the sheet's name, for messages; borrowed
+	SV *tmp; //scratch for one run of text, owned by the XSUB's scope
+} ods_ctx;
+
+// The four namespaces, as indices into ods_ctx's pfx and plen.
+#define ODS_OFFICE  0
+#define ODS_TABLE   1
+#define ODS_TEXT    2
+#define ODS_CALCEXT 3
+
+/*Bind each namespace to the prefix the root element of [xml, end) declares
+for it.  A namespace the root does not declare keeps its conventional prefix
+("table:" and so on), which every writer uses.  So does one bound to a prefix
+of more than ODS_PFX_MAX bytes, which no writer uses either.*/
+static void ods_bind(ods_ctx *restrict c, const char *restrict xml, const char *restrict end){
+	static const char *const conv[4] = { "office:", "table:", "text:", "calcext:" };
+	static const char *const uri[4] = {
+		"urn:oasis:names:tc:opendocument:xmlns:office:1.0",
+		"urn:oasis:names:tc:opendocument:xmlns:table:1.0",
+		"urn:oasis:names:tc:opendocument:xmlns:text:1.0",
+		"urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0"
+	};
+	const char *p = xml;
+	for (unsigned short int k = 0; k < 4; k++) {
+		c->plen[k] = (STRLEN)strlen(conv[k]);
+		Copy(conv[k], c->pfx[k], c->plen[k] + 1, char);
+	}
+	while (p < end) { //to the root element's start tag
+		const char *lt = (const char*)memchr(p, '<', (size_t)(end - p));
+		if (!lt || lt + 1 >= end) return;
+		p = lt + 1;
+		if (*p == '!') { p = xlsx_skip_bang(p, end); continue; }
+		if (*p == '?') continue;
+		break;
+	}
+	while (p < end && *p != '>' && *p != '/' && !xlsx_is_ws(*p)) //past the root's name
+		p++;
+	{
+		const char *a;
+		STRLEN alen;
+		bool self;
+		const char *q, *e;
+		(void)xlsx_tag_end(p, end, &a, &alen, &self);
+		q = a;
+		e = a + alen;
+		while (q < e) { //each attribute, as xlsx_attr() walks them
+			const char *ns, *ve;
+			STRLEN nlen;
+			char qc;
+			while (q < e && xlsx_is_ws(*q)) q++;
+			if (q >= e) break;
+			ns = q;
+			while (q < e && *q != '=' && !xlsx_is_ws(*q)) q++;
+			nlen = (STRLEN)(q - ns);
+			while (q < e && xlsx_is_ws(*q)) q++;
+			if (q >= e || *q != '=') continue;
+			q++;
+			while (q < e && xlsx_is_ws(*q)) q++;
+			if (q >= e || (*q != '"' && *q != '\'')) continue;
+			qc = *q++;
+			ve = (const char*)memchr(q, qc, (size_t)(e - q));
+			if (!ve) break;
+			if (nlen >= 5 && memcmp(ns, "xmlns", 5) == 0 && (nlen == 5 || ns[5] == ':')) {
+				for (unsigned short int k = 0; k < 4; k++) {
+					const STRLEN ul = (STRLEN)strlen(uri[k]);
+					if ((STRLEN)(ve - q) != ul || memcmp(q, uri[k], ul) != 0)
+						continue;
+					if (nlen == 5) //the default namespace: no prefix
+						c->plen[k] = 0;
+					else if (nlen - 6 + 1 <= ODS_PFX_MAX) {
+						Copy(ns + 6, c->pfx[k], nlen - 6, char);
+						c->pfx[k][nlen - 6] = ':';
+						c->plen[k] = nlen - 6 + 1;
+					}
+					c->pfx[k][c->plen[k]] = '\0';
+				}
+			}
+			q = ve + 1;
+		}
+	}
+}
+
+// Is the element name at p namespace k's 'name'?
+#define ODS_IS(c, p, end, k, name) \
+	xlsx_is_name((p), (end), (c)->pfx[k], (c)->plen[k], (name), sizeof(name) - 1)
+
+/*The value of attribute k:'name' in an attribute run, or NULL when it is
+absent; xlsx_attr() with the name in two parts, prefix and local name.*/
+static const char *ods_attr(const ods_ctx *restrict c, unsigned short int k,
+	const char *restrict a, STRLEN alen, const char *restrict name,
+	STRLEN *restrict vlen){
+	const char *p = a;
+	const char *const e = a + alen;
+	const STRLEN pl = c->plen[k];
+	const STRLEN nl = (STRLEN)strlen(name);
+	while (p < e) {
+		const char *ns, *ve;
+		STRLEN thislen;
+		char q;
+		while (p < e && xlsx_is_ws(*p)) p++;
+		if (p >= e) break;
+		ns = p;
+		while (p < e && *p != '=' && !xlsx_is_ws(*p)) p++;
+		thislen = (STRLEN)(p - ns);
+		while (p < e && xlsx_is_ws(*p)) p++;
+		if (p >= e || *p != '=') continue;
+		p++;
+		while (p < e && xlsx_is_ws(*p)) p++;
+		if (p >= e || (*p != '"' && *p != '\'')) continue;
+		q  = *p++;
+		ve = (const char*)memchr(p, q, (size_t)(e - p));
+		if (!ve) break;
+		if (thislen == pl + nl && memcmp(ns, c->pfx[k], pl) == 0
+		    && memcmp(ns + pl, name, nl) == 0) {
+			*vlen = (STRLEN)(ve - p);
+			return p;
+		}
+		p = ve + 1;
+	}
+	return NULL;
+}
+
+/*A repeat count, table:number-rows-repeated or table:number-columns-repeated:
+1 when it is absent or not a positive decimal number, and at most 'cap'.  Every
+count that matters is under the cap; a larger one only stands for more empty
+rows or cells past the last, which are never built.*/
+static size_t ods_count(const char *restrict v, STRLEN n, size_t cap){
+	size_t r = 0;
+	if (!v || !n) return 1;
+	for (STRLEN k = 0; k < n; k++) {
+		if (v[k] < '0' || v[k] > '9') return 1;
+		r = r * 10 + (size_t)(v[k] - '0');
+		if (r > cap) return cap;
+	}
+	return r ? r : 1;
+}
+
+/*The '<' of the end tag that closes the element whose content starts at p,
+with *after just past its '>', or NULL when it is not closed.  Elements of the
+same name inside it are counted, so that a sheet nested in a cell does not end
+the cell, or the table, it sits in.*/
+static const char *ods_find_close(const char *restrict p, const char *restrict end,
+	const char *restrict pfx, STRLEN plen, const char *restrict name, STRLEN nlen,
+	const char **restrict after){
+	size_t depth = 0;
+	while (p < end) {
+		const char *lt = (const char*)memchr(p, '<', (size_t)(end - p));
+		if (!lt) return NULL;
+		p = lt + 1;
+		if (p < end && *p == '!') {
+			p = xlsx_skip_bang(p, end);
+			continue;
+		}
+		if (p < end && *p == '/') {
+			if (xlsx_is_name(p + 1, end, pfx, plen, name, nlen)) {
+				const char *q = p + 1 + plen + nlen;
+				while (q < end && xlsx_is_ws(*q)) q++;
+				if (q < end && *q == '>') {
+					if (!depth) {
+						*after = q + 1;
+						return lt;
+					}
+					depth--;
+					p = q + 1;
+				}
+			}
+			continue;
+		}
+		if (xlsx_is_name(p, end, pfx, plen, name, nlen)) {
+			const char *a;
+			STRLEN alen;
+			bool self;
+			p = xlsx_tag_end(p + plen + nlen, end, &a, &alen, &self);
+			if (!self) depth++;
+		}
+	}
+	return NULL;
+}
+
+/*Append character data [s, s + n) of a paragraph to out, whose paragraph
+began at byte para0, by ODF's white-space rule (OpenDocument 1.2 part 1,
+section 6.1.2): a space, tab, CR or LF in the text is a space, and is dropped
+when it starts the paragraph or follows another white-space character.  The
+spaces, tabs and line breaks a paragraph means to keep are written as
+<text:s/>, <text:tab/> and <text:line-break/> instead, which ods_para_cat()
+appends as they are.  LibreOffice writes " 1 leading" as <text:s/>1 leading,
+and "4    spaces" as "4 <text:s text:c="3"/>spaces", which this reads as pandas
+does (tests/io/excel/test_readers.py, test_reader_spaces); and the line breaks
+and indentation of a pretty-printed file are not text.
+
+References are decoded first, so &#32; is a space like any other: the rule
+applies to the characters, not to how the XML spelled them.  kind is
+xlsx_text_piece()'s: 0 literal text, 1 a CDATA section's content.*/
+static void ods_chars_cat(pTHX_ SV *restrict out, STRLEN para0, SV *restrict tmp,
+	const char *restrict s, STRLEN n, unsigned short int kind){
+	const char *t, *te;
+	if (!n) return;
+	SvCUR_set(tmp, 0);
+	if (kind == 0)
+		xlsx_xml_uncat(aTHX_ tmp, s, n);
+	else
+		xlsx_eol_cat(aTHX_ tmp, s, n);
+	t  = SvPVX_const(tmp);
+	te = t + SvCUR(tmp);
+	while (t < te) {
+		const char *r = t;
+		while (r < te && !xlsx_is_ws(*r)) r++;
+		if (r > t) sv_catpvn(out, t, (STRLEN)(r - t));
+		if (r >= te) break;
+		while (r < te && xlsx_is_ws(*r)) r++; //a run of them is one space, or none
+		if (SvCUR(out) > para0 && !xlsx_is_ws(SvPVX_const(out)[SvCUR(out) - 1]))
+			sv_catpvn(out, " ", 1);
+		t = r;
+	}
+}
+
+/*The most spaces one <text:s text:c="N"/> stands for: Excel's limit on a
+cell, 32,767 characters (XLSX_MAX_CHARS).  pandas takes any count, so a file
+that asks for 10**12 of them asks it for a terabyte.*/
+#define ODS_MAX_SPACES ((size_t)XLSX_MAX_CHARS)
+
+/*Append the text of one paragraph, the content [p, end) of a <text:p> or
+<text:h>, to out.  Elements inside it -- <text:span>, <text:a> and the rest --
+add their text and nothing else, as pandas' _get_cell_string_value() reads
+them; <text:s>, <text:tab> and <text:line-break> stand for characters; and an
+<office:annotation>, a comment pinned to the cell, is not its text.*/
+static void ods_para_cat(pTHX_ const ods_ctx *restrict c, SV *restrict out,
+	const char *restrict p, const char *restrict end){
+	const STRLEN para0 = SvCUR(out);
+	while (p < end) {
+		const char *lt = (const char*)memchr(p, '<', (size_t)(end - p));
+		const char *stop = lt ? lt : end;
+		const char *a;
+		STRLEN alen;
+		bool self;
+		if (stop > p)
+			ods_chars_cat(aTHX_ out, para0, c->tmp, p, (STRLEN)(stop - p), 0);
+		if (!lt) break;
+		p = lt + 1;
+		if (p < end && *p == '!') {
+			const char *q = xlsx_skip_bang(p, end);
+			if (q != p && end - p >= 8 && memcmp(p, "![CDATA[", 8) == 0) {
+				const char *body = p + 8;
+				const char *ce = (q - body >= 3 && memcmp(q - 3, "]]>", 3) == 0) ? q - 3 : q;
+				ods_chars_cat(aTHX_ out, para0, c->tmp, body, (STRLEN)(ce - body), 1);
+			}
+			p = q;
+			continue;
+		}
+		if (p < end && *p == '/') { //an end tag: its element added its text already
+			const char *gt = (const char*)memchr(p, '>', (size_t)(end - p));
+			p = gt ? gt + 1 : end;
+			continue;
+		}
+		if (ODS_IS(c, p, end, ODS_TEXT, "s")) {
+			const char *v;
+			STRLEN vlen;
+			size_t n;
+			p = xlsx_tag_end(p + c->plen[ODS_TEXT] + 1, end, &a, &alen, &self);
+			v = ods_attr(c, ODS_TEXT, a, alen, "c", &vlen);
+			n = ods_count(v, vlen, ODS_MAX_SPACES);
+			while (n--)
+				sv_catpvn(out, " ", 1);
+			continue;
+		}
+		if (ODS_IS(c, p, end, ODS_TEXT, "tab")) {
+			p = xlsx_tag_end(p + c->plen[ODS_TEXT] + 3, end, &a, &alen, &self);
+			sv_catpvn(out, "\t", 1);
+			continue;
+		}
+		if (ODS_IS(c, p, end, ODS_TEXT, "line-break")) {
+			p = xlsx_tag_end(p + c->plen[ODS_TEXT] + 10, end, &a, &alen, &self);
+			sv_catpvn(out, "\n", 1);
+			continue;
+		}
+		if (ODS_IS(c, p, end, ODS_OFFICE, "annotation")) {
+			const char *after;
+			p = xlsx_tag_end(p + c->plen[ODS_OFFICE] + 10, end, &a, &alen, &self);
+			if (!self) {
+				const char *ce = ods_find_close(p, end, c->pfx[ODS_OFFICE],
+					c->plen[ODS_OFFICE], "annotation", 10, &after);
+				p = ce ? after : end;
+			}
+			continue;
+		}
+		{ //any other element: its start tag goes, and its content is read on
+			const char *gt;
+			const char *q = p;
+			while (q < end && *q != '>' && !xlsx_is_ws(*q)) q++;
+			gt = xlsx_tag_end(q, end, &a, &alen, &self);
+			p = gt;
+		}
+	}
+}
+
+/*The text of a cell body [body, body + blen), as a new SV: its paragraphs'
+text, joined by "\n".  An office:annotation is passed over whole, so a comment
+on a cell is no part of it (pandas' test_read_cell_annotation); anything else
+outside a paragraph is markup, or the white space between elements of a
+pretty-printed file (test_read_newlines_between_xml_elements_table).
+
+pandas joins a cell's paragraphs with nothing between them, so two lines of
+one cell, which LibreOffice writes as two <text:p>, come back run together;
+this joins them with "\n", which is what LibreOffice shows, and what the same
+cell saved as an .xlsx reads as.*/
+static SV *ods_cell_text(pTHX_ const ods_ctx *restrict c, const char *restrict body, STRLEN blen){
+	SV *out = newSVpvs("");
+	const char *p = body;
+	const char *const end = body + blen;
+	bool first = TRUE; //no paragraph read yet, so none needs a "\n" before it
+	while (p < end) {
+		const char *lt = (const char*)memchr(p, '<', (size_t)(end - p));
+		const char *a, *after, *ce;
+		STRLEN alen;
+		bool self;
+		unsigned short int para = 0; // 0 = no paragraph, 1 = <text:p>, 2 = <text:h>
+		if (!lt) break;
+		p = lt + 1;
+		if (p < end && *p == '!') {
+			p = xlsx_skip_bang(p, end);
+			continue;
+		}
+		if (ODS_IS(c, p, end, ODS_OFFICE, "annotation")) {
+			p = xlsx_tag_end(p + c->plen[ODS_OFFICE] + 10, end, &a, &alen, &self);
+			if (!self) {
+				ce = ods_find_close(p, end, c->pfx[ODS_OFFICE], c->plen[ODS_OFFICE],
+					"annotation", 10, &after);
+				p = ce ? after : end;
+			}
+			continue;
+		}
+		if (ODS_IS(c, p, end, ODS_TEXT, "p"))
+			para = 1;
+		else if (ODS_IS(c, p, end, ODS_TEXT, "h"))
+			para = 2;
+		if (!para)
+			continue;
+		p = xlsx_tag_end(p + c->plen[ODS_TEXT] + 1, end, &a, &alen, &self);
+		if (!first)
+			sv_catpvn(out, "\n", 1);
+		first = FALSE;
+		if (self)
+			continue;
+		ce = ods_find_close(p, end, c->pfx[ODS_TEXT], c->plen[ODS_TEXT],
+			para == 1 ? "p" : "h", 1, &after);
+		ods_para_cat(aTHX_ c, out, p, ce ? ce : end);
+		p = ce ? after : end;
+	}
+	return out;
+}
+
+// An attribute's value as a new SV, its references decoded.
+static SV *ods_attr_sv(pTHX_ const char *restrict v, STRLEN vlen){
+	SV *sv;
+	if (!memchr(v, '&', vlen) && !memchr(v, '\r', vlen))
+		return newSVpvn(v, vlen);
+	sv = newSVpvs("");
+	xlsx_xml_uncat(aTHX_ sv, v, vlen);
+	return sv;
+}
+
+/*The spreadsheet error values, OpenFormula's and Excel's: what a formula cell
+whose formula failed shows.*/
+static bool ods_is_error_text(const char *restrict s, STRLEN n){
+	static const char *const err[] = {
+		"#N/A", "#NULL!", "#DIV/0!", "#VALUE!", "#REF!", "#NAME?", "#NUM!"
+	};
+	for (unsigned short int k = 0; k < sizeof err / sizeof err[0]; k++)
+		if (strlen(err[k]) == n && memcmp(err[k], s, n) == 0)
+			return TRUE;
+	return 0;
+}
+
+/*The value of one <table:table-cell>, whose attributes are [a, a + alen) and
+whose content is [body, body + blen), as a new SV: "" for no value.  By its
+office:value-type, as pandas' _get_cell_value() reads it:
+
+  float, percentage, currency  office:value, the number as stored: 0.25 for 25%
+  date                         office:date-value, as stored: 2015-01-01T00:00:00
+  time                         the cell's text, as pandas reads it: LibreOffice
+                               writes office:time-value to the whole second
+                               (PT2H45M56S for 02:45:56.100, pandas' times_1900)
+  boolean                      office:boolean-value as 1 or 0, as an .xlsx's
+                               boolean cell reads here; pandas returns
+                               True/False from the text, which is localised
+  string                       office:string-value when given, else the text
+  void                         no value
+
+A formula whose result is an error is stored as the number 0, or as a string,
+with the error in the cell's text (pandas' test3.ods: office:value="0" and the
+text #N/A), so a formula cell whose text is an error value reads as that text,
+as an .xlsx's error cell does; pandas returns NaN for #N/A only, and 0 for the
+rest.  na_strings => '#N/A' gives the NaN.
+
+A cell with no office:value-type reads as its text, where pandas returns no
+value.  LibreOffice always writes the type, so it is other writers' files that
+differ, and their text is what the cell shows.  A type that is none of these
+croaks, as pandas raises "Unrecognized type".*/
+static SV *ods_cell_value(pTHX_ const ods_ctx *restrict c, const char *restrict a,
+	STRLEN alen, const char *restrict body, STRLEN blen){
+	STRLEN tlen, vlen;
+	const char *const t = ods_attr(c, ODS_OFFICE, a, alen, "value-type", &tlen);
+	const char *v;
+	if (!t)
+		return ods_cell_text(aTHX_ c, body, blen);
+	{ //an error from a formula
+		STRLEN elen;
+		const char *ext = ods_attr(c, ODS_CALCEXT, a, alen, "value-type", &elen);
+		if ((ext && elen == 5 && memcmp(ext, "error", 5) == 0)
+		    || ods_attr(c, ODS_TABLE, a, alen, "formula", &vlen)) {
+			SV *txt = ods_cell_text(aTHX_ c, body, blen);
+			if (ext ? (elen == 5 && memcmp(ext, "error", 5) == 0)
+			        : ods_is_error_text(SvPVX_const(txt), SvCUR(txt)))
+				return txt;
+			SvREFCNT_dec(txt);
+		}
+	}
+#define ODS_TYPE_IS(s) (tlen == sizeof(s) - 1 && memcmp(t, s, sizeof(s) - 1) == 0)
+	if (ODS_TYPE_IS("float") || ODS_TYPE_IS("percentage") || ODS_TYPE_IS("currency")) {
+		v = ods_attr(c, ODS_OFFICE, a, alen, "value", &vlen);
+		return v ? ods_attr_sv(aTHX_ v, vlen) : ods_cell_text(aTHX_ c, body, blen);
+	}
+	if (ODS_TYPE_IS("date")) {
+		v = ods_attr(c, ODS_OFFICE, a, alen, "date-value", &vlen);
+		return v ? ods_attr_sv(aTHX_ v, vlen) : ods_cell_text(aTHX_ c, body, blen);
+	}
+	if (ODS_TYPE_IS("time")) {
+		SV *txt = ods_cell_text(aTHX_ c, body, blen);
+		if (SvCUR(txt) || !(v = ods_attr(c, ODS_OFFICE, a, alen, "time-value", &vlen)))
+			return txt;
+		SvREFCNT_dec(txt);
+		return ods_attr_sv(aTHX_ v, vlen);
+	}
+	if (ODS_TYPE_IS("boolean")) {
+		v = ods_attr(c, ODS_OFFICE, a, alen, "boolean-value", &vlen);
+		if (v && ((vlen == 4 && memcmp(v, "true", 4) == 0) || (vlen == 1 && *v == '1')))
+			return newSVpvs("1");
+		if (v && ((vlen == 5 && memcmp(v, "false", 5) == 0) || (vlen == 1 && *v == '0')))
+			return newSVpvs("0");
+		return ods_cell_text(aTHX_ c, body, blen);
+	}
+	if (ODS_TYPE_IS("string")) {
+		v = ods_attr(c, ODS_OFFICE, a, alen, "string-value", &vlen);
+		return v ? ods_attr_sv(aTHX_ v, vlen) : ods_cell_text(aTHX_ c, body, blen);
+	}
+	if (ODS_TYPE_IS("void"))
+		return newSVpvs("");
+#undef ODS_TYPE_IS
+	{
+		SV *tsv = sv_2mortal(newSVpvn(t, tlen));
+		croak("read_table: a cell of sheet '%" SVf "' in %s has the value-type '%" SVf
+		      "', which is not an OpenDocument one\n", SVfARG(c->sheet), c->file, SVfARG(tsv));
+	}
+	return NULL; //not reached
+}
+
+/*A </table:table-row>, or what stands for one, for an .ods: the row in w->row
+is emitted 'rep' times, as rows w->rnum to w->rnum + rep - 1, each through
+xlsx_ws_row_end(), which applies skiprows to each.  A repeated row with values
+is one LibreOffice writes for identical rows, and pandas expands it.
+
+Pass 1 widens the sheet if any repetition is kept.  Pass 2 copies the row
+before emitting it, since the emit consumes it; the copy is w->tpl, so a croak
+from a later repetition leaves it to S_xlsx_ws_free().*/
+static void ods_row_end(pTHX_ xlsx_ws *restrict w, const ods_ctx *restrict c,
+	bool measure, size_t rep){
+	const size_t base = w->rnum;
+	if (measure) {
+		const size_t maxc = w->maxc; //xlsx_ws_row_end() resets it
+		for (size_t k = 0; k < rep && maxc > w->gmax; k++) {
+			w->maxc = maxc;
+			w->rnum = base + k;
+			xlsx_ws_row_end(aTHX_ w, TRUE);
+		}
+		w->maxc = 0;
+		w->next = 0;
+		w->rnum = base;
+		return;
+	}
+	if (w->any && base + rep - 1 > ODS_MAX_ROWS) //only pass 2 asks: pass 1 does not look at a row that cannot widen the sheet
+		croak("read_table: sheet '%" SVf "' in %s has a value in row %" UVuf
+		      ", past the %" UVuf " rows read_table reads\n",
+		      SVfARG(c->sheet), c->file, (UV)(base + rep - 1), (UV)ODS_MAX_ROWS);
+	if (!w->any || rep == 1) {
+		xlsx_ws_row_end(aTHX_ w, FALSE);
+		return;
+	}
+	{
+		const SSize_t fill = AvFILLp(w->row);
+		SV **ary = AvARRAY(w->row);
+		w->tpl = newAV();
+		av_extend(w->tpl, fill < 0 ? 0 : fill);
+		for (SSize_t j = 0; j <= fill; j++)
+			if (!XLSX_IS_HOLE(ary[j]))
+				av_store(w->tpl, j, newSVsv(ary[j]));
+	}
+	for (size_t k = 0; k < rep; k++) {
+		if (k) {
+			SV **tary = AvARRAY(w->tpl);
+			for (SSize_t j = 0; j <= AvFILLp(w->tpl); j++)
+				if (!XLSX_IS_HOLE(tary[j]))
+					av_store(w->row, j, newSVsv(tary[j]));
+			w->any = TRUE;
+		}
+		w->rnum = base + k;
+		xlsx_ws_row_end(aTHX_ w, FALSE);
+	}
+	SvREFCNT_dec((SV*)w->tpl);
+	w->tpl = NULL;
+}
+
+/*One pass over a sheet, the content [w->xml, w->end) of one <table:table>:
+xlsx_ws_scan()'s two passes, for an .ods.  measure = TRUE finds the width:
+only a cell that would widen the sheet has its value built, to see whether it
+has one, as xlsx_cell_has_value() spares pass 1 of an .xlsx.  Both passes step
+over every element the same way, so they agree about every column.*/
+static void ods_scan(pTHX_ xlsx_ws *restrict w, const ods_ctx *restrict c, bool measure){
+	const char *p = w->xml;
+	const char *const end = w->end;
+	const char *const tp = c->pfx[ODS_TABLE];
+	const STRLEN tl = c->plen[ODS_TABLE];
+	size_t rep = 1; //the open row's table:number-rows-repeated
+	size_t rnext = 1; //the number the next row takes: its position, counting repetitions
+	w->maxc   = 0;
+	w->next   = 0;
+	w->any    = 0;
+	w->in_row = 0;
+	w->rnum   = 0;
+	w->last   = 0;
+	while (p < end) {
+		const char *lt = (const char*)memchr(p, '<', (size_t)(end - p));
+		const char *a;
+		STRLEN alen;
+		bool self;
+		unsigned short int kind = 0; // 0 = not a cell, 1 = table-cell, 2 = covered-table-cell
+		if (!lt) break;
+		p = lt + 1;
+		if (p >= end) break;
+		if (*p == '!') {
+			p = xlsx_skip_bang(p, end);
+			continue;
+		}
+		if (*p == '/') {
+			if (xlsx_is_name(p + 1, end, tp, tl, "table-row", 9)) {
+				if (w->in_row) {
+					ods_row_end(aTHX_ w, c, measure, rep);
+					w->in_row = 0;
+				}
+				p += 1 + tl + 9;
+			}
+			continue;
+		}
+		if (xlsx_is_name(p, end, tp, tl, "table-row", 9)) {
+			const char *v;
+			STRLEN vlen;
+			if (w->in_row) ods_row_end(aTHX_ w, c, measure, rep); //an unclosed row before it
+			p = xlsx_tag_end(p + tl + 9, end, &a, &alen, &self);
+			v = ods_attr(c, ODS_TABLE, a, alen, "number-rows-repeated", &vlen);
+			rep = ods_count(v, vlen, ODS_MAX_ROWS + 1);
+/*Past ODS_MAX_ROWS only the count goes on, held at one more than the bound,
+so that it cannot wrap however many empty rows a file claims; a row with a
+value there croaks in ods_row_end().*/
+			w->rnum = rnext;
+			rnext   = rnext + rep > ODS_MAX_ROWS + 1 ? ODS_MAX_ROWS + 1 : rnext + rep;
+			w->in_row = 1;
+			if (self) {
+				ods_row_end(aTHX_ w, c, measure, rep);
+				w->in_row = 0;
+			}
+			continue;
+		}
+		if (xlsx_is_name(p, end, tp, tl, "table-cell", 10))
+			kind = 1;
+		else if (xlsx_is_name(p, end, tp, tl, "covered-table-cell", 18))
+			kind = 2;
+		if (!kind)
+			continue; //<table:table-column>, <table:table-header-rows>, ...
+		{
+			const char *body, *v;
+			STRLEN blen = 0, vlen;
+			size_t ci, crep;
+			p = xlsx_tag_end(p + tl + (kind == 1 ? 10 : 18), end, &a, &alen, &self);
+			body = p;
+			if (!self) { //both passes step over the content alike; see xlsx_ws_scan()
+				const char *after;
+				const char *ce = ods_find_close(p, end, tp, tl,
+					kind == 1 ? "table-cell" : "covered-table-cell", kind == 1 ? 10 : 18, &after);
+				blen = (STRLEN)((ce ? ce : end) - body);
+				p    = ce ? after : end;
+			}
+			if (!w->in_row) continue; //a cell outside a row
+			v    = ods_attr(c, ODS_TABLE, a, alen, "number-columns-repeated", &vlen);
+			crep = ods_count(v, vlen, ODS_MAX_COLS + 1);
+			ci   = w->next;
+			w->next = ci + crep > ODS_MAX_COLS + 1 ? ODS_MAX_COLS + 1 : ci + crep;
+/*A covered cell is one a merged cell spans: it takes its column, and has no
+value of its own, as pandas reads it; the merged cell's value is in the first
+column only, as in an .xlsx.*/
+			if (kind == 2)
+				continue;
+			if (measure) {
+				if (ci + crep > w->maxc && ci + crep > w->gmax) {
+					SV *val = ods_cell_value(aTHX_ c, a, alen, body, blen);
+					const bool has = SvCUR(val) > 0;
+					SvREFCNT_dec(val);
+					if (has) {
+						if (ci + crep > ODS_MAX_COLS)
+							croak("read_table: sheet '%" SVf "' in %s has a value past column "
+							      "%" UVuf ", the last read_table reads\n",
+							      SVfARG(c->sheet), c->file, (UV)ODS_MAX_COLS);
+						w->maxc = ci + crep;
+					}
+				}
+				continue;
+			}
+			if (ci >= w->width)
+				continue; //only an empty cell can lie past the width pass 1 found
+			{
+				const size_t stop = ci + crep < w->width ? ci + crep : w->width;
+				SV *val = ods_cell_value(aTHX_ c, a, alen, body, blen);
+				bool used = FALSE; //val itself is stored; later columns get copies
+				if (!SvCUR(val)) { //no value: the slots stay holes, which emit fills
+					SvREFCNT_dec(val);
+					continue;
+				}
+				xlsx_text_decode(aTHX_ val);
+				w->any = 1; //a row whose only values are in dropped columns is still a row
+				for (size_t j = ci; j < stop; j++) {
+					if (S_field_dropped(w->plan, j))
+						continue;
+					av_store(w->row, (SSize_t)j, used ? newSVsv(val) : val);
+					used = TRUE;
+				}
+				if (!used)
+					SvREFCNT_dec(val);
+			}
+		}
+	}
+	if (w->in_row) ods_row_end(aTHX_ w, c, measure, rep); //no </table:table-row> at the end
+}
+
+/*The sheets of content.xml [xml, end): one [name, from, to] per <table:table>
+that is not inside another, in document order, where [from, to) is its
+content's byte range and name is its table:name as characters, or undef.  A
+table nested in a cell is part of that cell, not a sheet of its own; pandas'
+reader, which asks odfpy for every table element, would count it as one.*/
+static AV *ods_tables(pTHX_ const ods_ctx *restrict c, const char *restrict xml, STRLEN xlen){
+	AV *out = newAV();
+	const char *p = xml;
+	const char *const end = xml + xlen;
+	const char *const tp = c->pfx[ODS_TABLE];
+	const STRLEN tl = c->plen[ODS_TABLE];
+	sv_2mortal((SV*)out); //until it is returned: a croak in xlsx_xml_uncat() cannot leak it
+	while (p < end) {
+		const char *lt = (const char*)memchr(p, '<', (size_t)(end - p));
+		const char *a, *v, *from, *to;
+		STRLEN alen, vlen;
+		bool self;
+		AV *t;
+		if (!lt) break;
+		p = lt + 1;
+		if (p < end && *p == '!') {
+			p = xlsx_skip_bang(p, end);
+			continue;
+		}
+		if (!xlsx_is_name(p, end, tp, tl, "table", 5))
+			continue;
+		p = xlsx_tag_end(p + tl + 5, end, &a, &alen, &self);
+		from = to = p;
+		if (!self) {
+			const char *after;
+			const char *ce = ods_find_close(p, end, tp, tl, "table", 5, &after);
+			to = ce ? ce : end;
+			p  = ce ? after : end;
+		}
+		t = newAV();
+		av_push(out, newRV_noinc((SV*)t));
+		v = ods_attr(c, ODS_TABLE, a, alen, "name", &vlen);
+		if (v) {
+			SV *name = newSVpvs("");
+			xlsx_xml_uncat(aTHX_ name, v, vlen);
+			av_push(t, xlsx_text_decode(aTHX_ name));
+		} else
+			av_push(t, newSV(0));
+		av_push(t, newSVuv((UV)(from - xml)));
+		av_push(t, newSVuv((UV)(to - xml)));
+	}
+	return (AV*)SvREFCNT_inc_simple_NN((SV*)out);
 }
 
 /*Formula and data-shape handling shared by lm() and glm().
@@ -27583,6 +28533,7 @@ typedef struct {
 	unsigned short npar; //how many parameters exist
 	unsigned short nrequired; //how many have no default
 	dist_fn fn;
+	short int nonneg_par; // index of the parameter (sd) whose negative value gives NaN with one warning per call; -1 = none
 } dist_spec;
 
 static NV dist_log(NV p, bool give_log) {
@@ -28109,8 +29060,14 @@ Positional and named are both accepted because R is called both ways --
 pt(2.5, 10) and pt(2.5, df = 10) are the same call there. A positional
 parameter is consumed only while one is still unfilled and the argument is not
 the name of one of this function's own options, so pf(3, 2, 10) fills df1 and
-df2 while pf(3, df2 => 10, df1 => 2) names them in either order.*/
-static void dist_parse(pTHX_ const dist_spec *spec, SV **st, Stack_off_t items, SV **x_out, NV *par, bool *lower, bool *give_log) {
+df2 while pf(3, df2 => 10, df1 => 2) names them in either order.
+
+A parameter may be an array reference, as in R, where pt(2, df = c(1, 2, 3))
+is three values: par_av[j] is then that array and par[j] is unused, and
+dist_apply() recycles it against x and the other parameters.  NULL is a single
+number, in par[j].  The par_av pointers are no restrict: they point into the
+caller's arrays, which a tied FETCH could reach.*/
+static void dist_parse(pTHX_ const dist_spec *spec, SV **st, Stack_off_t items, SV **x_out, NV *par, AV **par_av, bool *lower, bool *give_log) {
 	unsigned short filled = 0;
 	Stack_off_t i;
 	bool seen[DIST_MAX_PAR];
@@ -28121,8 +29078,9 @@ static void dist_parse(pTHX_ const dist_spec *spec, SV **st, Stack_off_t items, 
 	*lower    = 1;
 	*give_log = 0;
 	for (i = 0; i < (Stack_off_t)spec->npar; i++) {
-		par[i]  = spec->par_default[i];
-		seen[i] = 0;
+		par[i]    = spec->par_default[i];
+		par_av[i] = NULL;
+		seen[i]   = 0;
 	}
 
 	i = 1;
@@ -28134,6 +29092,14 @@ static void dist_parse(pTHX_ const dist_spec *spec, SV **st, Stack_off_t items, 
 	"10" =~ /(\d+)/, pt(2.5, $1) took $1 for an option name with no value
 	and croaked, where pt(2.5, df => $1) worked.*/
 		SvGETMAGIC(st[i]);
+ //A positional array reference: a vector of the next parameter
+		if (filled < spec->npar && SvROK(st[i]) && SvTYPE(SvRV(st[i])) == SVt_PVAV) {
+			par_av[filled] = (AV *)SvRV(st[i]);
+			seen[filled]   = 1;
+			filled++;
+			i++;
+			continue;
+		}
  //A positional parameter: something left to fill, and not an option name
 		if (filled < spec->npar && SvOK(st[i])) {
 			bool is_name = 0;
@@ -28165,7 +29131,19 @@ static void dist_parse(pTHX_ const dist_spec *spec, SV **st, Stack_off_t items, 
 			bool matched = 0;
 			for (unsigned short j = 0; j < spec->npar; j++) {
 				if (!strEQ(key, spec->par_name[j])) continue;
-				par[j]  = sv_num_opt(aTHX_ st[i + 1], spec->name, spec->par_name[j]);
+				SV *val = st[i + 1];
+				/*Get magic once, then sv_num_opt()'s test in the _nomg forms:
+				sv_num_opt() runs the magic itself, and a tied value would be
+				FETCHed twice.*/
+				SvGETMAGIC(val);
+				if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+					par_av[j] = (AV *)SvRV(val); // a vector, recycled by dist_apply()
+				} else {
+					if (!SvOK(val) || !(sv_lln_nomg(aTHX_ val) || (SvROK(val) && SvAMAGIC(val))))
+						usage_croak(aTHX_ spec->name, "%s is not a number", spec->par_name[j]);
+					par_av[j] = NULL; // a later number for the same name replaces a vector
+					par[j]    = SvNV_nomg(val);
+				}
 				seen[j] = 1;
 				matched = 1;
 				if (j + 1 > filled) filled = (unsigned short)(j + 1);
@@ -28184,12 +29162,12 @@ array element, or no SV at all is NaN, which is this module's R NA. The get
 magic is run once and the value read with the _nomg forms, so a tied element
 is FETCHed once and read as what FETCH returned -- SvOK() before the magic
 has run sees a tied element as undef.*/
-static NV dist_arg_nv(pTHX_ SV *sv, const char *fname) {
+static NV dist_arg_nv(pTHX_ SV *sv, const char *fname, const char *what) {
 	if (!sv) return NV_NAN;
 	SvGETMAGIC(sv);
 	if (!SvOK(sv)) return NV_NAN;
 	if (!sv_lln_nomg(aTHX_ sv) && !(SvROK(sv) && SvAMAGIC(sv)))
-		usage_croak(aTHX_ fname, "x is not a number"); // a value that is not a number was read as 0
+		usage_croak(aTHX_ fname, "%s is not a number", what); // a value that is not a number was read as 0
 	return SvNV_nomg(sv);
 }
 
@@ -28201,23 +29179,110 @@ The result array is owned by a mortal reference from before the first element
 is read, and handed back with a reference of its own for the XSUB's RETVAL to
 mortalise. Reading an element can die -- a tied FETCH, or the "isn't numeric"
 warning under FATAL warnings -- and up to 0.331 that left the half-built array
-with nothing to free it.*/
-static SV *dist_apply(pTHX_ const dist_spec *spec, SV *x, const NV *par, bool lower, bool give_log) {
+with nothing to free it.
+
+x and every parameter in par_av (see dist_parse()) are recycled as R recycles
+them (arithmetic.c, math2() and math3()): the answer has as many values as the
+longest, each shorter one is reused from its start, with no warning when a
+length does not divide the longest, and any of them empty makes the answer
+empty.  The answer is an array reference when x or any parameter is one, and a
+number only when all of them are numbers.  An undef element of a parameter is
+NaN, as one of x is, and the answer there is NaN, as R's NA is.  A negative
+value of spec->nonneg_par (dnorm()'s and pnorm()'s sd) gives NaN from spec->fn
+and one warning for the whole call, as R does; up to 0.3430 dnorm() warned once
+per element.*/
+static SV *dist_apply(pTHX_ const dist_spec *spec, SV *x, const NV *par, AV *const *par_av, bool lower, bool give_log) {//no restrict on par_av: it points at the caller's arrays
 	SvGETMAGIC(x);
-	if (SvROK(x) && SvTYPE(SvRV(x)) == SVt_PVAV) {
-		AV *in  = (AV *)SvRV(x);
-		AV *out = newAV();
-		SV *rv  = sv_2mortal(newRV_noinc((SV *)out));
-		const SSize_t n = av_len(in) + 1;
-		if (n > 0) av_extend(out, n - 1);
-		for (SSize_t i = 0; i < n; i++) {
-			SV **e = av_fetch(in, i, 0);
-			const NV v = dist_arg_nv(aTHX_ e ? *e : NULL, spec->name);
-			av_store(out, i, newSVnv(spec->fn(v, par, lower, give_log)));
-		}
-		return SvREFCNT_inc_simple_NN(rv);
+	const bool x_vec = SvROK(x) && SvTYPE(SvRV(x)) == SVt_PVAV;
+	bool any_vec = x_vec;
+	for (unsigned short j = 0; j < spec->npar; j++)
+		if (par_av[j]) any_vec = TRUE;
+	if (!any_vec) {
+		if (spec->nonneg_par >= 0 && par[spec->nonneg_par] < 0.0)
+			warn("%s: standard deviation must be non-negative", spec->name);
+		return newSVnv(spec->fn(SvOK(x) ? sv_num_opt(aTHX_ x, spec->name, "x") : NV_NAN, par, lower, give_log));
 	}
-	return newSVnv(spec->fn(SvOK(x) ? sv_num_opt(aTHX_ x, spec->name, "x") : NV_NAN, par, lower, give_log));
+
+	/*Lengths, and the longest.  SSize_t, as av_len() is: an array cannot
+	hold more than SSize_t_MAX elements, so the longest is one of them.*/
+	AV *x_av = x_vec ? (AV *)SvRV(x) : NULL;
+	const SSize_t nx = x_av ? av_len(x_av) + 1 : 1;
+	SSize_t npar_len[DIST_MAX_PAR];
+	SSize_t n = nx;
+	for (unsigned short j = 0; j < spec->npar; j++) {
+		npar_len[j] = par_av[j] ? av_len(par_av[j]) + 1 : 1;
+		if (npar_len[j] > n) n = npar_len[j];
+	}
+	AV *out = newAV();
+	SV *rv  = sv_2mortal(newRV_noinc((SV *)out));
+	if (nx == 0) return SvREFCNT_inc_simple_NN(rv);
+	for (unsigned short j = 0; j < spec->npar; j++)
+		if (npar_len[j] == 0) return SvREFCNT_inc_simple_NN(rv);
+
+	/*A number x is read once, before the loop, as the scalar path reads it,
+	so an undef x is NaN and a word dies naming x.*/
+	const NV x_one = x_av ? 0.0 : (SvOK(x) ? sv_num_opt(aTHX_ x, spec->name, "x") : NV_NAN);
+	bool warned = FALSE;
+	av_extend(out, n - 1);
+	for (SSize_t i = 0; i < n; i++) {
+		NV v;
+		if (x_av) {
+			SV **e = av_fetch(x_av, i % nx, 0);
+			v = dist_arg_nv(aTHX_ e ? *e : NULL, spec->name, "x");
+		} else {
+			v = x_one;
+		}
+		NV p[DIST_MAX_PAR];
+		for (unsigned short j = 0; j < spec->npar; j++) {
+			if (par_av[j]) {
+				SV **e = av_fetch(par_av[j], i % npar_len[j], 0);
+				p[j] = dist_arg_nv(aTHX_ e ? *e : NULL, spec->name, spec->par_name[j]);
+			} else {
+				p[j] = par[j];
+			}
+		}
+		if (spec->nonneg_par >= 0 && p[spec->nonneg_par] < 0.0 && !warned) {
+			warn("%s: standard deviation must be non-negative", spec->name);
+			warned = TRUE;
+		}
+		/*R's NA in any argument is NA out (nmath's ISNAN() tests on every
+		argument); the functions below test x, and this covers a parameter
+		element, which a number could not be before 0.3431.*/
+		bool nan_par = FALSE;
+		for (unsigned short j = 0; j < spec->npar; j++)
+			if (nv_isnan(p[j])) nan_par = TRUE;
+		av_store(out, i, newSVnv(nan_par ? NV_NAN : spec->fn(v, p, lower, give_log)));
+	}
+	return SvREFCNT_inc_simple_NN(rv);
+}
+
+/*dnorm() and pnorm() as dist_fn, so that they recycle a vector mean or sd
+through dist_apply() as the rest of the family does.  They keep their own
+argument parsing in the XSUBs (named mean and sd only), whose messages tests
+pin.  par[0] is the mean and par[1] the standard deviation.*/
+static NV d_dnorm(NV x, const NV *par, bool lower, bool give_log) {
+	PERL_UNUSED_ARG(lower); // a density has no tail
+	return c_dnorm(x, par[0], par[1], give_log);
+}
+static NV d_pnorm(NV x, const NV *par, bool lower, bool give_log) {
+	return nv_pnorm(x, par[0], par[1], lower, give_log);
+}
+static const dist_spec dnorm_spec = { "dnorm", { "mean", "sd" }, { 0.0, 1.0 }, 2, 0, d_dnorm, 1 };
+static const dist_spec pnorm_spec = { "pnorm", { "mean", "sd" }, { 0.0, 1.0 }, 2, 0, d_pnorm, 1 };
+
+/*dnorm()'s and pnorm()'s mean or sd: a number, or an array reference that
+dist_apply() recycles (par_av[k], with par[k] unused).  The get magic runs
+once; the number test is sv_num_opt()'s in the _nomg forms.*/
+static void norm_par(pTHX_ SV *val, const char *fname, const char *what, NV *par, AV **par_av) {//no restrict on par_av: it is left pointing at the caller's array
+	SvGETMAGIC(val);
+	if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+		*par_av = (AV *)SvRV(val);
+		return;
+	}
+	if (!SvOK(val) || !(sv_lln_nomg(aTHX_ val) || (SvROK(val) && SvAMAGIC(val))))
+		usage_croak(aTHX_ fname, "%s is not a number", what);
+	*par_av = NULL; // a later number for the same name replaces a vector
+	*par    = SvNV_nomg(val);
 }
 
 // XS SECTION
@@ -36566,8 +37631,12 @@ PPCODE:
 	XSRETURN_EMPTY;
 }
 
-SV* _parse_csv_file(char* file, const char* sep_str, const char* comment_str, SV* callback = &PL_sv_undef, SV* plan_sv = &PL_sv_undef, bool quote = TRUE, bool bare_comment = FALSE, SV* sep_rx = &PL_sv_undef, bool sep_ws = FALSE, SV* fh_sv = &PL_sv_undef, bool cr_eol = FALSE)
+SV* _parse_csv_file(char* file, const char* sep_str, const char* comment_str, SV* callback = &PL_sv_undef, SV* plan_sv = &PL_sv_undef, bool quote = TRUE, bool bare_comment = FALSE, SV* sep_rx = &PL_sv_undef, bool sep_ws = FALSE, SV* fh_sv = &PL_sv_undef, bool cr_eol = FALSE, SV* skip_sv = &PL_sv_undef, bool peek = FALSE)
 PREINIT:
+	rowskip *sk = NULL; //read_table's skiprows, freed with the scope; NULL = none
+	UV rowix = 0; //rows begun so far: the index the next row's first line asks skiprows about
+	bool skip_q = FALSE; //the row being left out has a quoted field running on to the next line
+	SV *peeked = NULL; //peek: the first line of the first row kept, the return value
 	PerlIO *fp; //not restrict: with fh_sv it is the caller's handle, perl-managed
 	AV *data = NULL;
 	SV *field = NULL;
@@ -36659,6 +37728,7 @@ LF line ends itself.*/
 	}
 	Newxz(plan, 1, csv_plan);
 	SAVEDESTRUCTOR_X(S_plan_free, plan);
+	sk = S_rowskip_new(aTHX_ skip_sv, FALSE); //rows are asked once each, in order: nothing to keep
 	line_sv = newSV(128);
 	SAVEFREESV(line_sv);
 	field = newSVpvs("");
@@ -36736,6 +37806,38 @@ test_utf8_bom), so a BOM-only first line is a blank line.*/
 			if (len >= 3 && memcmp(line, "\xEF\xBB\xBF", 3) == 0) {
 				line += 3;
 				len  -= 3;
+			}
+		}
+/*read_table's skiprows (S_row_skipped()).  pandas numbers rows, not lines: a
+row whose quoted field runs across lines is one index, and a blank line or a
+comment line is one too (pandas 3.0.4, tests/io/parser/test_skiprows.py,
+test_skip_row_with_newline and test_skip_rows_blank).  So a row is asked about
+at its first line, and a line inside a quoted field goes with the row it
+belongs to, kept or left out.  A row left out is not parsed, and so cannot
+fail: S_skip_line_quoted() reads only where its quoted fields run to.  peek is
+read_table's look at the first line of the first row kept, which may
+be a commented-out header that the parse below would drop as a comment; the
+read stops there, and the line is returned.*/
+		if (skip_q || (!in_quotes && (sk || peek))) {
+			if (!skip_q && !S_row_skipped(aTHX_ sk, rowix++)) {
+				if (peek) {
+					peeked = newSVpvn(line, len);
+					break;
+				}
+			} else {
+				bool rx_ok = TRUE; //the regex may be matched against this line
+				bool sk_utf8 = rx_utf8; //...as UTF-8; the parse's line_utf8, below
+				if (rx_utf8)
+					rx_ok = cBOOL(is_utf8_string((const U8*)line, (STRLEN)len));
+				else if (rx_chars) {
+					size_t h = 0; //the first byte >= 0x80
+					while (h < len && !((U8)line[h] & 0x80))
+						h++;
+					sk_utf8 = h < len && is_utf8_string((const U8*)line + h, (STRLEN)(len - h));
+				}
+				skip_q = quote && S_skip_line_quoted(aTHX_ line, len, skip_q, sep_str, sep_len,
+					rx, line_sv, rx_ok, sk_utf8, sep_ws);
+				continue;
 			}
 		}
 /*A UTF-8 sep pattern reads the line as UTF-8, and the regex engine does not
@@ -37012,32 +38114,37 @@ it would not be the function $! calls.  It is given only when the read that
 ended the loop left one in errno: the error flag can have been set by an
 earlier read, and errno is not defined to say anything after a call that did
 not fail, so up to 0.3213 a stale value could be reported as the cause.*/
-	if (PerlIO_error(fp)) {
-		if (read_errno)
-			croak("Error reading file '%s': %" SVf, file,
-			      SVfARG(wt_errno_text(aTHX_ read_errno)));
-		croak("Error reading file '%s'", file);
-	}
+	if (peek) { //a read error, or a quote left open, is the parse's to report
+		LEAVE;
+		RETVAL = peeked ? peeked : newSV(0);
+	} else {
+		if (PerlIO_error(fp)) {
+			if (read_errno)
+				croak("Error reading file '%s': %" SVf, file,
+				      SVfARG(wt_errno_text(aTHX_ read_errno)));
+			croak("Error reading file '%s'", file);
+		}
 /*R's scan() warns "EOF within quoted string" here (src/main/scan.c, R 4.6.1)
 and keeps what it read; pandas' C engine raises "EOF inside string starting at
 row N".  This keeps the row, as R does, but says where the quote opened: up to
 0.320 it said nothing, and everything after one stray '"' came back as a single
 cell.*/
-	if (in_quotes) {
-		warn("read_table: end of file inside a quoted field in %s: %" SVf "\n",
-		     file, SVfARG(S_quote_note(aTHX_ q_line, q_mid, 0)));
-		S_push_cell(aTHX_ plan, field, "", 0);
-		if (plan->active) {
-			plan->span_line = q_line;
-			plan->span_mid  = q_mid;
-			plan->span_to   = 0;
-			S_fast_row(aTHX_ plan, &plan->row);
-		} else
-			S_emit_row(aTHX_ &plan->row, use_cb, callback, data, q_line, q_mid, 0, first_q);
+		if (in_quotes) {
+			warn("read_table: end of file inside a quoted field in %s: %" SVf "\n",
+			     file, SVfARG(S_quote_note(aTHX_ q_line, q_mid, 0)));
+			S_push_cell(aTHX_ plan, field, "", 0);
+			if (plan->active) {
+				plan->span_line = q_line;
+				plan->span_mid  = q_mid;
+				plan->span_to   = 0;
+				S_fast_row(aTHX_ plan, &plan->row);
+			} else
+				S_emit_row(aTHX_ &plan->row, use_cb, callback, data, q_line, q_mid, 0, first_q);
+		}
+		S_plan_report(aTHX_ plan, plan_hv);
+		LEAVE;
+		RETVAL = use_cb ? newSV(0) : newRV_inc((SV*)data);
 	}
-	S_plan_report(aTHX_ plan, plan_hv);
-	LEAVE;
-	RETVAL = use_cb ? newSV(0) : newRV_inc((SV*)data);
 OUTPUT:
 	RETVAL
 
@@ -37082,7 +38189,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-SV* _parse_xlsx_sheet_xs(SV* xml_sv, SV* sst_sv, SV* callback, SV* plan_sv = &PL_sv_undef)
+SV* _parse_xlsx_sheet_xs(SV* xml_sv, SV* sst_sv, SV* callback, SV* plan_sv = &PL_sv_undef, SV* skip_sv = &PL_sv_undef)
 PREINIT:
 	xlsx_ws  *w    = NULL;
 	csv_plan *plan = NULL;
@@ -37121,6 +38228,7 @@ array cannot be reallocated under this pointer.*/
 	w->nsst     = (size_t)(AvFILLp(sst_av) + 1);
 	w->plan     = plan;
 	w->callback = callback;
+	w->skip     = S_rowskip_new(aTHX_ skip_sv, TRUE); //read_table's skiprows, normalized
 	xlsx_ws_scan(aTHX_ w, TRUE); //pass 1: the width, from the cell references
 	w->width = w->gmax;
 /*A sheet with no cells at all has no rows to emit, and skipping pass 2 is also
@@ -37134,6 +38242,70 @@ what keeps a width of 0 out of the row padding, which counts from width - 1.*/
 	RETVAL = newSV(0);
 OUTPUT:
 	RETVAL
+
+SV* _parse_ods_sheet_xs(SV* xml_sv, UV from, UV to, SV* callback, SV* plan_sv, SV* skip_sv, const char* file, SV* sheet)
+PREINIT:
+	xlsx_ws  *w    = NULL;
+	csv_plan *plan = NULL;
+	ods_ctx  c;
+	STRLEN xlen;
+	const char *xml;
+CODE:
+/*Stats::LikeR::read_table() hands content.xml here with one sheet's byte range,
+[from, to), from _ods_tables_xs(); the rest is _parse_xlsx_sheet_xs()'s, and
+see ods_scan() for the parser.  sheet is the sheet's name, or its number, for
+the messages.*/
+	if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
+		croak("_parse_ods_sheet_xs: callback must be a CODE reference");
+	xml = SvPV_const(xml_sv, xlen);
+	if (from > to || to > (UV)xlen)
+		croak("_parse_ods_sheet_xs: the range %" UVuf " to %" UVuf " is not within the %"
+		      UVuf " bytes of content.xml", from, to, (UV)xlen);
+	ENTER;
+	Newxz(plan, 1, csv_plan);
+	SAVEDESTRUCTOR_X(S_plan_free, plan);
+	Newxz(w, 1, xlsx_ws);
+	SAVEDESTRUCTOR_X(S_xlsx_ws_free, w);
+	w->row = newAV();
+	if (SvOK(plan_sv)) {
+		if (!SvROK(plan_sv) || SvTYPE(SvRV(plan_sv)) != SVt_PVHV)
+			croak("_parse_ods_sheet_xs: plan must be a HASH reference");
+		w->plan_hv = (HV*)SvRV(plan_sv);
+	}
+	ods_bind(&c, xml, xml + xlen);
+	c.file  = file;
+	c.sheet = sheet;
+	c.tmp   = newSVpvs("");
+	SAVEFREESV(c.tmp);
+	w->xml      = xml + from;
+	w->end      = xml + to;
+	w->plan     = plan;
+	w->callback = callback;
+	w->skip     = S_rowskip_new(aTHX_ skip_sv, TRUE);
+	ods_scan(aTHX_ w, &c, TRUE); //pass 1: the width
+	w->width = w->gmax;
+	if (w->width) { //as for an .xlsx: no cells, no rows, and no width - 1 to pad to
+		av_extend(w->row, (SSize_t)(w->width - 1));
+		ods_scan(aTHX_ w, &c, FALSE); //pass 2: build and emit
+	}
+	S_plan_report(aTHX_ plan, SvOK(plan_sv) ? (HV*)SvRV(plan_sv) : NULL);
+	LEAVE;
+	RETVAL = newSV(0);
+OUTPUT:
+	RETVAL
+
+ # The sheets of an .ods's content.xml, as [[name, from, to], ...]: see ods_tables().
+SV* _ods_tables_xs(SV* xml_sv)
+	CODE:
+	{
+		STRLEN xlen;
+		const char *xml = SvPV_const(xml_sv, xlen);
+		ods_ctx c;
+		ods_bind(&c, xml, xml + xlen);
+		RETVAL = newRV_noinc((SV*)ods_tables(aTHX_ &c, xml, xlen));
+	}
+	OUTPUT:
+		RETVAL
 
 SV* _xlsx_sst_xs(SV* xml_sv)
 	CODE:
@@ -41031,7 +42203,7 @@ CODE:
 {
 	size_t n = 0;
 	NV min = 0.0, max = 1.0;
-	bool n_set = 0, min_set = 0, max_set = 0;// Flags to track what has been assigned
+	bool n_set = FALSE, min_set = FALSE, max_set = FALSE;// Flags to track what has been assigned
 	SV *n_sv = NULL; // 'n' is range-checked once, after the parse
 	Stack_off_t i = 0;
 	if (items == 0) {
@@ -41057,18 +42229,18 @@ CODE:
 			SV *val = ST(i + 1);
 			if (!SvOK(val) || !looks_like_number(val))
 				usage_croak(aTHX_ "runif", "'%s' must be a number", key);
-			if      (is_n)   { n_sv = val;        n_set   = 1; }
-			else if (is_min) { min = SvNV(val);   min_set = 1; }
-			else             { max = SvNV(val);   max_set = 1; }
+			if      (is_n)   { n_sv = val;        n_set   = TRUE; }
+			else if (is_min) { min = SvNV(val);   min_set = TRUE; }
+			else             { max = SvNV(val);   max_set = TRUE; }
 			i += 2;
 			continue;
 		}
  // positional, in order: n, then min, then max
 		if (!SvOK(ST(i)) || !looks_like_number(ST(i)))
 			usage_croak(aTHX_ "runif", "argument %d is not a number", (int)i + 1);
-		if      (!n_set)   { n_sv = ST(i);       n_set   = 1; }
-		else if (!min_set) { min = SvNV(ST(i));  min_set = 1; }
-		else if (!max_set) { max = SvNV(ST(i));  max_set = 1; }
+		if      (!n_set)   { n_sv = ST(i);       n_set   = TRUE; }
+		else if (!min_set) { min = SvNV(ST(i));  min_set = TRUE; }
+		else if (!max_set) { max = SvNV(ST(i));  max_set = TRUE; }
 		else usage_croak(aTHX_ "runif", "too many arguments (expected n, min, max)");
 		i++;
 	}
@@ -41121,8 +42293,8 @@ SV* rbinom(...)
 	size_t n = 0;
 	UV size = 0; //a trial count, not an element count: see below
 	NV prob = 0.5;
-	bool n_set = FALSE, size_set = FALSE, prob_set = 0;
-	bool na = 0; //a fractional size or a NaN prob: R's rbinom() gives NA for every draw
+	bool n_set = FALSE, size_set = FALSE, prob_set = FALSE;
+	bool na = FALSE; //a fractional size or a NaN prob: R's rbinom() gives NA for every draw
 	/*Stack_off_t, the type of `items`: an unsigned short wrapped past 65535
 	arguments and the loop never ended.*/
 	for (Stack_off_t i = 0; i < items; i += 2) {
@@ -41130,7 +42302,7 @@ SV* rbinom(...)
 		SV* val = ST(i + 1);
 		if (strEQ(key, "n")) {
 			n = sv_count_arg(aTHX_ val, "rbinom", "n", 0);
-			n_set = 1;
+			n_set = TRUE;
 		} else if (strEQ(key, "size")) {
 			/*size is a trial count, not an element count, so neither
 			SV_COUNT_MAX nor SIZE_MAX applies: R draws from rbinom(3, 1e15, 0.3).
@@ -41141,8 +42313,8 @@ SV* rbinom(...)
 			size = sv_uv_arg_to(aTHX_ val, "rbinom", "size", 0, NV_INF, (UV)IV_MAX);
 			/*sv_count_arg() truncates, so 2.5 drew from size 2.  R's rbinom()
 			refuses a size that is not a whole number with NA.*/
-			if (SvNV(val) != (NV)size) na = 1;
-			size_set = 1;
+			if (SvNV(val) != (NV)size) na = TRUE;
+			size_set = TRUE;
 		} else if (strEQ(key, "prob")) {
 			/*SvNV() read 'abc' as 0, so rbinom(prob => 'abc') returned zeros.
 			NaN passes `prob < 0 || prob > 1`, and binom_draw() then never
@@ -41150,8 +42322,8 @@ SV* rbinom(...)
 			if (!SvOK(val) || !sv_is_numeric_arg(aTHX_ val))
 				usage_croak(aTHX_ "rbinom", "prob must be a number (got '%s')", SvOK(val) ? SvPV_nolen(val) : "undef");
 			prob = SvNV(val);
-			if (nv_isnan(prob)) na = 1;
-			prob_set = 1;
+			if (nv_isnan(prob)) na = TRUE;
+			prob_set = TRUE;
 		}
 		else usage_croak(aTHX_ "rbinom", "unknown argument '%s'", key);
 	}
@@ -41477,7 +42649,7 @@ SV* quantile(...)
 		NV *x;
 		Newx(x, n_raw, NV); SAVEFREEPV(x);
 		size_t n = 0;
-		bool saw_nan = 0;
+		bool saw_nan = FALSE;
 		{
 			SSize_t len = (SSize_t)n_raw, j = 0;
 			if (!SvRMAGICAL((SV*)x_av)) av_scan_extract(x_av, &j, len, x, &n);
@@ -41490,7 +42662,7 @@ SV* quantile(...)
 				x[n++] = SvNV(tv);
 			}
 			for (size_t k = 0; k < n; k++)
-				if (nv_isnan(x[k])) { saw_nan = 1; break; }
+				if (nv_isnan(x[k])) { saw_nan = TRUE; break; }
 		}
 		if (n == 0) croak("quantile: 'x' contains no valid numbers");
 		/*R's type 7 (quantile.default, R 4.6.1), in its own arithmetic: the
@@ -45663,7 +46835,7 @@ PPCODE:
 	4 * (first/4 + i*(step/4)), which is what R does to keep the
 	intermediate finite; scaling by 4 either way is exact, so no value moves
 	that does not have to.*/
-	bool   quarter = 0;
+	bool   quarter = FALSE;
 
 	if (!nv_isfinite(from)) usage_croak(aTHX_ "seq", "'from' must be a finite number");
 	if (!nv_isfinite(to))   usage_croak(aTHX_ "seq", "'to' must be a finite number");
@@ -45748,14 +46920,24 @@ PPCODE:
 	stringifies every element, from 409 to 83 ns/element -- an IV never
 	reaches Gconvert().  raw_last is bounded as well as last_val because it is
 	the unclamped endpoint that bounds every intermediate the loop below
-	walks through, and the clamp can only pull the last one inwards.*/
+	walks through, and the clamp can only pull the last one inwards.
+
+	step is gated on IV_MAX too, because the loop casts it to an IV: with two
+	or more elements it is at most raw_last - first, which can be twice
+	iv_bound when the sequence straddles zero, so seq(-2e9, 2e9, 4e9) on a
+	32-bit-IV perl cast 4e9 out of IV range, which C leaves undefined. Strictly
+	below (NV)IV_MAX, which rounds up to 2**63 on a double. The elements stay
+	exact without a tighter bound: each lies between first and raw_last. A
+	one-element sequence never steps, so its step, however large
+	(seq(0, 10, 1e20)), is not cast and does not bar the IV.*/
 	const bool use_iv = !quarter
 		&& first    == nv_trunc(first)
 		&& step     == nv_trunc(step)
 		&& last_val == nv_trunc(last_val)
 		&& nv_fabs(first)    <= iv_bound
 		&& nv_fabs(raw_last) <= iv_bound
-		&& nv_fabs(last_val) <= iv_bound;
+		&& nv_fabs(last_val) <= iv_bound
+		&& (n_elem == 1 || nv_fabs(step) < (NV)IV_MAX);
 	/*Nothing the caller can reach needs the other n_elem-1 values: in void
 	context none of them, and in scalar context only the last, which is what
 	the caller's assignment reads off the top of the stack -- the same answer
@@ -45784,7 +46966,7 @@ PPCODE:
 	such guarantee.  The running sum cannot overflow at all: every partial
 	value is an element of the sequence, so it lies between 'first' and
 	'raw_last', and the additions are exact.*/
-		const IV istep = (IV)step;
+		const IV istep = n_elem > 1 ? (IV)step : 0; //step is in IV range only when it is used: see use_iv
 		IV v = (IV)first;
 		for (size_t i = 0; i + 1 < n_elem; i++) { mPUSHi(v); v += istep; }
 	} else if (quarter) {
@@ -47129,8 +48311,9 @@ CODE:
 	if (items < 1) {
 		usage_croak(aTHX_ "dnorm", "the first argument, a number or an array reference, is required");
 	}
-	SV*x_sv = ST(0);
-	NV mean = 0.0, sd = 1.0; //defaults
+	SV *x_sv = ST(0);
+	NV par[DIST_MAX_PAR] = { 0.0, 1.0 }; // mean, sd
+	AV *par_av[DIST_MAX_PAR] = { NULL, NULL }; // an array reference given for one, recycled
 	bool give_log = 0;
  // Parse remaining named arguments from the flat stack
 	if ((items - 1) % 2 != 0) {
@@ -47139,37 +48322,19 @@ CODE:
 	for (Stack_off_t i = 1; i < items; i += 2) {
 		const char* key = SvPV_nolen(ST(i));
 		SV* val = ST(i + 1);
-		if      (strEQ(key, "mean")) mean     = sv_num_opt(aTHX_ val, "dnorm", "mean");
-		else if (strEQ(key, "sd"))   sd       = sv_num_opt(aTHX_ val, "dnorm", "sd");
+		if      (strEQ(key, "mean")) norm_par(aTHX_ val, "dnorm", "mean", &par[0], &par_av[0]);
+		else if (strEQ(key, "sd"))   norm_par(aTHX_ val, "dnorm", "sd",   &par[1], &par_av[1]);
 		else if (strEQ(key, "log"))  give_log = SvTRUE(val) ? 1 : 0;
 		else usage_croak(aTHX_ "dnorm", "unknown argument '%s'", key);
 	}
-	/*Branch on scalar vs. arrayref for 'x'. undef is NaN and the result is
-	mortal before any element is read, both as in pnorm() above.*/
-	SvGETMAGIC(x_sv);
-	if (SvROK(x_sv) && SvTYPE(SvRV(x_sv)) == SVt_PVAV) {
-		AV *x_av = (AV*)SvRV(x_sv); // x is an array reference
-		AV *result_av = newAV();
-		SV *rv = sv_2mortal(newRV_noinc((SV *)result_av));
-		const SSize_t n = av_len(x_av) + 1;
-		if (n > 0) {
-			av_extend(result_av, n - 1);
-			for (SSize_t i = 0; i < n; i++) {
-				SV **elem = av_fetch(x_av, i, 0);
-				const NV x_val = dist_arg_nv(aTHX_ elem ? *elem : NULL, "dnorm");
-				NV res = c_dnorm(x_val, mean, sd, give_log);
-				av_store(result_av, i, newSVnv(res));
-			}
-		}
-		RETVAL = SvREFCNT_inc_simple_NN(rv);
-	} else {// x is a single numeric scalar
-		const NV x_val = SvOK(x_sv) ? sv_num_opt(aTHX_ x_sv, "dnorm", "x") : NV_NAN;
-		NV res = c_dnorm(x_val, mean, sd, give_log);
-		RETVAL = newSVnv(res);
-	}
+	/*x, mean and sd are recycled as R recycles them, and a negative sd warns
+	once for the call (up to 0.3430 c_dnorm() warned once per element): see
+	dist_apply(). undef is NaN, as in pnorm() above.*/
+	RETVAL = dist_apply(aTHX_ &dnorm_spec, x_sv, par, par_av, FALSE, give_log);
 	}
 OUTPUT:
 	RETVAL
+
 
 void merge(...)
 PPCODE:
@@ -47838,6 +49003,10 @@ CODE:
 				const char*key = SvPV(arg2, klen);
  //negative for a UTF-8 name, which by its bytes alone matched no row
 				const I32 sk = SvUTF8(arg2) ? -(I32)klen : (I32)klen;
+				/*Read after the loop: rows were seen, and whether any has the
+				column. A key no row has dies, as dropna() and drop_duplicates()
+				die on one; up to 0.3430 it returned {} without a word.*/
+				bool any_row = FALSE, key_found = FALSE;
 				/*size_t, not unsigned, which would wrap past 2^32 rows.  The
 				row is read through av_slow_at(), which runs its get magic:
 				av_fetch() and SvROK() saw each row of a tied array as a
@@ -47849,22 +49018,27 @@ CODE:
 						croak("value_counts: array element %" UVuf " is not a reference; a HASH ref (Array of Hashes) or ARRAY ref (Array of Arrays) is required when a key/index is given", (UV)i);
 					}
 					SV*inner_rv = SvRV(elem);
+					any_row = TRUE;
 					if (SvTYPE(inner_rv) == SVt_PVHV) {// Array of Hashes: extract column by key
 						HV*inner_hv = (HV*)inner_rv;
 						SV**valp = hv_fetch(inner_hv, key, sk, 0);
-						if (valp) increment_count(aTHX_ counts_hv, *valp, fast_nv);// missing key -> skip row
+						if (valp) { key_found = TRUE; increment_count(aTHX_ counts_hv, *valp, fast_nv); }// missing key -> skip row
 					} else if (SvTYPE(inner_rv) == SVt_PVAV) {// Array of Arrays: extract column by index
 						if (!looks_like_number(arg2)) {
 							croak("value_counts: array element %" UVuf " is an ARRAY ref but index '%s' is not numeric", (UV)i, key);
 						}
 						AV*inner_av = (AV*)inner_rv;
 						SSize_t idx = SvIV(arg2);
+						const SSize_t rlen = av_len(inner_av) + 1;
+						if (idx >= 0 ? idx < rlen : -idx <= rlen) key_found = TRUE; // the row has that position, even if undef there
 						SV**valp = av_fetch(inner_av, idx, 0);
 						if (valp) increment_count(aTHX_ counts_hv, *valp, fast_nv);
 					} else {
 						croak("value_counts: unsupported nested reference type in array element %" UVuf, (UV)i);
 					}
 				}
+				if (any_row && !key_found)
+					croak("value_counts: column '%" SVf "' not found", SVfARG(arg2));
 			} else {
  // CASE 2a: Flattened/simple array (one value per element)
 				for (size_t i = 0; i < len; i++) { //size_t: an unsigned wrapped past 2^32
@@ -47892,21 +49066,25 @@ CODE:
 						if (valp) increment_count(aTHX_ counts_hv, *valp, fast_nv);
 					}
 				} else {// Fallback: Row-Oriented nested structure
+					bool any_row = FALSE, key_found = FALSE; // read after the loop, as for an array above
 					HE*he;
 					ITER_KEEP_BEGIN(hv);
 					hv_iterinit(hv);
 					while ((he = hv_iternext(hv))) {
 						SV*inner_sv = he_val(aTHX_ hv, he);
+						any_row = TRUE; // a value of any kind: a hash of scalars has no column either
 						if (SvROK(inner_sv)) {
 							SV*inner_rv = SvRV(inner_sv);
 							if (SvTYPE(inner_rv) == SVt_PVHV) {// CASE 5: Hash of Hashes
 								HV*inner_hv = (HV*)inner_rv;
 								SV**valp = hv_fetch(inner_hv, key, sk, 0);
-								if (valp) increment_count(aTHX_ counts_hv, *valp, fast_nv);
+								if (valp) { key_found = TRUE; increment_count(aTHX_ counts_hv, *valp, fast_nv); }
 							} else if (SvTYPE(inner_rv) == SVt_PVAV) {// CASE 4: Hash of Arrays (Row-Oriented)
 								if (looks_like_number(arg2)) {
 									AV*inner_av = (AV*)inner_rv;
 									SSize_t idx = SvIV(arg2);
+									const SSize_t rlen = av_len(inner_av) + 1;
+									if (idx >= 0 ? idx < rlen : -idx <= rlen) key_found = TRUE; // the row has that position
 									SV**valp = av_fetch(inner_av, idx, 0);
 									if (valp) increment_count(aTHX_ counts_hv, *valp, fast_nv);
 								}
@@ -47914,6 +49092,8 @@ CODE:
 						}
 					}
 					ITER_KEEP_END;
+					if (any_row && !key_found)
+						croak("value_counts: column '%" SVf "' not found", SVfARG(arg2));
 				}
 			} else { // CASE 3: Hash Reference (No 2nd argument)
 				HE*he;
@@ -49567,10 +50747,18 @@ PPCODE:
 	for (j = 0; j < m; j++) {
 		el = av_fetch(probs_av, j, 0);
 		p = el ? SvNV(*el) : 0.0;
+		/*NaN passes both clamps below and would reach the (IV) cast, which C
+		leaves undefined for a NaN. qcut() refuses one before it gets here;
+		this is for any other caller.*/
+		if (nv_isnan(p)) croak("_qcut_core: probability at index %" IVdf " is NaN", j);
 		if (p < 0.0) p = 0.0;
 		if (p > 1.0) p = 1.0;
 		h    = nv_narrow((NV)(n - 1) * p);
-		lo   = (IV) nv_floor((double) h);
+		/*nv_floor() is the NV-width floor; the (double) that used to sit in
+		front of h rounded it to 53 bits first on a long-double or
+		__float128 perl, which could carry an h just below an integer up to
+		it and take lo one order statistic too far.*/
+		lo   = (IV) nv_floor(h);
 		frac = h - (NV) lo;
 		if (lo + 1 < n)
 			edges[j] = srt[lo] + frac * (srt[lo + 1] - srt[lo]);
@@ -49722,49 +50910,29 @@ CODE:
 	if (items < 1)
 		usage_croak(aTHX_ "pnorm", "the first argument, a number or an array reference, is required");
 	SV *x_sv = ST(0);
-	NV mean = 0.0, sd = 1.0; // defaults
+	NV par[DIST_MAX_PAR] = { 0.0, 1.0 }; // mean, sd
+	AV *par_av[DIST_MAX_PAR] = { NULL, NULL }; // an array reference given for one, recycled
 	bool lower_tail = 1, give_log = 0;
 	if ((items - 1) % 2 != 0)
 		usage_croak(aTHX_ "pnorm", "arguments after x must be name => value pairs");
 	for (Stack_off_t i = 1; i < items; i += 2) {
 		const char *key = SvPV_nolen(ST(i));
 		SV *val = ST(i + 1);
-		if      (strEQ(key, "mean"))                              mean       = sv_num_opt(aTHX_ val, "pnorm", "mean");
-		else if (strEQ(key, "sd"))                                sd         = sv_num_opt(aTHX_ val, "pnorm", "sd");
+		if      (strEQ(key, "mean"))                              norm_par(aTHX_ val, "pnorm", "mean", &par[0], &par_av[0]);
+		else if (strEQ(key, "sd"))                                norm_par(aTHX_ val, "pnorm", "sd",   &par[1], &par_av[1]);
 		else if (strEQ(key, "lower") || strEQ(key, "lower_tail")) lower_tail = SvTRUE(val) ? 1 : 0;
 		else if (strEQ(key, "log")   || strEQ(key, "log_p"))      give_log   = SvTRUE(val) ? 1 : 0;
 		else usage_croak(aTHX_ "pnorm", "unknown argument '%s'", key);
 	}
-	if (sd < 0.0)
-		warn("pnorm: standard deviation must be non-negative");
-	/*An undef x, or an undef element, is NaN, as the README has always said
-	and as dist_apply() reads it; up to 0.331 SvNV() read it as 0, so
-	pnorm([undef]) was 0.5 where R's pnorm(NA) is NA. The result is mortal
-	before any element is read, for dist_apply()'s reason.*/
-	SvGETMAGIC(x_sv);
-	if (SvROK(x_sv) && SvTYPE(SvRV(x_sv)) == SVt_PVAV) {
-		AV *x_av = (AV*)SvRV(x_sv);
-		AV *result_av = newAV();
-		SV *rv = sv_2mortal(newRV_noinc((SV *)result_av));
-		const SSize_t n = av_len(x_av) + 1;
-		if (n > 0) {
-			av_extend(result_av, n - 1);
-			for (SSize_t i = 0; i < n; i++) {
-				SV **elem = av_fetch(x_av, i, 0);
-				const NV x_val = dist_arg_nv(aTHX_ elem ? *elem : NULL, "pnorm");
-				NV res = nv_pnorm(x_val, mean, sd, lower_tail, give_log);
-				av_store(result_av, i, newSVnv(res));
-			}
-		}
-		RETVAL = SvREFCNT_inc_simple_NN(rv);
-	} else {
-		const NV x_val = SvOK(x_sv) ? sv_num_opt(aTHX_ x_sv, "pnorm", "x") : NV_NAN;
-		NV res = nv_pnorm(x_val, mean, sd, lower_tail, give_log);
-		RETVAL = newSVnv(res);
-	}
+	/*x, mean and sd are recycled as R recycles them, and a negative sd warns
+	once for the call: see dist_apply(). An undef x, or an undef element, is
+	NaN, as the README has always said; up to 0.331 SvNV() read it as 0, so
+	pnorm([undef]) was 0.5 where R's pnorm(NA) is NA.*/
+	RETVAL = dist_apply(aTHX_ &pnorm_spec, x_sv, par, par_av, lower_tail, give_log);
 }
 OUTPUT:
 	RETVAL
+
 
  # The rest of the R distribution family.  Every one is the same six lines over a
  # different dist_spec; the numerics, the tail rules and the log_p caveat are all
@@ -49774,10 +50942,10 @@ SV* qnorm(...)
 CODE:
 {
 	static const dist_spec spec =
-		{ "qnorm", { "mean", "sd" }, { 0.0, 1.0 }, 2, 0, d_qnorm };
-	SV *x; NV par[DIST_MAX_PAR]; bool lower, give_log;
-	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, &lower, &give_log);
-	RETVAL = dist_apply(aTHX_ &spec, x, par, lower, give_log);
+		{ "qnorm", { "mean", "sd" }, { 0.0, 1.0 }, 2, 0, d_qnorm, -1 };
+	SV *x; NV par[DIST_MAX_PAR]; AV *par_av[DIST_MAX_PAR]; bool lower, give_log;
+	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, par_av, &lower, &give_log);
+	RETVAL = dist_apply(aTHX_ &spec, x, par, par_av, lower, give_log);
 }
 OUTPUT:
 	RETVAL
@@ -49786,10 +50954,10 @@ SV* pt(...)
 CODE:
 {
 	static const dist_spec spec =
-		{ "pt", { "df", NULL }, { 0.0, 0.0 }, 1, 1, d_pt };
-	SV *x; NV par[DIST_MAX_PAR]; bool lower, give_log;
-	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, &lower, &give_log);
-	RETVAL = dist_apply(aTHX_ &spec, x, par, lower, give_log);
+		{ "pt", { "df", NULL }, { 0.0, 0.0 }, 1, 1, d_pt, -1 };
+	SV *x; NV par[DIST_MAX_PAR]; AV *par_av[DIST_MAX_PAR]; bool lower, give_log;
+	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, par_av, &lower, &give_log);
+	RETVAL = dist_apply(aTHX_ &spec, x, par, par_av, lower, give_log);
 }
 OUTPUT:
 	RETVAL
@@ -49798,10 +50966,10 @@ SV* qt(...)
 CODE:
 {
 	static const dist_spec spec =
-		{ "qt", { "df", NULL }, { 0.0, 0.0 }, 1, 1, d_qt };
-	SV *x; NV par[DIST_MAX_PAR]; bool lower, give_log;
-	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, &lower, &give_log);
-	RETVAL = dist_apply(aTHX_ &spec, x, par, lower, give_log);
+		{ "qt", { "df", NULL }, { 0.0, 0.0 }, 1, 1, d_qt, -1 };
+	SV *x; NV par[DIST_MAX_PAR]; AV *par_av[DIST_MAX_PAR]; bool lower, give_log;
+	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, par_av, &lower, &give_log);
+	RETVAL = dist_apply(aTHX_ &spec, x, par, par_av, lower, give_log);
 }
 OUTPUT:
 	RETVAL
@@ -49810,10 +50978,10 @@ SV* pchisq(...)
 CODE:
 {
 	static const dist_spec spec =
-		{ "pchisq", { "df", NULL }, { 0.0, 0.0 }, 1, 1, d_pchisq };
-	SV *x; NV par[DIST_MAX_PAR]; bool lower, give_log;
-	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, &lower, &give_log);
-	RETVAL = dist_apply(aTHX_ &spec, x, par, lower, give_log);
+		{ "pchisq", { "df", NULL }, { 0.0, 0.0 }, 1, 1, d_pchisq, -1 };
+	SV *x; NV par[DIST_MAX_PAR]; AV *par_av[DIST_MAX_PAR]; bool lower, give_log;
+	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, par_av, &lower, &give_log);
+	RETVAL = dist_apply(aTHX_ &spec, x, par, par_av, lower, give_log);
 }
 OUTPUT:
 	RETVAL
@@ -49822,10 +50990,10 @@ SV* qchisq(...)
 CODE:
 {
 	static const dist_spec spec =
-		{ "qchisq", { "df", NULL }, { 0.0, 0.0 }, 1, 1, d_qchisq };
-	SV *x; NV par[DIST_MAX_PAR]; bool lower, give_log;
-	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, &lower, &give_log);
-	RETVAL = dist_apply(aTHX_ &spec, x, par, lower, give_log);
+		{ "qchisq", { "df", NULL }, { 0.0, 0.0 }, 1, 1, d_qchisq, -1 };
+	SV *x; NV par[DIST_MAX_PAR]; AV *par_av[DIST_MAX_PAR]; bool lower, give_log;
+	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, par_av, &lower, &give_log);
+	RETVAL = dist_apply(aTHX_ &spec, x, par, par_av, lower, give_log);
 }
 OUTPUT:
 	RETVAL
@@ -49834,10 +51002,10 @@ SV* pf(...)
 CODE:
 {
 	static const dist_spec spec =
-		{ "pf", { "df1", "df2" }, { 0.0, 0.0 }, 2, 2, d_pf };
-	SV *x; NV par[DIST_MAX_PAR]; bool lower, give_log;
-	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, &lower, &give_log);
-	RETVAL = dist_apply(aTHX_ &spec, x, par, lower, give_log);
+		{ "pf", { "df1", "df2" }, { 0.0, 0.0 }, 2, 2, d_pf, -1 };
+	SV *x; NV par[DIST_MAX_PAR]; AV *par_av[DIST_MAX_PAR]; bool lower, give_log;
+	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, par_av, &lower, &give_log);
+	RETVAL = dist_apply(aTHX_ &spec, x, par, par_av, lower, give_log);
 }
 OUTPUT:
 	RETVAL
@@ -49846,10 +51014,10 @@ SV* qf(...)
 CODE:
 {
 	static const dist_spec spec =
-		{ "qf", { "df1", "df2" }, { 0.0, 0.0 }, 2, 2, d_qf };
-	SV *x; NV par[DIST_MAX_PAR]; bool lower, give_log;
-	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, &lower, &give_log);
-	RETVAL = dist_apply(aTHX_ &spec, x, par, lower, give_log);
+		{ "qf", { "df1", "df2" }, { 0.0, 0.0 }, 2, 2, d_qf, -1 };
+	SV *x; NV par[DIST_MAX_PAR]; AV *par_av[DIST_MAX_PAR]; bool lower, give_log;
+	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, par_av, &lower, &give_log);
+	RETVAL = dist_apply(aTHX_ &spec, x, par, par_av, lower, give_log);
 }
 OUTPUT:
 	RETVAL
@@ -49858,10 +51026,10 @@ SV* pbinom(...)
 CODE:
 {
 	static const dist_spec spec =
-		{ "pbinom", { "size", "prob" }, { 0.0, 0.0 }, 2, 2, d_pbinom };
-	SV *x; NV par[DIST_MAX_PAR]; bool lower, give_log;
-	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, &lower, &give_log);
-	RETVAL = dist_apply(aTHX_ &spec, x, par, lower, give_log);
+		{ "pbinom", { "size", "prob" }, { 0.0, 0.0 }, 2, 2, d_pbinom, -1 };
+	SV *x; NV par[DIST_MAX_PAR]; AV *par_av[DIST_MAX_PAR]; bool lower, give_log;
+	dist_parse(aTHX_ &spec, &ST(0), items, &x, par, par_av, &lower, &give_log);
+	RETVAL = dist_apply(aTHX_ &spec, x, par, par_av, lower, give_log);
 }
 OUTPUT:
 	RETVAL

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Chat room — multiple users on named channels
+# Chat room -multiple users on named channels
 # Usage: perl eg/chat.pl <username> [channel]
 # Run multiple instances to chat between them
 use strict;

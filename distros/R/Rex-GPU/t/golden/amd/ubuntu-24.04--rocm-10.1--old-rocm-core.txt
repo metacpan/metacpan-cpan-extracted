@@ -1,0 +1,7 @@
+# golden: amd/ubuntu-24.04--rocm-10.1--old-rocm-core
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: cat /etc/os-release 2>/dev/null
+run: dpkg --print-architecture
+run: dpkg-query -W -f='${Package} ${Status} ${Version}\n' rocm-core amdrocm10.1-gfx1151 2>/dev/null
+DIE: install_rocm: ROCm 7.2.4.70204-1 (rocm-core) is installed; AMD requires removing ROCm 7.2.4 or older before installing ROCm 10.1, and install_rocm does not uninstall. Nothing was changed on the host

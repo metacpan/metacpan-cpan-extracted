@@ -7,19 +7,32 @@ Proc::Spawner::Docs - a map of the design documents shipped in F<doc/> (EXPERIME
 =head1 DESCRIPTION
 
 Besides the POD of its modules, the distribution ships its design notes as Markdown files under F<doc/>.
-CPAN tools do not show those files as documentation, so this page lists them, says who wrote each one
-and what it is for, and links to each twice on MetaCPAN: its name to the file, rendered, in the newest release;
-"The same file in this release" (shown only in HTML) to the file of the release whose page you read, which
-works from MetaCPAN's pages under F</release/.../view/> and F</dist/.../view/>, not from F</pod/...>.
+CPAN tools do not show those files as documentation, so this page lists them, says who wrote them and
+what each is for, and links to each one twice on MetaCPAN:
 
-The notes were written with Claude, at first by two working sessions with their own file prefixes: the
-I<executor session> (prefix C<pspawn->: L<Proc::Spawner>, L<Proc::Spawner::Graph>, L<Proc::ShellSpawn>)
+=over 4
+
+=item *
+
+its name links to the file, rendered, in the newest release;
+
+=item *
+
+"The same file in this release" (shown only in HTML) links to the file in the release whose page you are
+reading. This link works from MetaCPAN's pages under F</release/.../view/> and F</dist/.../view/>, not from
+F</pod/...>.
+
+=back
+
+The notes were written with Claude. At first two working sessions wrote them, each with its own file prefix:
+the I<executor session> (prefix C<pspawn->: L<Proc::Spawner>, L<Proc::Spawner::Graph>, L<Proc::ShellSpawn>)
 and the I<parser session> (prefix C<large-subset->: L<Proc::ShellSubset::Large>). Since 2026-11-02 one
-session maintains everything. The base parser's notes (F<doc/parsers/>) come from an earlier session.
+session has maintained them all. The base parser's notes (F<doc/parsers/>) come from an earlier session.
 
-B<Status> words used below: I<current> (describes the code of this release), I<reference> (a rule set or
-a procedure that stays valid), I<history> (kept for the record; may use the module names of its day:
-C<ShellSpawn> is now L<Proc::ShellSpawn>, C<ShellSubsetLarge> is now L<Proc::ShellSubset::Large>, and so on).
+Each entry below ends with its B<status>: I<current> (it describes the code of this release) or
+I<reference> (a rule set or a procedure that stays valid). I<Older names> means that the document uses the
+module names of its day: C<ShellSpawn> is now L<Proc::ShellSpawn>, C<ShellSubsetLarge> is now
+L<Proc::ShellSubset::Large>, and so on.
 
 =head2 An experiment: the same document in two forms
 
@@ -60,10 +73,10 @@ in the Proc-Spawner 0.03 distribution on CPAN; this one no longer ships them.
 
 =head2 Which version a result belongs to
 
-Every measured result in these documents names the code it was measured on: I<pre-0.01> (the modules
-under their former names, before the first distribution), I<0.01>, I<0.02> (the parsers of 0.01),
-I<early-post-0.02> (0.02 plus items P1-P4 of the page "Shell Corpus Gaps", the evening of 2026-11-02;
-that code was not kept), and I<0.03>.  The table is at the end of F<doc/README.md>.
+Every measured result in these documents names, by a label, the code it was measured on: a release, such
+as I<0.03>; I<pre-0.01>, the modules under their former names, before the first distribution; or
+I<post-N>, release N plus later work, not released. The table at the end of F<doc/README.md> lists every
+label.
 
 =head2 Start here
 
@@ -71,14 +84,16 @@ that code was not kept), and I<0.03>.  The table is at the end of F<doc/README.m
 
 =item L<doc/README.md|https://metacpan.org/dist/Proc-Spawner/view/doc/README.md>
 
-The index of the design notes, with the rename table of the modules. I<Current.>
+The index of the design notes, and the table of the version labels. I<Current.>
 
 =for html <p><a href="../../../doc/README.md">The same file in this release</a></p>
 
 =item L<doc/test-pools.md|https://metacpan.org/dist/Proc-Spawner/view/doc/test-pools.md>
 
-How to rebuild every test pool taken from public collections (tldr, NL2Bash, ShellCheck's tests, three
-books of examples) from pinned sources, and the per-test record of how dash and bash differ. I<Reference.>
+How to rebuild, from pinned sources, every test pool taken from public collections (tldr, NL2Bash,
+ShellCheck's tests, the bash Cookbook's examples, the pure sh and pure bash bibles, the book
+I<Managing Projects with GNU Make>), the record of the shells' verdict on every parser test, and every
+corpus measurement (C<make corpus-help>). I<Reference.>
 
 =for html <p><a href="../../../doc/test-pools.md">The same file in this release</a></p>
 
@@ -100,6 +115,20 @@ L<Proc::ShellSpawn> (running parse trees) fit together; what is not done yet. I<
 Every known issue, open and fixed, of the executor and the parsers, with its ID (X…, L…, E…). I<Current.>
 
 =for html <p><a href="../../../doc/pspawn-known-issues.md">The same file in this release</a></p>
+
+=item L<pspawn-loop.md|https://metacpan.org/dist/Proc-Spawner/view/doc/pspawn-loop.md>
+
+The event loop L<Proc::Spawner::Loop>, one interface on POSIX and on Windows: how it works (the I/O
+completion port, Ctrl-C, C<alarm>) and what was checked. I<Current.>
+
+=for html <p><a href="../../../doc/pspawn-loop.md">The same file in this release</a></p>
+
+=item L<pspawn-shell-windows.md|https://metacpan.org/dist/Proc-Spawner/view/doc/pspawn-shell-windows.md>
+
+L<Proc::ShellSpawn> on Windows: what the shell layer does differently there (paths, C<PATH> and
+C<PATHEXT>, C<NUL>, ...), what was checked, what is missing. I<Current.>
+
+=for html <p><a href="../../../doc/pspawn-shell-windows.md">The same file in this release</a></p>
 
 =item L<pspawn-design.md|https://metacpan.org/dist/Proc-Spawner/view/doc/pspawn-design.md>
 
@@ -127,6 +156,14 @@ Perl's signal and child-process model and its defects, met while writing the eve
 reports for Perl itself. I<Reference.>
 
 =for html <p><a href="../../../doc/perl-signals-findings.md">The same file in this release</a></p>
+
+=item L<perl-win32-system-bugs.md|https://metacpan.org/dist/Proc-Spawner/view/doc/perl-win32-system-bugs.md>
+
+Drafts of bug reports to Perl about its spawn on Windows (argv quoting, the retry through cmd.exe,
+batch files, inherited handles), not yet filed; and every workaround in this distribution, with what to do
+when Perl is fixed. I<Current.>
+
+=for html <p><a href="../../../doc/perl-win32-system-bugs.md">The same file in this release</a></p>
 
 =back
 
@@ -162,10 +199,19 @@ The index of this directory. I<Current.>
 
 =item L<large-subset-state.md|https://metacpan.org/dist/Proc-Spawner/view/doc/large-subset/large-subset-state.md>
 
-The state of the union: the rules for matching dash and bash and which rule beats which, the corpus
-parse results, the work list, the open questions. I<Current> (also as F<.md.html>, see above).
+Where the large parser stands: the rules for matching dash and bash and which rule wins over which, the
+corpus parse results, the work list, the open questions, and how the accepted samples behave in dash, in bash
+and in L<Proc::ShellSpawn>. I<Current> (also as F<.md.html>, see above).
 
 =for html <p><a href="../../../doc/large-subset/large-subset-state.md">The same file in this release</a></p>
+
+=item L<large-subset-environment.md|https://metacpan.org/dist/Proc-Spawner/view/doc/large-subset/large-subset-environment.md>
+
+How far the comparison with dash and bash depends on the environment of the runs (known issue X27):
+the corpus samples sorted into levels by what they depend on, and the runs in example environments.
+I<Current.>
+
+=for html <p><a href="../../../doc/large-subset/large-subset-environment.md">The same file in this release</a></p>
 
 =item L<large-subset-spec.md|https://metacpan.org/dist/Proc-Spawner/view/doc/large-subset/large-subset-spec.md>
 

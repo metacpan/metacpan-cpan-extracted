@@ -123,7 +123,9 @@ no_leaks_ok {
 	}, 'a');
 } 'value_counts: 2D hash with col/2nd key has no leaks' unless $INC{'Devel/Cover.pm'};
 
-$hash = value_counts( {
+# a column no row has dies, as in dropna() and drop_duplicates(); up to 0.3430
+# it returned {}
+throws_ok { value_counts( {
 	A => {
 		a => 'x',
 		b => 'z'
@@ -134,15 +136,9 @@ $hash = value_counts( {
 	C => {
 		a => 'y'
 	}
-}, 'c');
-$n = scalar keys %{ $hash };
-if ($n == 0) {
-	pass('value_counts: 2D hash has the correct # of hash keys');
-} else {
-	fail("value_counts: 2D hash has $n hash keys, when it should have 0");
-}
+}, 'c') } qr/\Avalue_counts: column 'c' not found/, 'value_counts: a column no row of a 2D hash has dies';
 no_leaks_ok {
-	value_counts( {
+	eval { value_counts( {
 		A => {
 			a => 'x',
 			b => 'z'
@@ -153,7 +149,7 @@ no_leaks_ok {
 		C => {
 			a => 'y'
 		}
-	}, 'c');
+	}, 'c') };
 } 'value_counts: no leaks when given 2D hash and non-existent column name' unless $INC{'Devel/Cover.pm'};
 # without specified key, "value_counts" goes through entire 2D hash
 $hash = value_counts( {

@@ -61,4 +61,4 @@ printf "%-20s %6s %8s %8s %8s %9s %9s %9s %9s %5s\n", qw(source n large lower up
 for (sort keys %S) { my $x = $S{$_}; my $p = sub { sprintf '%.1f%%', 100 * ($x->{$_[0]} // 0) / $x->{n} };
   printf "%-20s %6d %8s %8s %8s %9d %9d %9d %9d %5d\n", $_, $x->{n}, map($p->($_), qw(lg low up)), map $x->{$_} // 0, qw(rejlow rejsub accout none open) }
 print "\nOpen verdicts (free-form, postponed):\n", map("  $_: $VD{$_}[1]\n", grep $VD{$_}[0] eq 'O', sort keys %VD) if $V;
-if ($V) { for my $v (qw(B S X O)) { print "\n$v:\n"; printf "  %5d  %s\n", $feat{$v}{$_}, $_ for sort { $feat{$v}{$b} <=> $feat{$v}{$a} } keys %{$feat{$v}} } }
+if ($V) { for my $v (qw(B S X O)) { print "\n$v:\n"; printf "  %5d  %s\n", $feat{$v}{$_}, $_ for sort { $feat{$v}{$b} <=> $feat{$v}{$a} || $a cmp $b } keys %{$feat{$v}} } }

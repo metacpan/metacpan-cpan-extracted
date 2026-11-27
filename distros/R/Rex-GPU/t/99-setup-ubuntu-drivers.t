@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -70,7 +71,7 @@ sub ubuntu_drivers_calls { grep { /ubuntu-drivers/ } @{ $_[0]{lines} } }
   is($rec->{error}, undef, 'Ada: lives');
   like((installs($rec))[0], qr/ install -y linux-headers-\S+ nvidia-driver-580-server$/,
     'Ada: installs the newest proprietary -server package ubuntu-drivers names, headers of the running kernel only (k69)');
-  ok((grep { $_ eq q{run: dpkg -l nvidia-driver-580-server 2>/dev/null | grep -q '^ii'} } @{ $rec->{lines} }),
+  ok((grep { $_ eq q{run: dpkg -l nvidia-driver-580-server 2>/dev/null | grep -q '^[hi]i'} } @{ $rec->{lines} }),
     '... and verifies it');
   is_deeply([ grep { /apt-cache search/ } @{ $rec->{lines} } ], [], '... without apt-cache search');
   my @l = @{ $rec->{lines} };

@@ -123,13 +123,15 @@ sub exports_of ($package) {
 
 # The pipeline is Ekorn::Pipeline's, behind a facade of DBIx::Squirrel's
 # names: each exports Ekorn's functions from a list of its own, which
-# stays as documented, and names only functions Ekorn still exports.
+# stays as documented, and names only functions Ekorn still exports,
+# but for those DBIx::Squirrel adds of its own, such as is_stop (roadmap
+# 2026-0060).
 subtest 'the facades follow Ekorn::Pipeline' => sub {
     # DBIx::Squirrel's own lists, as its POD documents them: @EXPORT, and
     # the rest of @EXPORT_OK, all of which an :all tag holds.
     my %exports = (
         'Gather'        => [[qw(gather)]],
-        'Stop'          => [[qw(Stop)]],
+        'Stop'          => [[qw(Stop)],          [qw(is_stop)]],
         'Stages::Batch' => [[qw(batch collect)], []],
         'Stages::Flow'  => [
             [qw(take drop)],
@@ -139,6 +141,9 @@ subtest 'the facades follow Ekorn::Pipeline' => sub {
         ],
         'Stages::Taps' => [[qw(peek count_into)], [qw(dump_to tee)]],
     );
+
+    # The functions a facade has of its own, not Ekorn's.
+    my %own = ('Stop' => {is_stop => 1});
     for my $name (sort keys %exports) {
         my($ours,    $theirs) = ("DBIx::Squirrel::$name", "Ekorn::Pipeline::$name");
         my($default, $more)   = @{ $exports{$name} };
@@ -155,6 +160,12 @@ subtest 'the facades follow Ekorn::Pipeline' => sub {
         my($their_export, $their_ok) = exports_of($theirs);
         my %theirs = map { $_ => 1 } @$their_export, @$their_ok;
         for my $function (@$default, @{ $more // [] }) {
+            if ($own{$name}{$function}) {
+                ok !$theirs->can($function)
+                    || $ours->can($function) != $theirs->can($function),
+                    "$ours\'s $function is its own";
+                next;
+            }
             ok $theirs{$function}, "$theirs exports $function";
             ref_is $ours->can($function), $theirs->can($function),
                 "$ours\'s $function is $theirs\'s";

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Task pipeline — chained processing stages via queue groups
+# Task pipeline -chained processing stages via queue groups
 # Stage 1 (validate) -> Stage 2 (enrich) -> Stage 3 (store)
 # Each stage is a queue group so work is load-balanced
 use strict;

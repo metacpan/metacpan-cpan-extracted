@@ -7,6 +7,7 @@ use EV;
 use EV::Nats;
 use EV::Nats::JetStream;
 use EV::Nats::KV;
+use JSON::PP ();
 
 my ($host, $port) = nats_or_skip();
 my $nats   = EV::Nats->new(host => $host, port => $port);
@@ -16,7 +17,7 @@ my $kv     = EV::Nats::KV->new(js => $js, bucket => $bucket);
 
 js_or_skip($nats, sub { my ($d) = @_; $kv->create_bucket({}, sub { $d->($_[1]) }) });
 
-plan tests => 18;
+plan tests => 21;
 my $guard;  # kept: an unkept EV::timer never fires
 pass 'create_bucket';
 
@@ -159,4 +160,34 @@ ok $st && $st->{bucket} eq $bucket && $st->{values} > 0 && $st->{history} == 1,
 $kv->delete_bucket(sub { EV::break });
 $guard = EV::timer(3, 0, sub { EV::break });
 EV::run;
+
+# a bucket made before 0.08 has no allow_direct: create_bucket turns it on
+# and keeps the stream's other settings
+{
+    my $old = EV::Nats::KV->new(js => $js, bucket => "${bucket}_old");
+    my ($err, $info, $refused);
+    $js->stream_create({   # as 0.07 made it, plus a setting KV does not manage
+        name => "KV_${bucket}_old", subjects => ["\$KV.${bucket}_old.>"], retention => 'limits',
+        max_msgs_per_subject => 1, max_bytes => 4096, discard => 'new',
+        allow_rollup_hdrs => JSON::PP::true(), deny_delete => JSON::PP::true(),
+        deny_purge => JSON::PP::false(), description => 'kept',
+    }, sub {
+        $old->create_bucket({ max_bytes => 4096 }, sub {
+            $err = $_[1];
+            $js->stream_info("KV_${bucket}_old", sub {
+                $info = $_[0];
+                $old->create_bucket({}, sub { $refused = $_[1]; EV::break });
+            });
+        });
+    });
+    $guard = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+    is $err, undef, 'create_bucket accepts a bucket from before allow_direct';
+    ok $info && $info->{config}{allow_direct} && ($info->{config}{description} // '') eq 'kept',
+        'and turns allow_direct on, keeping its other settings';
+    like $refused // '', qr/different configuration/, 'a different limit is still refused';
+    $js->stream_delete("KV_${bucket}_old", sub { EV::break });
+    $guard = EV::timer(3, 0, sub { EV::break });
+    EV::run;
+}
 $nats->disconnect;

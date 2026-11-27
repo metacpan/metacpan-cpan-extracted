@@ -25,6 +25,7 @@ t/07-cache-life.t
 t/08-day-members.t
 t/09-user-agent.t
 t/10-cache-options.t
+t/11-asn-type.t
 t/lib/VPNDetectionTest.pm
 t/lib/VPNDetectionTest/Origin.pm
 testdata/testdata.json

@@ -1,3 +1,110 @@
+Thu Nov 26 14:30:21 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.7.0]:
+	* README.md: generated
+	* VERSION: bump
+	* Makefile: updated by CPAN-Maker-Bootstrapper
+	* .includes/bash-completion.mk: likewise
+	* .includes/git.mk: likewise
+	* .includes/local.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/test.mk: likewise
+	* .includes/update.mk: likewise
+	* .includes/version.mk: likewise
+	* lib/CLI/Simple.pm.in
+	(normalize_commands): new
+	(new)
+	- interpret and normalize commands
+	* t/21-command-normalization.t: new
+
+Thu Oct 29 16:27:47 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.6.0]:
+	* VERSION: bump
+	* README.md: generated
+	* deps.mk
+	- +CLI::Simple::Options, CLI::Simple::TempDir, CLI::Simple::TempFile dependencies for CLI::Simple
+	* lib/CLI/Simple/Constants.pm.in
+	(@VALID_OPTIONS): +options
+	* lib/CLI/Simple.pm.in
+	- compose CLI::Simple::Options role via Role::Tiny::With
+	- add options to constructor argument destructuring as $option_declarations
+	- croak if both options and option_specs are supplied
+	- call normalize_option_specs() on options or option_specs to extract specs and metadata hash
+	- store option metadata on instance as _cli_simple_option_metadata
+	- call validate_options() and finalize_options() after init_defaults() and before init_temp_resources()
+	* lib/CLI/Simple/Options.pm.in: new
+	- Role::Tiny role providing normalize_option_specs(), validate_options(), and finalize_options()
+	- normalize_option_specs() accepts array ref (plain specs) or hash ref (specs with metadata); returns normalized spec array and metadata hash
+	- infers option type from Getopt::Long spec suffix; recognizes file and directory semantic types
+	- validate_options() checks required, min, max, min_length, max_length, enum, and file/directory path constraints after all option sources have been resolved
+	- skips validation and finalization for undefined optional options
+	- finalize_options() invokes per-option finalize callback, passing the application instance and validated value; stores return value back to accessor
+	- slurp => 1 reads file contents before invoking any custom finalizer; accessor contains file contents when no finalizer is declared
+	* t/13-options-normalization.t: new
+	- test normalize_option_specs() with array ref and hash ref inputs; verify spec extraction and metadata passthrough
+	* t/14-options-constructor.t: new
+	- test options constructor argument: accepted as hash ref with metadata; rejects simultaneous options and option_specs
+	* t/15-options-validation.t: new
+	- test validate_options(): required, min, max, min_length, max_length, enum, file, and directory constraints
+	* t/16-options-validation-constructor.t: new
+	- test validation constraints applied via constructor options argument
+	* t/17-options-finalization.t: new
+	- test finalize callback invoked with application instance and validated value; return value replaces accessor
+	* t/18-options-finalization-constructor.t: new
+	- test finalization behavior applied via constructor options argument
+	* t/19-options-slurp.t: new
+	- test slurp => 1 reads file contents into accessor before finalizer is called
+	* t/20-options-slurp-constructor.t: new
+	- test slurp behavior applied via constructor options argument
+
+Thu Oct 29 12:27:44 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.5.0]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/CLI/Simple.pm.in
+	- compose CLI::Simple::TempFile and CLI::Simple::TempDir roles via Role::Tiny::With
+	- add %TEMP_RESOURCE_ACCESSORS package-level hash to track per-class generated accessors
+	- add temp_file and temp_dir to constructor argument destructuring
+	- call init_temp_resources() from new() after init_defaults() and before init()
+	(init_temp_resources): new
+	- validate all temp_file and temp_dir declarations before allocating any resources
+	- accept boolean (1), hash ref, or array ref of hash refs per resource kind
+	- croak on invalid declaration, non-hash entries, combined accessor/no_accessors, duplicate accessor names, or accessor collision with existing methods
+	- delegate to create_temp_file() or create_temp_dir() from the composed roles
+	- register generated get_/set_ accessor names in %TEMP_RESOURCE_ACCESSORS to permit re-construction of the same class
+	* lib/CLI/Simple/Constants.pm.in
+	- add temp_dir and temp_file to @VALID_OPTIONS
+	* lib/CLI/Simple/TempFile.pm.in: new
+	- Role::Tiny role providing create_temp_file()
+	- creates a File::Temp temporary file, stores ownership on the instance, sets path accessor if not suppressed
+	- supports accessor, cleanup, dir, template, suffix, and no_accessors attributes
+	- removes the file on object destruction when cleanup is enabled
+	* lib/CLI/Simple/TempDir.pm.in: new
+	- Role::Tiny role providing create_temp_dir()
+	- creates a File::Temp::tempdir temporary directory, stores ownership on the instance, sets path accessor if not suppressed
+	- supports accessor, cleanup, dir, template, and no_accessors attributes
+	- removes the directory and all contents on object destruction when cleanup is enabled
+	* lib/CLI/Simple/DumpSpec.pm.in
+	- add $VERSION
+	* lib/CLI/Simple/Helpers.pm.in
+	- add $VERSION
+	* lib/CLI/Simple/Migrate.pm.in
+	- add $VERSION
+	* lib/CLI/Simple/Modulino.pm.in
+	- add $VERSION
+	* lib/CLI/Simple/Scaffold.pm.in
+	- add $VERSION
+	* lib/CLI/Simple/Shell.pm.in
+	- add $VERSION
+	* t/10-temp-file.t: new
+	- test create_temp_file(): file is created, path accessor works, cleanup removes file on object destruction, cleanup => 0 leaves file on disk, suffix appended to filename
+	* t/11-temp-dir.t: new
+	- test create_temp_dir(): directory is created, path accessor works, cleanup removes directory tree on object destruction, cleanup => 0 leaves directory on disk
+	* t/12-temp-constructor.t: new
+	- test init_temp_resources() via new(): temp_file and temp_dir constructor args accept boolean, hash ref, and array ref forms; duplicate accessor names croak; accessor/no_accessors combination croaks; accessors return pathnames
+
 Thu Oct 29 08:21:10 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.4.0]:

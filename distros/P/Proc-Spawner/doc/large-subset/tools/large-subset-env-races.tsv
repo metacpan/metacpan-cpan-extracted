@@ -1,1 +1,1 @@
-# large-subset-repeat.pl: id, environment, runs, results of dash, bash, ours, verdict (same, race, ours), runs with ours' own result, shells repeating (each, one, neither)
+# large-subset-repeat.pl: id, environment, runs, results of dash, bash, ShellSpawn, verdict (same, race, shellspawn: ShellSpawn's own result), runs with ShellSpawn's own result, shells repeating (each, one, neither)

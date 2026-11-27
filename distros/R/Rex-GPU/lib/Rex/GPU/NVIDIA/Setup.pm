@@ -1,7 +1,7 @@
 # ABSTRACT: Base class of the per-distro NVIDIA driver setups (experimental)
 
 package Rex::GPU::NVIDIA::Setup;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use Moo;
 use Carp qw( croak );
 use Rex::Commands::File ();
@@ -241,6 +241,7 @@ sub install {
   $self->resolve_plan($plan);
   $self->install_packages($plan);
   $self->verify_packages($plan);
+  $self->verify_driver_branch($plan);
   $self->install_fabric_manager($plan) if $self->fabric_manager_needed;
   $self->install_nvlink_fabric($plan) if $self->nvlink_fabric_needed;
   $self->post_install($plan);
@@ -520,6 +521,22 @@ sub installed_driver_version {
   die ref($self)." has no packaging layer to read the driver version from\n";
 }
 
+# The package the source's $key (default fabric_manager_match) names, %s
+# filled with the exact branch -- for the packaging layers'
+# installed_driver_version. Dies when there is none; the message says what
+# that leaves undone.
+sub _driver_version_package {
+  my ( $self, $source, $key ) = @_;
+  $key //= 'fabric_manager_match';
+  my $pkg = $self->_with_branch($source->{$key}, $source);
+  return $pkg if defined $pkg;
+  die 'The driver source names no package to read the driver version from ('.$key.'); the '
+    .( $key eq 'fabric_manager_match'
+      ? 'driver is installed, Fabric Manager is not'
+      : 'driver packages are installed, their branch was not checked and nothing after them ran' )
+    ."\n";
+}
+
 sub install_versioned_package {
   my ( $self ) = @_;
   die ref($self)." has no packaging layer to install Fabric Manager with\n";
@@ -710,6 +727,45 @@ sub install_packages { }
 sub verify_packages  { }
 
 
+sub verify_driver_branch {
+  my ( $self, $plan ) = @_;
+  my $source = $plan->{source} or return;
+  return unless defined $source->{driver_version_from};
+  my $requirement = $self->requirement;
+  return unless defined $requirement->min_branch || defined $requirement->max_branch;
+  my $pkg     = $self->_driver_version_package($source, 'driver_version_from');
+  my $version = $self->installed_driver_version($source, 'driver_version_from');
+  my $branch  = $self->_driver_branch_of($version);
+  my $for     = $requirement->who.' ('.$requirement->describe.')';
+  my $undone  = 'The driver packages stay installed; '
+    .( $self->fabric_manager_needed ? 'Fabric Manager, ' : '' )
+    .'the nouveau blacklist, the initramfs and the reboot were not done';
+  die 'Cannot read the installed NVIDIA driver version from '.$pkg.' ('
+    .( defined $version && length $version ? $version : 'nothing' ).'), so its branch '
+    .'cannot be checked against what '.$for.' needs. '.$undone."\n"
+    unless defined $branch;
+  my $why = $requirement->why_not({ kernel_module => $source->{kernel_module}, branch => $branch });
+  die 'The installed NVIDIA driver does not fit '.$for.': '.$pkg.' is '.$version.', '.$why.'. '
+    .$undone.'. Something on the host keeps that branch -- a package hold or pin, a version '
+    .'lock, another enabled module stream or repository; remove it, or install a fitting '
+    ."driver yourself, then run again\n"
+    if defined $why;
+  Rex::Logger::info('  Installed driver: '.$pkg.' '.$version.' (branch '.$branch.')');
+  return;
+}
+
+# Pure: the driver branch of an upstream version, the number before its
+# first dot ("580.95.05" => 580, "590.48.01~rc" => 590); undef for anything
+# that does not start with digits, a dot and a digit (undef, "", an rpm
+# "package ... is not installed").
+sub _driver_branch_of {
+  my ( $self, $version ) = @_;
+  return unless defined $version;
+  my ($branch) = $version =~ /\A(\d+)\.\d/;
+  return $branch;
+}
+
+
 sub post_install {
   my ( $self ) = @_;
   $self->file_cmd('/etc/modprobe.d/blacklist-nouveau.conf',
@@ -813,7 +869,7 @@ Rex::GPU::NVIDIA::Setup - Base class of the per-distro NVIDIA driver setups (exp
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -928,7 +984,7 @@ L</nvlink_fabric_needed>.
   my %platform = $self->nvlink_platform_ids;   # device_id => platform
 
 The GPUs that mark an NVLink platform, as a list of lowercase PCI device
-IDs and the platform each one marks (karr #49; IDs from the supported-GPU
+IDs and the platform each one marks (IDs from the supported-GPU
 table of NVIDIA's open-gpu-kernel-modules README, driver 615):
 
 =over
@@ -938,7 +994,7 @@ Their NVSwitches are not PCI devices on the host, so there are no
 L</nvswitches>; CUDA needs NVIDIA Fabric Manager, the NVLink Subnet Manager
 (C<nvlsm>), the InfiniBand user-space stack and kernel 5.17 or newer. It
 makes L</nvlink_fabric_needed> true, so the driver comes with Fabric
-Manager and L</install_nvlink_fabric> (karr #56).
+Manager and L</install_nvlink_fabric>.
 
 =item * C<nvl72> -- GB200 (C<2941>) and GB300 (C<31c2>, C<31c3>) NVL72
 compute trays: multi-node NVLink needs C<nvidia-imex>; Fabric Manager runs
@@ -1072,6 +1128,8 @@ Runs the fixed sequence, each step a method a subclass can override:
   resolve_plan($plan) -> fixes the packages; dies before any install
   install_packages($plan)
   verify_packages($plan)
+  verify_driver_branch($plan)     -> dies, packages installed, if the
+                                     installed branch does not fit
   install_fabric_manager($plan)   -> only if fabric_manager_needed
   install_nvlink_fabric($plan)    -> only if nvlink_fabric_needed
   post_install($plan)
@@ -1183,6 +1241,15 @@ whose installed version is the driver's (L</installed_driver_version>). A
 source without C<fabric_manager> is rejected on a host with
 L</nvswitches>.
 
+=item * C<driver_version_from> -- the package whose installed upstream
+version is the driver's (C<%s> standing for the exact branch, as in
+C<fabric_manager_match>). With it, L</verify_driver_branch> reads the
+installed branch after L</verify_packages> and checks it against
+L</requirement>: for a source whose package names carry no branch (Debian's
+C<nvidia-driver>, the CUDA repository's C<nvidia-kernel-open-dkms>, RHEL's
+C<nvidia-driver>), a held or otherwise kept older package passes
+L</verify_packages>. Without it no branch is checked.
+
 =back
 
 Plus whatever keys the class's later steps read. Host-read-only, like
@@ -1255,9 +1322,10 @@ C<apt-cache policy>.
 
   $self->install_fabric_manager($plan);
 
-Runs after L</verify_packages> when L</fabric_manager_needed>: reads the
-installed driver's version (L</installed_driver_version>), installs the
-source's L</fabric_manager_package> at B<exactly> that upstream version
+Runs after L</verify_packages> and L</verify_driver_branch> when
+L</fabric_manager_needed>: reads the installed driver's version
+(L</installed_driver_version>), installs the source's
+L</fabric_manager_package> at B<exactly> that upstream version
 (L</install_versioned_package>) and checks it
 (L</verify_versioned_package>), then C<systemctl enable> of
 L</fabric_manager_service>. It is not started here: before the reboot that
@@ -1277,10 +1345,14 @@ C<nvidia-fabricmanager.service>.
 =head2 installed_driver_version
 
   my $version = $self->installed_driver_version($source);   # "580.95.05"
+  my $version = $self->installed_driver_version($source, 'driver_version_from');
 
 The upstream version of the installed driver, read from the package the
-source's C<fabric_manager_match> names (C<%s> = branch). Dies in the base
-class; the packaging layers read C<dpkg-query> / C<rpm -q>.
+source's C<$key> names (C<%s> = branch): C<fabric_manager_match> when
+C<$key> is not given (L</install_fabric_manager>), C<driver_version_from>
+for L</verify_driver_branch>. Dies when the source names no such package (or
+a C<%s> and no exact branch), and in the base class; the packaging layers
+read C<dpkg-query> / C<rpm -q>, and return C<undef> when that fails.
 
 =head2 install_versioned_package
 
@@ -1480,6 +1552,36 @@ L</resolve_plan> before L</install_packages>) and does nothing in the base
 class; the packaging layer (L<Rex::GPU::NVIDIA::Setup::Apt>,
 L<Rex::GPU::NVIDIA::Setup::Rpm>) and the distro classes fill them.
 
+=head2 verify_driver_branch
+
+  $self->verify_driver_branch($plan);
+
+The step after L</verify_packages>: whether the driver that B<is> installed
+fits L</requirement>, not only the source L</select_source> chose. A
+package name without a branch (Debian's C<nvidia-driver>, the CUDA
+repository's C<nvidia-kernel-open-dkms>, RHEL's C<nvidia-driver>) passes
+L</verify_packages> at whatever version is installed -- one held
+(C<apt-mark hold>), pinned, locked or kept by an earlier module stream
+stays, and the install does not fail.
+
+Runs only when the requirement has a branch bound (C<min_branch> or
+C<max_branch>) and the plan's source names C<driver_version_from> (see
+L</sources>); otherwise it reads nothing from the host -- GPUs whose
+L<Rex::GPU::NVIDIA::Requirement/generations> rows set no bound (Turing and
+Ampere without a row of their own, an ID no row covers), a host without
+GPUs and every source without the key are unchanged. Then it reads
+the installed version with
+L</installed_driver_version> (C<driver_version_from>), takes its branch
+(the number before the first dot) and asks
+L<Rex::GPU::NVIDIA::Requirement/why_not> with that exact branch and the
+source's C<kernel_module>. The kernel module is the source's declaration,
+not read from the host.
+
+A reason, or a version it cannot read, B<dies>: the driver packages stay
+installed, and Fabric Manager, the nouveau blacklist, the initramfs and the
+reboot are not done. An older branch that still fits (a Volta held at 535)
+passes; it is not upgraded.
+
 =head2 post_install
 
 Blacklists C<nouveau> in C</etc/modprobe.d/blacklist-nouveau.conf> and runs
@@ -1537,6 +1639,12 @@ rejects it and gets the built-in C<nvidia-driver-580-server>.
 C<check_candidate> is a key L<Rex::GPU::NVIDIA::Setup::Ubuntu> reads in its
 C<resolve_source>, after C<apt-get update>; which extra keys a source may carry depends on the class
 you extend.
+
+Its package names the branch, so the dpkg check of L</verify_packages>
+already proves it. A source whose package is unversioned (a mirror's
+C<nvidia-driver>) names it in C<driver_version_from> as well: then
+L</verify_driver_branch> checks the branch that got installed, so a held
+older one does not reach the reboot.
 
 =head2 Changing a step
 
@@ -1620,7 +1728,7 @@ L<Rex::GPU::NVIDIA>, L<Rex::GPU::NVIDIA::Requirement>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

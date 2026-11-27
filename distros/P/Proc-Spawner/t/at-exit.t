@@ -1,11 +1,11 @@
-# K5 (post-0.12, the user, 2026-11-15: "as shell"): at exit, ours waits only while it has something left to do for a
+# K5 (post-0.12, the user, 2026-11-15: "as shell"): at exit, ShellSpawn waits only while it has something left to do for a
 # background job (a command still to start), then exits, leaving the job's running processes alone, as the shells do;
 # PROC_SHELLSPAWN_END (or $Proc::ShellSpawn::END_WAIT): shell (the default), all, none, each with :SECONDS.
 use strict; use warnings;
 use Test::More; use File::Temp 'tempdir'; use Time::HiRes qw(time sleep);
 plan skip_all => 'POSIX: sleep and sh as programs' if $^O eq 'MSWin32';
 my $d = tempdir(CLEANUP => 1);
-# a job of two steps (ours starts the second), and one of one program that goes on after we exit
+# a job of two steps (ShellSpawn starts the second), and one of one program that goes on after we exit
 my $text = "(sleep 0.5; echo two > $d/two) & sh -c 'sleep 1.5; echo late > $d/late' &";
 sub run_with {   # (seconds until the program exited, files there then, files there 2.5 s later)
   my $mode = shift; unlink "$d/two", "$d/late";

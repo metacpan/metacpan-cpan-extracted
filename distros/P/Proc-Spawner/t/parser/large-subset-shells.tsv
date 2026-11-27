@@ -9,7 +9,7 @@ large-subset-tests.pl	LS:7	rej	none	B	parse:B:P:-n
 large-subset-tests.pl	LS:8	rej	bash	B	parse:B:P:-n,fnreserved:B:P:fnlocal	
 large-subset-tests.pl	LS:9	ok	both	-		
 large-subset-tests.pl	LS:10	rej	both	S	localnoval:S:P:local	
-large-subset-tests.pl	LS:11	rej	both	B	scope:B:P:local	
+large-subset-tests.pl	LS:11	rej	both	B	scope:B:P:localout	
 large-subset-tests.pl	LS:12	ok	both	X	returnout:X:E:error	
 large-subset-tests.pl	LS:13	ok	both	-		
 large-subset-tests.pl	LS:14	rej	both	-		
@@ -252,7 +252,7 @@ large-subset-tests.pl	LS:290	ok	both	X	jobsctx:X:E:info
 large-subset-tests.pl	LS:291	ok	both	-		
 large-subset-tests.pl	LS:292	ok	both	-		
 large-subset-tests.pl	LS:293	ok	both	X	cdargs:X:E:error,fdmulti:X:E:same,dotstar:X:E:harm,caret:X:E:platform,assignredir:X:E:effect	
-large-subset-tests.pl	LS:294	rej	both	B	scope:B:P:local,localnoval:S:P:local	
+large-subset-tests.pl	LS:294	rej	both	B	scope:B:P:localout,localnoval:S:P:local	
 large-subset-tests.pl	LS:295	ok	both	X	lineno:X:E:info	
 large-subset-tests.pl	LS:296	ok	both	-		
 large-subset-tests.pl	LS:297	rej	both	B	roassign:B:P:uidset	
@@ -986,7 +986,7 @@ shell-subset-corpus-tests.pl	BC:ch16/builtin_tty.c:46	rej	none	B	parse:B:P:-n
 shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection1:1	rej	both	B	arithop:B:P:pow	
 shell-subset-corpus-tests.pl	BC:ch12/oodiff:32	rej	both	-		
 shell-subset-corpus-tests.pl	NB:11427	rej	both	-		
-shell-subset-corpus-tests.pl	BC:ch16/func_tweak_path:105c5	rej	both	B	scope:B:P:local	
+shell-subset-corpus-tests.pl	BC:ch16/func_tweak_path:105c5	rej	both	B	scope:B:P:localout	
 shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg32:1	rej	both	X	testext:X:P:testeqeq	
 shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg31:1	rej	both	-		
 shell-subset-corpus-tests.pl	NB:8155	rej	both	-		

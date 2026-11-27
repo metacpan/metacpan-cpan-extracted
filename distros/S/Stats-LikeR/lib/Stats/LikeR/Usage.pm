@@ -871,14 +871,14 @@ usage: read_table(FILE [, sep => SEP] [, header => {0,1}] [, col_names => NAMES]
                   [, auto_row_names => NAME] [, comment => STR] [, quote => Q]
                   [, filter => FILTER] [, na_strings => STRS]
                   [, colClasses => CLASSES] [, keep_cols => COLS]
-                  [, drop_cols => COLS]
+                  [, drop_cols => COLS] [, skiprows => ROWS]
                   [, sheet => SHEET] [, explode => {0,1}])
 
-Read a delimited text, VCF or .xlsx file into a data frame, like R's read.table.
+Read a delimited, VCF, .xlsx or .ods file into a data frame, like read.table.
 
 positional arguments:
   FILE                   the file; .gz and .bz2 are read through, .xlsx is read
-                         as Excel
+                         as Excel and .ods as OpenDocument
 
 options:
   sep => SEP             a literal separator or a qr// regex; also delim
@@ -914,8 +914,11 @@ options:
                          either: a column with one of the names, or whose name
                          matches one of the regexes, is left out of the table
                          and never stored (default: every column is kept)
-  sheet => SHEET         .xlsx only: a sheet name or 1-based index (default: the
-                         first sheet)
+  skiprows => ROWS       rows left out before the header, by 0-based index, as
+                         in pandas: a count, an array ref of indices, or a code
+                         ref passed each index (default: none)
+  sheet => SHEET         .xlsx and .ods only: a sheet name or 1-based index
+                         (default: the first sheet)
   explode => {0,1}       VCF only: split each sample column by its FORMAT keys
                          (default: 1)
 
@@ -1637,7 +1640,9 @@ positional arguments:
 
 options:
   mean => MEAN           mean of the distribution (default: 0)
+                         (a number, or an array reference recycled as in R)
   sd => SD               standard deviation (default: 1)
+                         (a number, or an array reference recycled as in R)
   log => BOOL            return the log of the density (default: 0)
 
 example:
@@ -1657,7 +1662,9 @@ positional arguments:
 
 options:
   mean => MEAN           mean of the distribution (default: 0)
+                         (a number, or an array reference recycled as in R)
   sd => SD               standard deviation (default: 1)
+                         (a number, or an array reference recycled as in R)
   lower => BOOL          1 for the lower tail, 0 for the upper (default: 1);
                          also spelled lower_tail
   log => BOOL            return the log of the probability (default: 0); also
@@ -1678,7 +1685,9 @@ positional arguments:
   P                      a probability, or an array reference of them, which
                          gives one back (an undef in it is NaN)
   MEAN                   mean of the distribution (default: 0); or mean => MEAN
+                         (a number, or an array reference recycled as in R)
   SD                     standard deviation (default: 1); or sd => SD
+                         (a number, or an array reference recycled as in R)
 
 options:
   lower => BOOL          1 for the lower tail, 0 for the upper (default: 1);
@@ -1700,6 +1709,7 @@ positional arguments:
   Q                      a number, or an array reference of them, which gives
                          one back (an undef in it is NaN)
   DF                     degrees of freedom (required); or df => DF
+                         (a number, or an array reference recycled as in R)
 
 options:
   lower => BOOL          1 for the lower tail, 0 for the upper (default: 1);
@@ -1722,6 +1732,7 @@ positional arguments:
   P                      a probability, or an array reference of them, which
                          gives one back (an undef in it is NaN)
   DF                     degrees of freedom (required); or df => DF
+                         (a number, or an array reference recycled as in R)
 
 options:
   lower => BOOL          1 for the lower tail, 0 for the upper (default: 1);
@@ -1743,6 +1754,7 @@ positional arguments:
   Q                      a number, or an array reference of them, which gives
                          one back (an undef in it is NaN)
   DF                     degrees of freedom (required); or df => DF
+                         (a number, or an array reference recycled as in R)
 
 options:
   lower => BOOL          1 for the lower tail, 0 for the upper (default: 1);
@@ -1765,6 +1777,7 @@ positional arguments:
   P                      a probability, or an array reference of them, which
                          gives one back (an undef in it is NaN)
   DF                     degrees of freedom (required); or df => DF
+                         (a number, or an array reference recycled as in R)
 
 options:
   lower => BOOL          1 for the lower tail, 0 for the upper (default: 1);
@@ -1786,8 +1799,10 @@ positional arguments:
   Q                      a number, or an array reference of them, which gives
                          one back (an undef in it is NaN)
   DF1                    numerator degrees of freedom (required); or df1 => DF1
+                         (a number, or an array reference recycled as in R)
   DF2                    denominator degrees of freedom (required); or df2 =>
                          DF2
+                         (a number, or an array reference recycled as in R)
 
 options:
   lower => BOOL          1 for the lower tail, 0 for the upper (default: 1);
@@ -1810,8 +1825,10 @@ positional arguments:
   P                      a probability, or an array reference of them, which
                          gives one back (an undef in it is NaN)
   DF1                    numerator degrees of freedom (required); or df1 => DF1
+                         (a number, or an array reference recycled as in R)
   DF2                    denominator degrees of freedom (required); or df2 =>
                          DF2
+                         (a number, or an array reference recycled as in R)
 
 options:
   lower => BOOL          1 for the lower tail, 0 for the upper (default: 1);
@@ -1833,8 +1850,10 @@ positional arguments:
   Q                      a number, or an array reference of them, which gives
                          one back (an undef in it is NaN)
   SIZE                   number of trials (required); or size => SIZE
+                         (a number, or an array reference recycled as in R)
   PROB                   probability of success on each trial (required); or
                          prob => PROB
+                         (a number, or an array reference recycled as in R)
 
 options:
   lower => BOOL          1 for the lower tail, 0 for the upper (default: 1);
@@ -3109,7 +3128,7 @@ Stats::LikeR::Usage
 
 =head1 VERSION
 
-version 0.3430
+version 0.3431
 
 =head1 AUTHOR
 

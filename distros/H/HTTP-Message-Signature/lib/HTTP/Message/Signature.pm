@@ -6,12 +6,14 @@ use v5.24;
 use Moo;
 
 use Carp qw( carp croak );
-use Crypt::PK::Ed25519 0.089;
+use Crypt::PK::Ed25519;
+use Crypt::PK::RSA;
 use Hash::MultiValue;
-use HTTP::Message;
-use HTTP::Tiny;
 use Hash::Ordered;
-use JSON::MaybeXS qw( decode_json );
+use HTTP::Message;
+use HTTP::StructuredField v0.0.3;
+use HTTP::Tiny;
+use JSON          qw( decode_json );
 use List::Util    1.29 qw( first pairmap );
 use MIME::Base64  qw( decode_base64 );
 use PerlX::Maybe  qw( maybe );
@@ -26,7 +28,7 @@ use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.2';
+our $VERSION = 'v0.0.3';
 
 
 
@@ -71,10 +73,10 @@ has signature_agent => (
     isa     => NonEmptyStr,
     builder => sub($self) {
         my $agent = join(",", $self->headers->header("signature-agent") );
-        if ( $agent =~ /\A \w+ = /ax ) {
+        if ( $agent =~ /\A [a-z\*][a-z0-1_\-\.\*]* = /ax ) {
             my ($key) = $self->headers->header("signature-agent-key") || $self->signature_labels;
-            my $agents = $self->_parse_dict( ',', $agent );
-            $agent = $agents->{ unquote($key) };
+            my $agents = HTTP::StructuredField->parse_dictionary(  $agent );
+            $agent = $agents->get( unquote($key) )->value;
         }
         return $agent;
     }
@@ -96,10 +98,10 @@ has signature_agent_uri => (
 
 has signature_input => (
     is      => 'lazy',
-    isa     => InstanceOf ['Hash::MultiValue'],
+    isa     => InstanceOf ['Hash::Ordered'],
     builder => sub($self) {
         my @input = $self->headers->header("signature-input");
-        return $self->_parse_dict( ';', join( ';', @input ) );
+        return HTTP::StructuredField->parse_dictionary( join( ',', @input ) );
     },
     handles => {
         signature_labels => 'keys',
@@ -109,10 +111,10 @@ has signature_input => (
 
 has signature_header => (
     is      => 'lazy',
-    isa     => InstanceOf ['Hash::MultiValue'],
+    isa     => InstanceOf ['Hash::Ordered'],
     builder => sub($self) {
         my @input = $self->headers->header("signature");
-        return $self->_parse_dict( ',', join( ',', @input ) );
+        return HTTP::StructuredField->parse_dictionary( join( ',', @input ) );
     },
 );
 
@@ -156,37 +158,53 @@ has require_tag => (
 
 
 sub is_expired($self) {
-    my $expires = $self->signature_input->{expires} or return undef;
-    return time > $expires;
+    my $expires = $self->signature_input->get("expires") or return undef;
+    return time > $expires->value;
 }
 
 
 sub verify( $self, $label = undef ) {
 
+    ($label) = $self->signature_labels unless defined $label;
+    my $input = $self->signature_input->get($label) or croak "signature-input label ${label} was not found";
+
     if ( $self->has_require_tag ) {
+        my $check = $input->params->get("tag");
         my $tag = $self->require_tag;
-        croak "tag is not '${tag}'" unless unquote( $self->signature_input->{tag} ) eq $tag;
+        croak "tag is not '${tag}'" unless $check && $check->value eq $tag;
     }
 
-    my $kid = unquote( $self->signature_input->{keyid} )
-      or croak "not keyid was found in the signature-input";
+    my $keyid = $input->params->get("keyid") or croak "no keyid was found in the signature-input";
+    my $kid   = unquote( $keyid->value );
 
-    # TODO: add support for looking up keys from a cache based on agent URL and key id.
+    state $algs = {
+        "ed25519"        => { class => "Crypt::PK::Ed25519", key => { kty => "OKP", crv => "Ed25519" } },
+        "rsa-pss-sha512" => { class => "Crypt::PK::RSA", key => { kty => "RSA", alg => "PS512" }, hash => [qw/ SHA512 pss 64 /] },
+    };
+
+    my $alg  = eval { $input->params->get("alg")->value } or croak "missing alg parameter";
+    my $meta = $algs->{ $alg } or croak "unsupported algorithm";
 
     my $key = first { $_->{kid} eq $kid } $self->public_keys->{keys}->@*
       or croak "keyid '${kid}' was not found in the public keys";
 
-    croak "unsupposed algorithm" unless $key->{crv} eq "Ed25519";
+    # TODO: add support for looking up keys from a cache based on agent URL and key id, and alg
 
-    my $pk = Crypt::PK::Ed25519->new();
-    $pk->import_key($key);
+    for my $field ( keys $meta->{key}->%* ) {
+        $key->{$field} eq $meta->{key}{$field} or croak "keyid ${kid} is incompatible with ${alg}";
+    }
 
-    ($label) = $self->signature_labels unless defined $label;
-    my $sig = decode_base64( $self->signature_header->{$label} );
+    my $class = $meta->{class};
+
+    my @params = $meta->{hash} ? $meta->{hash}->@* : ();
+
+    my $pk = $class->new($key);
+
+    my $sig = $self->signature_header->get($label)->value;
 
     my $base = $self->_generate_signature_base($label);
 
-    return $pk->verify_message( $sig, $base );
+    return $pk->verify_message( $sig, $base, @params );
 }
 
 sub _generate_signature_base( $self, $label ) {
@@ -205,37 +223,33 @@ sub _generate_signature_base( $self, $label ) {
         push @buffer, $line;
     }
 
-    my $input = $self->signature_input->{$label} or croak "signature-input label ${label} was not found";
+    my $input = $self->signature_input->get($label) or croak "signature-input label ${label} was not found";
+    croak "label ${label} is not a list" unless $input->is_inner_list;
 
-    my @fields = split / /, unquote( $input, braces => 1 );
+    for my $field ( $input->value->@* ) {
 
-    for my $field (@fields) {
-        if ( $field =~ /\A \"? \@/ax ) {
+        my $name = unquote($field->value, braces => 1 );
+        if ( substr($name, 0, 1) eq '@' ) {
             _process_header_field( $self->_get_derived_field($field) );
         }
         else {
 
-            my $value;
+            my $header = $self->headers->header($name);
+            if ($field->has_params) {
 
-            my ( $key, $param ) = _structured_split( ';', $field );
+                my ($key) = $field->params->get("key")->value;
+                my $dict = HTTP::StructuredField->parse_dictionary($header);
+                my $param = $dict->get($key);
 
-            my $ufield = unquote( $param ? $key : $field );
+                # TODO: improve quoting
+                _process_header_field( "\"${name}\";key=\"${key}\"" => sprintf('"%s"', $param->value ) );
 
-            my $header = $self->headers->header($ufield);
-
-            if ($param) {
-                my ( $name, $key ) = _structured_split( '=', $param );
-                my $hash = $self->_parse_dict( ";", $header );
-                $value = $hash->{ unquote($key) };
-                _process_header_field( $field => $value );
             }
             else {
-                $value = $header;
-                $field = unquote($field);
-                _process_header_field( "\"${field}\"" => $value );
+                _process_header_field( "\"${name}\"" => $header );
             }
-
         }
+
     }
 
     my $header = $self->headers->header("signature-input");
@@ -247,6 +261,8 @@ sub _generate_signature_base( $self, $label ) {
 }
 
 sub _get_derived_field( $self, $field ) {
+
+    my $name = $field->value;
 
     # Note: HTTP::Message has uri_canonical but Plack::Request does not.
 
@@ -275,98 +291,18 @@ sub _get_derived_field( $self, $field ) {
         },
     };
 
-    my ( $key, $param, @extra ) = _structured_split( ';', $field );
+    croak "unsupported field ${name}" unless exists $handlers->{$name};
 
-    croak "extra parameters in field ${field}" if @extra;
+    my $quoted = "\"${name}\"";
 
-    if ( my ($quoted) = $key =~ /\A " ( \@ (?:\w+-)* \w+ ) "\z/ax ) {
-        $key = $quoted;
+    my ($param, @extra) = $field->params->keys;
+    if ( defined $param ) {
+        croak "extra parameters in field ${name}" if @extra;
+        $quoted .= ";" . unquote($param);
     }
 
-    croak "unsupported field ${field}" unless exists $handlers->{$key};
-
-    my $qfield = "\"${key}\"";
-    $qfield .= ";${param}" if defined $param;
-
-    return ( maybe $qfield => $handlers->{$key}->( $self->message, $param ) );
+    return ( maybe $quoted => $handlers->{$name}->( $self->message, $param ) );
 }
-
-sub _parse_dict( $self, $on, $input ) {
-    return Hash::MultiValue->new( map { _structured_split( '=', $_ ) } _structured_split( $on, $input ) );
-}
-
-
-use constant DQUOTE      => "\"";
-use constant ESCAPE      => "\\";
-use constant INNER_START => '(';
-use constant INNER_END   => ')';
-
-sub _structured_split( $on, $input ) {
-
-    my @res;
-    my @ctx;
-
-    my $i = 0;
-
-    while ( $i < length($input) ) {
-
-        my $char = substr( $input, $i, 1 );
-        match( $char : eq ) {
-
-            case (ESCAPE) {
-                my $next = substr( $input, $i + 1, 1 ) // '';
-                unless ( $next eq ESCAPE || $next eq DQUOTE ) {
-                    $i += 2;
-                    next;
-                }
-                croak "invalid character after backslash";
-            }
-
-            case (INNER_START) {
-                unless ( $ctx[-1] && $ctx[-1] eq DQUOTE ) {
-                    push @ctx, INNER_END;
-                }
-            }
-
-            case (DQUOTE) {
-                if ( $ctx[-1] && $ctx[-1] eq DQUOTE ) {
-                    pop @ctx;
-                }
-                else {
-                    push @ctx, DQUOTE;
-                }
-            }
-
-            case (INNER_END) {
-
-                if ( $ctx[-1] &&  $ctx[-1] eq INNER_END ) {
-                    pop @ctx;
-                }
-                elsif ( !( $ctx[-1] && $ctx[-1] eq DQUOTE ) ) {
-                    croak "unbalanced bracket";
-                }
-            }
-
-            case ($on) {
-
-                unless ( $ctx[-1] ) {
-                    push @res, trim( substr( $input, 0, $i ) );
-                    $input = substr( $input, $i + 1 );
-                    $i     = 0;
-                    next;
-                }
-            }
-
-        }
-
-        $i++;
-    }
-
-    push @res, trim($input) unless $input eq "";
-
-    return @res;
-}
-
 
 
 sub BUILDARGS( $, @args ) {
@@ -392,7 +328,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords Auth JWK
+=for stopwords Auth JWK pss rsa sha512
 
 =head1 NAME
 
@@ -400,7 +336,7 @@ HTTP::Message::Signature - Verify HTTP Message Signatures (RFC 9421)
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.3
 
 =head1 SYNOPSIS
 
@@ -521,21 +457,13 @@ Returns true if the signature was verified.
 
 The C<$label> defaults to the first L</signature_labels> if omitted.
 
-=for Pod::Coverage DQUOTE
-
-=for Pod::Coverage ESCAPE
-
-=for Pod::Coverage INNER_END
-
-=for Pod::Coverage INNER_START
-
 =for Pod::Coverage BUILDARGS
 
 =head1 KNOWN ISSUES
 
 =head2 Signature Algorithms
 
-The current version only supports the "Ed25519" algorithm.
+The current version only supports the "ed25519" and "rsa-pss-sha512" algorithms.
 
 =head2 Missing Signature-Agent headers
 
@@ -545,12 +473,12 @@ The current version does not support caching keys.
 
 The current version of this module does not support multiple signatures.
 
+=head2 Content Digests
+
+The L</verify> method only checks the signature.
+If the signature includes a C<Content-Digest> header, then the digest of the message body will need to be validated separately.
+
 =head1 SECURITY CONSIDERATIONS
-
-=head2 Structured Fields
-
-The current version of this module uses regular expressions for splitting dictionary and parameter fields,
-rather than using an HTTP Structured Field (RFC 9651) parser.
 
 =head2 Trusted Agents
 

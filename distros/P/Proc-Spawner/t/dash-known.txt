@@ -5,7 +5,7 @@ largebattery.txt	rejected by the parser: comma operator in arithmetic	echo $(( y
 largebattery.txt	$0 is sh here, not dash	echo $0 $# "[$*]"
 largebattery.txt	rejected by the parser: settings before export	x=1 export y=2; echo $x $y; sh -c 'echo $y'
 pspawn-d2.txt	rejected on purpose: a lone input redirection (bash reads the file in $(<file))	< /nonexist/f; echo $?
-pspawn-l10.txt	message prefix inside captured text (dash: 'dash: 1: ', ours: 'sh: ')	x=$( (head -c 10000000 /dev/zero | tr '\0' a & nosuchcmd; wait) 2>&1); echo ${#x}
+pspawn-l10.txt	message prefix inside captured text (dash: 'dash: 1: ', ShellSpawn: 'sh: ')	x=$( (head -c 10000000 /dev/zero | tr '\0' a & nosuchcmd; wait) 2>&1); echo ${#x}
 pspawn-l10.txt	message prefix inside captured text	x=$( (head -c 3000000 /dev/zero | tr '\0' a & echo ${zz?gone}; wait) 2>&1 | tr -d a); echo "$x"
 pspawn-l10.txt	printf is a program here, so a 10 MB argument is too long (E2BIG)	x=$(head -c 10000000 /dev/zero | tr '\0' a & umask; wait); echo ${#x} $(printf %s "$x" | tr -d a)
 t1.txt	X2: $! of a background job that started no process	: & echo "[$!]" | tr 0-9 N

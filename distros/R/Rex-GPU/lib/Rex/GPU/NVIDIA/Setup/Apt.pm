@@ -1,7 +1,7 @@
 # ABSTRACT: apt/dpkg packaging layer of the NVIDIA driver setups (experimental)
 
 package Rex::GPU::NVIDIA::Setup::Apt;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use Moo;
 use Rex::Logger ();
 use namespace::autoclean;
@@ -87,10 +87,13 @@ sub install_packages {
 }
 
 
+# k94: hi (apt-mark hold, installed and configured) counts, as on the AMD
+# apt layer (k89) and in NVIDIA's _toolkit_present; half-installed or
+# half-configured states (iU, iF, hF, iH, ...) do not.
 sub verify_packages {
   my ( $self, $plan ) = @_;
   for my $driver_pkg (@{ $plan->{verify} }) {
-    my $check = $self->run_cmd("dpkg -l $driver_pkg 2>/dev/null | grep -q '^ii'", auto_die => 0);
+    my $check = $self->run_cmd("dpkg -l $driver_pkg 2>/dev/null | grep -q '^[hi]i'", auto_die => 0);
     die "$driver_pkg not installed after apt-get install — check apt output\n"
       if $? != 0;
   }
@@ -105,11 +108,8 @@ sub fabric_manager_unavailable {
 }
 
 sub installed_driver_version {
-  my ( $self, $source ) = @_;
-  my $pkg = $self->_with_branch($source->{fabric_manager_match}, $source);
-  die "The driver source names no package to read the driver version from "
-    ."(fabric_manager_match); the driver is installed, Fabric Manager is not\n"
-    unless defined $pkg;
+  my ( $self, $source, $key ) = @_;
+  my $pkg = $self->_driver_version_package($source, $key);
   return $self->_dpkg_upstream_version($self->_dpkg_version($pkg));
 }
 
@@ -196,15 +196,15 @@ Rex::GPU::NVIDIA::Setup::Apt - apt/dpkg packaging layer of the NVIDIA driver set
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
 B<Experimental>, like L<Rex::GPU::NVIDIA::Setup>. The apt/dpkg half shared by
 L<Rex::GPU::NVIDIA::Setup::Debian> and L<Rex::GPU::NVIDIA::Setup::Ubuntu>:
 the lock timeout on every C<apt-get>, stopping the apt timers, C<apt-get
-update>, C<apt-get install> run directly and C<dpkg -l ... ^ii> as the only
-evidence of an install.
+update>, C<apt-get install> run directly and C<dpkg -l> -- C<ii> or C<hi>,
+never half configured -- as the only evidence of an install.
 
 =head2 apt_lock_timeout
 
@@ -274,9 +274,10 @@ is decided by L</verify_packages>, not by this exit code.
 
 =head2 verify_packages
 
-Dies unless every package in C<< $plan->{verify} >> is C<ii> in C<dpkg -l>.
-A DKMS build that fails in postinst leaves the package half-configured (not
-C<ii>), so a partial install dies here.
+Dies unless every package in C<< $plan->{verify} >> is installed and
+configured in C<dpkg -l>, held (C<hi>) or not (C<ii>). A DKMS build that
+fails in postinst leaves the package half-configured -- C<iF> (C<hF> when
+held), not C<ii> or C<hi> -- so a partial install dies here.
 
 =head2 fabric_manager_unavailable
 
@@ -287,8 +288,11 @@ package.
 =head2 installed_driver_version
 
 The upstream part (no epoch, no Debian revision) of C<dpkg-query -W
--f='${Version}'> for the source's C<fabric_manager_match> package:
-C<580.178.04-0ubuntu0.24.04.1> is C<580.178.04>.
+-f='${Version}'> for the package the source's C<fabric_manager_match> (or
+the key passed, see L<Rex::GPU::NVIDIA::Setup/installed_driver_version>)
+names: C<580.178.04-0ubuntu0.24.04.1> is C<580.178.04>, Debian 12's
+C<535.309.01-0+deb12u1> is C<535.309.01>. C<undef> when C<dpkg-query>
+fails or prints nothing.
 
 =head2 install_versioned_package
 
@@ -302,8 +306,9 @@ version aborts on the driver check.
 
 =head2 verify_versioned_package
 
-C<dpkg -l ... ^ii>, then the installed upstream version (C<dpkg-query>) must
-be C<$version>.
+L</verify_packages> (C<ii> or C<hi> in C<dpkg -l>), then the installed
+upstream version (C<dpkg-query>) must be C<$version>: a package held at
+another version dies here.
 
 =head2 nvlink_fabric_packages
 
@@ -323,7 +328,7 @@ L<Rex::GPU::NVIDIA::Setup>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/rex-gpu/issues>.
 
 =head1 CONTRIBUTING

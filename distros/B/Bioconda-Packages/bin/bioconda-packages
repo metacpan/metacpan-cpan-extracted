@@ -8,26 +8,140 @@ use Bioconda::Packages;
 
 =head1 NAME
 
-bioconda-packages - Query the bundled Bioconda package database from the command line.
+bioconda-packages - Offline query tool for the bundled Bioconda package database
 
 =head1 SYNOPSIS
 
+    bioconda-packages <command> [args] [options]
+
+    # Package information
     bioconda-packages info samtools
-    bioconda-packages deps multiqc            # run deps (--kind host|build|all)
     bioconda-packages versions samtools
+
+    # Dependencies
+    bioconda-packages deps multiqc               # run-time deps (default)
+    bioconda-packages deps multiqc --kind host   # host deps
+    bioconda-packages deps multiqc --kind all    # all dep kinds
+
+    # Reverse dependencies
+    bioconda-packages rdeps zlib                 # who uses zlib at run time
+    bioconda-packages rdeps zlib --kind build    # who uses it at build time
+    bioconda-packages rdeps zlib --all           # include removed packages
+
+    # Search & listing
     bioconda-packages search aligner
-    bioconda-packages rdeps zlib              # reverse deps (--kind run|host|build|all)
+    bioconda-packages search aligner --all       # include removed packages
+    bioconda-packages list
+    bioconda-packages list --all
+
+    # Database housekeeping
     bioconda-packages removed
     bioconda-packages stats
-    bioconda-packages version                 # tool + database version
+    bioconda-packages version
+
+=head1 COMMANDS
+
+=over 4
+
+=item B<info> I<PACKAGE>
+
+Print a summary for I<PACKAGE>: current version, one-line description, license,
+homepage, documentation URL, noarch flag, download count, known identifiers, and
+the number of run-time dependencies.
+
+=item B<deps> I<PACKAGE>
+
+List dependencies of I<PACKAGE>.  Defaults to run-time deps; use C<--kind> to
+select C<run>, C<host>, C<build>, or C<all>.  Each line is C<name> or
+C<name constraint>.
+
+=item B<versions> I<PACKAGE>
+
+List every version of I<PACKAGE> that is recorded in the database, one per line.
+
+=item B<search> I<TERM>
+
+Search package names and summaries for I<TERM> (case-insensitive substring
+match) and print matching package names.  Pass C<--all> to include packages that
+have been removed from the bioconda recipe tree.
+
+=item B<rdeps> I<PACKAGE>
+
+Print packages that depend on I<PACKAGE>.  Defaults to run-time reverse deps;
+use C<--kind> (C<run>|C<host>|C<build>|C<all>).  Pass C<--all> to include
+removed packages.
+
+=item B<list>
+
+Print the name of every package in the database, one per line.  Pass C<--all>
+to include removed packages.
+
+=item B<removed>
+
+Print the names of all packages that have been removed from the bioconda recipe
+tree but are still tracked in the database.
+
+=item B<stats>
+
+Print database statistics: version, total / current / removed package counts,
+noarch count, build timestamp, and the upstream recipes commit.
+
+=item B<version>
+
+Print the tool version (C<Bioconda::Packages> module version) and, if the
+database can be located, its version, file path, build timestamp, generator
+identifier, package count, and the bioconda-recipes commit it was built from.
+
+=back
 
 =head1 OPTIONS
 
-    --db PATH         Use a specific database file
-    --kind KIND       Dependency kind for 'deps'/'rdeps' (run|host|build|all)
-    --all             Include removed packages (search/list/rdeps)
-    --version, -V     Print the tool and database version
-    --help            This message
+=over 4
+
+=item B<--db> I<PATH>
+
+Load the database from I<PATH> instead of the default location.  The default
+search order is: (1) C<BIOCONDA_PACKAGES_DB> environment variable, (2)
+C<File::ShareDir> installed location, (3) C<share/bioconda-packages.json.gz>
+relative to the module file.
+
+=item B<--kind> I<KIND>
+
+Dependency kind for C<deps> and C<rdeps>.  One of C<run> (default), C<host>,
+C<build>, or C<all>.
+
+=item B<--all>
+
+Include packages that have been removed from the bioconda recipe tree in
+C<search>, C<list>, and C<rdeps> output.
+
+=item B<--version>, B<-V>
+
+Print the tool and database version, then exit.
+
+=item B<--help>
+
+Show this manual page and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item C<BIOCONDA_PACKAGES_DB>
+
+Override the database path without using C<--db>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Bioconda::Packages>, L<Bioconda::Packages::Package>
+
+=head1 AUTHOR
+
+Andrea Telatin, Quadram Institute Bioscience (2026)
 
 =cut
 

@@ -7,7 +7,7 @@ use Carp qw(croak);
 use Bioconda::Packages::DB      ();
 use Bioconda::Packages::Package ();
 
-our $VERSION = '2026.11.4';
+our $VERSION = '2026.11.5';
 
 =head1 NAME
 
@@ -282,6 +282,12 @@ L<Bioconda::Packages::RecipeParser>, L<https://bioconda.github.io>.
 =head1 AUTHOR
 
 Andrea Telatin
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl 5 itself. See L<perlartistic> and L<perlgpl> for the
+license terms.
 
 =cut
 

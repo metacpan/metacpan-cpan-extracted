@@ -4,8 +4,10 @@
 # Each candidate tries to KV::create('leader', $self_id). The KV bucket
 # enforces "Nats-Expected-Last-Subject-Sequence: 0" so create succeeds
 # for exactly one candidate; the rest see 'wrong last sequence'. The
-# leader periodically refreshes the entry (TTL semantics via KV
-# bucket's max_age). On leader exit / timeout, another candidate wins.
+# leader refreshes the entry with a compare-and-swap on its own
+# revision before the bucket's max_age expires it. A leader that stalls
+# past max_age finds its refresh refused and stands down instead of
+# overwriting the new leader.
 #
 # Run multiple instances simultaneously to see one win:
 #   perl leader_election.pl &
@@ -39,49 +41,35 @@ $kv->create_bucket({
     max_age     => $ttl * 1_000_000_000,  # ns
     max_history => 1,
 }, sub {
-    # Ignore "stream already in use" errors — coordinated startup races.
     my (undef, $err) = @_;
+    # concurrent candidates race to create the bucket
     warn "create_bucket: $err\n" if $err && $err !~ /already in use|already exists/i;
-
-    # Watch for leader changes so all instances log the current state.
-    $kv->watch($key, sub {
-        my ($k, $value, $op) = @_;
-        warn "[election] $op $k = " . ($value // '<deleted>') . "\n";
-    });
-
     contend();
 });
 
 sub contend {
     $kv->create($key, $self_id, sub {
-        my ($seq, $err) = @_;
-        if ($seq) {
-            warn "[$self_id] won leadership (seq=$seq)\n";
-            schedule_refresh();
-        } elsif ($err && $err =~ /wrong last sequence/i) {
-            # Someone else holds it — wait then retry.
-            warn "[$self_id] not leader; retrying in ${tick}s\n";
-            my $ct; $ct = EV::timer($tick, 0, sub { undef $ct; contend() });
-        } else {
-            warn "[$self_id] create failed: " . ($err // '?') . "\n";
-            my $ct; $ct = EV::timer($tick, 0, sub { undef $ct; contend() });
+        my ($rev, $err) = @_;
+        if ($rev) {
+            warn "[$self_id] won leadership (rev=$rev)\n";
+            return refresh_later($rev);
         }
+        warn $err && $err =~ /wrong last sequence/i
+            ? "[$self_id] not leader; retrying in ${tick}s\n"
+            : "[$self_id] create failed: " . ($err // '?') . "\n";
+        my $ct; $ct = EV::timer($tick, 0, sub { undef $ct; contend() });
     });
 }
 
-# Refresh by overwriting the value (max_age expires the entry if we
-# stop). On lease loss, contend again.
-sub schedule_refresh {
+sub refresh_later {
+    my ($rev) = @_;
     my $rt; $rt = EV::timer($tick, 0, sub {
         undef $rt;
-        $kv->put($key, $self_id, sub {
-            my ($seq, $err) = @_;
-            if ($err) {
-                warn "[$self_id] refresh failed: $err — re-contending\n";
-                contend();
-            } else {
-                schedule_refresh();
-            }
+        $kv->update($key, $self_id, $rev, sub {
+            my ($new_rev, $err) = @_;
+            return refresh_later($new_rev) if $new_rev;
+            warn "[$self_id] lost leadership: $err\n";
+            contend();
         });
     });
 }

@@ -8,7 +8,7 @@ use Ekorn::Pipeline::Stages::Flow qw(
     take       drop       take_first take_last take_single
     take_while drop_while take_if    drop_if);
 
-our $VERSION = 'v4.1.1';
+our $VERSION = 'v4.2.0';
 
 # A plain re-export of Ekorn::Pipeline::Stages::Flow's functions, from
 # DBIx::Squirrel's own list of them, imported from it by name, so a name

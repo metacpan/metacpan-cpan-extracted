@@ -1,71 +1,61 @@
 # Rex::GPU House Rules
 
-Apply to every task in this repository unless explicitly overridden. Bias: caution over speed on non-trivial work, judgment on trivial tasks. Loaded automatically at launch (same priority as `CLAUDE.md`). Subagents get their conventions from the skills force-loaded via `briefing.skills`; skill content is not restated here — this file is for the orchestrating agent.
+The shared house rules come from skilletor — bundle `getty-cpan-dist@getty`: engineering
+discipline, the delegation lock, the publish gate, karr coordination, CPAN release. They load
+as `.claude/rules/.local.*.md`; if they are missing, run `skilletor sync` and publish nothing
+until they load. This file adds what is true only here, and wins where it differs.
 
-## Engineering discipline
+## What this repo is
 
-1. **Think before coding** — State assumptions; when uncertain, ask rather than guess. Push back when a simpler approach exists; stop when confused and name what's unclear.
-2. **Simplicity first** — Minimum code that solves the problem. Nothing speculative.
-3. **Surgical changes** — Touch only what you must. Don't "improve" adjacent code, comments or formatting. Match existing style.
-4. **Match the codebase's conventions, even if you disagree** — Conformance > taste. Surface a harmful convention; don't fork silently.
-5. **Fail loud** — "Done" is wrong if anything was skipped silently. Surface uncertainty, don't hide it. A green `prove` is not evidence that a detection or install change works.
-6. **A red test is a claim before it is a failure** — before changing code to turn a test green, say what the test asserts and whether your fix keeps that claim or replaces it.
+GPU detection and driver management for Rex: `gpu_setup()` takes a bare-metal host from bare
+PCI to GPU-ready for Kubernetes. Pipeline, detection contract and distro matrix: skill
+`rex-gpu-core`.
 
-## Delegation
+## Agent team
 
-Depends on whether the Agent/Task tool is available to you.
+| Task | Agent |
+|---|---|
+| Implement / refactor / debug anything under `lib/` | `rex-gpu-worker` (default) |
+| New tests, regression tests, failure-path coverage, golden harness | `rex-gpu-test-writer` |
+| New GPU / driver branch / NVIDIA support list: generation rows, name rules, NVSwitch/NVLink IDs, vGPU table | `rex-gpu-hardware-curator` |
+| Commits, `Changes`, card → done, pre-release audit | `rex-gpu-release-manager` |
+| Read-only research, audit, gap analysis | `rex-gpu-worker` ("read-only, change nothing") |
 
-- **You can spawn subagents** (orchestrating main agent): do NOT touch behavior-relevant code yourself — delegate. Your lane: coordinate, inspect, plan, review diffs, run tests, edit non-behavioral docs. When in doubt, delegate. Why: only the `rex-gpu-*` agents get their skills force-loaded via `briefing.skills`; you get no briefing and would touch code that installs drivers and reboots production servers with too little context.
+Behavior-relevant = anything under `lib/`, the tests, and any change to a detection rule, a
+package list, an OS-version branch, the pipeline order, an emitted shell command, the
+containerd config, or the reboot logic. `README.md` and `Changes` wording are not.
 
-  | Task | Agent |
-  |---|---|
-  | Implement / refactor / debug anything under `lib/` | `rex-gpu-worker` (default) |
-  | New tests, regression tests, failure-path coverage, golden harness | `rex-gpu-test-writer` |
-  | New GPU / driver branch / NVIDIA support list: generation rows, name rules, NVSwitch/NVLink IDs, vGPU table | `rex-gpu-hardware-curator` |
-  | Commits, `Changes`, card → done, pre-release audit | `rex-gpu-release-manager` |
+## Release
 
-- **You cannot spawn subagents** (you ARE a `rex-gpu-*` agent): the delegation lock does not apply — implement, refactor, debug and test per these rules.
+`Rex::LibSSH` is a `recommends`, not a pin, so it does not gate a release here.
 
-Behavior-relevant = anything under `lib/`, the tests, and any change to a detection rule, a package list, an OS-version branch, the pipeline order, an emitted shell command, the containerd config, or the reboot logic. `README.md` and `Changes` wording are not.
+## Hazards
 
-**Only `rex-gpu-release-manager` commits.** A worker leaves a commit-ready tree and hands its card to `review`; you then dispatch `rex-gpu-release-manager` to cut the commit and close the card.
+- **The blast radius is a remote root shell that installs and reboots.** Every method emits a
+  package install, an initramfs rebuild or a `shutdown -r` on someone else's bare-metal host,
+  as root, and the *choice* of what to run comes from string-matched `lspci -nn` and
+  OS-version output. None of this reproduces in a local test: when a change touches a regex,
+  a package list or a version branch, say what it does on a host you are not testing on. The
+  traps themselves are in skill `rex-gpu-core`.
+- **Never route a driver package through Rex::Pkg.** Driver and toolkit installs call
+  `run "apt-get/dnf/zypper install", auto_die => 0` directly and verify with
+  `dpkg -l`/`rpm -q` — **not `pkg`**. `pkg` is for inert helpers only (`pciutils`, `curl`,
+  `epel-release`). This is the load-bearing invariant of the distribution: do not "clean it
+  up". Rationale: skill `rex-gpu-core`.
+- **A green suite is not a proof.** `prove -lr t/` covers compilation, pure selection logic
+  and golden files of the emitted host commands (`t/golden/`, regenerate on purpose with
+  `REX_GPU_GOLDEN_UPDATE=1`) — no detection, install, containerd or reboot path runs without
+  a real GPU host. Never report green as evidence for a behavior change; state that it was not
+  exercised against hardware and what a maintainer would run on a real node to confirm.
+- **This distribution is an upstream.** `Rex::Rancher` calls `gpu_setup` via its optional
+  `gpu => 1`, and `Rex::LibSSH` is the backend these deploys ride on. A change to
+  `gpu_setup`'s signature, defaults or detection outcome reaches Rancher's production deploys
+  with no version gate — a follow-up ticket on the *other* repo's board, never an edit made
+  here.
 
-## The blast radius is a remote root shell that installs and reboots
+## Perl / Rex specifics — reference, don't restate
 
-Every method here emits a package install, an initramfs rebuild or a `shutdown -r` on someone else's bare-metal host, as root, and the *choice* of what to run comes from string-matched `lspci -nn` and OS-version output. None of this reproduces in a local test: when a change touches a regex, a package list or a version branch, say what it does on a host you are not testing on. The traps themselves are in skill `rex-gpu-core`.
-
-## Never route a driver package through Rex::Pkg
-
-Driver and toolkit installs call `run "apt-get/dnf/zypper install", auto_die => 0` directly and verify with `dpkg -l`/`rpm -q` — **not `pkg`**. `pkg` is for inert helpers only (`pciutils`, `curl`, `epel-release`). This is the load-bearing invariant of the distribution: do not "clean it up". Rationale: skill `rex-gpu-core`.
-
-## A green suite is not a proof
-
-The suite covers compilation, pure selection logic and golden files of the emitted host commands (`t/golden/`, regenerate on purpose with `REX_GPU_GOLDEN_UPDATE=1`) — no detection, install, containerd or reboot path runs without a real GPU host. Never report green as evidence for a behavior change; state that it was not exercised against hardware and what a maintainer would run on a real node to confirm.
-
-```bash
-prove -lr t/
-```
-
-## Release — never without permission
-
-`dzil build` / `dzil test` / `prove -lr t/` are fine anytime. `dzil release` and any CPAN upload are STRICTLY forbidden without the maintainer's explicit go-ahead — even if a plan lists "release" as the next step. Stop and ask. `Rex::LibSSH` is a `recommends`, not a pin, so it does not gate a release here.
-
-## Coordination — karr board (always in scope)
-
-Ticket coordination is the orchestrating agent's job, so `karr` is always in scope — don't invoke the skill first, just use it. Board state lives in `refs/karr/*`.
-
-- `karr list --compact` / `karr board` · `karr show ID` · `karr create "Title" --priority high --body '…'` · `karr edit ID -a "note"` · `karr move ID in-progress --claim NAME` · `karr handoff ID --claim NAME --note "…"`
-
-Serialize board mutations when fanning out: keep implementation parallel, then loop the `karr move`/`handoff`/`sync` calls sequentially. Full command surface: skill `kanban-issues-karr-coordination`.
-
-## Public issues (GitHub) — never act without instruction
-
-`karr` is the internal agent board, churned freely. GitHub issues on `Getty/rex-gpu` are the **public tracker**: real people's reports, written under the maintainer's account. Never act on one on your own initiative — not even to read it. No listing, viewing, commenting, closing or creating unless the user explicitly says to handle a specific issue.
-
-## Downstream — this distribution is an upstream
-
-`Rex::Rancher` calls `gpu_setup` via its optional `gpu => 1`, and `Rex::LibSSH` is the backend these deploys ride on. A change to `gpu_setup`'s signature, defaults or detection outcome reaches Rancher's production deploys with no version gate. Such a change belongs in a follow-up ticket on the *other* repo's board, never as an edit made here.
-
-## Reference, don't restate
-
-Perl house style and cpanfile pinning: skills `getty-perl-core`, `getty-perl-release-author-getty`, `perl-release-dist-ini`. Rex idioms, connection types and the SFTP question: skill `rex`. This distribution's pipeline, detection contract and distro matrix: skill `rex-gpu-core`. All are force-loaded for `rex-gpu-*` agents; do not duplicate them here.
+Perl house style and cpanfile pinning: skills `getty-perl-core`,
+`getty-perl-release-author-getty`, `perl-release-dist-ini`. Rex idioms, connection types and
+the SFTP question: skill `rex`. This distribution's internals: skill `rex-gpu-core`. All are
+force-loaded for `rex-gpu-*` agents.

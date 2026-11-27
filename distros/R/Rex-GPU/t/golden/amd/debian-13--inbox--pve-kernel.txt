@@ -1,0 +1,10 @@
+# golden: amd/debian-13--inbox--pve-kernel
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: <AMD state script>
+run: cat /etc/os-release 2>/dev/null
+run: dpkg-query -W -f='${Status}\n' pve-firmware 2>/dev/null
+run: cat /proc/cmdline 2>/dev/null
+run: grep -rsHE --include='*.conf' '^[[:space:]]*(blacklist[[:space:]]+amdgpu|install[[:space:]]+amdgpu[[:space:]]+(/usr)?/bin/(false|true))([[:space:]]|$)' /etc/modprobe.d /run/modprobe.d /usr/lib/modprobe.d /lib/modprobe.d 2>/dev/null
+run: uname -r
+DIE: install_driver: the inbox amdgpu is supported on Debian GNU/Linux 13 (trixie) with Debian's own kernel 6.12 (6.12.N+deb13-amd64) only; this host runs 7.0.14-20-pve. Nothing was changed on the host

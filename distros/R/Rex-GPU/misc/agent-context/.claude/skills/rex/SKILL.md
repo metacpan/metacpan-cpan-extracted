@@ -1,6 +1,6 @@
 ---
 name: rex
-description: Author, review, debug, and safely operate Perl Rex automation, Rexfiles, tasks, inventory, CMDB, resources, SSH/OpenSSH/LibSSH transports, sudo, modules, and optional Rex::GPU or Rex::Rancher integrations. Use for Rex execution semantics, filesystem/SFTP failures, idempotency, deployment, testing, and backend-level source investigation.
+description: "Use when writing, reviewing, debugging or running Perl Rex automation — Rexfile, tasks, groups and inventory, CMDB, SSH/OpenSSH/LibSSH transports, sudo, SFTP or filesystem failures, idempotency, deployments, Rex::GPU, Rex::Rancher."
 ---
 
 # Rex automation

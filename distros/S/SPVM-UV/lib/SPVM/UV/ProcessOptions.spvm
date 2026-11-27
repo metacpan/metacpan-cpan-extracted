@@ -2,7 +2,9 @@
 # MIT License
 
 class UV::ProcessOptions {
-
+  
+  version_from UV;
+  
   use UV::StdioContainer;
   use UV::Callback::Exit;
   

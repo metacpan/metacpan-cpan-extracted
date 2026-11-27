@@ -25,26 +25,17 @@ To test:
     Fcntl
 
 BUGS
-The File-Path bug tracker is located at:
-
-<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Path>
-
-File reports by sending email to:
-
-    bug-File-Path@rt.cpan.org
-
-Include test programs or patches as email attachments.
+The File-Path bug tracker is located at: https://github.com/jkeenan/File-Path
 
 AUTHORS
 Prior authors and maintainers: Tim Bunce, Charles Bailey, and David
 Landgren (david at landgren dot net).
 
-Current maintainers are Richard Elberger (riche at cpan dot org) and
-James E Keenan (jkeenan at cpan dot org).
+Current maintainer is James E Keenan (jkeenan at pobox dot com).
 
 COPYRIGHT
 This module is copyright (C) Charles Bailey, Tim Bunce, David Landgren,
-James Keenan, and Richard Elberger 1995-2020. All rights reserved.
+James Keenan, and Richard Elberger 1995-2026. All rights reserved.
 
 LICENSE
 This library is free software; you can redistribute it and/or modify it

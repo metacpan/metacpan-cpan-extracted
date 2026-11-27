@@ -13,8 +13,8 @@ run: ls -1 /etc/apt/sources.list.d/ 2>/dev/null
 run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
 run: apt-get -o DPkg::Lock::Timeout=120 update -q
 run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y linux-headers-6.1.0-37-amd64 nvidia-driver nvidia-smi libcuda1
-run: dpkg -l nvidia-driver 2>/dev/null | grep -q '^ii'
-run: dpkg -l libcuda1 2>/dev/null | grep -q '^ii'
+run: dpkg -l nvidia-driver 2>/dev/null | grep -q '^[hi]i'
+run: dpkg -l libcuda1 2>/dev/null | grep -q '^[hi]i'
 file: /etc/modprobe.d/blacklist-nouveau.conf
   | blacklist nouveau
   | options nouveau modeset=0

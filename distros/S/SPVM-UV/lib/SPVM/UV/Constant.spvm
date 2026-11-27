@@ -1,5 +1,7 @@
 class UV::Constant {
   
+  version_from UV;
+  
   use Resource::UV;
   use UV::Resource::UV;
   

@@ -80,7 +80,7 @@ my @F = (   # [id, verdict, basis, regex, on: r(aw text) or u(nquoted parts only
   # judgements (not yet reviewed)
   [dashflags   => B => 'J',            qr/\$-|\$\{-\}/, 'u'],           # the value always differs; a test for *i* agrees
   [lineno      => X => 'E:info',       qr/\$\{?LINENO\b/, 'u'],         # the line number, as bash (G8, post-0.04); dash: empty in -c
-  [scope       => B => 'P:local',      qr/(?!)/, 'u', sub { $_[0] =~ /${C}local\b(?!=)/ && $_[0] !~ /\w\s*\(\s*\)/ }],   # local outside a function: both shells fail
+  [scope       => B => 'P:localout',   qr/(?!)/, 'u', sub { $_[0] =~ /${C}local\b(?!=)/ && $_[0] !~ /\w\s*\(\s*\)/ }],   # local outside a function: both shells fail
   [returnout   => X => 'E:error',      qr/(?!)/, 'u', sub { $_[0] =~ /${C}return\b(?!=)/ && $_[0] !~ /\w\s*\(\s*\)/ }],   # return outside a function: an error, as bash (rule E)
   [killsig     => B => 'M:38',         qr/\bkill\s+-SIG/, 'u'],          # both refuse in --posix; whether bash's manual allows it: not checked
   [specialerr  => X => 'E:posix',         qr/(?!)/, 'u'],                   # a special builtin's error (dash stops, bash goes on): not detectable from text

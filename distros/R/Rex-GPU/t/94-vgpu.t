@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -117,7 +118,7 @@ subtest '_parse_lspci_vmm' => sub {
 
 #### detect()
 
-my $LSPCI_READ = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]|\[0380\].*\[1002:'};
+my $LSPCI_READ = q{lspci -nn 2>&1 | grep -E '\[03(00|02)\]|\[(0380|1200)\].*\[1002:'};
 my $VMM_READ   = 'lspci -vmmnn -d 10de: 2>/dev/null';
 
 sub detect_on {
