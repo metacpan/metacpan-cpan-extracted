@@ -1,12 +1,3 @@
-/*
- * HTTP::libsfparse - Perl XS binding for libsfparse (RFC 9651)
- *
- * Copyright (c) 2026 HTTP::libsfparse contributors
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the same terms as Perl itself.
- */
-
 #define PERL_NO_GET_CONTEXT 1
 
 #include "EXTERN.h"
@@ -15,6 +6,8 @@
 
 #include "ppport.h"
 
+#define MATH_INT64_NATIVE_IF_AVAILABLE
+#include "perl_math_int64.h"
 #include "sfparse.h"
 
 /* ------------------------------------------------------------------------
@@ -111,17 +104,7 @@ static const char *sfp_input(pTHX_ SV *sv, STRLEN *lenp) {
  * ------------------------------------------------------------------------ */
 
 static SV *sfp_int_sv(pTHX_ int64_t v) {
-#if IVSIZE >= 8
-  return newSViv((IV)v);
-#else
-  /* RFC 9651 integers and dates are limited to 15 digits, which a double
-     still represents exactly, so this stays lossless on 32 bit IVs. */
-  if (v >= I32_MIN && v <= I32_MAX) {
-    return newSViv((IV)v);
-  }
-
-  return newSVnv((NV)v);
-#endif
+  return newSVi64(v);
 }
 
 static SV *sfp_vec_sv(pTHX_ const sfparse_vec *v) {
@@ -439,6 +422,7 @@ PROTOTYPES: DISABLE
 # also what the code building the structures uses.
 
 BOOT:
+  PERL_MATH_INT64_LOAD_OR_CROAK;
 {
   static const struct {
     const char *name;

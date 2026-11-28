@@ -12,6 +12,7 @@ cpanfile
 eg/adapter_recipe.pl
 eg/affinity.pl
 eg/basic.pl
+eg/bench_hotspots.pl
 eg/bench_offload.pl
 eg/blocking_offload.pl
 eg/coro_prodcons.pl

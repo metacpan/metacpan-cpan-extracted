@@ -1,5 +1,12 @@
 Revision history for App-SlimPacker
 
+0.09  2026-11-27
+    - Fix: slimpack exits with an error, and writes nothing, when the
+      script does not compile. It used to write an incomplete bundle and
+      exit 0, e.g. when a module the script uses was not installed.
+    - Fix: the trace sees the --lib directory, as the bundle does, so a
+      script that needs it to compile is traced fully.
+
 0.08  2026-10-21
     - Fix: require Module::CoreList 3.07; on perls <= 5.16 the core-shipped
       version has no is_core() and slimpack died with "Undefined subroutine".

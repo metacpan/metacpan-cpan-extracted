@@ -4,6 +4,8 @@ author:
   - 'Jacques Deguest (jack@deguest.jp)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  MIME::Base64: '0'
   Test::More: '1.302162'
   Test::Pod: '1.52'
   lib: '0'
@@ -34,5 +36,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/deguest/JSON-Schema-Validate/issues
   repository: https://gitlab.com/deguest/JSON-Schema-Validate
-version: v0.9.1
+version: v0.9.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

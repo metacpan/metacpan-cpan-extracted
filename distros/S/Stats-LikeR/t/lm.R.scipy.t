@@ -111,7 +111,7 @@
 require 5.010;
 use strict;
 use warnings FATAL => 'all';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::More;
 
 my $INF = 9**9**9;

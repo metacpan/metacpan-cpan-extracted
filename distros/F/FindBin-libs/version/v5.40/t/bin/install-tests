@@ -1,6 +1,7 @@
 #!/bin/bash
 ########################################################################
-# install test symlinks for all groups in t/etc/tests.yaml
+# install the generated tests: t/01-bash, t/02-syntax, t/03-version,
+# and all groups in t/etc/tests.yaml.
 # each install-tests.d/<group>.inst handles one group directory.
 ########################################################################
 
@@ -41,6 +42,19 @@ for cruft in $root_d/{.prove,cover_db}
 do
     [[ -e $cruft ]] && rm -rf $cruft;
     [[ -e $cruft ]] && fatal "Failed remove: stale '$cruft' ($?)";
+done
+
+########################################################################
+# generated tests, not distributed: t/01-bash, t/02-syntax, and
+# t/03-version are symlinks to the install-tests.d templates, made
+# here because "make dist" would store each symlink as a copy.
+
+for unit in install-bash install-syntax install-version
+do
+    log-msg "$bin_d/$unit";
+
+    "$PERL" "$bin_d/$unit" \
+    || fatal "Failed: $bin_d/$unit ($?)";
 done
 
 ########################################################################

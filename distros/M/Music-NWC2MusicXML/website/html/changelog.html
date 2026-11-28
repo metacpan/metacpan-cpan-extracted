@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changes — Music::NWC2MusicXML</title>
+<meta name="description" content="What changed in each release of Music::NWC2MusicXML, from the first CPAN release to 0.003.1.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="changelog.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Music::NWC2MusicXML">
+<meta property="og:title" content="Changes — Music::NWC2MusicXML">
+<meta property="og:description" content="What changed in each release of Music::NWC2MusicXML, from the first CPAN release to 0.003.1.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Music::NWC2MusicXML</span>
+			<span class="brand-tag">NoteWorthy Composer scores to MusicXML</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="commands.html">Commands</a>
+			<a href="api.html">Perl API</a>
+			<a href="formats.html">What converts</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html" class="current" aria-current="page">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Changes</h1>
+	<p class="lead">
+		The highlights of each release. The full revision history, including test
+		and documentation changes, is in the <code>Changes</code> file that ships
+		with the distribution.
+	</p>
+
+	<h2>0.003.1 <span class="muted small">— 27 November 2026</span></h2>
+	<ul>
+		<li>Triplets were converted as plain notes: three triplet quavers took the time of three ordinary quavers and printed without the "3". They now last two thirds of their written value and are written as triplets.</li>
+	</ul>
+
+	<h2>0.003.0 <span class="muted small">— 9 November 2026</span></h2>
+	<ul>
+		<li>A whole rest alone in its bar is now written as a full-measure rest of the right length in any time signature.</li>
+		<li>Added this website.</li>
+	</ul>
+
+	<h2>0.002.4 <span class="muted small">— 3 November 2026</span></h2>
+	<ul>
+		<li><code>DynVariance</code> records are no longer emitted as hairpin wedges. <em>Crescendo</em> and <em>diminuendo</em> records of that kind are the written words <em>cresc.</em> and <em>dim.</em>; hairpins come from <code>Opts:Crescendo</code> and <code>Opts:Diminuendo</code> on individual notes, and still do. <code>crescOff</code> now emits nothing, which is what stopping a text marking means.</li>
+		<li>A text direction with a <code>Pos</code> field but no <code>Placement</code> used to be written below the staff whatever its vertical position. Placement is now inferred from the sign of <code>Pos</code>, so a marking such as <em>Slightly faster</em> at <code>Pos:7</code> appears above the staff where it belongs.</li>
+		<li>A staff's <code>EndingBar</code> of <em>Section Close</em> was stored with its space but compared without one, so the ending barline was silently dropped. Values are now normalised on ingestion, and a second <code>StaffProperties</code> record — the one carrying channel and volume and no <code>EndingBar</code> — no longer overwrites the first.</li>
+	</ul>
+
+	<h2>0.002.3 <span class="muted small">— 2 November 2026</span></h2>
+	<ul>
+		<li>A tempo record with optional text, such as <em>With Expression</em>, was discarded entirely. The text is now kept and emitted in the same direction as the metronome mark, with parentheses around the mark so it reads <em>With Expression (crotchet = 92)</em>.</li>
+		<li><code>TempoVariance</code> style <em>Ritenuto</em> is abbreviated to <em>rit.</em>, joining the other standard abbreviations.</li>
+		<li>The permission-check test skips on Cygwin, where <code>chmod 0000</code> does not prevent a file being read.</li>
+	</ul>
+
+	<h2>0.002.2 <span class="muted small">— 30 October 2026</span></h2>
+	<ul>
+		<li>Some NWC versions spell the hairpin dynamic record <code>DynamicVariance</code> rather than <code>DynVariance</code>. The longer spelling is now an alias in the dispatch table, so crescendos and diminuendos parse from either.</li>
+	</ul>
+
+	<h2>0.002.1 <span class="muted small">— 12 October 2026</span></h2>
+	<ul>
+		<li>A <code>TempoVariance:Fermata</code> was written as the word <em>Fermata</em> in a direction. It is now a <code>&lt;fermata/&gt;</code> notation on the note or rest that follows the record, which is the note it decorates.</li>
+	</ul>
+
+	<h2>0.002.0 <span class="muted small">— 9 October 2026</span></h2>
+	<ul>
+		<li>A single-note slur produced a zero-length arc, with start and stop on the same note: the stop was placed on the last note carrying the <code>Slur</code> token instead of on the landing note after it. Slurs are now drawn from the first marked note to the first unmarked one.</li>
+		<li>The decoder's <code>open</code> suppresses <code>autodie</code> locally so the "cannot read file" <code>croak</code> fires on Cygwin, where a <code>chmod 0000</code> file still reports as readable.</li>
+		<li><code>--validate</code> now checks each staff: empty staves, measure durations against the active time signature, ties that are opened and never closed, and slurs left open.</li>
+	</ul>
+
+	<h2>0.001.1 <span class="muted small">— 19 September 2026</span></h2>
+	<ul>
+		<li>Corrected the test dashboard URL and raised the minimum version of <code>Params::Validate::Strict</code>.</li>
+	</ul>
+
+	<h2>0.001.0 <span class="muted small">— 18 September 2026</span></h2>
+	<ul>
+		<li>First CPAN release: a working NWC-to-MusicXML pipeline, from the binary container decoder through the NWCTXT parser and the score model to the MusicXML 4.0 generator, with the <code>nwc2musicxml</code> command in front of it.</li>
+		<li>Notes, chords and rests in every NWC duration; grace notes; slurs numbered up to six at once; ties; articulations and ornaments; clef, key and time changes both initial and mid-staff; transposing instruments.</li>
+		<li>Tempo and tempo-variance directions; dynamics with the staff's <code>DynVel</code> velocities; hairpin wedges; text directions; repeat marks and other barline styles.</li>
+		<li>Staff visibility, staff groups, MIDI channel and program, asymmetric page margins from <code>PgMargins</code>, word and lyric fonts from <code>Font</code> records, and the score's own metadata.</li>
+		<li>Command line: single-file and batch conversion, recursive scanning, a selectable output directory, an overwrite guard, a warnings file and the extended consistency check.</li>
+	</ul>
+
+	<h2>Reading the whole history</h2>
+	<p>
+		The distribution's <code>Changes</code> file is on
+		<a href="https://metacpan.org/dist/Music-NWC2MusicXML/changes">MetaCPAN</a>,
+		and the commit history is in the
+		<a href="https://github.com/nigelhorne/NWC2MusicXML">repository</a>.
+	</p>
+
+	<div class="pager">
+		<a href="limitations.html">← Limits</a>
+		<span></span>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Music::NWC2MusicXML 0.002.4 — Copyright 2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/pod/Music::NWC2MusicXML">MetaCPAN</a> ·
+			<a href="https://metacpan.org/pod/nwc2musicxml">nwc2musicxml</a> ·
+			<a href="https://github.com/nigelhorne/NWC2MusicXML">Source</a> ·
+			<a href="https://nigelhorne.github.io/nwc2musicxml/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

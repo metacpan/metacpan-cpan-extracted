@@ -41,7 +41,7 @@
 require 5.010;
 use strict;
 use warnings FATAL => 'all';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::More;
 
 my @x  = (-60, -50, -45, -40, -35, -30, -25, -20, 0, 1, 2, 3, 4);

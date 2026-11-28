@@ -119,3 +119,9 @@ Revision history for Perl extension WebService::Browshot.
 	- Add screenshot_video and screenshot_video_file for WebM, MP4 and GIF
 	- Document new capture options and country-specific instance IDs
 	- Add offline unit tests and opt-in remote tests for API 1.32
+
+2.0.0
+	- Prefer Browshot API v2 for shared requests and retain v1 for legacy arguments
+	- Make instance IDs optional for capture, batch, and crawl requests
+	- Add named device lookup, multiple capture profiles, and S3 and webhook apps
+	- Use v2 for screenshot IDs from either version and keep v1 details on request

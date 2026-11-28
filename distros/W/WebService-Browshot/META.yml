@@ -24,6 +24,7 @@ requires:
   JSON: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
+  URI: '0'
   URI::Encode: '0'
-version: v1.32.0
+version: v2.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

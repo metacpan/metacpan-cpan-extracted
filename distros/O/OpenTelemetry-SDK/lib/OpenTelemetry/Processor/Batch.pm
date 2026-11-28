@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Processor::Batch;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 # TODO: If we move the different base implementations of processors
 # to the top-level, that still leaves the specific implementations
@@ -52,6 +52,11 @@ class OpenTelemetry::Processor::Batch :does(OpenTelemetry::Processor) {
             Invalid => "Exporter must implement the OpenTelemetry::Exporter interface: " . ( ref $exporter || $exporter )
         ) unless $exporter && $exporter->DOES('OpenTelemetry::Exporter');
 
+        # deprecated, non-standard variable explicitly not allowed by the OTel spec
+        if ( ( $ENV{OTEL_PERL_BSP_MAX_WORKERS} // 1 ) > 1 ) {
+            $logger->warn('Running the batch processor with multiple workers (OTEL_PERL_BSP_MAX_WORKERS) is no longer supported because the OpenTelemetry spec forbids it');
+        }
+
         if ( $batch_size > $max_queue_size ) {
             $logger->warn(
                 'Max export batch size cannot be greater than maximum queue size when instantiating batch processor',
@@ -63,11 +68,11 @@ class OpenTelemetry::Processor::Batch :does(OpenTelemetry::Processor) {
             $batch_size = $max_queue_size;
         }
 
-        # This is a non-standard variable, so we make it Perl-specific
-        my $max_workers = $ENV{OTEL_PERL_BSP_MAX_WORKERS};
-
         $function = IO::Async::Function->new(
-            $max_workers ? ( max_workers => $max_workers ) : (),
+            # The specification requires batch processors to synchronise
+            # calls to the exporter, so a single worker does all the
+            # exporting, one batch at a time.
+            max_workers => 1,
 
             code => sub ( $exporter, $batch, $timeout ) {
                 $exporter->export( $batch, $timeout );

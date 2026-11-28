@@ -2,15 +2,19 @@ name: Build and deploy site
 
 on:
   push:
-    branchs:
+    branches:
       - 'main'
     paths:
       - 'links.json'
+      - 'img/**'
+      - 'CNAME'
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
 jobs:
   build:
+    # Manual runs can select other branches; only main may build and deploy.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     container: davorg/links:latest
 

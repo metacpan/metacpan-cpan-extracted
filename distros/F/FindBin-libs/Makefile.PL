@@ -1,42 +1,45 @@
 #!/usr/bin/env perl
 ########################################################################
 # even the old version is guaranteed not to work
-# with anything earlier than 5.008.
+# with anything earlier than 5.008001.
 
-use 5.008;
+use 5.008001;
 use strict;
 use version;
 
 use ExtUtils::MakeMaker;
 
-use ExtUtils::Manifest  qw();
 use File::Basename      qw( basename    );
-use File::Find          qw( find        );
-use File::Path          qw( make_path remove_tree );
+use File::Path          qw( mkpath rmtree );
 use List::Util          qw( first       );
+
+# everything used here has to work on perl v5.8.1: modules are either
+# core in v5.8.1 with the functions used (mkpath and rmtree, not
+# File::Path 2.07's make_path and remove_tree) or are listed in
+# CONFIGURE_REQUIRES with a release that installs on v5.8.1.
 
 use File::Spec::Functions
 qw
 (
-    splitpath
-    catpath
     catdir
     catfile
     curdir
 );
 
 ########################################################################
-# optional version argument overrides the running perl version when
-# selecting a version/ directory.
-
-my $forced_version
-= @ARGV && $ARGV[0] =~ m{^  v? (?:\d+[.]?)+ $}x
-? shift @ARGV
-: undef
-;
-
-########################################################################
 # deal with MakeMaker version.
+#
+# CONFIGURE_REQUIRES is read by installers from the static META.json,
+# written by whatever perl ran "make dist", before this file is run:
+# it cannot be selected by perl version here.  Every entry must
+# install on v5.8.1:
+#
+#   version 0.77 (not core before v5.10; parse() needs 0.77, v5.10.0
+#   ships 0.74);
+#   File::Copy::Recursive::Reduced, which uses parent without declaring
+#   it (parent is core from v5.10.1, installs on v5.6) and whose tests
+#   need Path::Tiny (v5.8.1): the reason the floor is v5.8.1;
+#   List::Util for first(), present in every release.
 
 my $mm_v    = ExtUtils::MakeMaker->VERSION;
 
@@ -56,7 +59,7 @@ my @config_requires
                 }
                 (
                     [ qw( File::Copy::Recursive::Reduced  v0.6  ) ],
-                    [ qw( List::Util                      v1.46 ) ],
+                    [ qw( version                         v0.77 ) ],
                 )
             ),
             (
@@ -67,12 +70,12 @@ my @config_requires
                 qw
                 (
                     strict
-                    version
+                    parent
                     ExtUtils::MakeMaker
                     File::Basename
+                    File::Path
                     List::Util
                     File::Spec::Functions
-                    YAML::Tiny
                 )
             ),
         }
@@ -80,34 +83,18 @@ my @config_requires
 ;
 
 ########################################################################
-# File::Util::SecureDir is used by the v5.40 release, which is
-# installed for perl v5.40 and later; earlier releases do not use it.
+# perl version used to select the version/ directory and the
+# prerequisites.  PERL_VERSION (if set) stands in for the running
+# perl, so any version/ directory can be selected for validation.
+#
+# version->parse handles both: $^V is a plain v-string on v5.8.1, and
+# PERL_VERSION is a string ("v5.8.1", "v5.40", "v5.30.1").  The ternary
+# is used instead of // to keep this file v5.8.1 safe.
 
-my @securedir_prereq
-= version->parse( $^V ) < version->parse( 'v5.40' )
-? ()
-: ( 'File::Util::SecureDir' => version->parse( 'v0.1.0' )->numify )
-;
-
-########################################################################
-# test-only modules: TEST_REQUIRES needs MakeMaker 6.64, older
-# versions get them as runtime prerequisites.
-
-my %test_requires
-= (
-    'Test::More'    => 0
-);
-
-my @test_requires
-= $mm_v < 6.64
-? ()
-: ( TEST_REQUIRES => { %test_requires } )
-;
-
-my @test_prereqs
-= $mm_v < 6.64
-? %test_requires
-: ()
+my $perl_v
+= defined $ENV{ PERL_VERSION }
+? version->parse( $ENV{ PERL_VERSION } )
+: version->parse( $^V )
 ;
 
 ########################################################################
@@ -118,24 +105,15 @@ my @test_prereqs
 # lib/ and t/ are already in place -- skip the dircopy entirely.
 ########################################################################
 
+# version of the directory installed, '' for a dist install.
+
+my $src_v   = '';
+
 if( -d 'version' || $ENV{ FORCE_VERSION } )
 {
-    my $perl_v
-    = do
-    {
-        my $text
-        = defined $forced_version
-        ? $forced_version
-        : sprintf '%vd' => $^V
-        ;
+    # $perl_v is set above from PERL_VERSION or $^V.
 
-        print "\n# Parsing perl version: '$text'\n";
-
-        eval { version->parse( $text )->numify }
-        or die "Un-parsable perl version: '$text'";
-    };
-
-    print "\n# Running perl version: '$perl_v'\n";
+    print "\n# Installing with perl version: '$perl_v'\n";
 
     my $src_d
     = $ENV{ FORCE_VERSION }
@@ -161,10 +139,10 @@ if( -d 'version' || $ENV{ FORCE_VERSION } )
             my $ver
             = eval
             {
-                version->parse( $base )->numify
+                version->parse( $base )
             };
 
-            if( $ver )
+            if( defined $ver )
             {
                 [ $ver => $_ ]
             }
@@ -189,12 +167,15 @@ if( -d 'version' || $ENV{ FORCE_VERSION } )
 
     print "\n# Version directory: $src_d <= $perl_v.\n";
 
+    $src_v  = version->parse( basename $src_d );
+
     require File::Copy::Recursive::Reduced;
 
-    # MANIFEST is saved before dircopy and restored after; it is not
-    # touched during cleanup.  If it is absent (e.g. first install from
-    # a tarball) dircopy provides the version-local one, which is left
-    # in place.
+    # The top-level MANIFEST is the package MANIFEST: tracked in git
+    # and shipped in the tarball, it lists every version/ tree.  It is
+    # saved before dircopy and restored after, so the version-local
+    # MANIFEST that dircopy installs never replaces it; it is not
+    # touched during cleanup.
 
     my $manifest_text
     = do
@@ -223,7 +204,7 @@ if( -d 'version' || $ENV{ FORCE_VERSION } )
         next unless -e $dest || -l $dest;
 
         -d $dest && ! -l $dest
-        ? remove_tree( $dest )
+        ? rmtree( $dest )
         : unlink $dest;
     }
 
@@ -263,13 +244,37 @@ else
     print "\n# Dist install: lib/ and t/ already in place; skipping dircopy.\n";
 }
 
-# install-tests generates the t/20-*/ t/21-*/ etc. symlinks from
-# tests.yaml; called from the test target after dependencies are installed.
+# install-tests generates the t/01-bash/, t/02-syntax/, t/03-version/
+# symlinks and the t/20-*/ t/21-*/ etc. groups from tests.yaml; none
+# of them are distributed.  Called from the test target after
+# dependencies are installed.
 
 my $install_tests   = catfile curdir, 't', 'bin', 'install-tests';
 
 -f $install_tests
 and chmod 0755, $install_tests;
+
+# only version/v5.40 has t/bin/install-tests and tests in t/*/: the
+# Makefile runs install-tests only when t/bin is a directory and
+# install-tests is an executable file, and globs t/*/*.t only when
+# there are tests to match (an unmatched glob is passed to the
+# harness as a literal name).
+
+my $test_bin_d  = catdir curdir, 't', 'bin';
+
+my $has_install
+= -d $test_bin_d
+&& -f $install_tests
+&& -x _
+;
+
+my @sub_tests   = glob catfile( 't', '*', '*.t' );
+
+my $test_files
+= ( $has_install || @sub_tests )
+? 't/*.t t/*/*.t'
+: 't/*.t'
+;
 
 ########################################################################
 # reasonable question as to whether all of the version/* files represent
@@ -284,16 +289,22 @@ and chmod 0755, $install_tests;
 #
 # 09-Bin-symlink-exec.t is a file symlink so that $0 is a symlink when
 # make test runs it, letting the test verify $Bin_l/$Bin_p behavior.
+#
+# each spec names the directory its test lives in: the fixtures only
+# belong to the v5.40 tests, so a spec is skipped when the selected
+# version's t/ does not have that directory (e.g., version/v5.28).
 
 for my $spec
 (
-    [ catfile( 't', '10-Bin-path', 'foo' ), 'bar',                '../../.'                                              ]
-  , [ 't',                                  '12-Bin_l',           '11-Bin'                                               ]
-  , [ catfile( 't', '10-Bin-path'        ), '09-Bin-symlink-exec.t', '../../version/v5.40/t/10-Bin-path/09-Bin-symlink-exec.t' ]
+    [ 't',                                  '12-Bin_l',              '11-Bin'                                                , catfile( 't', '11-Bin'      ) ]
+  , [ catfile( 't', '10-Bin-path'        ), '09-Bin-symlink-exec.t', '../../version/v5.40/t/10-Bin-path/09-Bin-symlink-exec.t', catfile( 't', '10-Bin-path' ) ]
 )
 {
-    my ( $dir, $name, $target ) = @$spec;
+    my ( $dir, $name, $target, $test_d ) = @$spec;
     my $path = catfile $dir, $name;
+
+    -d $test_d
+    or next;
 
     -l $path
     and next;
@@ -307,7 +318,7 @@ for my $spec
     };
 
     -d $dir
-    or make_path $dir;
+    or mkpath $dir;
 
     symlink $target, $path
     or warn "Cannot create symlink '$path' -> '$target': $!";
@@ -323,12 +334,110 @@ unless( -f 'Makefile' )
     or die "Cannot create placeholder Makefile: $!";
 }
 
+########################################################################
+# prerequisites by version directory: each release lists only what
+# its own lib/ and t/ use, so an older perl is never asked to install
+# a module that requires a newer one (e.g., File::Util::SecureDir is
+# v5.36+ and used only by v5.40).  These reach installers through
+# MYMETA, generated here for the running perl.
+#
+# done_testing in the tests of every release needs Test::More 0.88.
+# v5.40 uses List::Util uniq (1.45).  t/bin/install-tests reads
+# tests.yaml with YAML::Tiny.
+
+my %dir_prereqz =
+(
+    'v5.8.1'    =>
+    {
+        runtime =>
+        {
+            map { ( $_ => 0 ) }
+            qw( Carp Cwd File::Basename File::Spec::Functions List::Util Symbol )
+        }
+      , test    =>
+        {
+            'File::Temp'    => 0
+          , 'Test::More'    => 0.88
+        }
+    }
+  , 'v5.40'     =>
+    {
+        runtime =>
+        {
+            ( map { ( $_ => 0 ) } qw( Carp File::Basename File::Spec::Functions File::stat Symbol parent ) )
+          , 'Cwd'                   => version->parse( 'v3.73' )->numify
+          , 'List::Util'            => 1.45
+          , 'File::Util::SecureDir' => version->parse( 'v0.1.0' )->numify
+        }
+      , test    =>
+        {
+            ( map { ( $_ => 0 ) } qw( Encode File::Copy File::Find File::Path File::Temp IPC::Open3 YAML::Tiny autodie ) )
+          , 'Test::More'    => 0.88
+        }
+    }
+);
+
+# v5.14 and v5.28 use the same modules as v5.8.1.
+
+$dir_prereqz{ $_ } = $dir_prereqz{ 'v5.8.1' }
+for qw( v5.14 v5.28 );
+
+# the table entry is chosen by the version directory installed above;
+# a dist install without version/ chooses by the perl version.
+
+my $dir_v
+= $src_v
+? $src_v
+: $perl_v
+;
+
+my $prereq_key
+= first
+{
+    version->parse( $_ ) <= $dir_v
+}
+sort
+{
+    version->parse( $b ) <=> version->parse( $a )
+}
+keys %dir_prereqz
+or die "No prerequisites for version '$dir_v'.\n";
+
+my $prereqz = $dir_prereqz{ $prereq_key };
+
+print "\n# Prerequisites for: '$prereq_key'.\n";
+
+# TEST_REQUIRES needs MakeMaker 6.64, older versions get the test
+# modules as runtime prerequisites.
+
+my @test_requires
+= $mm_v < 6.64
+? ()
+: ( TEST_REQUIRES => { %{ $prereqz->{ test } } } )
+;
+
+my @test_prereqs
+= $mm_v < 6.64
+? %{ $prereqz->{ test } }
+: ()
+;
+
+# File::Copy::Recursive::Reduced is configure-only: MakeMaker before
+# 6.52 has no CONFIGURE_REQUIRES, and gets it as a runtime one.
+
+my @fcrr_prereq
+= $mm_v < 6.52
+? ( 'File::Copy::Recursive::Reduced' => version->parse( 'v0.6' )->numify )
+: ()
+;
+
 WriteMakefile
 (
 qw
 (
     NAME            FindBin::libs
     LICENSE         perl
+    VERSION         v5.5.3
 ),
 
 # note that the VERSION_FROM path is handled *after* the
@@ -337,35 +446,12 @@ qw
 # after three modules and examples the version has to float
 # independent of just the modules.
 
-  VERSION         => v5.5.2
 , AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>'
 , PREREQ_PM       =>
     {
-        'Cwd'
-        => version->parse( 'v3.73'  )->numify,
-
-        'File::Copy::Recursive::Reduced'
-        => version->parse( 'v0.002' )->numify,
-
-        @securedir_prereq,
-
-        # particular versions
-        # are unlikely to cause pain.
-
-        qw
-        (
-            Carp                    0
-            File::Basename          0
-            File::Spec::Functions   0
-            File::Temp              0
-            File::stat              0
-            List::Util              0
-            Symbol                  0
-            strict                  0
-            version                 0
-        ),
-
-        @test_prereqs
+        %{ $prereqz->{ runtime } }
+      , @fcrr_prereq
+      , @test_prereqs
     }
 
 , @config_requires
@@ -377,8 +463,12 @@ qw
 
     sub postamble
     {
-        <<END
-TEST_FILES = t/*.t t/*/*.t
+        my $text    = "TEST_FILES = $test_files\n";
+
+        $has_install
+        or return $text;
+
+        $text . <<END
 
 # pure_all runs during the build phase; test depends on it.
 # Hooking here ensures install-tests runs before the harness

@@ -68,10 +68,10 @@ sub compare {
 	my $signature = $subroutine->signature;
 	my $fail = 0;
 
-	if(@$signature == @{$self->signature}) {
+	if(@$signature == @{$self->{signature}}) {
 		for my $type (@{$self->{signature}}) {
 			my $other_type = $signature->[$i++];
-			$fail = 1, last unless $type <= $other_type;
+			$fail = 1, last unless $other_type <= $type;
 		}
 	} else {
 		$fail = 1;
@@ -132,6 +132,26 @@ Creates a wrapper function that checks the signature.
 =head2 compare ($subroutine)
 
 Checks its (expected) signature against the one declared by the function in the module and throws an exception if the signatures do not match.
+
+But the second signature may have narrowed types.
+
+	use Aion::Types;
+	use Aion::Meta::Subroutine;
+	
+	my $x1 = Aion::Meta::Subroutine->new(pkg => 'ExCompare', subname => 'x1', signature => [Num() => Any]);
+	my $x2 = Aion::Meta::Subroutine->new(pkg => 'ExCompare', subname => 'x2', signature => [Int() => Str]);
+	
+	Int <= Num # -> 1
+	Str <= Any # -> 1
+	
+	$x1->compare($x2);
+	$x2->compare($x1); # @-> Signature mismatch: x2(Int => Str) of ExCompare <=> x1(Num => Any) of ExCompare
+	
+	my $x3 = Aion::Meta::Subroutine->new(pkg => 'ExCompare', subname => 'x3', signature => [Str() => Any]);
+	
+	Str <= Num # -> ""
+	
+	$x1->compare($x3); # @-> Signature mismatch: x1(Num => Any) of ExCompare <=> x3(Str => Any) of ExCompare
 
 =head2 stringify ()
 

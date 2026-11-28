@@ -11,8 +11,15 @@
 #   define INITIALIZATION_SIZE 64
 #endif
 
+/* Cap retained buffer size on reusable encoders so an occasional huge
+ * packet does not permanently pin multi-MB buffers. */
+#ifndef SRL_ENC_BUF_REUSE_MAX_SIZE
+#   define SRL_ENC_BUF_REUSE_MAX_SIZE (1024 * 1024)
+#endif
+
 #include "srl_inline.h"
 #include "srl_buffer_types.h"
+#include "srl_str_dedupe.h"
 
 typedef struct PTABLE * ptable_ptr;
 struct srl_encoder_frame;
@@ -34,8 +41,7 @@ typedef struct {
                                * Possibly this should be replaced with freezeobj_svhash, but this works fine.
                                */
     ptable_ptr freezeobj_svhash; /* ptr table for tracking objects and their frozen replacments via FREEZE */
-    HV *string_deduper_hv;    /* literal string offsets, by content, for COPY */
-    HV *string_alias_hv;      /* first scalar value offsets, by content, for ALIAS */
+    srl_str_dedupe_tbl_t str_dedupe_tbl; /* open-addressed C table for COPY/ALIAS string deduplication */
     struct srl_encoder_frame *frames; /* live C traversal state, not input snapshots */
     ptable_ptr callback_seen;
     struct PTABLE_entry *callback_spare; /* reusable callback_seen entries */
@@ -45,6 +51,7 @@ typedef struct {
     AV *callback_keepalive;   /* values borrowed across actual Perl callbacks */
 
     void *snappy_workmem;     /* lazily allocated if and only if using Snappy */
+    void *zstd_cctx;          /* lazily allocated ZSTD_CCtx when reusing encoder */
     U8 checksum_key[16];
     U8 checksum_key_set;
     U8 checksum_policy;

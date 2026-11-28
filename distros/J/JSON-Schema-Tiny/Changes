@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Tiny
 
+0.035     2026-11-27 23:58:56Z
+          - clean up dependency list a bit more
+
 0.034     2026-07-03 17:38:43Z
           - removed dependency on namespace::clean
           - config option "max_traversal_depth" has been renamed to

@@ -29,7 +29,7 @@
 require 5.010;
 use warnings FATAL => 'all';
 use strict;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::More;
 
 # Relative comparison: across the power_t_test files the solved quantities span

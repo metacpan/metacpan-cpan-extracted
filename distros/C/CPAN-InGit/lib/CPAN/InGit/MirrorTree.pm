@@ -1,5 +1,5 @@
 package CPAN::InGit::MirrorTree;
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # ABSTRACT: Subclass of ArchiveTree which automatically mirrors files from upstream
 
 
@@ -10,6 +10,8 @@ use IO::Uncompress::Gunzip qw( gunzip $GunzipError );
 use JSON::PP;
 use Time::Piece;
 use Log::Any '$log';
+use Digest::SHA 'sha1_hex';
+use CPAN::InGit::DistTree;
 use Moo;
 use v5.36;
 
@@ -72,18 +74,51 @@ sub get_path($self, $path) {
          unless ($ent) {
             $log->debug(" mirror autofetch $path");
             my $blob= $self->add_upstream_package_details;
-            $self->clear_package_details; # will lazily rebuild
             $ent= [ $blob, 0100644 ];
          }
       }
       elsif ($path =~ m{^authors/id/(.*)} and !$ent) {
-         $log->debug(" mirror autofetch $path");
          my $author_path= $1;
+         # The server can generate the archive for a locally unpacked distribution.
+         return undef if $self->_unpacked_dist_dir($author_path);
+         $log->debug(" mirror autofetch $path");
          my $blob= $self->add_upstream_author_file($author_path, undef_if_404 => 1);
          $ent= [ $blob, 0100644 ] if $blob;
       }
    }
    return $ent;
+}
+
+sub get_distfile($self, $author_path) {
+   my $bytes= $self->SUPER::get_distfile($author_path);
+   return $bytes if $bytes;
+   return $self->autofetch? $self->fetch_upstream_file("authors/id/$author_path", undef_if_404 => 1) : undef;
+}
+
+sub get_dist($self, $author_path, %options) {
+   my $dist= $self->next::method($author_path, %options);
+   return $dist if $dist || !$options{fetch} || !defined $self->upstream_url;
+   my ($name)= CPAN::InGit::DistTree->parse_filename($author_path)
+      or return undef;
+   # Files on CPAN never change, so this can be cached by name
+   my $repo= $self->parent;
+   my $key= 'path/'.sha1_hex($self->upstream_url."\0".$author_path);
+   my $tree= $repo->cached_dist_tree($key);
+   unless ($tree) {
+      # download before taking the cache lock
+      $log->debug(" mirror fetch authors/id/$author_path for dist cache");
+      my $bytes= $self->fetch_upstream_file("authors/id/$author_path", undef_if_404 => 1)
+         or return undef;
+      $tree= $repo->cached_dist_tree($key, sub {
+         CPAN::InGit::DistTree->new_from_archive(
+            parent => $repo, filename => $author_path, data => $bytes
+         )->tree;
+      });
+   }
+   return CPAN::InGit::DistTree->new(
+      parent => $repo, tree => $tree, name => $name,
+      author_path => $author_path, storage => 'upstream',
+   );
 }
 
 
@@ -115,8 +150,22 @@ sub add_upstream_package_details($self, %options) {
    my $txt;
    gunzip $content_ref => \$txt
       or croak "gunzip failed: $GunzipError";
+   my $previous= $self->SUPER::get_path('modules/02packages.details.txt');
+   my $old_index= $previous? $previous->[0]->content : '';
+   if ($old_index =~ /^\S+\s+\S+\s+L\/LO\/LOCAL\//m) {
+      my $old= $self->parse_package_details($old_index);
+      my $updated;
+      for my $path (keys %{ $old->{by_dist} }) {
+         next unless $path =~ m{\AL/LO/LOCAL/} && $self->SUPER::get_path($self->meta_path_for_dist($path));
+         $updated //= $self->parse_package_details($txt);
+         $self->_index_distribution($updated, $path,
+            { map { $_->[0] => $_->[1] } @{ $old->{by_dist}{$path} } });
+      }
+      $txt= $self->_format_package_details($updated) if $updated;
+   }
    my $blob= Git::Raw::Blob->create($self->git_repo, $txt);
    $self->set_path('modules/02packages.details.txt', $blob);
+   $self->clear_package_details;
    $self->{_blob_last_update}{$blob->id}= time;
    return $blob;
 }
@@ -200,7 +249,7 @@ Also return the C<Git::Raw::BLOB>.
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

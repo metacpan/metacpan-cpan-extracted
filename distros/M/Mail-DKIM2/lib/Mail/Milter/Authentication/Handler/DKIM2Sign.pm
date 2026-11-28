@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signing
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 use base 'Mail::Milter::Authentication::Handler';
 
 use Mail::DKIM2::Common qw(extract_mi_version parse_mime DKIM2_DRAFT DKIM2_REPO DKIM2_DATE);

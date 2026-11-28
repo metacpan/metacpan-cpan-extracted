@@ -44,6 +44,7 @@ mdee - em·dee, Markdown Easy on the Eyes
      -L  --[no-]lateral     all pages in one row, scrolled sideways
          --[no-]rule        use Unicode rules for tables (default: on)
     --ts --table-style=#    table style: lattice, 3line or simple (default: lattice)
+         --keep TYPE=WHAT   kept in one pane: table=none|row|head|all (default: table=head)
          --cat-v            visualize whitespace via cat-v
          --[no-]image[=#]   image types to show (default: png,jpeg,gif)
      -w  --width=#          output width (default: terminal width)
@@ -75,7 +76,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.30
+Version 1.32
 
 =cut
 
@@ -171,6 +172,7 @@ declare -a pass_nup=(--document --no-filename --no-highlight)
 declare -a pass_md=()
 declare -a _config=()
 declare -A show=()
+declare -A keep=()
 declare -A default=()
 
 # Declared here because %! auto-assigns broken values to this hash;
@@ -199,6 +201,7 @@ declare -A OPTS=(
     [        lateral | L             # all pages in one row  ]=_
     [           rule |               # table rule lines      ]=_
     [    table-style | ts :          # table style           ]=lattice
+    [           keep |    %          # kept in one pane      ]=
     [          width | w  : =i       # output width          ]=0
     [     fold-width |    : =i       # fold width            ]=0
     [          runin |    : =i       # run-in width          ]=4
@@ -464,6 +467,21 @@ case $table_style in
     pipe) table_style=lattice ;;
     *) die "--table-style: lattice, 3line or simple expected, not '$table_style'" ;;
 esac
+# --keep TYPE=WHAT: what of a block of the type is kept in one pane;
+# default[keep] gives those not given on the command line
+if [[ ${default[keep]:-} ]]; then
+    IFS=, read -ra _keep <<< "${default[keep]}"
+    for _k in "${_keep[@]}"; do
+        [[ -v keep[${_k%%=*}] ]] || keep[${_k%%=*}]=${_k#*=}
+    done
+fi
+for _k in "${!keep[@]}"; do
+    case $_k=${keep[$_k]} in
+        table=none|table=row|table=head|table=all) ;;
+        table=*) die "--keep: table=none, row, head or all expected, not '${keep[$_k]}'" ;;
+        *) die "--keep: unknown type '$_k' (table)" ;;
+    esac
+done
 case $boundary in
     word|space|none) ;;
     *) die "--boundary: word, space or none expected, not '$boundary'" ;;
@@ -637,6 +655,7 @@ run_greple() {
     [[ $trim  ]] && config_params+=("table_trim=1") || config_params+=("table_trim=0")
     [[ $rule  ]] && config_params+=("rule=1")  || config_params+=("rule=0")
     [[ $table_style != lattice ]] && config_params+=("table_style=$table_style")
+    [[ $_intact && ${keep[table]:-head} != head ]] && config_params+=("keep.table=${keep[table]}")
     [[ $heading_markup ]] && config_params+=("heading_markup=$heading_markup")
     [[ $refill ]] && config_params+=("refill=1")
 
@@ -788,8 +807,8 @@ if [[ -v image ]]; then
     _image_types=${image:-png,jpeg,gif}
     for _t in ${_image_types//,/ }; do
         case $_t in
-            png|jpeg|gif) ;;
-            *) die "--image: unknown type: $_t (png, jpeg or gif)" ;;
+            png|jpeg|gif|mermaid) ;;
+            *) die "--image: unknown type: $_t (png, jpeg, gif or mermaid)" ;;
         esac
     done
 fi
@@ -1272,6 +1291,43 @@ right of the cell.  With C<table_gap=2> a cell of C<lattice> has a
 space on both sides; the spaces at the right end of the table are then
 left out when the table does not fit the width with them.
 
+=item B<--keep> I<TYPE>=I<WHAT>[,...]
+
+Tell what of a block of the I<TYPE> is kept in one pane of nup, so
+that a pane does not end inside it.  The block goes to the next pane
+when that part does not fit in the rest of the pane.  The option can
+be repeated, and the settings can be joined by commas:
+C<--keep table=all>.  C<table> is the only I<TYPE> for now, with
+these values of I<WHAT> (default: C<head>):
+
+=over 4
+
+=item C<none>
+
+Nothing: a pane may end between any two lines of a table.
+
+=item C<row>
+
+The lines of a row, which has more than one line when a cell is
+wrapped.
+
+=item C<head>
+
+Also the header, the rule below it and the first row, and with
+C<3line> and C<simple>, the last row and the rule below it.
+
+=item C<all>
+
+The whole table.  A table longer than a pane is laid out as lines,
+and may be divided anywhere.
+
+=back
+
+This has an effect only when tables are kept intact: with nup, when
+folding and table formatting are on, and without C<--cat-v>.
+C<default[keep]> in the configuration file gives the settings of the
+types not given on the command line: C<default[keep]=table=all>.
+
 =item B<--cat-v>
 
 Pass the output through L<cat-v(1)|App::cat::v> to visualize
@@ -1283,7 +1339,9 @@ visualization is disabled by default.
 
 Show images in the terminal (default: on).  I<TYPES> is a list of
 the types of images to show, separated by commas: C<png>, C<jpeg> and
-C<gif> (default: all of them).  B<--image=png> shows PNG only, and
+C<gif> (default: all of them), and C<mermaid>, which is not in the
+default: B<--image=png,jpeg,gif,mermaid> also draws the Mermaid
+diagrams (see L</Mermaid Diagrams>).  B<--image=png> shows PNG only, and
 B<--no-image> none.  They are shown only in the terminals that
 support them; see L</IMAGES>.
 
@@ -1712,6 +1770,38 @@ is written in C<=begin html> in POD and copied into README.
 
 Images inside a paragraph or a code block are not shown.
 
+=head2 Mermaid Diagrams
+
+With C<mermaid> in B<--image>, a fenced code block whose info string
+is C<mermaid> is followed by the image of its diagram.  The code is
+shown as it is, as the line of an image is, so the output with
+B<--no-image> is the same text without the images.
+
+The diagrams are drawn by B<mmdr> of
+L<mermaid-rs-renderer|https://github.com/1jehuang/mermaid-rs-renderer>,
+which needs no browser, is quick, and draws the diagrams in its own
+way.  They are drawn on the background GitHub shows them on: the
+C<default> theme on white, or the C<dark> theme on C<#0d1117> in the
+dark mode.  The images are kept in
+F<mdee-mermaid-I<UID>> of the temporary directory (C<TMPDIR>, or
+F</tmp>), which only the user can read, and drawn again only when the
+code changes or the system has cleaned them up.  A diagram that
+cannot be drawn is not shown, and is tried again the next time.
+B<mmdr> does not fetch anything from the network.
+
+The look is set by C<--config>: C<mermaid_theme=NAME> (C<default>,
+C<dark>, C<forest> or C<neutral>), C<mermaid_background=COLOR> (a color
+of CSS, or C<transparent>, with which the background of the terminal
+shows through) and C<mermaid_scale=N> (1.5 by default).  A diagram is
+shown at its size, in the cells of the terminal, and reduced to the
+fold width when it is wider; a larger scale makes a small diagram take
+more cells, and fewer panes (C<-C1>, or C<-p>) leave more width for a
+wide one.
+
+The command is given by C<--config mermaid_command=COMMAND>, split
+into words as a shell does: a path, or B<mmdr> with options.  With
+its own C<-c>, it is not given the background.
+
 =head2 Image Files
 
 The file is read from the local disk, by a path relative to the
@@ -1740,6 +1830,9 @@ width and within the terminal height minus four lines.  With nup, an
 image is not split across panes: if it does not fit in the rest of a
 pane, it starts in the next one (requires
 L<ansicolumn(1)|App::ansicolumn> 1.71 or later).
+
+An image is put in the middle of the fold width.  With
+C<--config image_align=left> it is put at the left end.
 
 =head2 Conditions
 
@@ -1912,6 +2005,7 @@ This is a shell script that can set defaults and override colors:
     default[fold_width]=80           # set default fold width
     default[refill]=1                # join paragraph lines
     default[lateral]=1               # all pages in one row
+    default[keep]=table=all          # a table in one pane
     default[base_color]=DarkCyan     # set default base color
 
 A value which has spaces or characters special to the shell, as C<< < >>,
@@ -1934,6 +2028,8 @@ The C<default> associative array supports the following keys:
 =item C<default[refill]> - Corresponds to C<--refill> (C<1> to enable)
 
 =item C<default[lateral]> - Corresponds to C<--lateral> (C<1> to enable)
+
+=item C<default[keep]> - Corresponds to C<--keep> (e.g., C<table=all>)
 
 =item C<default[pane_width]> - Corresponds to C<--pane-width> (e.g., C<100>)
 

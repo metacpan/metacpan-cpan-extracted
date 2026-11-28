@@ -26,5 +26,7 @@ $res = $worker->call('Command A');
 say 'Main: Worker yielded: ' . $res;
 say 'Main: Finishing up...';
 $res = $worker->call('Final Command');
+say 'Main: Worker yielded: ' . $res;
+$res = $worker->call('Done');
 say 'Main: Worker returned: ' . $res;
 say 'Main: Worker is officially finished.' if $worker->is_done;

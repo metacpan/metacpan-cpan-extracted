@@ -1,5 +1,12 @@
 Revision history for Logic-Relational
 
+0.04	27 November 2026
+	- Added in-process JSON-Datalog query interface
+	- Added program introspection and schema auto-reflection via describe() method
+	- Added predicate and program metadata registration
+	- Extended Logic::Relational::Syntax with description, doc, program_version, and predicate declarations, plus describe, query_data, and query_json package exports
+	- Added example of JSON-Datalog query interface
+
 0.03	10 November 2026
 	- Added detection of direct left-recursion and automatic tabling
 	- Introduced sub-second precision timestamping via Time::HiRes for expiring facts, snapshot TTL calculations, and query goal expiration

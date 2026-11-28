@@ -1,3 +1,48 @@
+0.007 - 2026-11-27
+  - cpangit-add
+     - New feature `--local` imports a dist to L/LO/LOCAL for customization
+       and sets this local version as the provider for the contained modules.
+  - cpangit-audit: New tool listing every dist of a branch for which a newer
+    dist is available in its import sources, and which versions are affected
+    by CVEs.
+  - cpangit-diff: New tool for comprehensively diffing two versions of the
+    same dist, primarily for showing what would change if it were upgraded.
+  - When importing a dist into a branch, warn if it provides modules which
+    were not indexed at the source.  This could be a sign that it is
+    violating namespace permissions.
+  - New module CPAN::InGit::Advisories looks up CVEs in the CPANSA feed, with
+    the same semantics as the web interface.
+  - ArchiveTree: New method `find_upgrades` compares the index with other
+    trees, grouping modules by (dist here, dist there).
+  - CPAN::InGit:
+     - New method `load_advisories` and attributes `cve_feed_url`,
+       `cve_feed_path`, `cve_feed_max_age`.
+     - New attribute `dist_cache_repo` provides a Git::Repo for cached
+       unpacking of dists without polluting the main repo.
+     - Removed method `process_distfile` which has been superceeded by
+       DistTree and its methods.
+  - MutableTree:
+     - New methods list_dir and diff
+     - set_path accepts a hashref or Git tree to replace a whole directory
+     - get_path can return directories
+  - New class CPAN::InGit::DistTree gives access to the files, META, change
+    log, and prereqs of a distribution, and can compare two distributions.
+    Get one from new method ArchiveTree->get_dist.
+  - ArchiveTree:
+     - get_dist_meta falls back to the META inside of the distribution
+     - get_dist: new method returns CPAN::InGit::DistTree instances
+     - import_dist writes the .meta file from the distribution if the source
+       tree lacks one
+     - dist_storage: new method indicates whether a dist is stored as a single
+       archive file or is already unpacked in the repo.
+  - Server:
+     - Browse the files of a distribution at authors/id/.../Dist-1.0.tar.gz/
+     - New views of a distribution: ~changes, ~meta, and ~diff?to=OTHER_DIST
+     - The "Src. Ver." column of the index links to a ~diff of the pinned
+       distribution vs. the one in the import source.
+     - The front-end can now collapse modules from the same dist and matching
+       prefix, for readability.
+
 0.006 - 2026-10-29
   - Server:
      - Fix ability to run Mojo server mounted at a deeper path than '/'

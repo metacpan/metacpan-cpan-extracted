@@ -12,7 +12,26 @@ To install this module type the following:
    make test
    make install
 
-API 1.32
+API v1 AND v2
+
+The client selects the API version for each request. It uses v1 for legacy
+options such as instance_id, instances, screen, details, hooks, and hosting,
+and for instance lookup and screenshot_host. Shared calls prefer v2. If the
+server reports that the v2 route is unavailable, shared requests can use v1.
+
+   $browshot->screenshot_create(url => 'https://example.org/', instance_id => 373);
+   $browshot->screenshot_create(url => 'https://example.org/', country => 'fr', device => 'iphone_15_pro');
+   $browshot->screenshot_thumbnail(id => $id, width => 640);
+
+screenshot_info uses v2 by default for IDs from either version. Use
+details => 0–3 or api_version => 1 to read the v1 response, including
+instance_id. A client created with an explicit base URL keeps that URL.
+
+Use device_list for device names. The app_list, app_info, app_create,
+app_update, app_delete, app_test, and app_run methods manage v2 S3 and
+webhook apps. See the module documentation for examples.
+
+PDF AND VIDEO
 
 New capture options are passed as named arguments to the existing screenshot,
 multiple, batch, and crawl methods. No request format change is needed.
@@ -51,6 +70,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
+  URI
   URI::Encode
   JSON
   LWP::UserAgent

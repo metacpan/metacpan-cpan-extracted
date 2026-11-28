@@ -1,13 +1,14 @@
-use 5.022;
+use 5.024;
 use stable qw( postderef );
 use experimental qw( signatures );
 use true;
 
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.81 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.82 {
 
   use Moose;
   use Dist::Zilla::File::InMemory;
   use Dist::Zilla::File::FromCode;
+  use Dist::Zilla::Plugin::Author::Plicease;
   use Sub::Exporter::ForMethods qw( method_installer );
   use Data::Section { installer => method_installer }, -setup => { header_re => qr/^@@ (.*?)$/ };
   use Dist::Zilla::MintingProfile::Author::Plicease;
@@ -244,6 +245,16 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.81 {
     $self->gather_file_template('t/main_class.t' => 't/' . lc($self->zilla->name =~ s/-/_/gr) . ".t" );
     $self->gather_file_simple  ('xt/author/critic.t');
 
+    if($self->perl_version >= 5.042)
+    {
+      $self->add_file(
+        Dist::Zilla::File::InMemory->new({
+          name    => 'docs/PERLSTYLE.md',
+          content => Dist::Zilla::Plugin::Author::Plicease->dist_dir->child('docs/PERLSTYLE.md')->slurp_utf8,
+        })
+      );
+    }
+
     foreach my $workflow ($self->workflow->@*)
     {
       $self->gather_file_simple(".github/workflows/$workflow.yml");
@@ -458,7 +469,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.81
+version 2.82
 
 =head1 DESCRIPTION
 

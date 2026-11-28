@@ -33,6 +33,23 @@ cpangit-add --branch=my_app Catalyst DBIx::Class
 # The versions are pinned until you request a newer version.
 cpangit-add --branch=my_app Catalyst DBIx::Class Log::Any
 
+# Unpack a distribution into authors/id/L/LO/LOCAL, and update the package
+# index to make this the source for the modules it provides.
+cpangit-add --local Crypt::DES
+cpangit-add --local ./Example-1.00.tar.gz
+
+# Review what would change by upgrading a module to the version found in the
+# branch's import source: prereq changes, new change log entries, and a diff.
+cpangit-diff --branch=my_app DBIx::Class
+
+# Or compare any two distributions
+cpangit-diff A/AU/AUTHOR/Example-1.00.tar.gz ./Example-1.02.tar.gz
+
+# List every distribution of a branch that is outdated or affected by a CVE
+cpangit-audit --branch=my_app
+# Just fail if anything in the branch has a known CVE (add --json for the report too)
+cpangit-audit --branch=my_app --assert-no-cve
+
 # Serve your own CPAN
 cpangit-server -l http://localhost:3000 &
 

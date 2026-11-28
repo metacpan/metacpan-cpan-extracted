@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 use Scalar::Util 'looks_like_number';
 use Test::Exception; # die_ok
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::LeakTrace 'no_leaks_ok';
 # Custom helper for floating-point comparisons
 sub is_approx {

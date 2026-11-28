@@ -157,11 +157,11 @@ msgstr "Perl version."
 msgid "Строки, включая числа."
 msgstr "Strings, including numbers."
 
-msgid "Строки Unicode с флагом utf8 или если декодирование в utf8 происходит без ошибок."
-msgstr "Unicode strings with the utf8 flag or if decoding to utf8 occurs without errors."
+msgid "Строки с флагом utf8 или с номерами символов меньше 128."
+msgstr "Lines with the utf8 flag or with character numbers less than 128."
 
-msgid "Бинарные строки без флага utf8 и октетов с номерами меньше 128."
-msgstr "Binary strings without the utf8 flag and octets with numbers less than 128."
+msgid "Строки без флага utf8."
+msgstr "Lines without the utf8 flag."
 
 msgid "Строка начинается с `begin`."
 msgstr "The line starts with `begin`."

@@ -1,5 +1,5 @@
 use Test2::V0 -no_srand => 1;
-use 5.022;
+use 5.024;
 use Test::DZil;
 use List::Util qw( first );
 

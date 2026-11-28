@@ -17,7 +17,7 @@
 require 5.010;
 use strict;
 use warnings FATAL => 'all';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::More;
 
 # Relative to the value, or absolute where it is below 1.  The worst error seen

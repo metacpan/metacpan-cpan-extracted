@@ -1,0 +1,383 @@
+package DBIx::QuickORM::Manual::Dialects;
+use strict;
+use warnings;
+
+our $VERSION = '0.000031';
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Manual::Dialects - What differs between PostgreSQL, MySQL, MariaDB, SQLite, and DuckDB, and what it means for your code.
+
+=head1 DESCRIPTION
+
+The ORM hides most database differences. Here is what still affects your
+code, at a glance:
+
+=over 4
+
+=item PostgreSQL
+
+PostgreSQL is the baseline, so everything on these pages works as shown.
+One caveat is C<json>: unlike C<jsonb>, it has no C<=> operator, so
+compare-and-swap fails on a C<json> column.
+
+The ORM reuses prepared statements for its CRUD operations. Behind a pooler
+in transaction mode, such as PgBouncer, turn off server-side prepares. Set
+C<< pg_server_prepare => 0 >> in the C<attrs> of C<credentials>, or in the
+attributes your C<connect> sub passes to C<< DBI->connect >>.
+
+=item MariaDB
+
+MariaDB has no C<RETURNING> on C<UPDATE>. It declares C<JSON> as
+C<LONGTEXT> with a validity check, so the scan sees text. Named time zones
+need the server's time zone tables.
+
+=item MySQL
+
+MySQL has no C<RETURNING> at all. A C<JSON> value never compares equal to a
+text bind. Named time zones need the server's time zone tables.
+
+=item SQLite
+
+SQLite has no C<async> or C<aside> (L<DBIx::QuickORM::Manual::Background>),
+no transaction isolation levels (L<DBIx::QuickORM::Manual::Transactions>),
+and no session time zone. It binds values as text, and an in-memory database
+allows no second connection. Foreign keys are enforced, since the ORM sends
+C<PRAGMA foreign_keys = ON> on every SQLite connection.
+
+=item DuckDB
+
+DuckDB has no savepoints, no second connection, no C<async> or C<aside>,
+and no isolation levels. Errors are classified from their message, and time
+zones work by name only.
+
+=back
+
+=head1 SCHEMA
+
+The examples use PostgreSQL and this schema:
+
+=for highlighter language=sql
+
+    CREATE TABLE users (
+        id          SERIAL PRIMARY KEY,
+        name        TEXT NOT NULL,
+        email       TEXT UNIQUE,
+        prefs       JSON,
+        referred_by INTEGER REFERENCES users (id),
+        created     TIMESTAMP NOT NULL DEFAULT now()
+    );
+
+    CREATE TABLE posts (
+        id      SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users (id),
+        title   TEXT NOT NULL,
+        views   INTEGER NOT NULL DEFAULT 0
+    );
+
+=head1 ASKING THE DIALECT
+
+=for highlighter language=perl
+
+    my $dialect = $orm->connection->dialect;
+
+    # 'PostgreSQL', 'MySQL', 'MariaDB', 'SQLite', or 'DuckDB'
+    my $name = $dialect->name;
+
+    # 170004 for PostgreSQL 17.4 (its own number), and elsewhere
+    # major * 1_000_000 + minor * 1_000 + patch: 8000036 for MySQL 8.0.36
+    my $version = $dialect->server_version;
+
+    # branch on a capability, not a name
+    my $whole = $dialect->supports_returning_update ? 'the row' : 'its key';
+
+The capabilities: C<supports_returning_insert>, C<supports_returning_update>,
+C<supports_returning_delete>,
+C<supports_savepoints>, C<supports_isolation>, C<supports_async>,
+C<supports_second_connection($dbh)>, C<having_uses_alias>, and
+C<bind_limit>. MySQL and MariaDB both connect through L<DBD::MariaDB>. The
+dialect tells them apart by the server's version.
+
+=head1 RETURNING
+
+With C<RETURNING>, C<insert> and a row's C<update> hand back the written row
+(its default fields), so the row object holds them. PostgreSQL, SQLite, and
+DuckDB have it on every statement. MariaDB has it on C<INSERT> and
+C<DELETE>, not C<UPDATE>. MySQL never does.
+
+    my $ann = $orm->insert(users => {
+        name  => 'Ann',
+        email => 'ann@example.com',
+    });
+    $ann->update({name => 'Ann B'});
+
+    # every field, but on MySQL, and on MariaDB after an update, only id
+    my @have = sort keys %{$ann->row_data};
+
+    # 'Ann B' everywhere: a field the row lacks is fetched when read
+    my $name = $ann->field('name');
+
+Without C<RETURNING> a written row holds only its primary key. A missing
+field is fetched when first read. C<< $row->fields(@names) >> fetches several
+in one query. So on MySQL and MariaDB:
+
+=over 4
+
+=item *
+
+C<cas_update> croaks after an update (on MySQL, after an insert too) until
+the fields it compares are read again: C<refresh>, or C<fields> for just
+those (L<DBIx::QuickORM::Role::Row>).
+
+=item *
+
+C<insert> into a table with no primary key must be called in void context or
+with C<< as_given => 1 >> (MySQL).
+
+=item *
+
+C<insert_many> needs every row to carry its whole primary key to return the
+rows, unless called with C<< count => 1 >> or in void context (MySQL, see
+L<DBIx::QuickORM::Manual::BulkInsert>).
+
+=item *
+
+C<< $h->delete(mark_deleted => 1) >> runs a C<SELECT ... FOR UPDATE> of the
+keys, then the C<DELETE>, holding row locks until the transaction ends
+(MySQL, see L<DBIx::QuickORM::Handle/Writing>).
+
+=item *
+
+A UUID key the database would fill is generated by the ORM instead, since it
+could not be read back (MySQL, see L<DBIx::QuickORM::Manual::Keys>). Only a
+type with C<generate_key_value> does this, so a DateTime key is not generated.
+
+=back
+
+=head1 TRANSACTIONS
+
+DuckDB has no savepoints, so a transaction inside another croaks there.
+C<insert_many> and C<find_or_insert> inside a transaction use that
+transaction as it is (on the other databases they take a savepoint), so a
+failed insert leaves it unusable.
+
+    my $nested = eval {
+        $orm->txn(sub {
+            # a savepoint. DuckDB has none, so this croaks
+            $orm->txn(sub { $orm->insert(users => {name => 'Bob'}) });
+        });
+        1;
+    };
+
+Every root transaction states its isolation level on PostgreSQL, MySQL, and
+MariaDB: C<read committed> unless the ORM or the C<txn> call names another,
+or names C<server> for a plain C<BEGIN>.
+PostgreSQL sends one C<BEGIN ISOLATION LEVEL ...>. The MySQL family sends
+C<SET TRANSACTION ISOLATION LEVEL ...> then C<BEGIN>. SQLite and DuckDB have
+no levels to set: they get a plain C<BEGIN>, and a level croaks
+(L<DBIx::QuickORM::Manual::Transactions/ISOLATION>).
+
+Nothing about isolation is set when a connection opens. SQLite's
+C<PRAGMA foreign_keys = ON> is: it is a setting of the connection, not of a
+transaction, and SQLite enforces foreign keys only once a connection asks.
+The ORM sends it on every SQLite connection it opens or is given.
+
+With C<binlog_format=STATEMENT>, the MySQL family refuses writes at C<read
+committed>: switch the server to C<ROW> or C<MIXED>, or give the ORM
+C<< isolation => 'repeatable read' >>.
+
+=head1 BACKGROUND QUERIES AND FORKING
+
+C<async> and C<aside> need PostgreSQL, MySQL, or MariaDB. C<aside>,
+C<forked>, and a forked child using the ORM at all need a second connection
+to the same data: not DuckDB, not an in-memory SQLite database, and not an
+ORM given a C<dbh>.
+
+    my $memory = DBIx::QuickORM->new(
+        connect => sub { DBI->connect('dbi:SQLite:dbname=:memory:', '', '', {RaiseError => 1}) },
+    );
+
+    # croaks: no second connection can reach this SQLite database
+    my $ok = eval { $memory->handle(\'SELECT 1 AS one')->forked->iter; 1 };
+
+C<can_async>, C<can_aside>, and C<can_forked> say whether a mode can run
+here. C<maybe_async> and the like switch to the mode when it can run, and
+leave the handle's mode alone otherwise.
+
+A forked child reconnects on its first use of the ORM, through C<connect> or
+C<credentials>, and leaves the parent's session alone. Nothing to do on your
+side. L<DBIx::QuickORM::Manual::Background> has the details.
+
+=head1 TIME ZONES
+
+The ORM's C<time_zone> (default C<UTC>) becomes the session time zone on
+PostgreSQL, MySQL, MariaDB, and DuckDB. SQLite has none.
+
+    my $ny = DBIx::QuickORM->new(
+        credentials => {
+            dsn  => $dsn,
+            user => $user,
+            pass => $pass,
+        },
+        # a floating DateTime written to a timestamp with time zone is taken to be in it
+        time_zone   => 'America/New_York',
+    );
+
+On MySQL and MariaDB a named zone needs the server's time zone tables
+(C<mysql_tzinfo_to_sql>). Without them the connection fails with C<Unknown
+or incorrect time zone>. An offset always works, and C<UTC> is sent as
+C<+00:00>:
+
+    my $maria = DBIx::QuickORM->new(
+        credentials => {
+            dsn  => $dsn,
+            user => $user,
+            pass => $pass,
+        },
+        # MySQL and MariaDB without time zone tables (DuckDB takes names only)
+        time_zone   => '+05:30',
+    );
+
+Which column holds an instant (a point in time, with a zone) differs too:
+C<TIMESTAMP WITH TIME ZONE> on PostgreSQL and DuckDB, C<TIMESTAMP> on MySQL
+and MariaDB (C<DATETIME> is zoneless there). SQLite stores the text it is
+given, and its C<CURRENT_TIMESTAMP> is UTC whatever the zone.
+
+On MySQL and MariaDB a C<TIMESTAMP> in the repeated hour of a daylight saving
+C<time_zone> (when clocks go back) is ambiguous and may read back an hour off.
+To get exact instants, run in UTC: keep C<time_zone> at its default C<UTC>
+(or pass C<< time_zone => 'UTC' >>), and convert only for display, with
+C<< $row->field($name)->datetime->set_time_zone($zone) >>.
+
+L<DBD::DuckDB> drops the leading zeros of a fractional second on every
+timestamp it returns (500 microseconds come back as C<.500>, another
+instant), so a timestamp key with such a fraction does not find its held row
+(L<DBIx::QuickORM::Manual::Keys/"TYPED KEYS">). See
+L<DBIx::QuickORM::Type::DateTime>.
+
+=head1 JSON
+
+PostgreSQL C<json>:
+
+    my $cy = $orm->insert(users => {
+        name  => 'Cy',
+        prefs => {theme => 'dark'},
+    });
+
+    # undef: json has no = operator, so the database raises an error ($@)
+    my $compared = eval { $cy->update({name => 'Cy B'}, cas => ['prefs']) };
+    $cy->update({name => 'Cy B'}, cas => ['name']);    # compare a plain field instead
+
+Compare-and-swap (C<cas_update>, or C<cas> on C<update>, see
+L<DBIx::QuickORM::Manual::Caching>) compares with C<=>,
+SQL's equality operator. PostgreSQL C<json> has no C<=> (C<jsonb> does).
+MySQL compares a C<JSON> column with a text bind as JSON values, and an
+object or array never equals a string, so a C<cas> on one misses and returns
+undef. MariaDB declares C<JSON> as C<LONGTEXT> with a check, so the scan sees
+C<longtext>: autotype claims such a column by name only (C<json> as a word of
+the name, such as C<prefs_json>), so name the type yourself:
+
+    my $maria_json = DBIx::QuickORM->new(
+        credentials => {
+            dsn  => $dsn,
+            user => $user,
+            pass => $pass,
+        },
+        # MariaDB: a JSON column is longtext to the scan
+        types       => {users => {prefs => 'JSON'}},
+    );
+
+=head1 ERRORS
+
+    my $ok = eval {
+        $orm->insert(users => {
+            name  => 'Dup',
+            email => 'ann@example.com',    # taken: Ann's, from RETURNING above
+        });
+        1;
+    };
+    my $err  = $@;
+    my $kind = $err->kind;    # 'unique_violation' on every database
+
+    # '23505' on PostgreSQL, '23000' on MySQL and MariaDB, 'S1000' on SQLite and DuckDB
+    my $state = $err->state;
+
+    # 7 on PostgreSQL, 1062 on MySQL and MariaDB, 2067 on SQLite, 1 on DuckDB
+    my $native = $err->native;
+
+The kinds are the same everywhere: code against C<kind> and C<retriable>,
+not C<state> or C<native>. PostgreSQL reports a useful SQLSTATE, SQLite and
+the MySQL family a native code, and DuckDB neither, so its kind comes from
+the message (L<DBIx::QuickORM::Manual::Errors>).
+
+=head1 SQL YOU WRITE
+
+    # "users", or `users` on MySQL and MariaDB
+    my $q    = $orm->connection->dialect->quote_identifier('users');
+    my @rows = $orm->handle(\"SELECT * FROM $q")->all;
+
+SQLite binds values as text. A column comparison still works, through the
+column's affinity, but a bound number never compares as a number with an
+expression such as a count: C<< sql('COUNT(*) > ?', 1) >> in C<having>
+matches nothing there. Write the number into the SQL, C<sql('COUNT(*) > 1')>,
+or cast the bind: C<< sql('COUNT(*) > CAST(? AS INTEGER)', $min) >>. The
+same holds for a C<having> that names a computed column.
+
+A C<having> may name a computed column on every database. MySQL and MariaDB
+get the name (C<having_uses_alias>). Elsewhere the ORM writes the column's
+SQL there, since PostgreSQL rejects the name and SQLite lets a table column
+of the same name win (L<DBIx::QuickORM::Manual::Aggregates/HAVING>).
+
+=head1 BULK INSERTS
+
+C<insert_many> puts as many rows in one statement as the dialect's
+C<bind_limit> allows. PostgreSQL, MySQL, and MariaDB allow 65535 binds,
+DuckDB 7000, and SQLite 999 (L<DBIx::QuickORM::Manual::BulkInsert>).
+
+=head1 DUCKDB
+
+DuckDB locks its database file for one connection. Close any other handle on
+the file before the ORM opens it: a second connection in the same process
+does not see tables the first created.
+
+=cut
+
+1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx-QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

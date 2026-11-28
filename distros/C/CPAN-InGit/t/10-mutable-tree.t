@@ -112,4 +112,87 @@ subtest in_workdir => sub {
    }
 };
 
+subtest directories => sub {
+   for my $use_workdir (0, 1) {
+      my $repodir= File::Temp->newdir(CLEANUP => $ENV{TEST_CPAN_MIRROR_INGIT_CLEANUP} // 1);
+      my $git_repo= Git::Raw::Repository->init($repodir, !$use_workdir);
+      my $cpan_repo= CPAN::InGit->new(repo => $git_repo);
+      my $mtree= CPAN::InGit::MutableTree->new(parent => $cpan_repo, use_workdir => $use_workdir);
+      my $label= $use_workdir? 'workdir' : 'bare';
+
+      is( $mtree->list_dir, undef, "$label: no root directory in an empty tree" ) unless $use_workdir;
+      $mtree->set_path('top.txt', \'top');
+      $mtree->set_path('dir', {
+         'a.txt'       => \'A',
+         'bin/run'     => [ \'#!/bin/sh', 0100755 ],
+         'sub'         => { 'b.txt' => \'B', 'link' => [ \'b.txt', 0120000 ] },
+      });
+      is( $mtree->list_dir('dir'),
+         { 'a.txt' => [ object { call content => 'A' }, 0100644 ],
+           'bin'   => [ object { call is_tree => T }, 0040000 ],
+           'sub'   => [ object { call is_tree => T }, 0040000 ] },
+         "$label: list_dir of pending directory" );
+      is( $mtree->get_path('dir/bin/run'), [ object { call content => '#!/bin/sh' }, 0100755 ], "$label: executable" );
+      is( $mtree->get_path('dir/sub/link'), [ object { call content => 'b.txt' }, 0120000 ], "$label: symlink" );
+      is( [ sort keys %{ $mtree->list_dir } ], [ 'dir', 'top.txt' ], "$label: list_dir of root" );
+      is( $mtree->list_dir('top.txt'), undef, "$label: list_dir of a file" );
+      is( $mtree->list_dir('nope'), undef, "$label: list_dir of a missing path" );
+      if ($use_workdir) {
+         is( slurp("$repodir/dir/sub/b.txt"), 'B', 'workdir: file written' );
+         is( readlink("$repodir/dir/sub/link"), 'b.txt', 'workdir: symlink written' );
+         ok( -x "$repodir/dir/bin/run", 'workdir: executable bit' );
+      }
+      $mtree->commit('first', create_branch => 'main');
+
+      # Setting a directory replaces everything that was there
+      my $before= $mtree->get_path('dir')->[0];
+      $mtree->set_path('dir', { 'a.txt' => \'A2', 'new/c.txt' => \'C' });
+      is( [ sort keys %{ $mtree->list_dir('dir') } ], [ 'a.txt', 'new' ], "$label: directory replaced" );
+      is( $mtree->get_path('dir/sub/b.txt'), undef, "$label: old file is gone" );
+      is( $mtree->get_path('dir/sub'), undef, "$label: old subdirectory is gone" );
+      is( $mtree->get_path('dir/new/c.txt'), [ object { call content => 'C' }, 0100644 ], "$label: new file" );
+      ok( !-e "$repodir/dir/sub", 'workdir: old subdirectory removed' ) if $use_workdir;
+      # and can then be modified further
+      $mtree->set_path('dir/new/d.txt', \'D');
+      is( [ sort keys %{ $mtree->list_dir('dir/new') } ], [ 'c.txt', 'd.txt' ], "$label: added to new directory" );
+
+      # compare the pending state to the previous directory
+      is( $mtree->diff($mtree->tree, paths => ['top.txt']), [], "$label: no difference in top.txt" );
+      my $deltas= CPAN::InGit::MutableTree->new(parent => $cpan_repo, tree => $before)
+         ->diff($mtree->get_path('dir')->[0], patch => 1);
+      is( $deltas,
+         [
+            { path => 'a.txt', status => 'modified', binary => 0, additions => 1, deletions => 1,
+              old_id => T, new_id => T, old_mode => 0100644, new_mode => 0100644,
+              patch => match qr/^-A\n.*^\+A2\n/ms },
+            { path => 'bin/run', status => 'deleted', binary => 0, additions => 0, deletions => 1,
+              old_id => T, new_id => undef, old_mode => 0100755, new_mode => undef, patch => T },
+            { path => 'new/c.txt', status => 'added', binary => 0, additions => 1, deletions => 0,
+              old_id => undef, new_id => T, old_mode => undef, new_mode => 0100644, patch => T },
+            { path => 'new/d.txt', status => 'added', binary => 0, additions => 1, deletions => 0,
+              old_id => undef, new_id => T, old_mode => undef, new_mode => 0100644, patch => T },
+            { path => 'sub/b.txt', status => 'deleted', binary => 0, additions => 0, deletions => 1,
+              old_id => T, new_id => undef, old_mode => 0100644, new_mode => undef, patch => T },
+            { path => 'sub/link', status => 'deleted', binary => 0, additions => 0, deletions => 1,
+              old_id => T, new_id => undef, old_mode => 0120000, new_mode => undef, patch => T },
+         ],
+         "$label: diff" );
+      is( scalar @{ $mtree->diff(undef) }, 4, "$label: diff with an empty tree" );
+
+      # A Git tree can be used as a directory, and then modified
+      $mtree->set_path('copy', $before);
+      is( $mtree->get_path('copy/sub/b.txt'), [ object { call content => 'B' }, 0100644 ], "$label: path within a tree" );
+      $mtree->set_path('copy/sub/b.txt', undef);
+      is( [ sort keys %{ $mtree->list_dir('copy/sub') } ], [ 'link' ], "$label: removed a file of the tree" );
+      $mtree->set_path('copy', undef);
+      is( $mtree->get_path('copy'), undef, "$label: removed directory" );
+      $mtree->commit('second');
+      is( [ sort keys %{ $mtree->list_dir('dir/new') } ], [ 'c.txt', 'd.txt' ], "$label: after commit" );
+      is( $mtree->get_path('dir/sub'), undef, "$label: replaced directory stays gone after commit" );
+
+      like( dies { $mtree->set_path('x', { 'a' => \'1', 'a/b' => \'2' }) }, qr/Conflicting/, "$label: conflicting entries" );
+      like( dies { $mtree->set_path('x', { '../a' => \'1' }) }, qr/Invalid path/, "$label: path escaping the directory" );
+   }
+};
+
 done_testing;

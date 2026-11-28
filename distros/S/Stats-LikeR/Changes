@@ -1,5 +1,86 @@
 Revision history for Stats-LikeR
 
+0.3501 2026-11-27 CST
+
+ [Bug fixes]
+
+ - summary() and write_table(tex_format => 1) printed a %.4g number with
+   the exponent as the C library writes it, and the MSVCRT behind
+   Strawberry Perl 5.24 writes at least three digits where C99, glibc,
+   UCRT and R write two: 12345 came out as "1.234e+004" there and
+   "1.234e+04" elsewhere. 0.35 failed 33 subtests of t/format.ties.R.t
+   (78, 81-105, 109-111, 117, 122, 162-163) on perl 5.24.4
+   MSWin32-x64-multi-thread, every one over the exponent; the ties those
+   subtests are about were already rounded right. The module was at
+   fault, not the test: one table read differently on two platforms. The
+   XS now trims such an exponent to two digits, as quantile() and hist()
+   labels already did, and leaves one that needs three ("2.582e+120")
+   alone. An LD_PRELOAD shim that makes glibc print three-digit exponents
+   reproduced the report on Linux, failing those 33 subtests and no other
+   in the whole suite; with the fix the suite passes under it.
+
+ [Tests]
+
+ - t/format.ties.R.t gains 18 %g rows that are not ties: 1e5, 2^-30,
+   2^400 and 2^-900 at 1, 4 and 15 significant digits, so two- and
+   three-digit exponents of both signs, from R 4.6.2's sprintf() by
+   t/format.ties.R.R. 0.35 under the shim fails 7 of them.
+
+0.35 2026-11-27 CST
+
+ [Incompatible changes]
+
+ - Nothing is exported by default any more; name the functions to import,
+   as in use Stats::LikeR qw(mean sd t_test), or import every one with
+   use Stats::LikeR qw(:all). Up to 0.3431 a plain use Stats::LikeR
+   exported all 142 functions, which is not what Perl modules are
+   expected to do, and users objected: names such as min, max, sum, mode,
+   filter, merge, sample, seq and uniq replaced the caller's own, or
+   those from List::Util. Code that relied on the old default needs
+   qw(:all) added to its use line. h(\&name) now works whether or not
+   name was imported, as h('name') and h(*name) already did; from the
+   shell, it is perl -MStats::LikeR=h -e 'h(*agg)'. New t/exports.t tests
+   the default, a named import, :all, and h() on names not imported.
+
+ [Bug fixes]
+
+ - table_one() printed a percentage, mean or sd that falls exactly halfway
+   between two results as the C library rounds it, and the libraries
+   disagree: glibc, UCRT and R round such a tie to the even digit, the
+   MSVCRT behind Strawberry Perl 5.24 away from zero. 18 of 32 is exactly
+   56.25%, so 0.3431 gave "18 (56.3%)" there and "18 (56.2%)" elsewhere,
+   and t/table_one.R.datasets.t failed subtest 120 on perl 5.24.4
+   MSWin32-x64-multi-thread. The module was at fault, not the test: one
+   table read differently on two platforms. A tie is now recognized
+   exactly (x * 2^(d+1) is an odd integer at d decimals) and rounded to
+   even in the XS, so the cell is R's everywhere; any other value is
+   still left to the C library. summary()'s %.4g statistics and
+   write_table(tex_format => 1) depended on the library the same way and
+   take the same path. An LD_PRELOAD shim that makes glibc round ties
+   away from zero reproduced the report on Linux, failing that subtest
+   and no other in the whole suite; with the fix the suite passes under
+   it. A tie with more than 17 significant digits, which the MSVCRT does
+   not print exactly, is still rounded by the library.
+
+ [Tests]
+
+ - New t/format.ties.R.t: 143 ties and near-ties in %f and %g, built from
+   the examples in R's Round.Rd and tests/reg-tests-3.R, against R
+   4.6.2's sprintf() on glibc, written by the new t/format.ties.R.R; and
+   table_one(), summary() and write_table(tex_format => 1) on ties.
+   0.3431 under the shim fails its table_one(), summary() and tex
+   subtests.
+ - t/formula.parser.R.t subtest 119, "the long sum is not quadratic",
+   timed lm() on y ~ v1 + ... + v8000, fit included, against a 120 s
+   bound, and failed at 150 s on the armv6l-linux perl 5.44.0 smoker, a
+   Raspberry Pi, which passed it on 0.3429. The test was at fault: the
+   fit is quadratic in the terms by nature (X'X and its factor are 8001
+   x 8001; it peaks at 760 MB and takes 0.5 s on x86-64), and lm() takes
+   the same time here in 0.3429 and 0.3431. Only the parse, which the
+   subtest is about, is now timed: against data without the v columns
+   lm() reads the whole formula and stops at "object 'v1' not found".
+   The fit is still run and checked, untimed.
+
 0.3431 2026-11-26 CST
 
  [read_table(): OpenDocument spreadsheets, and skiprows]

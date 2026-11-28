@@ -3,7 +3,7 @@ use experimental 'class';
 
 # What join, action and request handlers receive as their first argument.
 class BoardStreams::Context {
-    our $VERSION = "v0.0.58";
+    our $VERSION = "v0.0.60";
 
     use BoardStreams::Rejection;
 

@@ -4,11 +4,11 @@ require 5.010;
 use warnings FATAL => 'all';
 use Test::Exception; # dies_ok
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::LeakTrace 'no_leaks_ok';
 
 # Assume Stats::LikeR handles the `vals` export natively in your build.
-# use Stats::LikeR;
+# use Stats::LikeR qw(:all);
 
 # Custom helper for floating-point comparisons
 sub is_approx {

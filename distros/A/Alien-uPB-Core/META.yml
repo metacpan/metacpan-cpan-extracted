@@ -23,7 +23,7 @@ name: Alien-uPB-Core
 resources:
   homepage: https://github.com/mbarbon/alien-upb
   repository: https://github.com/mbarbon/alien-upb.git
-version: '0.22'
+version: '0.23'
 x_generated_by_perl: v5.42.3
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

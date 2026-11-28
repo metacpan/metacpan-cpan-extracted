@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use Test::Exception;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::LeakTrace;
 
 # Test Case 1: Intercept-Free Modeling (R Compatibility)

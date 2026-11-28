@@ -4,7 +4,7 @@ require 5.010;
 use strict;
 use warnings;
 use File::Temp;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::More;
 use Test::Exception;
 
@@ -254,7 +254,7 @@ SKIP: {
 		# both.  The file's name comes in @ARGV, not in the script's text.
 		my $script = "$dir/pipe.pl";
 		open my $sfh, '>', $script or die "cannot write $script: $!";
-		print {$sfh} 'use Stats::LikeR; my @rows = map { my $i = $_; +{ id => $i, name => "row $i & <more>", v => $i / 7 } } 1 .. 6000;',
+		print {$sfh} 'use Stats::LikeR qw(:all); my @rows = map { my $i = $_; +{ id => $i, name => "row $i & <more>", v => $i / 7 } } 1 .. 6000;',
 			" write_table(\\\@rows, \$ARGV[0], xlsx => 1, quiet => 1);",
 			" write_table(\\\@rows, '/dev/stdout', xlsx => 1, quiet => 1);\n";
 		close $sfh or die "cannot write $script: $!";

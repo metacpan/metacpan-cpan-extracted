@@ -3,7 +3,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # optional test modules: import if present, else install skipping stubs
 BEGIN {

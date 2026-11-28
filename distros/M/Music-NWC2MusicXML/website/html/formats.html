@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What converts — Music::NWC2MusicXML</title>
+<meta name="description" content="Which NoteWorthy Composer constructs become which MusicXML elements: notes, chords, rests, grace notes, slurs, ties, fermatas, dynamics, hairpins, lyrics, barlines and layout.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="formats.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Music::NWC2MusicXML">
+<meta property="og:title" content="What converts — Music::NWC2MusicXML">
+<meta property="og:description" content="Which NoteWorthy Composer constructs become which MusicXML elements: notes, chords, rests, grace notes, slurs, ties, fermatas, dynamics, hairpins, lyrics, barlines and layout.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Music::NWC2MusicXML</span>
+			<span class="brand-tag">NoteWorthy Composer scores to MusicXML</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="commands.html">Commands</a>
+			<a href="api.html">Perl API</a>
+			<a href="formats.html" class="current" aria-current="page">What converts</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>What converts</h1>
+	<p class="lead">
+		The guiding rule is to preserve musical meaning rather than graphical
+		appearance. Notes and rhythm come first; a page break that was in the
+		original does not.
+	</p>
+
+	<h2>Notes, chords and rhythm</h2>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>NWC</th><th>MusicXML</th></tr></thead>
+			<tbody>
+				<tr><td>Note, with any duration NWC allows</td><td><code>&lt;note&gt;</code> with <code>&lt;pitch&gt;</code> and <code>&lt;duration&gt;</code>, in the divisions the score needs.</td></tr>
+				<tr><td>Dots, double dots</td><td>The duration itself; a dotted value is one number, not a note plus a tie.</td></tr>
+				<tr><td>Triplets</td><td>Two thirds of the written duration, with <code>&lt;time-modification&gt;</code> and a <code>&lt;tuplet&gt;</code> bracket.</td></tr>
+				<tr><td>Chord</td><td>One <code>&lt;note&gt;</code> per pitch, the second and later ones marked <code>&lt;chord/&gt;</code>.</td></tr>
+				<tr><td>Rest</td><td><code>&lt;note&gt;&lt;rest/&gt;</code> with the same duration handling.</td></tr>
+				<tr><td>Grace note</td><td><code>&lt;grace/&gt;</code> immediately before the pitch, with no <code>&lt;duration&gt;</code> — the schema puts grace notes in a separate content branch.</td></tr>
+				<tr><td>Articulations and ornaments on a note</td><td><code>&lt;notations&gt;&lt;articulations&gt;</code> and <code>&lt;ornaments&gt;</code> on the note they belong to.</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2>Pitch and accidentals</h2>
+	<p>
+		NWC counts staff positions from the middle line, so pitch depends on the
+		clef in force. Each clef has a reference pitch on that line — B4 for
+		treble, D3 for bass, C4 for alto, A3 for tenor — and a position is a
+		step offset from it. Explicit accidentals are written on the note and, as
+		in ordinary notation, carry through the rest of the measure for that pitch
+		class until the bar line resets them or another accidental overrides them.
+	</p>
+
+	<h2>Staves and parts</h2>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>NWC</th><th>MusicXML</th></tr></thead>
+			<tbody>
+				<tr><td>Each staff</td><td>One <code>&lt;part&gt;</code>, in staff order, from a matching <code>&lt;part-list&gt;</code>.</td></tr>
+				<tr><td>Staff name</td><td><code>&lt;part-name&gt;</code>. A generic <code>Staff-1</code> gives way to the MIDI instrument's name, and then to a positional <code>Staff-N</code>; duplicate names are made unique because MusicXML requires it.</td></tr>
+				<tr><td>Staff visibility</td><td><code>print-object="no"</code> on the part name for a hidden staff, so the notes stay in the file.</td></tr>
+				<tr><td>Staff group (bracket or brace)</td><td><code>&lt;part-group&gt;</code> with the matching group symbol.</td></tr>
+				<tr><td>Transposing instrument</td><td><code>&lt;transpose&gt;&lt;chromatic&gt;</code>, so a written part sounds at the right pitch.</td></tr>
+				<tr><td>MIDI channel, program, volume, pan</td><td><code>&lt;midi-instrument&gt;</code> in the part list.</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2>Clefs, keys and time</h2>
+	<p>
+		A clef, key or time signature that appears before the staff's first
+		sounding note becomes part of the first measure's
+		<code>&lt;attributes&gt;</code>. The same record appearing later is a
+		mid-staff change, and is emitted as a minimal
+		<code>&lt;attributes&gt;</code> block at that point in its measure. Key
+		signatures are counted in fifths on the circle, so the signature, its
+		tonic and the accidental count all agree.
+	</p>
+
+	<h2>Directions: tempo, dynamics, text</h2>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>NWC</th><th>MusicXML</th></tr></thead>
+			<tbody>
+				<tr><td>Tempo marking</td><td><code>&lt;direction&gt;</code> with <code>&lt;metronome&gt;</code> and a matching <code>&lt;sound tempo="…"/&gt;</code>. A tempo that carries text — <em>With Expression</em> — keeps the text and sets <code>parentheses="yes"</code> on the metronome mark.</td></tr>
+				<tr><td>Dynamic marking</td><td><code>&lt;direction-type&gt;&lt;dynamics&gt;</code>, plus <code>&lt;sound dynamics="N"/&gt;</code> when the staff's <code>DynVel</code> table gives that marking a velocity.</td></tr>
+				<tr><td>Hairpin (<code>Opts:Crescendo</code>, <code>Opts:Diminuendo</code> on notes)</td><td><code>&lt;wedge type="crescendo"/&gt;</code> … <code>&lt;wedge type="stop"/&gt;</code>.</td></tr>
+				<tr><td><code>DynVariance</code>: <code>Crescendo</code>, <code>Diminuendo</code></td><td>Written text, <code>&lt;words font-style="italic"&gt;cresc.&lt;/words&gt;</code> or <em>dim.</em> — these are the words, not the hairpin. <code>crescOff</code> ends them silently.</td></tr>
+				<tr><td><code>TempoVariance</code>: <em>rit.</em>, <em>ritenuto</em>, <em>accel.</em>, …</td><td><code>&lt;direction&gt;</code> with the standard abbreviation as italic words.</td></tr>
+				<tr><td><code>TempoVariance:Fermata</code></td><td><code>&lt;notations&gt;&lt;fermata/&gt;</code> on the note or rest that follows it, because NWC records the fermata before the note it decorates.</td></tr>
+				<tr><td>Text direction</td><td><code>&lt;words&gt;</code>, placed above or below according to the sign of NWC's <code>Pos</code> field when no explicit placement is given.</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2>Slurs, ties and bar lines</h2>
+	<p>
+		NWC marks every note under a slur, so the converter places
+		<code>&lt;slur type="start"&gt;</code> on the first marked note and
+		<code>&lt;slur type="stop"&gt;</code> on the first note after the run that
+		is <em>not</em> marked — the landing note, which is where the arc ends. A
+		slur still open at the end of a staff is closed on its last note, and up
+		to six simultaneous arcs are numbered so each pair is distinct.
+	</p>
+	<p>
+		A tie is the <code>^</code> suffix on a position: the note is tied forward
+		to the next note of the same pitch. Bar lines carry their style —
+		double, section close, and the master and local repeat marks — and a
+		staff's <code>EndingBar</code> property sets the style of the final
+		barline, including multi-word NWC values such as <em>Section Close</em>.
+	</p>
+
+	<h2>Page, fonts and metadata</h2>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>NWC</th><th>MusicXML</th></tr></thead>
+			<tbody>
+				<tr><td><code>PgMargins</code> left, right, top, bottom</td><td>Asymmetric page margins in <code>&lt;defaults&gt;&lt;page-layout&gt;</code>; the copyright line is placed from the bottom margin.</td></tr>
+				<tr><td><code>Font</code> records</td><td><code>&lt;word-font&gt;</code> from the first staff font and <code>&lt;lyric-font&gt;</code> from a staff-lyric font.</td></tr>
+				<tr><td>Title, author, lyricist, copyright, comments</td><td><code>&lt;work&gt;</code>, <code>&lt;identification&gt;</code> and <code>&lt;credit&gt;</code> elements.</td></tr>
+				<tr><td>Lyrics</td><td><code>&lt;lyric&gt;</code> with syllabic type. Emission exists, but has not been validated against a golden score — see <a href="limitations.html">the limits</a>.</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2>What is not carried over</h2>
+	<p>
+		Graphical layout: absolute positions, staff spacing, per-element font
+		sizes, page breaks and anything else that affects only how the page looked
+		in NoteWorthy Composer. A notation program will lay the score out itself,
+		and will do it better than a reconstruction of another program's decisions
+		would. The <a href="limitations.html">limits page</a> covers the rest.
+	</p>
+
+	<div class="pager">
+		<a href="api.html">← Perl API</a>
+		<a href="limitations.html">Limits →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Music::NWC2MusicXML 0.003.1 — Copyright 2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/pod/Music::NWC2MusicXML">MetaCPAN</a> ·
+			<a href="https://metacpan.org/pod/nwc2musicxml">nwc2musicxml</a> ·
+			<a href="https://github.com/nigelhorne/NWC2MusicXML">Source</a> ·
+			<a href="https://nigelhorne.github.io/nwc2musicxml/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

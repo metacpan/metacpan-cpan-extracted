@@ -15,7 +15,7 @@
 # and its RSS check only guards against a future leak.
 require 5.010; use strict; use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 { package Dying; sub TIEARRAY { bless { n => 1000 }, shift }
   sub FETCH { die "boom\n" if $_[1] == 500; $_[1] } sub FETCHSIZE { $_[0]{n} } }

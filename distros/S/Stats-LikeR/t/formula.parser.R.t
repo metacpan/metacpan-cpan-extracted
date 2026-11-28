@@ -3,7 +3,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use Test::Exception;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Time::HiRes ();
 
 # Regression tests for the formula parser (0.3428).
@@ -109,11 +109,20 @@ check_coef(lm(formula => 'y~0+1', data => \%d), { Intercept => 5.099999999999999
 	my %w = (y => $d{y});
 	$w{"v$_"} = $d{x} for 1 .. $k;
 	my $f = 'y~' . join('+', map { "v$_" } 1 .. $k);
-	my $t0 = [Time::HiRes::gettimeofday];
 	my $r;
 	lives_ok { $r = lm(formula => $f, data => \%w) } "a sum of $k terms parses";
 	is($r->{rank}, 2, 'the long sum: rank 2') if $r;
-	# Generous bound: this whole test file runs in about a second; a quadratic parse (and 0.3427 outright) did not finish.
+	# Only the parse is timed.  Against data without the v columns lm() reads
+	# the whole formula and stops at R's "object 'v1' not found", which it
+	# checks after the term algebra.  The fit above is quadratic in the terms
+	# by nature: X'X and its factor are 8001 x 8001, and it peaks at 760 MB
+	# and 0.5 s on x86-64.  0.3431 took 150 s over parse and fit on a
+	# Raspberry Pi (armv6l smoker) and failed when this bound covered both.
+	# Generous bound: the parse takes 5 ms on x86-64, and a quadratic parse
+	# (and 0.3427 outright) did not finish.
+	my $t0 = [Time::HiRes::gettimeofday];
+	throws_ok { lm(formula => $f, data => { y => $d{y} }) } qr/object 'v1' not found/,
+		'the long sum is read to the end before its names are looked up';
 	cmp_ok(Time::HiRes::tv_interval($t0), '<', 120, 'the long sum is not quadratic');
 }
 

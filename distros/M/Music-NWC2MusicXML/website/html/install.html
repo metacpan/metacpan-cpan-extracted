@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install — Music::NWC2MusicXML</title>
+<meta name="description" content="Installing Music::NWC2MusicXML and the nwc2musicxml command from CPAN or from a git checkout, with the Perl version and modules it needs.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="install.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Music::NWC2MusicXML">
+<meta property="og:title" content="Install — Music::NWC2MusicXML">
+<meta property="og:description" content="Installing Music::NWC2MusicXML and the nwc2musicxml command from CPAN or from a git checkout, with the Perl version and modules it needs.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Music::NWC2MusicXML</span>
+			<span class="brand-tag">NoteWorthy Composer scores to MusicXML</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html" class="current" aria-current="page">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="commands.html">Commands</a>
+			<a href="api.html">Perl API</a>
+			<a href="formats.html">What converts</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Install</h1>
+	<p class="lead">
+		The module and the <code>nwc2musicxml</code> command are one CPAN
+		distribution. Perl 5.36 or newer is the only thing that has to be there
+		beforehand.
+	</p>
+
+	<h2>From CPAN</h2>
+<pre><code>cpanm Music::NWC2MusicXML
+</code></pre>
+	<p>
+		<code>cpanm</code> installs the dependencies below as it goes. Without
+		App::cpanminus, <code>cpan Music::NWC2MusicXML</code> does the same job,
+		and <code>cpanm --installdeps .</code> in a checkout installs exactly the
+		versions that checkout declares.
+	</p>
+
+	<h2>From a checkout</h2>
+<pre><code>git clone https://github.com/nigelhorne/NWC2MusicXML.git
+cd NWC2MusicXML
+perl Makefile.PL
+make
+make test
+make install
+</code></pre>
+	<p>
+		<code>make test</code> runs the full suite. The part worth knowing about
+		is <code>t/40-input.t</code>: it converts every <code>.nwc</code> file in
+		<code>t/input/</code> and compares the result byte for byte with the
+		golden <code>.musicxml</code> file committed beside it. A change that
+		alters the output of an existing score therefore fails the suite rather
+		than passing quietly.
+	</p>
+
+	<h2>What it needs</h2>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>Requirement</th><th>Why</th></tr></thead>
+			<tbody>
+				<tr>
+					<td>Perl 5.36 or newer</td>
+					<td>The minimum is declared in <code>Makefile.PL</code> and is not a guess: the modules are written for that version's semantics.</td>
+				</tr>
+				<tr>
+					<td><code>Compress::Zlib</code></td>
+					<td>The NWC container is a zlib stream. This is the only dependency that is not pure Perl, and it has shipped with Perl for years.</td>
+				</tr>
+				<tr>
+					<td><code>Object::Configure</code></td>
+					<td>Lets a program set converter defaults once, at class level, instead of passing them to every <code>new</code>.</td>
+				</tr>
+				<tr>
+					<td><code>Params::Get</code>, <code>Params::Validate::Strict</code> (0.39+)</td>
+					<td>Argument checking for the public methods, so a misspelt parameter is rejected instead of ignored.</td>
+				</tr>
+				<tr>
+					<td><code>Readonly</code></td>
+					<td>The parser's dispatch table and the pitch, clef and tempo maps are read-only constants built once at load.</td>
+				</tr>
+				<tr>
+					<td><code>Carp</code>, <code>File::*</code>, <code>Getopt::Long</code>, <code>Pod::Usage</code></td>
+					<td>Core modules: errors, file handling, and the command line.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		Nothing else is required. There is no NoteWorthy Composer, no Java and no
+		libxml2 involved: the MusicXML is written directly rather than through an
+		XML library, so the converter runs anywhere Perl does, including on a
+		server with no desktop software at all.
+	</p>
+
+	<h2>Check it works</h2>
+<pre><code>nwc2musicxml --version
+nwc2musicxml --help
+</code></pre>
+	<p>
+		The help text is the command's manual page as well:
+		<code>perldoc nwc2musicxml</code> prints the same thing, and
+		<code>perldoc Music::NWC2MusicXML</code> documents the Perl API. If
+		<code>nwc2musicxml</code> is not found, the installation put it somewhere
+		your <code>PATH</code> does not look — <code>perl -V:installbin</code>
+		says where.
+	</p>
+
+	<h2>What gets installed</h2>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+			<tbody>
+				<tr><td><code>bin/nwc2musicxml</code></td><td>The command-line interface.</td></tr>
+				<tr><td><code>Music::NWC2MusicXML</code></td><td>The facade: <code>convert</code>, <code>batch_convert</code>, <code>diagnostics</code>.</td></tr>
+				<tr><td><code>Music::NWC2MusicXML::NWC</code></td><td>Binary container decoder: signature check, zlib inflation, NWCTXT text.</td></tr>
+				<tr><td><code>Music::NWC2MusicXML::Parser</code></td><td>NWCTXT text to a score of staves and events.</td></tr>
+				<tr><td><code>Music::NWC2MusicXML::Score</code>, <code>::Staff</code>, <code>::Event</code></td><td>The internal score model, with durations held as exact rationals.</td></tr>
+				<tr><td><code>Music::NWC2MusicXML::MusicXML</code></td><td>Score to MusicXML 4.0 document.</td></tr>
+				<tr><td><code>Music::NWC2MusicXML::Diagnostics</code></td><td>The message catalogue and the <code>carp</code>/<code>croak</code> helpers behind every warning and error.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		Each of those can be used on its own. The <a href="api.html">Perl API</a>
+		page shows the three-stage pipeline that <code>convert</code> performs.
+	</p>
+
+	<div class="note">
+		<span class="note-title">A distribution-managed Perl</span>
+		<p>
+			If <code>perl</code> belongs to your operating system, install into a
+			<code>local::lib</code> or a perlbrew rather than over the top of it:
+			<code>cpanm --local-lib=~/perl5 Music::NWC2MusicXML</code>, then add
+			that library's <code>bin</code> to <code>PATH</code>. The same advice
+			applies to a Perl that a packaging system will overwrite at its next
+			upgrade.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="index.html">← Home</a>
+		<a href="quickstart.html">Quick start →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Music::NWC2MusicXML 0.003.1 — Copyright 2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/pod/Music::NWC2MusicXML">MetaCPAN</a> ·
+			<a href="https://metacpan.org/pod/nwc2musicxml">nwc2musicxml</a> ·
+			<a href="https://github.com/nigelhorne/NWC2MusicXML">Source</a> ·
+			<a href="https://nigelhorne.github.io/nwc2musicxml/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

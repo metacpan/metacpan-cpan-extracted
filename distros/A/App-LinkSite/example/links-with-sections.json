@@ -1,0 +1,66 @@
+{
+  "name": "Dave Cross",
+  "handle": "davorg",
+  "image": "davorg.jpg",
+  "og_image": "og.png",
+  "site_url": "https://some-site.com/",
+  "desc": "I make things from software. Some of them are useful.<br>And I've been known to write a book or two.",
+  "ga4": "Your Google Analytics key",
+  "social": [{
+    "service": "facebook"
+  }, {
+    "service": "x-twitter"
+  }, {
+    "service": "github"
+  }, {
+    "service": "mastodon",
+    "url": "https://fosstodon.org/@davorg"
+  }],
+  "sections": [{
+    "title": "Books",
+    "links": [{
+      "title": "GitHub Actions Essentials",
+      "subtitle": "A book for techies",
+      "link": "https://actions.davecross.co.uk/"
+    }, {
+      "title": "George and the Smart Home",
+      "subtitle": "A children's book",
+      "link": "https://george.davecross.co.uk/"
+    }, {
+      "title": "Books I've written",
+      "link": "https://davecross.co.uk/books/"
+    }]
+  }, {
+    "title": "Projects",
+    "links": [{
+      "title": "Line of Succession",
+      "subtitle": "See the British line of succession on dates in the past",
+      "link": "https://lineofsuccession.co.uk/"
+    }, {
+      "title": "Royal Relations",
+      "subtitle": "All one big happy family",
+      "link": "https://rels.lineofsuccession.co.uk/"
+    }]
+  }, {
+    "title": "Writing",
+    "links": [{
+      "title": "dev.to",
+      "subtitle": "A developer's blog",
+      "link": "https://dev.to/davorg"
+    }, {
+      "title": "Blog",
+      "link": "https://blog.dave.org.uk/"
+    }, {
+      "title": "Perl Hacks",
+      "subtitle": "Stuff about Perl",
+      "link": "https://perlhacks.com/"
+    }]
+  }],
+  "links": [{
+    "title": "Web site",
+    "link": "https://davecross.co.uk/"
+  }, {
+    "title": "Email",
+    "link": "mailto:me@example.com"
+  }]
+}

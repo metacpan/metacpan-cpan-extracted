@@ -1,5 +1,41 @@
 Revision history for HTTP-Message-Signature:
 
+v0.1.0    2026-11-27 21:42:02+00:00 Europe/London
+  [Enhancements]
+  - Added an options hash reference to the verify method.
+
+  - Changed the verify method to check expiration and creation times by default.
+
+  - Added support for verifying responses.
+
+  - The signature_agent attribute will coerce a URI.
+
+  - Added alias request and response constructor attributes.
+
+  - Added option to verify public keys when they are retrieved from the signatures-directory.
+
+  [Bug Fixes]
+  - Bumped minimum version of HTTP::libsfparse to a non-broken version.
+
+  [Documentation]
+  - Amended Changes.
+
+  [Tests]
+  - Report versions of additional prereqs of HTTP::libsfparse.
+
+v0.0.4    2026-11-27 12:43:51+00:00 Europe/London
+  [Security]
+  - Added max_keys attribute to truncate public keys.
+
+  [Bug Fixes]
+  - Removed unused prerequisite.
+
+  - Bumped minimum version of HTTP::libsfparse.
+    (This was supposed to be an enhancement, but was broken.)
+
+  [Tests]
+  - Added more test data.
+
 v0.0.3    2026-11-26 16:53:57+00:00 Europe/London
   [Enhancements]
   - Changed the internals to use HTTP::libsfparse (via HTTP::StructuredField) for parsing structured fields.

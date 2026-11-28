@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::Author::Plicease::Tests 2.81 {
+package Dist::Zilla::Plugin::Author::Plicease::Tests 2.82 {
 
-  use 5.022;
+  use 5.024;
   use Moose;
   use File::chdir;
   use File::Path qw( make_path );
@@ -177,7 +177,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.81
+version 2.82
 
 =head1 SYNOPSIS
 

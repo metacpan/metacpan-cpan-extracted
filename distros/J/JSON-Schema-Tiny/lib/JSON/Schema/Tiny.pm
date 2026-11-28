@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 use if $ENV{AUTHOR_TESTING}, strictures => version => 2;
-package JSON::Schema::Tiny; # git description: v0.033-12-g455ea01
+package JSON::Schema::Tiny; # git description: v0.034-5-gfc6ad52
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use stable 0.031 'postderef';
@@ -1379,7 +1379,10 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.034
+version 0.035
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

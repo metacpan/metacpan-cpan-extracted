@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick start — Music::NWC2MusicXML</title>
+<meta name="description" content="From one .nwc file to a score open in MuseScore, then a whole folder: the first commands to run with Music::NWC2MusicXML.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="quickstart.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Music::NWC2MusicXML">
+<meta property="og:title" content="Quick start — Music::NWC2MusicXML">
+<meta property="og:description" content="From one .nwc file to a score open in MuseScore, then a whole folder: the first commands to run with Music::NWC2MusicXML.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Music::NWC2MusicXML</span>
+			<span class="brand-tag">NoteWorthy Composer scores to MusicXML</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html" class="current" aria-current="page">Quick start</a>
+			<a href="commands.html">Commands</a>
+			<a href="api.html">Perl API</a>
+			<a href="formats.html">What converts</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Quick start</h1>
+	<p class="lead">
+		One file, one command, then open the result. Everything after that is
+		about doing it to a folder instead of a file.
+	</p>
+
+	<h2>1. Convert one file</h2>
+<pre><code>nwc2musicxml Pilgrim.nwc
+</code></pre>
+	<p>
+		With a single argument the output goes beside the input, with the
+		extension replaced: <code>Pilgrim.musicxml</code>. When the conversion is
+		clean the command prints nothing at all, which makes it safe to put in a
+		Makefile.
+	</p>
+
+	<h2>2. Read the exit status</h2>
+<pre><code>nwc2musicxml Pilgrim.nwc
+echo $?
+</code></pre>
+	<p>
+		<strong>0</strong> is a clean conversion, <strong>1</strong> means it
+		converted but warned about something, <strong>2</strong> means the input
+		was missing, unreadable or not an NWC file, <strong>3</strong> is an
+		output failure and <strong>4</strong> is an internal error. A warning does
+		not stop the file being written — it says part of the score was not
+		understood, so the output is worth opening before it is trusted.
+	</p>
+
+	<h2>3. Open it</h2>
+	<p>
+		In MuseScore, <em>File → Open</em> and choose the
+		<code>.musicxml</code> file; Finale, Sibelius and Dorico import the same
+		format. If a program refuses it, check first that the file is well-formed
+		XML, before suspecting the notes:
+	</p>
+<pre><code>xmllint --noout Pilgrim.musicxml
+</code></pre>
+
+	<h2>4. Say where the output goes</h2>
+<pre><code>nwc2musicxml Pilgrim.nwc /tmp/Pilgrim.musicxml
+</code></pre>
+	<p>
+		Two positional arguments are read as input then output, but only when the
+		first ends in <code>.nwc</code> and the second does not. That rule exists
+		so that <code>nwc2musicxml a.nwc b.nwc</code> stays what it looks like: two
+		files to convert, not one file written over another.
+	</p>
+
+	<h2>5. Convert a folder</h2>
+<pre><code>nwc2musicxml --output-dir musicxml scores/
+</code></pre>
+	<p>
+		A directory argument collects the <code>.nwc</code> files directly inside
+		it. Add <code>--recursive</code> and the tree is walked instead, with the
+		folder structure kept underneath the output directory:
+	</p>
+<pre><code>nwc2musicxml --recursive --output-dir musicxml scores/
+
+musicxml/suite-1/prelude.musicxml
+musicxml/suite-1/fugue.musicxml
+musicxml/suite-2/allemande.musicxml
+</code></pre>
+
+	<h2>6. Re-run it</h2>
+	<p>
+		Existing output files are skipped by default, so a second run only
+		converts what is new. That is the useful behaviour when a folder of scores
+		is being converted a few at a time — and the surprising one the day an
+		edited score seems to have been ignored. <code>--overwrite</code> replaces
+		what is there.
+	</p>
+<pre><code>nwc2musicxml --recursive --overwrite --output-dir musicxml scores/
+</code></pre>
+
+	<h2>7. Collect the warnings</h2>
+<pre><code>nwc2musicxml --recursive --warnings conversions.log --output-dir musicxml scores/
+</code></pre>
+	<p>
+		Warnings still go to standard error; <code>--warnings</code> writes a
+		second copy to a UTF-8 file, which is how a batch of a hundred scores gets
+		sorted out afterwards. <code>--verbose</code> adds a line per file as it
+		goes, and <code>--debug</code> traces the pipeline itself — noisy, but it
+		says which record of which staff produced the complaint.
+	</p>
+
+	<h2>8. Ask for the checks</h2>
+<pre><code>nwc2musicxml --validate Pilgrim.nwc
+</code></pre>
+	<p>
+		<code>--validate</code> turns on the internal consistency checks: pitches
+		in range, ties that are opened and closed, slurs that are closed, each
+		measure's duration against the active time signature, and staves that
+		never sound. It is not a schema validation — for that, run an XSD-aware
+		validator over the output, or let a notation program import it.
+	</p>
+
+	<h2>9. Do it from Perl</h2>
+<pre><code>use Music::NWC2MusicXML;
+
+my $converter = Music::NWC2MusicXML-&gt;new(log_level =&gt; 'quiet');
+
+my $counts = $converter-&gt;batch_convert(
+        inputs     =&gt; [ glob('scores/**/*.nwc') ],
+        output_dir =&gt; 'musicxml',
+        recursive  =&gt; 1,
+        base_dir   =&gt; 'scores',
+        overwrite  =&gt; 1,
+);
+
+printf &quot;%d converted, %d warned, %d failed\n&quot;,
+        $counts-&gt;{successful}, $counts-&gt;{warnings}, $counts-&gt;{failed};
+</code></pre>
+	<p>
+		One bad score does not stop the batch: failures are caught, counted and
+		reported, and the rest of the list is converted.
+		<a href="api.html">The Perl API page</a> has the arguments and the
+		return values in full.
+	</p>
+
+	<div class="warn">
+		<span class="warn-title">When a score comes out wrong</span>
+		<p>
+			Check <a href="limitations.html">the limits</a> first: simultaneous voices on one staff and a page size other than A4 all
+			produce output that looks different from NoteWorthy Composer on screen
+			without anything having failed. If a file is not in that list, run it
+			with <code>--debug</code> and include the output with the report —
+			every message carries a code that says which stage gave up.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="install.html">← Install</a>
+		<a href="commands.html">Commands →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Music::NWC2MusicXML 0.003.1 — Copyright 2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/pod/Music::NWC2MusicXML">MetaCPAN</a> ·
+			<a href="https://metacpan.org/pod/nwc2musicxml">nwc2musicxml</a> ·
+			<a href="https://github.com/nigelhorne/NWC2MusicXML">Source</a> ·
+			<a href="https://nigelhorne.github.io/nwc2musicxml/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

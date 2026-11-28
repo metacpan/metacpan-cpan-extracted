@@ -3,7 +3,7 @@ require 5.010;
 use warnings FATAL => 'all';
 use Test::Exception; # dies_ok
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::LeakTrace 'no_leaks_ok';
 # Custom helper for floating-point comparisons
 sub is_approx {

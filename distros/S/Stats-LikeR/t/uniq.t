@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 require 5.010;
 use Test::More;
 use Test::LeakTrace;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # The functional value is computed OUTSIDE the leak block: the whole
 # no_leaks_ok statement is skipped under Devel::Cover (its instrumentation SVs

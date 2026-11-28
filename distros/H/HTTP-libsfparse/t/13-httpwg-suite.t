@@ -22,11 +22,8 @@ use File::Basename qw( dirname );
 use File::Spec ();
 use Test2::V0;
 
-eval { require JSON::PP; JSON::PP->VERSION('2.27103'); 1 }
-    or plan skip_all => 'JSON::PP is required for the httpwg test suite';
-
-eval { require B; 1 }
-    or plan skip_all => 'B is required for the httpwg test suite';
+use JSON ();
+use B;
 
 use HTTP::libsfparse qw(
     parse_item parse_list parse_dictionary :types :index
@@ -169,7 +166,7 @@ sub expected_bare {
         die "unexpected __type '$type'\n";
     }
 
-    # JSON::PP::Boolean, and anything else blessed, is a boolean.
+    # JSON::is_bool and anything else blessed, is a boolean.
     return [ 'boolean', $bare ? 1 : 0 ] if ref $bare;
 
     my $kind = json_scalar_kind($bare);
@@ -269,7 +266,7 @@ sub got_structure {
 # ---------------------------------------------------------------------------
 
 {
-    my $probe = JSON::PP->new->decode('[1, 1.0, "42", true, false]');
+    my $probe = JSON->new->decode('[1, 1.0, "42", true, false]');
 
     is json_scalar_kind( $probe->[0] ), 'integer',
         'a JSON integer is told apart from';
@@ -297,7 +294,7 @@ sub got_structure {
 # Run the suite
 # ---------------------------------------------------------------------------
 
-my $json = JSON::PP->new->utf8;
+my $json = JSON->new->utf8;
 my %total = ( pass => 0, rejected_as_required => 0, allowed_failure => 0 );
 
 for my $name (@files) {

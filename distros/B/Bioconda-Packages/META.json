@@ -61,6 +61,6 @@
          "web" : "https://github.com/telatin/bioconda-packages"
       }
    },
-   "version" : "v2026.11.5",
+   "version" : "v2026.11.6",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,394 @@
+# =============================================================================
+# Logic::Relational::Manual::JSONDatalog
+# =============================================================================
+
+=head1 NAME
+
+Logic::Relational::Manual::JSONDatalog - Declarative JSON-Datalog query interface
+
+=head1 VERSION
+
+Version 0.04
+
+=head1 SYNOPSIS
+
+    use v5.38;
+    use Logic::Relational::Syntax;
+
+    # 1. Declare a Knowledge Base with Docstrings and Metadata
+    logic HospitalKB {
+        description 'Hospital Staffing and Clinical Duty Roster';
+        program_version '1.0.0';
+
+        predicate employee => (
+            doc  => 'Active or inactive hospital staff member',
+            args => ['name'],
+        );
+
+        predicate role => (
+            doc  => 'Clinical role classification (doctor, nurse, surgeon)',
+            args => ['name', 'title'],
+        );
+
+        predicate on_leave => (
+            doc  => 'Staff members currently on approved leave',
+            args => ['name'],
+        );
+
+        facts {
+            employee('Alice');
+            employee('Bob');
+            employee('Charlie');
+
+            role('Alice',   'doctor');
+            role('Bob',     'doctor');
+            role('Charlie', 'nurse');
+
+            on_leave('Bob');
+        }
+    }
+
+    # 2. Introspect Schema (Auto-reflection for Tool Discovery)
+    my $schema = HospitalKB->describe(include_stdlib => 0);
+    # Returns catalog with names, arities, argument types, and docstrings
+
+    # 3. In-Process Perl Data Query (query_data)
+    my $res = HospitalKB->query_data({
+        goals => [
+            { pred => 'role', args => ['$name', 'doctor'] },
+            { not  => { pred => 'on_leave', args => ['$name'] } },
+        ],
+        select   => ['$name'],
+        distinct => 1,
+    });
+
+    if ($res->{ok}) {
+        for my $row (@{ $res->{results} }) {
+            say "Active doctor: " . $row->{name};  # Alice
+        }
+    }
+
+    # 4. Raw JSON String Query (query_json) for Web APIs
+    my $json_req = q|{"goals":[{"pred":"employee","args":["$who"]}],"limit":2}|;
+    my $json_res = HospitalKB->query_json($json_req, pretty => 1);
+
+=head1 DESCRIPTION
+
+Traditionally, querying relational logic engines like L<Logic::Relational> or Prolog systems requires writing host-language code, constructing imperative iterators, and looping over solution streams.
+
+With the rise of autonomous AI agents, Model Context Protocol (MCP) servers, and distributed web services, there is a strong need for an in-process, data-oriented interface that allows external callers to:
+
+=over 4
+
+=item 1.
+
+B<Discover capabilities dynamically:> Introspect relations, argument names, types, and docstrings via C<describe()>.
+
+=item 2.
+
+B<Query declaratively via JSON:> Issue conjunctive queries with negation-as-failure (NAF) using portable JSON/data structures without generating or evaling Perl source code.
+
+=item 3.
+
+B<Receive fully bounded result sets:> Obtain deduplicated, projected dictionary results in a single round-trip with explicit pagination (C<limit>, C<truncated>).
+
+=item 4.
+
+B<Execute safely with hard guardrails:> Rely on the AST planner to detect unground negation (C<UNSAFE_NEGATION>), reorder goals for safe execution, cap execution steps (C<max_steps>), and enforce wall-clock timeouts (C<timeout_ms>).
+
+=back
+
+This manual provides the complete specification and integration guide for the JSON-Datalog interface introduced in L<Logic::Relational> v0.04.
+
+=head1 PROGRAM INTROSPECTION (describe)
+
+The C<describe()> method inspects a target L<Logic::Relational::Program> (or package created with C<logic KB { ... }>) and returns an auto-reflected schema dictionary describing the program and its predicates.
+
+    my $schema = $program->describe(%options);
+    # or
+    my $schema = MyKB->describe(%options);
+
+=head2 Options
+
+=over 4
+
+=item * C<< include_stdlib => 0 | 1 >> (default: 1)
+
+When set to 0, standard library built-ins (such as C<append/3>, C<member/2>, C<between/3>) are excluded, returning only user-defined facts, rules, and generators.
+
+=item * C<< format => 'hash' | 'json' >> (default: 'hash')
+
+Specifies whether to return an unblessed Perl hashref or a formatted JSON string.
+
+=item * C<< pretty => 0 | 1 >> (default: 0)
+
+When C<format =E<gt> 'json'> is selected, controls JSON pretty-printing.
+
+=back
+
+=head2 Returned Schema Structure
+
+The returned schema hash contains:
+
+=over 4
+
+=item * C<name> (string): The program or package name.
+
+=item * C<version> (string): Program version specified by C<program_version>.
+
+=item * C<description> (string): Top-level description specified by C<description>.
+
+=item * C<predicates> (array of hashrefs): Descriptor objects for every discovered or registered predicate.
+
+=back
+
+Each predicate descriptor contains:
+
+=over 4
+
+=item * C<name> (string): Functor name of the predicate.
+
+=item * C<arity> (integer): Number of positional arguments.
+
+=item * C<kind> (string): One of C<"fact">, C<"rule">, or C<"generator">.
+
+=item * C<mutable> (boolean): C<true> if dynamic facts can be asserted/retracted at runtime; C<false> for static rules or generators.
+
+=item * C<tabled> (boolean): C<true> if iterative fixpoint tabling is enabled for this predicate.
+
+=item * C<builtin> (boolean): C<true> if the predicate is exported from L<Logic::Relational::StdLib>.
+
+=item * C<ground_required> (array of integers): Zero-based argument indices that must be ground (bound) at query time.
+
+=item * C<args> (array of hashrefs): Positional argument descriptors, each containing C<name> and optional C<type>. Defaults to C<arg0>, C<arg1>, etc., unless overridden by C<predicate> declarations.
+
+=item * C<description> (string): Docstring provided by C<predicate> declaration or C<doc> attribute.
+
+=back
+
+=head1 QUERY SPECIFICATION (QuerySpec)
+
+A JSON-Datalog query specification is passed to C<query_data(\%spec)> as a Perl hash reference, or to C<query_json($json_string)> as a serialized JSON object.
+
+=head2 Top-Level Attributes
+
+    {
+        "goals":      [ ... ],        # Required: array of goal objects
+        "select":     [ "$x", "$y" ], # Optional: variables to project into rows
+        "distinct":   true,           # Optional (default true): deduplicate rows
+        "limit":      50,             # Optional: maximum rows to return
+        "max_steps":  10000,          # Optional: override execution step budget
+        "timeout_ms": 250             # Optional: wall-clock timeout in milliseconds
+    }
+
+=head3 goals (Required)
+
+An array of one or more goal objects executed as a logical conjunction (AND). Each goal represents a relational check or pattern to satisfy.
+
+=head3 select (Optional)
+
+An array of variable names (e.g. C<['$name', '$dept']>) to project into the result rows. When omitted, the planner automatically projects all positive variables appearing across the query goals. Variables in output rows have their leading C<$> prefix stripped (e.g. C<"$name"> becomes key C<"name">).
+
+=head3 distinct (Optional, default: true)
+
+When C<true>, solutions are deduplicated into mathematical set semantics using compound value signatures. When C<false>, multiset semantics are used and duplicate derivation paths are preserved.
+
+=head3 limit (Optional)
+
+An integer capping the maximum number of rows returned. If more solutions exist beyond C<limit>, evaluation halts immediately and the C<truncated> response flag is set to C<true>.
+
+=head3 max_steps (Optional)
+
+Overrides the engine's resolution step cap (default 100,000 steps). If search exceeds this threshold without finding enough solutions, execution terminates with error code C<MAX_STEPS_EXCEEDED>. Pass C<0> for unlimited steps.
+
+=head3 timeout_ms (Optional)
+
+Specifies a wall-clock deadline in milliseconds. If execution exceeds this deadline, execution aborts with error code C<TIMEOUT_EXCEEDED>.
+
+=head2 Goal Objects
+
+Goals can be specified in three equivalent styles:
+
+=head3 1. Positive Relational Call
+
+    { "pred": "department", "args": ["$name", "ICU"] }
+
+Evaluates predicate C<pred> with the given positional C<args>.
+
+=head3 2. Nested Negation (not)
+
+    {
+        "not": { "pred": "on_leave", "args": ["$name"] }
+    }
+
+Applies Negation-as-Failure (NAF). Succeeds only if the inner goal cannot be satisfied.
+
+=head3 3. Inline Negation (negated: true)
+
+    { "pred": "on_leave", "args": ["$name"], "negated": true }
+
+Functionally identical to nested negation.
+
+=head2 Terms: Variables vs Literals
+
+Arguments in C<args> arrays are interpreted according to their value:
+
+=over 4
+
+=item * B<Named Logical Variables:> Strings starting with a dollar sign followed by an alphanumeric identifier (e.g. C<"$emp">, C<"$PatientId">). Variables shared across goals represent relational joins.
+
+=item * B<Anonymous Wildcards:> The string C<"$_"> represents an anonymous variable whose value is discarded and never projected.
+
+=item * B<Literal Constants:> Any scalar string not starting with C<$>, numbers (e.g. C<42>, C<3.14>), booleans (C<true>, C<false>), or C<null>/C<undef> are treated as exact literal terms to unify against.
+
+=back
+
+=head1 RESPONSE FORMAT & AUDITING
+
+Both C<query_data> and C<query_json> return a structured dictionary.
+
+=head2 Successful Response (ok => 1)
+
+    {
+        "ok":        1,
+        "matched":   1,
+        "count":     2,
+        "truncated": false,
+        "results": [
+            { "name": "Alice", "title": "doctor" },
+            { "name": "Fiona", "title": "doctor" }
+        ],
+        "audit": {
+            "steps":         14,
+            "elapsed_ms":    2,
+            "planned_goals": [
+                "department($name, 'ICU')",
+                "role($name, $title)"
+            ]
+        }
+    }
+
+=over 4
+
+=item * C<ok> (boolean): C<1> on success; C<0> on validation or execution failure.
+
+=item * C<matched> (boolean): C<1> if at least one solution satisfied the query; C<0> if no solutions were found.
+
+=item * C<count> (integer): Total number of rows returned in C<results>.
+
+=item * C<truncated> (boolean): C<true> if the query hit the row C<limit> while more solutions remained unconsumed; C<false> otherwise.
+
+=item * C<results> (array of hashrefs): Projected key-value rows. For boolean/ground queries with no projected variables, returns C<[{}]> if matched or C<[]> if not.
+
+=item * C<audit> (hashref): Diagnostic metadata including resolution C<steps> executed, wall-clock C<elapsed_ms>, and the C<planned_goals> execution order chosen by the planner.
+
+=back
+
+=head2 Error Response (ok => 0)
+
+    {
+        "ok":         0,
+        "error_code": "UNSAFE_NEGATION",
+        "error":      "Negated goal 'on_leave/1' contains unground free variable(s): $who",
+        "audit": {
+            "steps":      0,
+            "elapsed_ms": 1
+        }
+    }
+
+=head1 SAFETY & PLANNER SEMANTICS
+
+The L<Logic::Relational::Query::Plan> query planner enforces strict verification and safety rules before any logic search begins:
+
+=head2 1. Negation-as-Failure Safety (UNSAFE_NEGATION)
+
+In Datalog and First-Order Logic, Negation-as-Failure is sound only when the negated subgoal is completely ground (all its variables are already bound to concrete values). If an unbound variable appears inside a negated goal without being bound by a positive goal in the same conjunction, the search flounders and produces unsound results.
+
+The planner statically analyzes all goals. If any variable in a negated goal is not bound by a corresponding positive goal, the query is rejected immediately with error code C<UNSAFE_NEGATION>.
+
+=head2 2. Automatic Goal Reordering
+
+External clients and LLMs frequently generate goals in suboptimal or unsafe order (e.g. placing a negated condition first: C<not on_leave($x)>, then C<employee($x)>).
+
+The query planner automatically reorders goals using a safe heuristic:
+
+=over 4
+
+=item 1.
+
+Positive goals with ground constant terms are scheduled first to narrow the search space early.
+
+=item 2.
+
+Remaining positive goals are scheduled next to bind relational variables.
+
+=item 3.
+
+Negated goals are deferred until all their variables are safely bound by preceding positive goals.
+
+=back
+
+=head2 3. Groundness Constraints (UNBOUND_REQUIRED_ARG)
+
+Certain predicates (such as arithmetic relations, external database lookups, or system generators) require specific arguments to be bound on entry. Predicates declare this via C<ground_required =E<gt> [0]>.
+
+The planner checks that required arguments are either constant literals or variables previously bound by an earlier goal. If not, the query fails with C<UNBOUND_REQUIRED_ARG>.
+
+=head2 4. Search Budgets (MAX_STEPS_EXCEEDED & TIMEOUT_EXCEEDED)
+
+To protect services from runaway left-recursion, unbounded generator generation, or combinatorial Cartesian products, every query is guarded by:
+
+=over 4
+
+=item * B<Resolution Step Cap:> Governed by C<max_steps> (default 100,000 steps).
+
+=item * B<Wall-Clock Deadline:> Governed by C<timeout_ms> (evaluated after each solution candidate).
+
+=back
+
+=head1 ERROR CODE REFERENCE
+
+The following standard error codes are returned in C<error_code>:
+
+=over 4
+
+=item * B<C<INVALID_SPEC>>
+
+The query specification is malformed (not a hashref, empty C<goals> array, missing C<pred>, or non-existent C<select> variable).
+
+=item * B<C<INVALID_JSON>>
+
+Passed invalid or unparseable JSON text to C<query_json()>.
+
+=item * B<C<UNKNOWN_PREDICATE>>
+
+A goal references a predicate name not declared or known in the knowledge base.
+
+=item * B<C<ARITY_MISMATCH>>
+
+The number of arguments supplied in C<args> does not match the arity of the predicate.
+
+=item * B<C<UNSAFE_NEGATION>>
+
+A negated goal contains one or more free variables that are never bound by any positive goal in the query.
+
+=item * B<C<UNBOUND_REQUIRED_ARG>>
+
+A predicate argument marked with a C<ground_required> constraint was passed an unbound variable.
+
+=item * B<C<MAX_STEPS_EXCEEDED>>
+
+The query evaluation exceeded the allowed resolution step budget (C<max_steps>).
+
+=item * B<C<TIMEOUT_EXCEEDED>>
+
+The query evaluation exceeded the wall-clock deadline (C<timeout_ms>).
+
+=item * B<C<EXECUTION_ERROR>>
+
+A runtime exception occurred during unification or goal evaluation.
+
+=back
+
+=cut
+

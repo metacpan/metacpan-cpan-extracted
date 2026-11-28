@@ -44,7 +44,7 @@ sub md {
 
 my $tty = "$dir/tty";
 my $base = 'mode=light';
-my $img  = "image_types=png:jpeg:gif,image_term=80x24:16x34,image_tty=$tty";
+my $img  = "image_types=png:jpeg:gif,image_term=80x24:16x34,image_tty=$tty,image_align=left";
 
 sub mdee_out {
     my($cfg, $md) = @_;
@@ -87,6 +87,20 @@ my $doc = md('doc.md', "# Title\n\n![logo](a.png)\n\ntext with ![inline](a.png) 
     open my $fh, '<:raw', "$dir/a.png" or die;
     my $data = encode_base64(do { local $/; <$fh> }, '');
     like($sent, qr/;\Q$data\E\e\\$/, 'the data of the image is sent');
+}
+
+# image_align: an image is put in the middle of the fold width, or of
+# the terminal width, by default
+{
+    my $center = "image_types=png,image_term=80x24:16x34,image_tty=$tty";
+    my $rows = sub { grep { /$PH/ } split /\n/, mdee_out("$base,$center,$_[0]", $doc) };
+    my @rows = $rows->('mode=light');
+    is(scalar @rows, 2, 'center: two rows');
+    like($_, qr/^ {38}\e\[38;2;/, 'center: in the middle of the terminal width') for @rows;
+    like(($rows->('fold=1,fold_width=20'))[0], qr/^ {8}\e\[38;2;/, 'center: in the middle of the fold width');
+    like(($rows->('image_align=left'))[0], qr/^\e\[38;2;/, 'left: at the left end');
+    my $r = run("'-Mmd::config($base,$center,image_align=right)' $doc");
+    isnt($r->status, 0, 'an unknown image_align dies');
 }
 
 # image_osc=1: each row tells the file of the image, for ansi2pdf
@@ -201,6 +215,20 @@ SKIP: {
 	      'refill: the paragraph below the image is joined and folded');
     is(scalar(grep { /$PH/ } @l), 3, 'refill: the rows of the image stay');
     is(scalar(grep { /$PH/ && !/^(?:$PH.{2}){4}$/ } @l), 0, 'refill: the rows are not folded');
+}
+
+# a paragraph between a code block and an image stays where it is:
+# the line of the image is counted in the text before the code block
+# is made one line
+SKIP: {
+    App::Greple::md::Blocks::available() or skip 'no parser for refill', 1;
+    png("$dir/three.png", 64, 102);
+    my $md = md('code.md', "```\n1\n2\n3\n4\n5\n6\n```\n\naaaa bbbb cccc\ndddd eeee ffff\n\n![logo](three.png)\n\nend\n");
+    my $out = mdee_out("$base,$img,refill=1,fold=1,fold_width=10", $md);
+    (my $plain = $out) =~ s/\e\[[0-9;]*m//g;
+    my @text = grep { /[a-f]{4}/ } split /\n/, $plain;
+    is_deeply([ map { s/\h+$//r } @text ], [ 'aaaa bbbb', 'cccc dddd', 'eeee ffff' ],
+	      'refill: the paragraph after a code block and above an image is folded');
 }
 
 # an image on GitHub of the repository of the file is the file in it

@@ -1,6 +1,10 @@
 use v5.40;
 use blib;
 use Acme::Parataxis qw[:all];
+use IO::Socket::INET;
+use POSIX       ();
+use Socket      qw[SHUT_WR];
+use Time::HiRes qw[time];
 $|++;
 #
 package My::HTTP {
@@ -66,22 +70,58 @@ package My::HTTP::Handle {
     }
 }
 
-# Use the integrated scheduler to run concurrent fetches
+# Use the integrated scheduler to run concurrent fetches against a local mock
+# listener, so the example does not depend on public network access or TLS.
 async {
     say 'Starting concurrent fetches...';
-    my $http = My::HTTP->new( timeout => 10, verify_SSL => 0 );
-    my @urls = qw[
-        http://www.google.com
-        http://www.example.com
-        https://www.perl.org
-        https://metacpan.org
-    ];
-    my @futures;
+    my $listener = IO::Socket::INET->new( Listen => 10, LocalAddr => '127.0.0.1', LocalPort => 0, Proto => 'tcp', ReuseAddr => 1, Blocking => 0 ) or
+        die 'Could not create listener: ' . $!;
+    my $port = $listener->sockport;
+    fiber {
+        while (1) {
+            my $ready = await_read( $listener, 5000 );
+            next unless $ready > 0;
+            my $client = $listener->accept();
+            next unless $client;
+            fiber {
+                $client->blocking(0);
+                my $buffer = '';
+                while (1) {
+                    my $bytes = sysread( $client, $buffer, 4096, length($buffer) );
+                    last if $buffer =~ /\r?\n\r?\n/;
+                    if ( !defined $bytes ) {
+                        last if $! != POSIX::EAGAIN && $! != POSIX::EWOULDBLOCK;
+                        await_read( $client, 100 );
+                    }
+                    last if defined $bytes && $bytes == 0;
+                }
+                my $response = <<~'EOF';
+                HTTP/1.1 200 OK
+                Content-Type: text/plain
+                Content-Length: 2
+                Connection: close
 
+                HI
+                EOF
+                my $offset = 0;
+                while ( $offset < length $response ) {
+                    my $written = syswrite( $client, $response, length($response) - $offset, $offset );
+                    if    ( defined $written )                                { $offset += $written }
+                    elsif ( $! != POSIX::EAGAIN && $! != POSIX::EWOULDBLOCK ) {last}
+                    else                                                      { await_write( $client, 100 ) }
+                }
+                $client->shutdown(SHUT_WR);
+                $client->close();
+            };
+        }
+    };
+    my @urls = map {"http://127.0.0.1:$port/$_"} qw[one two three four];
+    my @futures;
     for my $url (@urls) {
         push @futures, fiber {
             my $start = time();
             say sprintf '  [Fiber %d] Fetching %s...', current_fid(), $url;
+            my $http    = My::HTTP->new( timeout => 10, verify_SSL => 0 );
             my $res     = $http->get($url);
             my $elapsed = time() - $start;
             say sprintf '  [Fiber %d] Done %s (Status: %d) in %.2fs', current_fid(), $url, $res->{status}, $elapsed;
@@ -94,5 +134,7 @@ async {
         my $res = await $futures[$i];
         say sprintf 'Final Result for %s: %d %s', $urls[$i], $res->{status}, $res->{reason};
     }
+    $listener->close();
     say 'All tasks finished.';
+    stop();
 };

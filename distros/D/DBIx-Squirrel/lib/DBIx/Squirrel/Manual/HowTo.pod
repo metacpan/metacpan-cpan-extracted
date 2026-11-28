@@ -2094,7 +2094,7 @@ B<What it gives you:> C<:flow>, C<:batch>, C<:taps> and C<:rows>
 
 =item C<:context>
 
-B<What it gives you:> C<iterator>, C<result_number> and C<result_original>
+B<What it gives you:> C<iterator>, C<kept_origin>, C<result_number> and C<result_original>
 
 B<Made in:> DBIx::Squirrel::Context
 

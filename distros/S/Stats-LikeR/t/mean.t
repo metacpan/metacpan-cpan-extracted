@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 require 5.010;
 use Test::More;
 use Test::LeakTrace;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 sub is_approx {
 	my ($got, $exp, $msg, $tol) = @_;

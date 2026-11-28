@@ -10,6 +10,7 @@ lib/BoardStreams.pm
 lib/BoardStreams/Client.pm
 lib/BoardStreams/Client/Channel.pm
 lib/BoardStreams/Client/Error.pm
+lib/BoardStreams/Client/Handshake.pm
 lib/BoardStreams/Client/Membership.pm
 lib/BoardStreams/Context.pm
 lib/BoardStreams/Diff.pm
@@ -25,5 +26,6 @@ t/03_patterns.t
 t/04_client.t
 t/05_client_hub.t
 t/06_graceful_stop.t
+t/07_route_behind_under.t
 META.yml
 MANIFEST

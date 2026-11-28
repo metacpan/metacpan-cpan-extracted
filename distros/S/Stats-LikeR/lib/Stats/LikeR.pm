@@ -3,14 +3,17 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3431';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3501';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw(reftype looks_like_number);
 XSLoader::load('Stats::LikeR', $VERSION);
 our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc avals bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort density df2h dftype bw_nrd0 bw_nrd bw_ucv bw_bcv bw_sj dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm pt qt pchisq qchisq pf qf pbinom qnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table zerotrunc hurdle svyglm ivreg lmer glmer);
-our @EXPORT = @EXPORT_OK;
+# Nothing is exported by default: a caller names what it wants, or asks for
+# ':all'. Up to 0.3431 @EXPORT was all of @EXPORT_OK, which put min, max, sum,
+# mode, filter, merge, sample and seq over whatever the caller already had.
+our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 # File operations: failure reporting
 #
@@ -108,6 +111,7 @@ my %HELP_ALIAS = (
 	_melt_xs          => 'melt',
 	_impute_xs        => 'fillna',
 	_numeric_cells    => 'summary',
+	_format_nv        => 'table_one',
 	_t1_col           => 'table_one',
 	_aoh2hoh_xs       => 'aoh2hoh',
 	_dropna_xs        => 'dropna',
@@ -146,9 +150,10 @@ sub _help_show {
 #     h(\&bedroc);      # by reference
 #     h();              # the general help, and the list of topics
 #
-# h(bedroc), with no quotes and no sigil, cannot be made to work: every
-# function here is exported, so Perl parses the bareword as a call to bedroc()
-# before h() is ever reached.  Use one of the four forms above.
+# h(bedroc), with no quotes and no sigil, cannot be made to work: if the caller
+# imported bedroc, Perl parses the bareword as a call to bedroc() before h() is
+# ever reached, and if not, strict refuses the bareword.  Use one of the four
+# forms above, which work whether or not the name was imported.
 #
 # Returns the name whose documentation was shown.
 sub h {
@@ -168,6 +173,15 @@ sub h {
 			next unless $slot && $slot == $what;
 			$name = $cand;
 			last;
+		}
+		# \&bedroc in a caller that did not import bedroc is a reference to an
+		# undefined stub in the caller's package; its name is still the one asked
+		# about.  A defined sub of the caller's own is not ours, so it still dies.
+		if (!defined $name && !defined &$what) {
+			require B;
+			my $gv = B::svref_2object($what)->GV;
+			my $stub = $gv->isa('B::GV') ? $gv->NAME : undef;
+			$name = $stub if defined $stub && grep { $_ eq $stub } @EXPORT_OK;
 		}
 		die "h: that code reference is not a Stats::LikeR function\n"
 			unless defined $name;
@@ -838,7 +852,6 @@ sub rownames {
 # `select`/`rename` would shadow them in the caller.  The `_cols` suffix
 # avoids that and reads as a trio.
 
-
 # select_cols($df, @cols) | select_cols($df, \@cols)
 # drop_cols($df,   @cols) | drop_cols($df,   \@cols)
 # rename_cols($df, old => new, ...) | rename_cols($df, { old => new, ... })
@@ -1337,9 +1350,8 @@ sub df2h {
 		$dup_code{$dup}, undef);
 }
 { no warnings 'once'; *aoh2h = \&df2h; }  # true synonym
-# agg / concat / rbind  --  additions to lib/Stats/LikeR.pm
-# Splice these in after the dropna sub. Also add  agg concat rbind  to
-# @EXPORT_OK. rbind is a true glob-alias synonym for concat.
+# agg / concat / rbind
+# rbind is a true glob-alias synonym for concat.
 
 # A tied frame, as a plain copy of it; anything else, as it is. Each pass over a
 # tied frame -- _df_shape, _present_keys, the XS read -- FETCHes every row or
@@ -1559,7 +1571,6 @@ sub _untied {
 			\@out_names, [ @by ], [ @agg_cols ]);
 	}
 }
-
 
 # assign($df, name => \&code, name2 => \&code2, ...)
 #
@@ -2835,13 +2846,14 @@ sub summary {
 		$any_nan ||= $n_nan;
 		if (!@$numeric) { push @raw, [ 0, (undef) x 6, $n_nan ]; next }	# empty -> na stats
 		my $q = quantile($numeric, probs => [0.25, 0.75]);
-		# format as %.4g strings; they still look numeric, so _render_grid
+		# format as %.4g strings, a tie rounded to even on every platform by
+		# _format_nv (LikeR.xs); they still look numeric, so _render_grid
 		# right-aligns and colours them as numbers.
 		push @raw, [
 			scalar @$numeric,
-			sprintf('%.4g', min($numeric)),    sprintf('%.4g', $q->{'25%'}),
-			sprintf('%.4g', median($numeric)), sprintf('%.4g', mean($numeric)),
-			sprintf('%.4g', $q->{'75%'}),      sprintf('%.4g', max($numeric)),
+			_format_nv('g', 4, min($numeric)),    _format_nv('g', 4, $q->{'25%'}),
+			_format_nv('g', 4, median($numeric)), _format_nv('g', 4, mean($numeric)),
+			_format_nv('g', 4, $q->{'75%'}),      _format_nv('g', 4, max($numeric)),
 			$n_nan,
 		];
 	}
@@ -3022,7 +3034,6 @@ sub _zip_open {
 	}
 	return { file => $file, entries => \%entries };
 }
-
 
 # The same member, read straight out of the archive with Compress::Raw::Zlib
 # instead of through IO::Uncompress::Unzip.
@@ -5597,11 +5608,11 @@ sub table_one {
 			for my $gi (0 .. $#groups) {
 				my $gv = $byg[$gi];
 				$row{ $groups[$gi] } = @$gv
-					? sprintf('%.*f (%.*f)', $digits, mean($gv), $digits, @$gv > 1 ? sd($gv) : 0)
+					? _format_nv('f', $digits, mean($gv)) . ' (' . _format_nv('f', $digits, @$gv > 1 ? sd($gv) : 0) . ')'
 					: '';
 			}
 			$row{Overall} = @$allv
-				? sprintf('%.*f (%.*f)', $digits, mean($allv), $digits, @$allv > 1 ? sd($allv) : 0)
+				? _format_nv('f', $digits, mean($allv)) . ' (' . _format_nv('f', $digits, @$allv > 1 ? sd($allv) : 0) . ')'
 				: '';
 			if (defined $by && @groups >= 2) {
 				($row{'p_value'}, $row{test}) = _t1_cont_p(\@byg, $nonpar);
@@ -5639,13 +5650,15 @@ sub table_one {
 			push @out, \%hdr;
 			for my $lv (@levels) {
 				my %row = (variable => $v, level => $lv, type => 'categorical');
+				# _format_nv, not sprintf: a count of 18 in 32 is exactly 56.25%, a tie that
+				# glibc rounds to 56.2 and the MSVCRT of Strawberry Perl 5.24 to 56.3.
 				for my $gi (0 .. $#groups) {
 					my $cnt = $gcnt[$gi]{$lv} || 0;
 					my $tot = $gsize[$gi];
-					$row{ $groups[$gi] } = $tot ? sprintf('%d (%.*f%%)', $cnt, $pdig, 100 * $cnt / $tot) : '0';
+					$row{ $groups[$gi] } = $tot ? sprintf('%d (%s%%)', $cnt, _format_nv('f', $pdig, 100 * $cnt / $tot)) : '0';
 				}
 				my $cntall = $allcnt{$lv} || 0;
-				$row{Overall} = $R ? sprintf('%d (%.*f%%)', $cntall, $pdig, 100 * $cntall / $R) : '0';
+				$row{Overall} = $R ? sprintf('%d (%s%%)', $cntall, _format_nv('f', $pdig, 100 * $cntall / $R)) : '0';
 				push @out, \%row;
 			}
 		}
@@ -5654,7 +5667,7 @@ sub table_one {
 }
 
 # Effect sizes (Perl level; compose the XS primitives mean/var/aov).  All
-# validated numerically against R.  Added to @EXPORT_OK (== @EXPORT).
+# validated numerically against R.  Each is in @EXPORT_OK.
 
 # _num_pair(\@x, \@y, $who) -> (\@xn, \@yn): defined, numeric values only.
 sub _num_pair {
@@ -6415,7 +6428,6 @@ sub age_standardize {
 	};
 }
 
-
 # anova($fit0, $fit1, ..., test => 'Chisq' | 'LRT' | 'F', dispersion => $phi)
 #
 # Nested-model comparison on fits that already exist -- R's anova(m0, m1) --
@@ -6821,11 +6833,11 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3431
+version 0.3501
 
 =head1 Synopsis
 
- use Stats::LikeR;
+ use Stats::LikeR qw(read_table summary avals mean sd t_test lm);
 
  my $patients = read_table('patients.csv');    # array of hashes, one per row
  summary($patients);                            # R's summary(), one row per column
@@ -6854,7 +6866,20 @@ List::Util returns C<undef>; given a reference to an empty array, as
 C<min(\@empty)>, they return C<undef>. A C<NaN> anywhere in the input makes the
 result C<NaN>, as it does in R.
 
-Every function is exported by default.
+=head1 Importing
+
+Nothing is exported by default. Name the functions you want, or ask for all of
+them with C<:all>:
+
+ use Stats::LikeR qw(mean sd t_test);   # these three
+ use Stats::LikeR qw(:all);             # every function
+ use Stats::LikeR;                      # none: call Stats::LikeR::mean(...)
+
+Several names (C<min>, C<max>, C<sum>, C<mode>, C<filter>, C<merge>, C<sample>,
+C<seq>, C<uniq>) are also those of functions in List::Util and elsewhere, so
+importing only what you use keeps them from replacing yours. Before 0.35
+every function was exported by default; code that relied on that needs
+C<qw(:all)> added to its C<use> line.
 
 =head1 Getting help
 
@@ -6866,14 +6891,18 @@ the spirit of R's C<?function> at the prompt. It takes the name three ways:
  h(\&quantile);    # by reference
  h();              # this section, and the list of documented functions
 
- perl -MStats::LikeR -e 'h(*agg)'   # straight from the shell
+ perl -MStats::LikeR=h -e 'h(*agg)'   # straight from the shell
 
 C<h> works for every function in the distribution looking the name up in the module's own POD rather than watching an argument list. That POD is generated from this file, so what C<h>
 prints is what you are reading.
 
-Note that C<h(bedroc)>, with no quotes and no sigil, cannot be made to work:
-every function here is exported, so Perl parses the bareword as a call to
-C<bedroc()> before C<h> is ever reached. Use one of the three forms above.
+C<h> itself must be imported, or called as C<Stats::LikeR::h>; the function asked
+about need not be, since all three forms above work whether or not it was.
+
+Note that C<h(bedroc)>, with no quotes and no sigil, cannot be made to work: if
+C<bedroc> was imported, Perl parses the bareword as a call to C<bedroc()> before
+C<h> is ever reached, and if not, C<use strict> refuses the bareword. Use one of
+the three forms above.
 
 =head1 Functions/Subroutines
 
@@ -7158,7 +7187,7 @@ memory.
 
 =head3 Usage
 
- use Stats::LikeR;
+ use Stats::LikeR 'agg';
 
  # grouped, one aggregator per column
  my $out = agg($df, by => 'sex', agg => { wt => 'mean' });
@@ -8088,7 +8117,7 @@ A plain coderef stores its B<return value>, so an in-place transform of an exist
 
 C<map_cell { ... }> removes the ceremony. Inside the block, B<< C<$_> is the named column's current cell >> (not the whole row), the block's return value is B<ignored>, and the modified C<$_> is stored back -- for a HoA, C<$_> aliases the cell itself, so the edit is made where the cell lies:
 
- use Stats::LikeR;   # exports map_cell alongside assign
+ use Stats::LikeR qw(assign map_cell);
 
  assign($df, 'Res.' => map_cell { s/^[A-Z]:// });   # strip a leading "X:"
  assign($df, 'Res.' => map_cell { $_ = uc });        # upper-case in place
@@ -8503,7 +8532,7 @@ Select B<columns> out of a table and return it in the same shape. A column is
 the inner (second-level) key of a B<hash of hashes> or an B<array of hashes>,
 or the outer key of a B<hash of arrays>:
 
- use Stats::LikeR;
+ use Stats::LikeR 'cfilter';
  my %hoa = ( x => [1,2,3], y => [4,5,6], z => [0,0,0] );
  cfilter(\%hoa, keep   => ['x','y']);  # { x => [1,2,3], y => [4,5,6] }
  cfilter(\%hoa, remove => ['z']);      # { x => [1,2,3], y => [4,5,6] }
@@ -9087,7 +9116,7 @@ It's the workhorse behind things like correlation matrices: give it your data an
 the name of a function that takes two columns (C<cor>, C<t_test>, …) and you get
 back every column compared against every other column.
 
- use Stats::LikeR;
+ use Stats::LikeR 'col2col';
 
  my %data = (
      height => [ 170, 165, 180, 175 ],
@@ -9399,7 +9428,7 @@ original frames are never modified.
 
 =head3 Usage
 
- use Stats::LikeR;
+ use Stats::LikeR qw(concat rbind);
 
  my $all = concat($df1, $df2, $df3);   # any number of frames
  my $all = rbind($df1, $df2);          # identical: rbind is a synonym
@@ -9490,7 +9519,7 @@ frame round-trips unchanged.
 
 =head3 rbind
 
-C<rbind> is the same subroutine as C<concat>, exported under a second name for
+C<rbind> is the same subroutine as C<concat>, exportable under a second name for
 readers who know it from R:
 
  my $c = rbind($df1, $df2);
@@ -11399,7 +11428,7 @@ C<filter> accepts a predicate in one of two forms:
 
 =back
 
-Both C<filter> and C<col> are exported by default.
+Import both: C<use Stats::LikeR qw(filter col);>.
 
 =head3 Arguments
 
@@ -11531,7 +11560,7 @@ The two selectable output types are C<'aoh'> and C<'hoa'>. C<'hoh'> is B<not> se
 
 =head3 Examples
 
- use Stats::LikeR;
+ use Stats::LikeR qw(read_table filter col);
  my $df = read_table('patients.csv');                 # array of hashes
 
  my $adults = filter($df, col('Age') >= 18);          # numeric threshold
@@ -12418,7 +12447,7 @@ ask for a name, get the section of the manual that describes it.
  h(\&quantile);    # by reference
  h();              # the general help, and every documented function
 
- perl -MStats::LikeR -e 'h(*write_table)'   # straight from the shell
+ perl -MStats::LikeR=h -e 'h(*write_table)'   # straight from the shell
 
 =head3 Arguments
 
@@ -12440,7 +12469,7 @@ ask for a name, get the section of the manual that describes it.
 </tr>
 <tr>
   <td><code>h(\&amp;name)</code></td>
-  <td>A code reference to one of this module's functions. Dies if the reference is not one.</td>
+  <td>A code reference to one of this module's functions, imported or not. Dies if the reference is to some other defined function.</td>
 </tr>
 <tr>
   <td><code>h()</code></td>
@@ -12449,9 +12478,9 @@ ask for a name, get the section of the manual that describes it.
 </tbody>
 </table>
 
-C<h(bedroc)>, with no quotes and no sigil, cannot be made to work: every function
-here is exported, so Perl parses the bareword as a call to C<bedroc()> before C<h>
-is ever reached.
+C<h(bedroc)>, with no quotes and no sigil, cannot be made to work: if C<bedroc>
+was imported, Perl parses the bareword as a call to C<bedroc()> before C<h> is
+ever reached, and if not, C<use strict> refuses the bareword.
 
 =head3 Return value
 
@@ -12679,7 +12708,7 @@ Convert a B<hash of hashes> (row-major: outer key = row, inner key = column)
 into a B<hash of arrays> (column-major: key = column, value = that column's
 cells down the rows).
 
- use Stats::LikeR;
+ use Stats::LikeR 'hoh2hoa';
 
  my %hoh = (
      'r1' => { 'a' => 1, 'b' => 2 },
@@ -13205,7 +13234,7 @@ positive integer; or an invalid C<limit_direction>/C<limit_area>.
 Returns the set intersection (∩) of a list of array references: the values
 that appear in B<every> array ref given.
 
- use Stats::LikeR;
+ use Stats::LikeR 'intersection';
 
  my @i = intersection([1, 2, 3], [2, 3, 4]);          # (2, 3)
  my @t = intersection([1, 2, 3, 4], [2, 3, 4], [3, 4]); # (3, 4)
@@ -18171,7 +18200,7 @@ Dies if any inner element is not a hash reference
 
 Returns the distinct values of its arguments, in first-seen order.
 
- use Stats::LikeR;
+ use Stats::LikeR 'uniq';
 
  my @u = uniq(1, 2, 2, 3, 1);         # (1, 2, 3)
  my @s = uniq(qw/a b a c/);           # ('a', 'b', 'c')
@@ -18399,7 +18428,7 @@ equal values whose sum overflows still have a variance of C<0>
 
 As described by R: Performs an F test to compare the variances of two samples from normal populations
 
- use Stats::LikeR;
+ use Stats::LikeR 'var_test';
 
  my @x = (2.9, 3.0, 2.5, 2.6, 3.2);
  my @y = (3.8, 2.7, 4.0, 2.4);

@@ -30,11 +30,12 @@
             "ExtUtils::MakeMaker" : "0",
             "File::Basename" : "0",
             "File::Copy::Recursive::Reduced" : "0.006000",
+            "File::Path" : "0",
             "File::Spec::Functions" : "0",
             "List::Util" : "0",
-            "YAML::Tiny" : "0",
+            "parent" : "0",
             "strict" : "0",
-            "version" : "0"
+            "version" : "0.077000"
          }
       },
       "runtime" : {
@@ -42,24 +43,29 @@
             "Carp" : "0",
             "Cwd" : "3.073000",
             "File::Basename" : "0",
-            "File::Copy::Recursive::Reduced" : "0.002000",
             "File::Spec::Functions" : "0",
-            "File::Temp" : "0",
             "File::Util::SecureDir" : "0.001000",
             "File::stat" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.45",
             "Symbol" : "0",
-            "strict" : "0",
-            "version" : "0"
+            "parent" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Encode" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88",
+            "YAML::Tiny" : "0",
+            "autodie" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v5.5.2",
+   "version" : "v5.5.3",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

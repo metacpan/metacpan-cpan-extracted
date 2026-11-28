@@ -59,14 +59,6 @@ extern "C" {
 #define PARANOID_MAX_ARRAY_ENTRIES 1000000
 #define PARANOID_MAX_HASH_ENTRIES 250000
 
-#if defined(__GNUC__) || defined(__clang__)
-#   define SRL_NOINLINE __attribute__((noinline))
-#elif defined(_MSC_VER)
-#   define SRL_NOINLINE __declspec(noinline)
-#else
-#   define SRL_NOINLINE
-#endif
-
 #if !defined(HAVE_CSNAPPY)
 # include "snappy/csnappy_decompress.c"
 #endif
@@ -147,23 +139,23 @@ SRL_STATIC_INLINE void srl_clear_thaw_state(pTHX_ srl_decoder_t *dec);          
 SRL_STATIC_INLINE void srl_assert_input_unchanged(pTHX_ srl_decoder_t *dec);        /* croak if a callback modified the input */
 
 /* the internal routines to handle each kind of object we have to deserialize */
-SRL_STATIC_INLINE void srl_read_copy(pTHX_ srl_decoder_t *dec, SV* into);
+static SRL_NOINLINE void srl_read_copy(pTHX_ srl_decoder_t *dec, SV* into);
 
 SRL_STATIC_INLINE void srl_read_hash(pTHX_ srl_decoder_t *dec, SV* into, U8 tag);
-SRL_STATIC_INLINE void srl_read_array(pTHX_ srl_decoder_t *dec, SV* into, U8 tag);
-SRL_STATIC_INLINE void srl_read_regexp(pTHX_ srl_decoder_t *dec, SV* into);
+static SRL_NOINLINE void srl_read_array(pTHX_ srl_decoder_t *dec, SV* into, U8 tag);
+static SRL_NOINLINE void srl_read_regexp(pTHX_ srl_decoder_t *dec, SV* into);
 
 SRL_STATIC_INLINE void srl_read_refp(pTHX_ srl_decoder_t *dec, SV* into);
 SRL_STATIC_INLINE void srl_read_refn(pTHX_ srl_decoder_t *dec, SV* into);
 SRL_STATIC_INLINE void srl_read_weaken(pTHX_ srl_decoder_t *dec, SV* into);
-SRL_STATIC_INLINE void srl_read_long_double(pTHX_ srl_decoder_t *dec, SV* into);
+static SRL_NOINLINE void srl_read_long_double(pTHX_ srl_decoder_t *dec, SV* into);
 SRL_STATIC_INLINE void srl_read_double(pTHX_ srl_decoder_t *dec, SV* into);
 SRL_STATIC_INLINE void srl_read_float(pTHX_ srl_decoder_t *dec, SV* into);
-SRL_STATIC_INLINE void srl_read_float_128(pTHX_ srl_decoder_t *dec, SV* into);
+static SRL_NOINLINE void srl_read_float_128(pTHX_ srl_decoder_t *dec, SV* into);
 SRL_STATIC_INLINE void srl_read_string(pTHX_ srl_decoder_t *dec, int is_utf8, SV* into);
 SRL_STATIC_INLINE void srl_read_varint_into(pTHX_ srl_decoder_t *dec, SV* into, SV** container, const U8 *track_it);
 SRL_STATIC_INLINE void srl_read_zigzag_into(pTHX_ srl_decoder_t *dec, SV* into, SV** container, const U8 *track_it);
-SRL_STATIC_INLINE void srl_read_reserved(pTHX_ srl_decoder_t *dec, U8 tag, SV* into);
+static SRL_NOINLINE SRL_UNUSED void srl_read_reserved(pTHX_ srl_decoder_t *dec, U8 tag, SV* into);
 SRL_STATIC_INLINE void srl_read_object(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag, int read_class_name_only);
 SRL_STATIC_INLINE void srl_read_objectv(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag);
 
@@ -176,7 +168,7 @@ SRL_STATIC_INLINE int srl_class_allowed(pTHX_ HV *allow_hash, SV *allow_cb, HV *
 SRL_STATIC_INLINE void srl_track_class(pTHX_ srl_decoder_t *dec, SV *class_entry);
 
 /* FIXME unimplemented!!! */
-SRL_STATIC_INLINE int srl_read_extend(pTHX_ srl_decoder_t *dec, SV* into);
+static SRL_NOINLINE int srl_read_extend(pTHX_ srl_decoder_t *dec, SV* into);
 
 #define DEPTH_INCREMENT(dec) STMT_START {                                           \
     if (expect_false(++dec->recursion_depth > dec->max_recursion_depth)) {                        \
@@ -335,6 +327,7 @@ srl_build_decoder_struct(pTHX_ HV *opt, sv_with_hash *options,
 
     SRL_RDR_CLEAR(&dec->buf);
     dec->pbuf = &dec->buf;
+    dec->zstd_dctx = NULL;
 
     /* Dispatch supplied options by their precomputed IDs. Dependent options
      * are collected here and resolved after the loop. */
@@ -771,7 +764,10 @@ srl_build_decoder_struct_alike(pTHX_ srl_decoder_t *proto)
 
     SRL_RDR_CLEAR(&dec->buf);
     dec->pbuf = &dec->buf;
+    dec->zstd_dctx = NULL;
     dec->flags = proto->flags;
+    dec->flags_readonly = proto->flags_readonly;
+    dec->alias_varint_under = proto->alias_varint_under;
     SRL_DEC_RESET_VOLATILE_FLAGS(dec);
 
     return dec;
@@ -781,6 +777,10 @@ srl_build_decoder_struct_alike(pTHX_ srl_decoder_t *proto)
 void
 srl_destroy_decoder(pTHX_ srl_decoder_t *dec)
 {
+    if (dec->zstd_dctx != NULL) {
+        ZSTD_freeDCtx((ZSTD_DCtx *)dec->zstd_dctx);
+        dec->zstd_dctx = NULL;
+    }
     PTABLE_free(dec->ref_seenhash);
     if (dec->ref_stashes) {
         PTABLE_free(dec->ref_stashes);
@@ -923,7 +923,8 @@ srl_decode_into_internal(pTHX_ srl_decoder_t *origdec, SV *src, SV *header_into,
         dec->bytes_consumed = srl_decompress_body_zlib(aTHX_ dec->pbuf, NULL, dec->max_uncompressed_size);
         origdec->bytes_consumed = dec->bytes_consumed;
     } else if (expect_false( SRL_DEC_HAVE_OPTION(dec, SRL_F_DECODER_DECOMPRESS_ZSTD) )) {
-        dec->bytes_consumed = srl_decompress_body_zstd(aTHX_ dec->pbuf, NULL, dec->max_uncompressed_size);
+        dec->bytes_consumed = srl_decompress_body_zstd_ctx(aTHX_ dec->pbuf, NULL, dec->max_uncompressed_size,
+            SRL_DEC_HAVE_OPTION(dec, SRL_F_DECODER_REUSE) ? &dec->zstd_dctx : NULL);
         origdec->bytes_consumed = dec->bytes_consumed;
     }
 
@@ -1829,7 +1830,7 @@ srl_fetch_item(pTHX_ srl_decoder_t *dec, UV item, const char * const tag_name)
 /****************************************************************************
  * PRIVATE WORKER SUBS FOR DEPARSING                                        *
  ****************************************************************************/
-SRL_STATIC_INLINE void
+static SRL_NOINLINE void
 srl_alias_iv(pTHX_ srl_decoder_t *dec, SV **container, const U8 *track_it, IV iv)
 {
     SV *alias;
@@ -1949,7 +1950,7 @@ srl_read_string(pTHX_ srl_decoder_t *dec, int is_utf8, SV* into)
     SRL_RDR_ASSERT_SPACE(dec->pbuf, len, " while reading string");
     if (expect_false(is_utf8 && SRL_DEC_HAVE_OPTION(dec, SRL_F_DECODER_VALIDATE_UTF8))) {
         /* checks for invalid byte sequences. */
-        if (expect_false( !is_utf8_string((U8*)dec->buf.pos, len) )) {
+        if (expect_false( len > 0 && !is_utf8_string((U8*)dec->buf.pos, len) )) {
             SRL_RDR_ERROR(dec->pbuf, "Invalid UTF8 byte sequence");
         }
     }
@@ -1962,7 +1963,7 @@ srl_read_string(pTHX_ srl_decoder_t *dec, int is_utf8, SV* into)
     dec->buf.pos+= len;
 }
 
-SRL_STATIC_INLINE void
+static SRL_NOINLINE void
 srl_read_vstring(pTHX_ srl_decoder_t *dec, SV* into, int is_utf8)
 {
     UV len = srl_read_varint_uv_length(aTHX_ dec->pbuf, " while reading extended VSTRING");
@@ -2041,7 +2042,7 @@ srl_read_float(pTHX_ srl_decoder_t *dec, SV* into)
     dec->buf.pos+= sizeof(float);
 }
 
-SRL_STATIC_INLINE void
+static SRL_NOINLINE void
 srl_read_float_128(pTHX_ srl_decoder_t *dec, SV* into)
 {
     U8 bytes[16], scratch[16];
@@ -2056,22 +2057,28 @@ srl_read_float_128(pTHX_ srl_decoder_t *dec, SV* into)
     dec->buf.pos += 16;
 }
 
-SRL_STATIC_INLINE void
-srl_read_double(pTHX_ srl_decoder_t *dec, SV* into)
+SRL_STATIC_INLINE double
+srl_read_double_val(pTHX_ srl_decoder_t *dec)
 {
     union myfloat val;
     U8 scratch[sizeof(double)];
     SRL_RDR_ASSERT_SPACE(dec->pbuf, sizeof(double), " while reading DOUBLE");
     if (srl_native_float_payload(dec))
-        Copy(dec->buf.pos,val.c,sizeof(double),U8);
+        Copy(dec->buf.pos, val.c, sizeof(double), U8);
     else
         srl_copy_double_little_endian(aTHX_ val.c, srl_ordered_float_payload(dec, scratch, sizeof(double)));
-    sv_setnv(into, (NV)val.d);
-    dec->buf.pos+= sizeof(double);
+    dec->buf.pos += sizeof(double);
+    return val.d;
+}
+
+SRL_STATIC_INLINE void
+srl_read_double(pTHX_ srl_decoder_t *dec, SV* into)
+{
+    sv_setnv(into, (NV)srl_read_double_val(aTHX_ dec));
 }
 
 
-SRL_STATIC_INLINE void
+static SRL_NOINLINE void
 srl_read_long_double(pTHX_ srl_decoder_t *dec, SV* into)
 {
     union myfloat val;
@@ -2100,6 +2107,20 @@ srl_read_long_double(pTHX_ srl_decoder_t *dec, SV* into)
 
 
 SRL_STATIC_INLINE void
+srl_array_set_iv(pTHX_ srl_decoder_t *dec, SV **slot, IV iv)
+{
+    if (expect_false(IS_IV_ALIAS(dec, iv))) {
+        *slot = NULL;
+        srl_alias_iv(aTHX_ dec, slot, NULL, iv);
+    } else {
+        SV * const sv = newSViv(iv);
+        if (expect_false(dec->flags_readonly))
+            SvREADONLY_on(sv);
+        *slot = sv;
+    }
+}
+
+static SRL_NOINLINE void
 srl_read_array(pTHX_ srl_decoder_t *dec, SV *into, U8 tag) {
     UV len;
     if (tag) {
@@ -2133,10 +2154,95 @@ srl_read_array(pTHX_ srl_decoder_t *dec, SV *into, U8 tag) {
         av_end= av_array + len;
 
         dec->owed_bytes += len;
+
+        /* Match DEPTH_INCREMENT parity: if entering an element would exceed
+         * max_recursion_depth, let srl_read_single_value handle it identically. */
+        if (expect_false(dec->recursion_depth >= dec->max_recursion_depth)) {
+            for ( ; av_array < av_end ; av_array++) {
+                dec->owed_bytes--;
+                *av_array = FRESH_SV();
+                srl_read_single_value(aTHX_ dec, *av_array, av_array);
+            }
+            return;
+        }
+
         for ( ; av_array < av_end ; av_array++) {
+            U8 elem_tag;
             dec->owed_bytes--;
-            *av_array = FRESH_SV();
-            srl_read_single_value(aTHX_ dec, *av_array, av_array);
+            if (expect_false(SRL_RDR_DONE(dec->pbuf))) {
+                *av_array = FRESH_SV();
+                srl_read_single_value(aTHX_ dec, *av_array, av_array);
+                continue;
+            }
+            elem_tag = *dec->buf.pos;
+            if (elem_tag <= SRL_HDR_NEG_HIGH) {
+                const IV iv = (elem_tag <= SRL_HDR_POS_HIGH)
+                    ? (IV)elem_tag
+                    : (IV)elem_tag - 32;
+                dec->buf.pos++;
+                srl_array_set_iv(aTHX_ dec, av_array, iv);
+            } else if (elem_tag >= SRL_HDR_SHORT_BINARY_LOW
+                    && elem_tag <= SRL_HDR_SHORT_BINARY_HIGH) {
+                const STRLEN slen = (STRLEN)SRL_HDR_SHORT_BINARY_LEN_FROM_TAG(elem_tag);
+                SV *sv;
+                dec->buf.pos++;
+                SRL_CHECK_MAX_STRING_LENGTH(dec, slen, "string");
+                SRL_RDR_ASSERT_SPACE(dec->pbuf, slen, " while reading ascii string");
+                sv = newSVpvn((const char *)dec->buf.pos, slen);
+                dec->buf.pos += slen;
+                if (expect_false(dec->flags_readonly))
+                    SvREADONLY_on(sv);
+                *av_array = sv;
+            } else {
+                switch (elem_tag) {
+                    case SRL_HDR_VARINT:
+                    {
+                        UV uv;
+                        dec->buf.pos++;
+                        uv = srl_read_varint_uv(aTHX_ dec->pbuf);
+                        if (expect_true(uv <= (UV)IV_MAX)) {
+                            srl_array_set_iv(aTHX_ dec, av_array, (IV)uv);
+                        } else {
+                            SV * const sv = newSVuv(uv);
+                            if (expect_false(dec->flags_readonly))
+                                SvREADONLY_on(sv);
+                            *av_array = sv;
+                        }
+                        break;
+                    }
+                    case SRL_HDR_DOUBLE:
+                    {
+                        SV *sv;
+                        dec->buf.pos++;
+                        sv = newSVnv((NV)srl_read_double_val(aTHX_ dec));
+                        if (expect_false(dec->flags_readonly))
+                            SvREADONLY_on(sv);
+                        *av_array = sv;
+                        break;
+                    }
+                    case SRL_HDR_CANONICAL_UNDEF:
+                        if (expect_false(dec->proto_version < 3)) {
+                            dec->buf.pos++;
+                            SRL_RDR_ERROR(dec->pbuf, "CANONICAL_UNDEF tag requires protocol version 3 or later");
+                        }
+                        /* fall through */
+                    case SRL_HDR_UNDEF:
+                        dec->buf.pos++;
+                        if (SRL_DEC_HAVE_OPTION(dec, SRL_F_DECODER_USE_UNDEF)) {
+                            *av_array = &PL_sv_undef;
+                        } else {
+                            SV * const sv = FRESH_SV();
+                            if (expect_false(dec->flags_readonly))
+                                SvREADONLY_on(sv);
+                            *av_array = sv;
+                        }
+                        break;
+                    default:
+                        *av_array = FRESH_SV();
+                        srl_read_single_value(aTHX_ dec, *av_array, av_array);
+                        break;
+                }
+            }
         }
     }
 }
@@ -2773,7 +2879,7 @@ srl_read_object(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag, int read_class_n
                 SRL_RDR_ERRORf2(dec->pbuf,
                     COPY_OFFSET_ERROR_FMT_PREFIX " while reading classname", (UV)ofs, key_len_uv);
             }
-            if ((flags & SVf_UTF8) && !is_utf8_string(from, key_len))
+            if ((flags & SVf_UTF8) && key_len > 0 && !is_utf8_string(from, key_len))
                 SRL_RDR_ERROR_PANIC(dec->pbuf, "utf8 flagged classname is not actually utf8");
         }
     } else {
@@ -2962,7 +3068,7 @@ srl_thaw_object(pTHX_ srl_decoder_t *dec, HV *class_stash, SV *into)
 }
 
 
-SRL_STATIC_INLINE void
+static SRL_NOINLINE SRL_UNUSED void
 srl_read_reserved(pTHX_ srl_decoder_t *dec, U8 tag, SV* into)
 {
     const UV len = srl_read_varint_uv_length(aTHX_ dec->pbuf, " while reading reserved");
@@ -2973,7 +3079,7 @@ srl_read_reserved(pTHX_ srl_decoder_t *dec, U8 tag, SV* into)
 }
 
 
-SRL_STATIC_INLINE void
+static SRL_NOINLINE void
 srl_read_regexp(pTHX_ srl_decoder_t *dec, SV* into)
 {
     SV *sv_pat= sv_2mortal(FRESH_SV());
@@ -3117,7 +3223,7 @@ srl_read_regexp(pTHX_ srl_decoder_t *dec, SV* into)
 
 /* Returns true for UNDEF_DEADLY so the caller can use the ordinary UNDEF
  * path, including use_undef aliasing and the original tag's tracking bit. */
-SRL_STATIC_INLINE int
+static SRL_NOINLINE int
 srl_read_extend(pTHX_ srl_decoder_t *dec, SV* into)
 {
     U8 ext_tag;
@@ -3148,7 +3254,7 @@ srl_read_extend(pTHX_ srl_decoder_t *dec, SV* into)
     return 0;
 }
 
-SRL_STATIC_INLINE void
+static SRL_NOINLINE void
 srl_read_copy(pTHX_ srl_decoder_t *dec, SV* into)
 {
     const U8 *copytag_start = dec->buf.pos - 1;

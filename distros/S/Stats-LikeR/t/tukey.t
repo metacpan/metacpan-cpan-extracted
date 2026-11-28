@@ -2,7 +2,7 @@ require 5.010;
 use strict;
 use warnings;
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # Prefer Test::LeakTrace; fall back to a no-op so the file is self-contained
 # and runs where Test::LeakTrace is not installed.

@@ -1,3 +1,21 @@
+commit c5ad1b9d1c015b3d5ee42f96f21eef2794e0cd04
+Author: Frank Carnovale <frankc@dbnet.com.au>
+Date:   Fri Nov 27 19:17:46 2026 +0000
+
+    Build version 1.09
+
+commit 5d43f488175beb2d7772061b3fc555acd8dfdd9d
+Author: Frank Carnovale <frankc@dbnet.com.au>
+Date:   Fri Nov 27 19:14:38 2026 +0000
+
+    allow deployment to an arbitrary Mojolicious route
+
+commit dc46c11c2abf8d5cbf88c30341af0013c4b74120
+Author: Frank Carnovale <frankc@dbnet.com.au>
+Date:   Fri Nov 6 17:08:42 2026 +0000
+
+    Built version 1.08
+
 commit d0302fadf7242c9bc6f26ce233fb2e71b0f431a7
 Author: Frank Carnovale <frankc@dbnet.com.au>
 Date:   Fri Nov 6 17:08:18 2026 +0000

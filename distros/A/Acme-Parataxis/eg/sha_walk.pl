@@ -163,7 +163,7 @@ Acme::Parataxis::run(
                             wanted   => sub {
                                 $hook->() if $hook;
                                 return;
-                            },
+                            }
                         },
                         $root
                     );
@@ -171,13 +171,11 @@ Acme::Parataxis::run(
             );
         };
 
-        # Not imported, and not callable as a method: `set_preempt_threshold(5)` is an undefined subroutine under
-        # `use Acme::Parataxis qw[:all]` because it is missing from @EXPORT_OK, and `Acme->set_preempt_threshold(5)`
-        # dies with "Wrong number of arguments. Expected 1, got 2" because the method form never applies the
-        # argument offset. The fully qualified function call is the only form that works.
+        # set_preempt_threshold() is exported by :all and is also callable as a class method, so the
+        # imported form used here is the ordinary way to arm the counter.
         my $arm = sub {
             my ($n) = @_;
-            Acme::Parataxis::set_preempt_threshold($n);
+            set_preempt_threshold($n);
             return;
         };
         $arm->(0);
@@ -199,15 +197,14 @@ Acme::Parataxis::run(
         say '';
         say '  Read the first two rows together, because they are the whole point of this section.';
         say '';
-        say '  maybe_yield() at the default threshold is not a yield. It increments a per-fiber counter and yields';
+        say '  maybe_yield() at the default threshold is not a yield. It increments a preemption counter and yields';
         say '  only when that counter reaches the threshold, and the default threshold is 0 - so it never fires,';
         say '  and the row is identical to not calling it at all. A program full of maybe_yield() calls can be just as';
         say '  monopolising as a program with none, and it will look deliberate while it does it.';
         say '';
         say '  yield() is the real thing: one resume per entry. Arming the counter works too, and the threshold is';
         say '  the dial - at 1 it matches yield() exactly, at 5 and 20 it hands the thread back progressively less';
-        say '  often. A threshold with no preemption hook installed is still just a counter; eg/preempt.pl is what';
-        say '  arms the other half of that pair.';
+        say '  often. set_preempt_threshold() arms that counter itself; see eg/preempt.pl for a shorter demo.';
         say '';
         say '  Which you want depends on the walk. This one visits a handful of local directories, so the yield buys';
         say '  nothing you can time. Over a network mount, where every stat is a round trip, an unyielding walk blocks';
@@ -215,7 +212,7 @@ Acme::Parataxis::run(
         say '  entry when the tree is large and the entries are cheap.';
         say '';
         my @sorted;
-        File::Find::find( { no_chdir => 1, wanted => sub { push @sorted, $File::Find::name if -f $_ }, }, $root );
+        File::Find::find( { no_chdir => 1, wanted => sub { push @sorted, $File::Find::name if -f $_ } }, $root );
         @sorted = sort @sorted;
 
         # The naive hasher.
@@ -267,9 +264,8 @@ Acme::Parataxis::run(
                                     $sem->down;
 
                                     # try/catch, not eval: the rethrow has to preserve the original error, and
-                                    # `catch ($caught)` is the only form that actually assigns the caught value -
-                                    # `catch ($err)` silently leaves $err undef, because the value is only visible
-                                    # inside the block.
+                                    # the named lexical is bound in either `catch ($caught)` or `catch ($err)`
+                                    # spelling.
                                     my $got;
                                     try {
                                         $got = hash_loop( $path, 65_536, 0 );
@@ -402,7 +398,9 @@ Acme::Parataxis::run(
         # is exactly the module that cannot be loaded on a perl built without thread support. Testing `require
         # threads` instead would be a weaker check on a perl that has the module but not the build.
         my $ithreads = ( defined $Config{useithreads} && $Config{useithreads} eq 'define' ) ? 1 : 0;
-        $ithreads = 0 if $^O eq 'MSWin32';    # perl_clone does not work there
+
+        # The old blanket Windows gate is gone. Blocking.pod documents a narrow 5.42.x perl_clone/DESTROY
+        # caveat on some Windows builds; the supported case is covered by t/357_clone_unblocking.t.
         my $have_blocking = eval { require Acme::Parataxis::Blocking; 1 } ? 1 : 0;
         if ( $have_blocking && $ithreads ) {
             require Acme::Parataxis::Blocking;
@@ -430,7 +428,7 @@ Acme::Parataxis::run(
         }
         else {
             say '  The only way to speed up a CPU-bound digest is to get it off this OS thread, which needs a';
-            say '  background interpreter: Acme::Parataxis::Blocking, a separate distribution, via';
+            say '  background interpreter: the bundled Acme::Parataxis::Blocking module, via';
             say '  spawn_blocking(). It is not available here:';
             printf "    Acme::Parataxis::Blocking installed: %s\n",   ( $have_blocking ? 'yes' : 'no' );
             printf "    an ithreads perl for it to clone:      %s\n", ( $ithreads      ? 'yes' : 'no' );

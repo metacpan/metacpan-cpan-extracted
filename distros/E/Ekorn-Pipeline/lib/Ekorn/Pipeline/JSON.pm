@@ -13,7 +13,7 @@ use Ekorn::Pipeline::Errors    qw(croakf);
 use Ekorn::Pipeline::Factories qw(gather sink_one source stage);
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.4.5';
+our $VERSION = 'v0.5.0';
 
 our @EXPORT_OK   = qw(from_json from_jsonl to_json to_jsonl);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);

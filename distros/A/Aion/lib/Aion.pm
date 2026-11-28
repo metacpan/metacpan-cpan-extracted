@@ -2,7 +2,7 @@ package Aion;
 
 use common::sense;
 
-our $VERSION = "2.5";
+our $VERSION = "2.6";
 
 use Aion::Types qw//;
 use Aion::Meta::RequiresAnyFunction;
@@ -39,7 +39,8 @@ sub import {
 	my $is_role; my @type_attrs;
 	my @with; my @extends;
 	my @export; my $use_only;
-	while(local $_ = shift @attrs) {
+	local $_;
+	while($_ = shift @attrs) {
 		given($_) {
 			$is_role = 1 when '-role';
 			$use_only = 1 when '-use_only';
@@ -119,7 +120,7 @@ sub unimport {
 sub export($@) {
 	my $pkg = shift;
 	for my $sub (@_) {
-		my $can = $pkg->can($sub);
+		my $can = *{"$pkg\::$sub"}{CODE};
 		die "$pkg can $sub!" if $can && $can != \&$sub;
 		*{"${pkg}::$sub"} = \&$sub unless $can;
 	}
@@ -611,7 +612,7 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-2.5
+2.6
 
 =head1 SYNOPSIS
 

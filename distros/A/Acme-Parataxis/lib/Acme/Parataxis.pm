@@ -2,7 +2,7 @@ use v5.40;
 no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use experimental qw[class try];
 
-package Acme::Parataxis v0.1.6 {
+package Acme::Parataxis v0.1.7 {
     use Affix qw[affix :types];
     use Config;
     use File::Spec;
@@ -30,18 +30,20 @@ package Acme::Parataxis v0.1.6 {
     our @IPC_BUFFER;
     my $lib;
     my @SCHEDULER_QUEUE;
-    my %SCHEDULER_QUEUED;
-    my $IS_RUNNING = 0;
-    my $DRIVER;                 # the attached Acme::Parataxis::Driver (undef = the worker-pool fallback path), see attach_loop
-    my %PARKED;                 # fid => true, while the fiber is suspended in a blocking wait (see _park / _resume_hooks)
-    my %PARK_REGS;              # fid => coderef that removes a parked fiber from its waiter list when its park is interrupted
-    our %FIBER_LOCALS;          # fiber-object refaddr => { local-id => value }; stashes for Acme::Parataxis::Local
-    our @INHERIT_LOCAL_IDS;     # ids of Acme::Parataxis::Local objects created with inherit => 1; spawn seeds these from parent to child
-    our %ACTOR_REGISTRY;        # registered actor names => Acme::Parataxis::Actor handles; the actor(name)/whereis table
-    my $BACKTRACE_DEPTH = 6;    # max user-side caller frames captured at each park (0 disables the capture)
-    my $VIRTUAL_CLOCK;          # undef = wall clock; a running virtual run sets this to the current virtual ms
-    my %VIRTUAL_DEADLINES;      # fid => absolute virtual-ms deadline of that fiber's one armed virtual timer
-    my @VIRTUAL_TIMERS;         # [deadline_ms, fid] ascending; lazy deletion via %VIRTUAL_DEADLINES
+    my $HAS_PRIORITIES = 0;                 # true once any fiber has been given a non-default priority
+    my $IS_RUNNING     = 0;
+    my $DRIVER;                             # the attached Acme::Parataxis::Driver (undef = the worker-pool fallback path), see attach_loop
+    our %FIBER_LOCALS;                      # fiber-object refaddr => { local-id => value }; stashes for Acme::Parataxis::Local
+    our @INHERIT_LOCAL_IDS;                 # ids of Acme::Parataxis::Local objects created with inherit => 1; spawn seeds these from parent to child
+    our %ACTOR_REGISTRY;                    # registered actor names => Acme::Parataxis::Actor handles; the actor(name)/whereis table
+    my $BACKTRACE_DEPTH   = 6;              # max user-side caller frames captured at each park (0 disables the capture)
+    my @WAITING_DEPOSIT   = ('WAITING');    # shared one-element marker handed to the scheduler by every parked fiber
+    my $PREEMPT_THRESHOLD = 0;              # mirror of the C threshold, so disabled preemption needs no FFI call
+    my $VIRTUAL_CLOCK;                      # undef = wall clock; a running virtual run sets this to the current virtual ms
+    my %VIRTUAL_DEADLINES;                  # fid => absolute virtual-ms deadline of that fiber's one armed virtual timer
+    my @VIRTUAL_DEADLINES;                  # deadline_ms ascending; paired with @VIRTUAL_TIMER_FIDS; lazy deletion via %VIRTUAL_DEADLINES
+    my @VIRTUAL_TIMER_FIDS;                 # fid for each deadline; avoids one two-element AV per armed timer
+    my $VIRTUAL_TIMER_HEAD = 0;             # fired prefix of the parallel timer arrays, compacted lazily
 
     # Fiber object layout: a flat arrayref of slots rather than perlclass objects (array access is much cheaper than
     # classes and even hash lookup on the hot spawn/await path).
@@ -61,14 +63,45 @@ package Acme::Parataxis v0.1.6 {
         F_INTERRUPT       => 12,
         F_CANCEL_SCOPES   => 13,
         F_DEADLINE_SCOPES => 14,
-        F_DEADLINE_ARMED  => 15
+        F_DEADLINE_ARMED  => 15,
+        F_PARKED          => 16,    # true while suspended in a blocking wait (was %PARKED)
+        F_PARK_DEREG      => 17,    # coderef removing this fiber from its waiter list on an interrupted park
+        F_QUEUED          => 18     # true while sitting in @SCHEDULER_QUEUE (was %SCHEDULER_QUEUED)
     };
+
+    # Parked fibers used to be tracked in %PARKED/%PARK_REGS keyed by fid, and queued ones in %SCHEDULER_QUEUED.
+    # Those hashes cost a lookup on every park, wake and enqueue; the flags now live in flat slots on the fiber
+    # object instead. Destroying a fiber drops its flags with it, and run() clears them explicitly on the cold
+    # teardown paths (the hot loop clears them as it drains the queue).
+    sub _take_park_dereg ($fiber) {
+        my $dereg = $fiber->[F_PARK_DEREG];
+        $fiber->[F_PARK_DEREG] = undef;
+        return $dereg;
+    }
+
+    # Clears stale queue flags and returns the same live-id snapshot run() needs for %PRESET_FIBERS. This used to
+    # enumerate ids and then fetch every object a second time; one pass is enough on both startup and teardown paths.
+    sub _clear_queued_flags () {
+        my $snapshot = Acme::Parataxis::snapshot_live_fibers();
+        return () unless ref $snapshot eq 'ARRAY';
+        my @ids;
+        for ( my $i = 0; $i < @$snapshot; $i += 2 ) {
+            my $fiber = $snapshot->[$i];
+            my $fid   = $snapshot->[ $i + 1 ];
+            $fiber->[F_QUEUED] = 0;
+            push @ids, $fid;
+        }
+        return @ids;
+    }
 
     # Scheduler run queue. Kept sorted by descending priority (stable for equal priorities, so a group of same-priority fibers stays FIFO).
     sub _enqueue ($fiber) {
-        my $fid = $fiber->[F_FID];
-        return if $SCHEDULER_QUEUED{$fid};
-        $SCHEDULER_QUEUED{$fid} = 1;
+        return if $fiber->[F_QUEUED];
+        $fiber->[F_QUEUED] = 1;
+        if ( !$HAS_PRIORITIES ) {
+            push @SCHEDULER_QUEUE, $fiber;
+            return;
+        }
         my $prio = $fiber->[F_PRIORITY] // 0;
         my $i    = 0;
         $i++ while $i < @SCHEDULER_QUEUE && ( $SCHEDULER_QUEUE[$i]->[F_PRIORITY] // 0 ) >= $prio;
@@ -90,7 +123,7 @@ package Acme::Parataxis v0.1.6 {
 
     # Diagnostics: a snapshot of every live fiber, riding entirely on wait_reason: _park records
     # [reason, file, line] on the fiber before it yields and _resume_hooks clears it on a natural wake, so a
-    # live fiber that still carries a reason (or is in %PARKED) is blocked, not merely preempted. WAITING =
+    # live fiber that still carries a reason (or has its parked slot set) is blocked, not merely preempted. WAITING =
     # parked on a wait; READY = in the scheduler run queue; RUNNING = the fiber calling the snapshot (only
     # when taken from inside a run); RUNNABLE = live but neither parked nor queued (e.g. a generator's body
     # or a fiber surrendered mid-quantum). Each record also carries the bounded user-side caller
@@ -105,9 +138,9 @@ package Acme::Parataxis v0.1.6 {
             next unless $fiber && ref $fiber;
             my $reason = $fiber->[F_WAIT_REASON];    # undef once the fiber is woken normally
             my $state
-                = ( defined $reason || $PARKED{$fid} ) ? 'WAITING' :
-                $SCHEDULER_QUEUED{$fid}                ? 'READY' :
-                ( $current >= 0 && $fid == $current )  ? 'RUNNING' :
+                = ( defined $reason || $fiber->[F_PARKED] ) ? 'WAITING' :
+                $fiber->[F_QUEUED]                          ? 'READY' :
+                ( $current >= 0 && $fid == $current )       ? 'RUNNING' :
                 'RUNNABLE';
             push @rows, { fid => $fid, state => $state, reason => $reason };
         }
@@ -151,6 +184,7 @@ package Acme::Parataxis v0.1.6 {
         affix $l, 'coro_yield',                                            [ Pointer [SV] ],               Pointer [SV];
         affix $l, 'is_finished',                                           [Int],                          Int;
         affix $l, 'get_fiber_by_id',                                       [Int],                          Pointer [SV];
+        affix $l, 'snapshot_live_fibers',                                  [],                             Pointer [SV];
         affix $l, 'get_live_fiber_count',                                  [],                             Int;
         affix $l, 'get_fiber_capacity',                                    [],                             Int;
         affix $l, 'destroy_coro',                                          [Int],                          Void;
@@ -164,6 +198,7 @@ package Acme::Parataxis v0.1.6 {
         affix $l, 'drain_jobs',                                            [ Pointer [SV] ],               Void;
         affix $l, 'check_for_completion',                                  [],                             Int;
         affix $l, 'get_outstanding_jobs',                                  [],                             Int;
+        affix $l, 'get_short_sleep_jobs',                                  [],                             Int;
         affix $l, 'recall_sleep_jobs_for_fiber',                           [Int],                          Int;
         affix $l, 'get_job_result',                                        [Int],                          Pointer [SV];
         affix $l, 'get_job_coro_id',                                       [Int],                          Int;
@@ -337,9 +372,9 @@ package Acme::Parataxis v0.1.6 {
     }
 
     sub _park ( $reason, $level = 1, $dereg = undef, $nodl = 0 ) {
-        my $fid = Acme::Parataxis->current_fid;
+        my $fid = get_current_parataxis_id();
         croak '_park() must be called from inside a scheduled fiber' if $fid < 0;
-        my $fiber = Acme::Parataxis->by_id($fid);
+        my $fiber = get_fiber_by_id($fid);
         return unless $fiber;    # already finished; nothing to park
 
         # Fail fast: a fiber that was interrupted while it was running (not parked), then reached a wait point, throws
@@ -352,8 +387,8 @@ package Acme::Parataxis v0.1.6 {
             warn sprintf "PARATAXIS_TRACE t=%.0fms fid=%d ENTRY failfast pre=%s site=%s\n", ( time - $^T ) * 1000, $fid, $pre, "$pfile:$pline"
                 if $ENV{PARATAXIS_TRACE};
             $fiber->[F_INTERRUPT] = undef;
-            delete $PARKED{$fid};
-            if ( my $dereg = delete $PARK_REGS{$fid} ) { $dereg->() }
+            $fiber->[F_PARKED]    = 0;
+            if ( my $dereg = _take_park_dereg($fiber) ) { $dereg->() }
             warn "PARATAXIS_TRACE park RE-ENTRY fail-fast fid=$fid reason=$reason pre=$pre\n" if $ENV{PARATAXIS_TRACE};
             my $err = $pre eq 'timeout' ? Acme::Parataxis::Error::Timeout->new( wait_reason => $pre_site ) :
                 Acme::Parataxis::Error::Cancelled->new( wait_reason => $pre_site );
@@ -368,8 +403,8 @@ package Acme::Parataxis v0.1.6 {
             my $scope = $scopes->[-1];
             if ( $scope && $scope->cancelled ) {
                 my ( $pfile, $pline ) = ( caller($level) )[ 1, 2 ];
-                delete $PARKED{$fid};
-                if ( my $old = delete $PARK_REGS{$fid} ) { $old->() }
+                $fiber->[F_PARKED] = 0;
+                if ( my $old = _take_park_dereg($fiber) ) { $old->() }
                 $dereg->() if $dereg;    # this park's waiter entry (pushed before _park) is stale: remove it too
                 die Acme::Parataxis::Error::Cancelled->new( wait_reason => [ 'cancel', $pfile, $pline ] );
             }
@@ -409,8 +444,8 @@ package Acme::Parataxis v0.1.6 {
                     # returns normally.
                     $eff->{served} = 1;
                     my ( $pfile, $pline ) = ( caller($level) )[ 1, 2 ];
-                    delete $PARKED{$fid};
-                    if ( my $old = delete $PARK_REGS{$fid} ) { $old->() }
+                    $fiber->[F_PARKED] = 0;
+                    if ( my $old = _take_park_dereg($fiber) ) { $old->() }
                     $dereg->() if $dereg;    # as above: this park's own waiter entry is stale too
                     warn "PARATAXIS_TRACE park DEADLINE fail-fast fid=$fid reason=$reason abs=" . $eff->{abs} . " now=$now\n"
                         if $ENV{PARATAXIS_TRACE};
@@ -444,15 +479,25 @@ package Acme::Parataxis v0.1.6 {
             for ( my $i = 1; $i <= $BACKTRACE_DEPTH; $i++ ) {
                 my @c = caller( $level + $i );
                 last unless defined $c[0];
-                next if index( $c[0], 'Acme::Parataxis' ) == 0;    # user-side frames only
+
+                # The fiber body is the last user frame; above it sits the library's spawn wrapper. Once we reach
+                # library code there are no more user frames to collect, and caller() is expensive enough that
+                # walking the remaining slots (all skipped before) was a measurable cost on every park.
+                last if index( $c[0], 'Acme::Parataxis' ) == 0;
                 push @$bt, [ $c[0], $c[1], $c[2], $c[3] ];
             }
         }
         my $site = [ $reason, $file, $line, $bt ];
         $fiber->[F_WAIT_REASON] = $site;
-        $PARKED{$fid}           = 1;
-        $PARK_REGS{$fid}        = $dereg if defined $dereg;
-        my $res = yield('WAITING');
+        $fiber->[F_PARKED]      = 1;
+        $fiber->[F_PARK_DEREG]  = $dereg if defined $dereg;
+
+        # Bypass yield()'s general argument marshalling here: every park deposits the same immutable ['WAITING']
+        # marker, and the scheduler reads it directly from run_fiber_checked(). Keep yield()'s scalar-context
+        # unwrapping: job completions resume the fiber with an argument arrayref, while callers of the waits in this
+        # module expect the last element (the job result), not the transport arrayref.
+        my $res = coro_yield( \@WAITING_DEPOSIT );
+        $res = $res->[-1] if ref $res eq 'ARRAY';
         if ( defined( my $kind = $fiber->[F_INTERRUPT] ) ) {
             if ( $kind eq 'timeout' ) {
 
@@ -468,8 +513,8 @@ package Acme::Parataxis v0.1.6 {
                 ( defined $site ? $site->[1] . ':' . $site->[2] : 'n/a' )
                 if $ENV{PARATAXIS_TRACE};
             $fiber->[F_INTERRUPT] = undef;
-            delete $PARKED{$fid};
-            if ( my $dereg = delete $PARK_REGS{$fid} ) { $dereg->() }
+            $fiber->[F_PARKED]    = 0;
+            if ( my $dereg = _take_park_dereg($fiber) ) { $dereg->() }
             my $err = $kind eq 'timeout' ? Acme::Parataxis::Error::Timeout->new( wait_reason => $site ) :
                 Acme::Parataxis::Error::Cancelled->new( wait_reason => $site );
             die $err;
@@ -487,16 +532,17 @@ package Acme::Parataxis v0.1.6 {
         $fiber->[F_INTERRUPT] = $kind if $kind eq 'cancel' || $kind eq 'timeout';
         recall_sleep_jobs_for_fiber($fid);
         _recall_virtual_timer($fid);    # a virtual timer has no C job; drop it so a recalled fiber is never re-woken
-        _scheduler_enqueue_by_id($fid) if $PARKED{$fid};
+        _scheduler_enqueue_by_id($fid) if $fiber->[F_PARKED];
         return $fiber;
     }
 
     # On a natural wake the park's deregistrations are dropped (the park is over); on an interrupt wake they are kept
     # for the throw in _park, which runs them before the fiber unwinds.
     sub _resume_hooks ($fiber) {
-        return unless delete $PARKED{ $fiber->[F_FID] };
+        return unless $fiber->[F_PARKED];
+        $fiber->[F_PARKED]      = 0;
         $fiber->[F_WAIT_REASON] = undef;
-        delete $PARK_REGS{ $fiber->[F_FID] } unless defined $fiber->[F_INTERRUPT];
+        $fiber->[F_PARK_DEREG]  = undef unless defined $fiber->[F_INTERRUPT];
         my $hooks = $fiber->[F_WAKE_HOOKS];
         $fiber->[F_WAKE_HOOKS] = undef;
         if ($hooks) { $_->($fiber) for @$hooks }
@@ -527,8 +573,16 @@ package Acme::Parataxis v0.1.6 {
         return if $fid < 0;
         my $dl = $VIRTUAL_CLOCK + $ms;
         $VIRTUAL_DEADLINES{$fid} = $dl;
-        push @VIRTUAL_TIMERS, [ $dl, $fid ];
-        @VIRTUAL_TIMERS = sort { $a->[0] <=> $b->[0] || $a->[1] <=> $b->[1] } @VIRTUAL_TIMERS;
+        my $lo = $VIRTUAL_TIMER_HEAD;
+        my $hi = @VIRTUAL_DEADLINES;
+        while ( $lo < $hi ) {
+            my $mid = ( $lo + $hi ) >> 1;
+            my $cmp = $VIRTUAL_DEADLINES[$mid] <=> $dl || $VIRTUAL_TIMER_FIDS[$mid] <=> $fid;
+            if   ( $cmp < 0 ) { $lo = $mid + 1 }
+            else              { $hi = $mid }
+        }
+        splice @VIRTUAL_DEADLINES,  $lo, 0, $dl;
+        splice @VIRTUAL_TIMER_FIDS, $lo, 0, $fid;
         return $dl;
     }
 
@@ -540,12 +594,24 @@ package Acme::Parataxis v0.1.6 {
     # timers are popped and skipped, never woken).
     sub _fire_virtual ($now) {
         my $fired = 0;
-        while ( @VIRTUAL_TIMERS && $VIRTUAL_TIMERS[0][0] <= $now ) {
-            my ( $dl, $fid ) = @{ shift @VIRTUAL_TIMERS };
+        while ( $VIRTUAL_TIMER_HEAD < @VIRTUAL_DEADLINES && $VIRTUAL_DEADLINES[$VIRTUAL_TIMER_HEAD] <= $now ) {
+            my $dl  = $VIRTUAL_DEADLINES[$VIRTUAL_TIMER_HEAD];
+            my $fid = $VIRTUAL_TIMER_FIDS[$VIRTUAL_TIMER_HEAD];
+            $VIRTUAL_TIMER_HEAD++;
             next unless exists $VIRTUAL_DEADLINES{$fid} && $VIRTUAL_DEADLINES{$fid} == $dl;
             delete $VIRTUAL_DEADLINES{$fid};
             Acme::Parataxis::_scheduler_enqueue_by_id($fid);
             $fired++;
+        }
+        if ( $VIRTUAL_TIMER_HEAD == @VIRTUAL_DEADLINES ) {
+            @VIRTUAL_DEADLINES  = ();
+            @VIRTUAL_TIMER_FIDS = ();
+            $VIRTUAL_TIMER_HEAD = 0;
+        }
+        elsif ( $VIRTUAL_TIMER_HEAD > 64 && $VIRTUAL_TIMER_HEAD * 2 >= @VIRTUAL_DEADLINES ) {
+            splice @VIRTUAL_DEADLINES,  0, $VIRTUAL_TIMER_HEAD;
+            splice @VIRTUAL_TIMER_FIDS, 0, $VIRTUAL_TIMER_HEAD;
+            $VIRTUAL_TIMER_HEAD = 0;
         }
         return $fired;
     }
@@ -1223,7 +1289,8 @@ package Acme::Parataxis v0.1.6 {
     }
 
     sub maybe_yield {
-        @_ = ();
+        return unless $PREEMPT_THRESHOLD;    # disabled preemption is a no-op; don't clear @_ or cross FFI for it
+        @_ = ();                             # drop caller args before the C call can yield
         my $result = Acme::Parataxis::_maybe_yield();
         return unless defined $result;
         return wantarray ? @$result : $result->[-1];
@@ -1232,7 +1299,9 @@ package Acme::Parataxis v0.1.6 {
     sub set_preempt_threshold {
         my $o = _arg_offset( $_[0] );
         croak 'set_preempt_threshold() expects a threshold value' unless @_ > $o;
-        Acme::Parataxis::_set_preempt_threshold( $_[$o] // 0 );
+        my $threshold = $_[$o] // 0;
+        $PREEMPT_THRESHOLD = $threshold;
+        Acme::Parataxis::_set_preempt_threshold($threshold);
     }
     sub tid            { get_os_thread_id_export() }
     sub current_fid    { get_current_parataxis_id() }
@@ -1249,8 +1318,8 @@ package Acme::Parataxis v0.1.6 {
 
     # Scheduler internals
     sub _scheduler_enqueue_by_id ($fid) {
-        return if $SCHEDULER_QUEUED{$fid};
         if ( my $fiber = Acme::Parataxis->by_id($fid) ) {
+            return if $fiber->[F_QUEUED];
             _enqueue($fiber);
         }
     }
@@ -1323,9 +1392,9 @@ package Acme::Parataxis v0.1.6 {
             _enqueue($fiber);
             return $fiber->await;
         }
-        @SCHEDULER_QUEUE  = ();
-        %SCHEDULER_QUEUED = ();
-        $IS_RUNNING       = 1;
+        @SCHEDULER_QUEUE = ();
+        my @preset_ids = _clear_queued_flags();
+        $IS_RUNNING = 1;
 
         # run( virtual => 1 ) turns on the virtual clock for the whole run. Everything the scheduler waits
         # on (and every mock_time read) then rides $VIRTUAL_CLOCK, and the idle path fast-forwards it instead of
@@ -1333,16 +1402,18 @@ package Acme::Parataxis v0.1.6 {
         # one (or vice versa) is exactly wall-clock behavior again.
         my $saved_clock = $VIRTUAL_CLOCK;
         if ($virtual) {
-            $VIRTUAL_CLOCK     = 0;
-            %VIRTUAL_DEADLINES = ();
-            @VIRTUAL_TIMERS    = ();
+            $VIRTUAL_CLOCK      = 0;
+            %VIRTUAL_DEADLINES  = ();
+            @VIRTUAL_DEADLINES  = ();
+            @VIRTUAL_TIMER_FIDS = ();
+            $VIRTUAL_TIMER_HEAD = 0;
         }
 
         # Snapshot the fibers that were already alive before this run. A fiber parked by a *previous* deadlocked run
         # can never be woken again, but the C table still counts it as live; the deadlock detector below must only
         # consider fibers that actually belong to this run, otherwise any run after a deadlock would be misread as
         # another deadlock. (Leaked fibers keep their C slot occupied, so their fids cannot be reused in between.)
-        my %PRESET_FIBERS = map { $_ => 1 } _live_fiber_ids();
+        my %PRESET_FIBERS = map { $_ => 1 } @preset_ids;
         my $main_fiber    = __PACKAGE__->new( code => $code );
 
         # on_shutdown => opts the OUTERMOST run into installing SIGINT/SIGTERM handlers for the run's lifetime
@@ -1404,6 +1475,10 @@ package Acme::Parataxis v0.1.6 {
         _enqueue($main_fiber);
         my $run_ok = 1;
         my $run_failure;
+        my $idle_polls     = 0;    # short poll budget, replenished when job activity changes
+        my $spin_short     = 0;    # true while a sub-tick sleep is armed, so only sleeps get the longer wall-clock spin
+        my $fast_until     = 0;    # wall-clock deadline for the longer spin
+        my $last_job_count = 0;
         try {
             while ($IS_RUNNING) {
 
@@ -1422,15 +1497,21 @@ package Acme::Parataxis v0.1.6 {
                     $shutdown_fired = 1;
                     $interrupt_run_fibers->();
                 }
-                my @ready;
-                if ( get_outstanding_jobs() ) {
-                    my $out = [];
-                    drain_jobs($out);
-                    @ready = @$out;
+                my @ready;    # flat fiber_id/result pairs written by drain_jobs()
+                my $job_count = get_outstanding_jobs();
+                if ( $job_count != $last_job_count ) {
+                    $idle_polls     = 0;
+                    $spin_short     = get_short_sleep_jobs() > 0;
+                    $fast_until     = $spin_short ? Time::HiRes::time() + 0.002 : 0;
+                    $last_job_count = $job_count;
                 }
-                for my $ready (@ready) {
-                    my ( $fid, $res ) = @$ready;
-                    my $fiber = __PACKAGE__->by_id($fid);
+                if ($job_count) {
+                    drain_jobs( \@ready );
+                }
+                for ( my $i = 0; $i < @ready; $i += 2 ) {
+                    my $fid   = $ready[$i];
+                    my $res   = $ready[ $i + 1 ];
+                    my $fiber = get_fiber_by_id($fid);
                     next unless $fiber;
                     _resume_hooks($fiber);
                     my $yield_val = $fiber->call($res);
@@ -1438,21 +1519,49 @@ package Acme::Parataxis v0.1.6 {
                         _enqueue($fiber) unless defined $yield_val && $yield_val eq 'WAITING';
                     }
                 }
+
+                # Refresh after resumed fibers have submitted their next job. drain_jobs() has already released the
+                # completed slot by this point, so sampling here sees only newly armed sleeps.
+                if (@ready) {
+                    $idle_polls = 0;
+                    $spin_short = get_short_sleep_jobs() > 0;
+                    $fast_until = $spin_short ? Time::HiRes::time() + 0.002 : 0;
+                }
                 if (@SCHEDULER_QUEUE) {
                     my @work = @SCHEDULER_QUEUE;
-                    @SCHEDULER_QUEUE  = ();
-                    %SCHEDULER_QUEUED = ();
+                    @SCHEDULER_QUEUE = ();
                     for my $current (@work) {
                         next unless $current;
+                        $current->[F_QUEUED] = 0;
                         _resume_hooks($current);
-                        _handle_run( $current, run_fiber_checked( $current->fid, undef ) );
+                        _handle_run( $current, run_fiber_checked( $current->[F_FID], undef ) );
                     }
                 }
                 my $active_count = get_live_fiber_count();
                 if ( $IS_RUNNING && !@SCHEDULER_QUEUE && !@ready ) {
-                    if ( get_outstanding_jobs() ) {
+                    my $remaining_jobs = get_outstanding_jobs();
+                    unless ($remaining_jobs) {
+                        $idle_polls = 0;
+                        $spin_short = 0;
+                        $fast_until = 0;
+                    }
+                    if ($remaining_jobs) {
                         $DRIVER->poll_ready() if $DRIVER;    # fire any already-live driver events, best effort
-                        usleep(1000);                        # Wait for background jobs to finish
+
+                        # Poll briefly at sub-millisecond granularity after job activity: C jobs often finish well
+                        # inside one scheduler tick, and a 1 ms usleep is a full 15 ms timer tick on Windows. Short
+                        # sleeps get a wall-clock-bounded spin; CPU jobs keep the fixed poll budget so the scheduler
+                        # does not steal the core from the worker that needs to finish the job.
+                        if ( $spin_short && Time::HiRes::time() < $fast_until ) {
+                            usleep(200);
+                        }
+                        elsif ( $idle_polls < 64 ) {
+                            usleep(200);
+                            $idle_polls++;
+                        }
+                        else {
+                            usleep(1000);
+                        }
                     }
                     elsif ( $DRIVER && $DRIVER->pending ) {
 
@@ -1468,8 +1577,8 @@ package Acme::Parataxis v0.1.6 {
                         # (or declaring a deadlock), wind the virtual clock up to the earliest outstanding deadline and
                         # fire anything due, then re-loop to run the woken fibers. The clock never moves while any fiber
                         # is runnable or any real job is in flight, so only real waiting is accelerated.
-                        if ( defined $VIRTUAL_CLOCK && @VIRTUAL_TIMERS ) {
-                            my $earliest = $VIRTUAL_TIMERS[0][0];
+                        if ( defined $VIRTUAL_CLOCK && $VIRTUAL_TIMER_HEAD < @VIRTUAL_DEADLINES ) {
+                            my $earliest = $VIRTUAL_DEADLINES[$VIRTUAL_TIMER_HEAD];
                             $VIRTUAL_CLOCK = $earliest if $VIRTUAL_CLOCK < $earliest;
                             if ( _fire_virtual($VIRTUAL_CLOCK) ) {next}
                         }
@@ -1482,9 +1591,9 @@ package Acme::Parataxis v0.1.6 {
                             # above so they cannot make a later healthy run look deadlocked; they stay parked forever in
                             # the C table but are harmless because the count below only ever triggers on fibers created
                             # by this run.
-                            $IS_RUNNING       = 0;
-                            @SCHEDULER_QUEUE  = ();
-                            %SCHEDULER_QUEUED = ();
+                            $IS_RUNNING      = 0;
+                            @SCHEDULER_QUEUE = ();
+                            _clear_queued_flags();
                             my $rows = _fiber_snapshot();
                             my @mine = grep { !$PRESET_FIBERS{ $_->{fid} } } @$rows;
                             my $body = '';
@@ -1544,9 +1653,11 @@ package Acme::Parataxis v0.1.6 {
             $SIG{INT}  = $old_int;
             $SIG{TERM} = $old_term;
         }
-        %VIRTUAL_DEADLINES = ();
-        @VIRTUAL_TIMERS    = ();              # a virtual run's timers die with the run
-        $VIRTUAL_CLOCK     = $saved_clock;    # whatever the next run does, the wall clock is the default
+        %VIRTUAL_DEADLINES  = ();
+        @VIRTUAL_DEADLINES  = ();              # a virtual run's timers die with the run
+        @VIRTUAL_TIMER_FIDS = ();
+        $VIRTUAL_TIMER_HEAD = 0;
+        $VIRTUAL_CLOCK      = $saved_clock;    # whatever the next run does, the wall clock is the default
         if ( $on_shutdown && $shutdown_fired ) {
             $shutdown_cb->($shutdown_token) if $shutdown_cb;
 
@@ -1565,7 +1676,7 @@ package Acme::Parataxis v0.1.6 {
     sub stop () { $IS_RUNNING = 0 }
 
     sub new ( $class, %args ) {
-        my $self = bless [ $args{code}, 0, undef, undef, undef, 0, [], undef, undef, 0, undef, undef, undef, [] ], $class;
+        my $self = bless [ $args{code}, 0, undef, undef, undef, 0, [], undef, undef, 0, undef, undef, undef, [], (undef) x 5 ], $class;
         my $fid  = Acme::Parataxis::create_fiber( $args{code}, $self );
         croak 'could not allocate a fiber: ' .
             ( $fid == -3 ?
@@ -1587,8 +1698,10 @@ package Acme::Parataxis v0.1.6 {
         return $prio unless @_;
         my $n = shift;
         $self->[F_PRIORITY] = $n;
-        my $fid = $self->[F_FID];
-        if ( delete $SCHEDULER_QUEUED{$fid} ) {
+        $HAS_PRIORITIES = 1 if $n;
+        if ( $self->[F_QUEUED] ) {
+            my $fid = $self->[F_FID];
+            $self->[F_QUEUED] = 0;
             @SCHEDULER_QUEUE = grep { $_->[F_FID] != $fid } @SCHEDULER_QUEUE;
             _enqueue($self);
         }
@@ -1626,10 +1739,10 @@ package Acme::Parataxis v0.1.6 {
         return if $self->[F_IS_DONE];
         $self->[F_IS_DONE] = 1;
         if ( defined $self->[F_FID] && $self->[F_FID] >= 0 ) {
-            delete $PARKED{ $self->[F_FID] };
-            delete $PARK_REGS{ $self->[F_FID] };
+            $self->[F_PARKED]     = 0;
+            $self->[F_PARK_DEREG] = undef;
             _recall_virtual_timer( $self->[F_FID] );    # a finished fiber must not leave a virtual timer behind
-            delete $FIBER_LOCALS{ refaddr($self) };
+            delete $FIBER_LOCALS{ refaddr($self) } if %FIBER_LOCALS;
             $self->[F_FID] = -1;
         }
     }
@@ -1664,15 +1777,15 @@ package Acme::Parataxis v0.1.6 {
 
     sub is_done ($self) {
         if ( $self->[F_IS_DONE] ) {
-            delete $FIBER_LOCALS{ refaddr($self) };
+            delete $FIBER_LOCALS{ refaddr($self) } if %FIBER_LOCALS;
             return 1;
         }
         if ( defined $self->[F_FID] && $self->[F_FID] >= 0 && Acme::Parataxis::is_finished( $self->[F_FID] ) ) {
             $self->[F_IS_DONE] = 1;
             my $old_fid = $self->[F_FID];
-            delete $PARKED{$old_fid};
-            delete $PARK_REGS{$old_fid};
-            delete $FIBER_LOCALS{ refaddr($self) };
+            $self->[F_PARKED]     = 0;
+            $self->[F_PARK_DEREG] = undef;
+            delete $FIBER_LOCALS{ refaddr($self) } if %FIBER_LOCALS;
             $self->[F_FID] = -1;
             Acme::Parataxis::destroy_coro($old_fid);
             return 1;
@@ -1717,8 +1830,8 @@ package Acme::Parataxis v0.1.6 {
             $ready = $self->[F_IS_READY];
         }
         croak 'Future not ready' unless $ready;
-        delete $FIBER_LOCALS{ refaddr($self) };    # the fiber is done now; its locals die with it (no-op for Futures)
-        die $self->[F_ERROR] if defined $self->[F_ERROR];
+        delete $FIBER_LOCALS{ refaddr($self) } if %FIBER_LOCALS;              # the fiber is done now; its locals die with it (no-op for Futures)
+        die $self->[F_ERROR]                   if defined $self->[F_ERROR];
         $self->[F_RESULT];
     }
 
@@ -1729,11 +1842,11 @@ package Acme::Parataxis v0.1.6 {
     }
 
     sub DESTROY($self) {
-        return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-        delete $FIBER_LOCALS{ refaddr($self) };
+        return                                 if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+        delete $FIBER_LOCALS{ refaddr($self) } if %FIBER_LOCALS;
         if ( defined $self->[F_FID] && $self->[F_FID] >= 0 ) {
-            delete $PARKED{ $self->[F_FID] };
-            delete $PARK_REGS{ $self->[F_FID] };
+            $self->[F_PARKED]     = 0;
+            $self->[F_PARK_DEREG] = undef;
             Acme::Parataxis::destroy_coro( $self->[F_FID] );
             $self->[F_FID] = -1;
         }

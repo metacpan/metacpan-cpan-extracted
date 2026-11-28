@@ -2,6 +2,6 @@
    "automated_actions" : "code_request",
    "automated_contributions" : "code_request",
    "code_generation" : "machine_generated",
-   "distribution" : "HTTP-Message-Signature-v0.0.3",
+   "distribution" : "HTTP-Message-Signature-v0.1.0",
    "version" : 1
 }

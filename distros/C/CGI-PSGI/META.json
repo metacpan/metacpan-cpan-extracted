@@ -59,7 +59,7 @@
          "web" : "https://github.com/miyagawa/CGI-PSGI"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_contributors" : [
       "Anirvan Chatterjee <x.github@chatterjee.net>",
       "Chia-liang Kao <clkao@clkao.org>",

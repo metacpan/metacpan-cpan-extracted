@@ -68,7 +68,7 @@ sub table {
     my $tinfo  = $c->shipped('tinfo');
 
     if (($c->stash('format')||'html') eq 'html') {
-        $c->redirect_to("/tables?start_with=$table");
+        $c->redirect_to($c->url_for('tables')->query(start_with=>$table));
         return;
     }
 
@@ -167,9 +167,7 @@ sub nuke {
     my $row0 = "$row";
     my $hits = $row->nuke;
     $c->add_flash(messages=>"REMOVED $row0 at key $id and all subordinate info.. $hits records in total") if $hits;
-    my $url  = $c->url_for('/tables')->query(start_with=>$table);
-    $c->redirect_to($url);
-
+    $c->redirect_to($c->url_for('tables')->query(start_with=>$table));
 }
 
 sub save {
@@ -233,8 +231,9 @@ sub save {
             return;
         }
     }
-    my $redirect_to = $c->param('redirect_to') || "/tables/$table/$id/view";
-    $c->redirect_to($redirect_to);
+    my $redirect = $c->param('redirect_to') || ($c->url_for('tables')."/$table/$id/view");
+    $c->redirect_to($redirect);
+    return
 }
 
 sub children {
@@ -295,7 +294,7 @@ sub navigate {
     if (my $hit = $rs->search($where, $attrs)->first) {
         $newid = $hit->id;
     }
-    $c->redirect_to("/tables/$table/$newid/view");
+    $c->redirect_to($c->url_for('tables')."/$table/$newid/view");
 }
 
 1;

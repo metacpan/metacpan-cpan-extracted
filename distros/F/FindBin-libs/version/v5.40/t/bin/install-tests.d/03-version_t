@@ -1,0 +1,116 @@
+########################################################################
+# housekeeping
+########################################################################
+package Testy;
+use v5.40;
+
+########################################################################
+# Makefile.PL must select the version/ directory that is the newest
+# one at or below the perl named by the test file's basename:
+#
+#   03-version/05-v5.8.1.t  ->  PERL_VERSION = 'v5.8.1'
+#
+# The expected directory is computed here from the names in version/,
+# independently of Makefile.PL.  Makefile.PL runs in a scratch
+# directory that links to the checkout's version/, so the checkout is
+# not modified.  A version below every directory expects a failure.
+
+use Cwd                   qw( abs_path );
+use File::Basename        qw( basename dirname );
+use File::Copy            qw( copy );
+use File::Spec::Functions qw( catdir catfile );
+use File::Temp           qw( tempdir );
+use Test::More;
+use version;
+
+########################################################################
+# the test case is the basename: 05-v5.8.1.t -> v5.8.1
+########################################################################
+
+my $base    = basename $0, '.t';
+my ( $case ) = $base =~ m{ \A \d+ - ( v \d+ (?: [.] \d+ )* ) \z }x;
+
+defined $case
+or BAIL_OUT "Bad test name: '$base' (expected NN-vX[.Y[.Z]].t)";
+
+########################################################################
+# the checkout root is two levels above t/03-version/.
+
+my $root_d = abs_path catdir dirname( $0 ), '..', '..';
+
+-f catfile $root_d, 'Makefile.PL'
+or plan skip_all => "No Makefile.PL at '$root_d'; run from the checkout";
+
+########################################################################
+# expected directory: the newest version/vX at or below $case.
+
+my @dirz
+= map
+{
+    [ version->parse( basename $_ ) => basename $_ ]
+}
+glob catdir $root_d, 'version', '*';
+
+my $want    = version->parse( $case );
+my $expect;
+
+for my $dir ( sort { $a->[0] <=> $b->[0] } @dirz )
+{
+    $dir->[0] <= $want
+    and $expect = $dir->[1];
+}
+
+########################################################################
+# run Makefile.PL with PERL_VERSION set to the case.
+
+my $work_d  = tempdir CLEANUP => 1;
+my $perl    = $^X;
+
+copy catfile( $root_d, 'Makefile.PL' ), catfile( $work_d, 'Makefile.PL' )
+or BAIL_OUT "copy Makefile.PL to '$work_d': $!";
+
+symlink catdir( $root_d, 'version' ), catdir( $work_d, 'version' )
+or BAIL_OUT "symlink version/ into '$work_d': $!";
+
+my $output
+= do
+{
+    local $ENV{ PERL_VERSION } = $case;
+
+    qx{ cd "$work_d" && "$perl" Makefile.PL 2>&1 };
+};
+
+my $status  = $? >> 8;
+
+my ( $found )
+= $output
+=~ m{
+    ^ \# [ ] Version [ ] directory: [ ] \S* /
+    ( v \d+ (?: [.] \d+ )* )
+    [ ] <=
+}xm;
+
+########################################################################
+# tests: one result per test.
+########################################################################
+
+if( defined $expect )
+{
+    is $status, 0,
+    "$case: Makefile.PL exits 0";
+
+    is $found, $expect,
+    "$case: selects version/$expect";
+}
+else
+{
+    isnt $status, 0,
+    "$case: Makefile.PL fails when no version/ directory is at or below it";
+
+    my $needle = "Unable to install with Perl version '$case'";
+
+    ok index( $output, $needle ) >= 0,
+    "$case: failure names the version";
+}
+
+done_testing;

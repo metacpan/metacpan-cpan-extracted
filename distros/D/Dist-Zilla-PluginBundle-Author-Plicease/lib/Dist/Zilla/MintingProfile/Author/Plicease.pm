@@ -1,6 +1,6 @@
-package Dist::Zilla::MintingProfile::Author::Plicease 2.81 {
+package Dist::Zilla::MintingProfile::Author::Plicease 2.82 {
 
-  use 5.022;
+  use 5.024;
   use Moose;
   with qw( Dist::Zilla::Role::MintingProfile );
   use namespace::autoclean;
@@ -43,7 +43,7 @@ Dist::Zilla::MintingProfile::Author::Plicease - Minting profile for Plicease
 
 =head1 VERSION
 
-version 2.81
+version 2.82
 
 =head1 SYNOPSIS
 

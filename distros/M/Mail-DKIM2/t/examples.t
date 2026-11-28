@@ -31,6 +31,13 @@ for my $u (qw(dkim2-milter-inbound dkim2-milter-outbound dkim2-milter dkim2-milt
          "$u creates the snapshot directory with privilege");
     unlike($t, qr{mkdir}, "$u has no sandboxed mkdir that cannot succeed");
 }
+{
+    my $t = slurp("$ex/dkim2-milter-originating.service");
+    like($t, qr{^ExecStart=/usr/local/bin/dkim2-milter\b}m, 'originating unit runs the installed program');
+    like($t, qr{^\s+--mode outbound\b}m, '  ... in outbound mode');
+    unlike($t, qr{--snapshot-dir|ReadWritePaths}, '  ... with no snapshot directory (it needs none)');
+    unlike($t, qr{/root/|/opt/dkim2|-I/}m, '  ... and no checkout path');
+}
 like(slurp("$ex/dkim2-split.service"), qr{^ExecStart=/usr/local/bin/dkim2-split-lmtp$}m,
      'the split unit runs the installed daemon');
 

@@ -1655,7 +1655,11 @@ C<single> finishes it. What the end returns is dropped.
 The parts can be given as a list, in that order, with C<undef> for a
 flush left out before an end. Or they can be given by name, in one
 hash reference with the keys C<step>, C<flush> and C<end>, giving only
-those the stage has.
+those the stage has. By name, a stage that holds values back can say
+so with C<holds> set true, and say which row each value it gives came
+from, for L<result_original|/"result_original">, as
+L<kept_origin|/"kept_origin"> says. One that doesn't say so is taken
+for a map.
 
     use DBIx::Squirrel::Stages::Rows qw(pluck);
     use DBIx::Squirrel::Gather qw(gather);
@@ -2550,7 +2554,7 @@ B<Holds:> C<:flow>, C<:batch>, C<:taps> and C<:rows>
 
 =item C<:context>
 
-B<Holds:> C<iterator>, C<result_number>, C<result_original>
+B<Holds:> C<iterator>, C<kept_origin>, C<result_number>, C<result_original>
 
 B<Made in:> L<Context|/"Context">
 
@@ -3166,9 +3170,10 @@ reading a statement; any other run, such as a pipeline called with
 values, has some other context, or none. C<pluck> and C<as_hash> read
 it, and so can a stage of yours; C<result_original> gives the same
 row, which the source also gives Ekorn as its original. While a flush
-gives its values, which come from every row, not one,
-C<Ekorn::Pipeline::ending()> is true, and the row is no value's;
-C<result_original> gives C<undef> then.
+gives its values, C<Ekorn::Pipeline::ending()> is true, and the row is
+no value's: C<result_original> gives C<undef> for a value made from
+many rows, and a value's own row when a stage that holds values back
+says where it came from, as C<take_last> does.
 
     my $columns = sub ($row) {
         my $names = Ekorn::Pipeline::run_context()->{columns};
@@ -4008,6 +4013,22 @@ request.
 
 See L<Context|/"Context">.
 
+=head3 kept_origin
+
+    use DBIx::Squirrel::Tooling qw(kept_origin);
+
+    $origin = kept_origin();
+
+In the step of a stage that holds values back, returns the origin of
+the value it's keeping, which it gives back with what it makes of the
+value, so the stages after it get that value's row from
+L<result_original|/"result_original">. It's Ekorn::Pipeline::Context's
+own; Ekorn::Pipeline's
+L<Stages that hold values back|Ekorn::Pipeline::Manual::Reference/"Stages that hold values back">
+says how such a stage is written. Exported upon request.
+
+See L<Context|/"Context">.
+
 =head3 result_number
 
     use DBIx::Squirrel::Tooling qw(result_number);
@@ -4032,9 +4053,11 @@ See L<Context|/"Context">.
     $row = result_original();
 
 Returns the row the result is being made from, as it was fetched,
-before any stage changed it; for a result set, the row object. In a
-flush of a stage made with L<gather|/"gather">, and the stages after it,
-it's C<undef>, as what a flush gives comes from every row, not one. In
+before any stage changed it; for a result set, the row object. For a
+value made from many rows, such as a batch, or given by a flush of a
+stage made with L<gather|/"gather">, it's C<undef>, unless a stage that
+holds values back says which row the value came from, as C<take_last>
+does. In
 a run reading no statement, it's the value the run's source gave, or
 that was pushed. It's Ekorn::Pipeline::Context's own, with an empty
 prototype. Exported upon request.

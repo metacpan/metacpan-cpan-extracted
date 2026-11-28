@@ -1,8 +1,12 @@
+AGENTS.md
 bin/linksite
-cpanfile
+CONTRIBUTING.md
 Changes.md
+docker/README.md
 example/build.yml
 example/links.json
+example/links-with-sections.json
+example/links-with-utm.json
 lib/App/LinkSite.pm
 lib/App/LinkSite/Link.pm
 lib/App/LinkSite/Site.pm
@@ -10,13 +14,22 @@ lib/App/LinkSite/Section.pm
 lib/App/LinkSite/Social.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json
 README.md
 src/css/style.css
 src/index.html.tt
+t/analytics.t
 t/basic.t
+t/cli.t
+t/file-parameter-isolation.t
+t/file-parameter.t
 t/link.t
 t/links.json
+t/metadata.t
+t/prerequisites.t
+t/section.t
 t/site.t
 t/social.t
+t/template-paths.t
+t/utm.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

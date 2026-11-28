@@ -34,6 +34,8 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES =>
     {
         'lib'               => 0,
+        'File::Temp'        => 0,
+        'MIME::Base64'      => 0,
         'Test::More'        => '1.302162',
         'Test::Pod'         => '1.52',
     },

@@ -22,7 +22,7 @@
 # perl-5.12.5 and 5.44.0-quadmath); the bound leaves a hundredfold headroom.
 require 5.010; use strict; use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my @want = (1.16322565816005796, 0.80430471103811163);
 my $r = prcomp([map { [$_ * 1e-20, (1, 4, 2, 2, 2, 4, 1, 2, 2, 0)[$_ - 1]] } 1 .. 10], scale => 1);

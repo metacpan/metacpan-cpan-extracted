@@ -1,4 +1,4 @@
-use 5.022;
+use 5.024;
 use Test2::V0 -no_srand => 1;
 use File::ShareDir::Dist qw( dist_share );
 use Dist::Zilla::Plugin::Author::Plicease;

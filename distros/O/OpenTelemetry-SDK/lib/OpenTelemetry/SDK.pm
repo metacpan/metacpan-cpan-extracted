@@ -1,7 +1,7 @@
 package OpenTelemetry::SDK;
 # ABSTRACT: An implementation of the OpenTelemetry SDK for Perl
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use strict;
 use warnings;

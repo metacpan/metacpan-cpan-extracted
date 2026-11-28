@@ -6,3 +6,7 @@ Revision history for App-HashMake
 0.02    November 26, 2026
         Updated version after getting help on having the executable 'hashmake'
         added to the EXE_FILES list.
+
+0.03    November 27, 2026
+        Correct a logic error -- when there are multiple targets, the required
+        action should only be run once.

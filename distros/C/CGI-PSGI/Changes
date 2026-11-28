@@ -1,5 +1,13 @@
 Revision history for Perl extension CGI::PSGI
 
+0.17  2026-11-27 23:38:46 JST
+        - Keep reading psgi.input until the requested length, EOF or an
+          error: a server returning short reads truncated urlencoded and
+          XML bodies, and broke multipart ones (reported by shigeta)
+        - psgi_header accepts positional extra headers given as a ready-made
+          "Name: value" line, which CGI.pm 5.02 header() sends as is, instead
+          of dropping them. A newline in one dies (reported by shigeta)
+
 0.16  2026-11-23 23:22:20 JST
         - Fix the env wrappers: referer (was misspelled referrer) and
           env_query_string now read the PSGI env, and methods the installed

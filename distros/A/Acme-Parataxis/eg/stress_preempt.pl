@@ -7,8 +7,8 @@ use Time::HiRes     qw[time];
 # This tests the integrity of the stack teleportation during deep recursion
 # and the effectiveness of the preemption threshold.
 # Configuration
-my $recursion_depth = 50;     # Not too deep to overflow 4MB C-stack, but deep enough to test pads
-my $preempt_at      = 100;    # Operations before forced yield
+my $recursion_depth = 50;     # Modest depth; fiber C-stack size is platform-dependent (2/8/64 MiB)
+my $preempt_at      = 100;    # maybe_yield() calls before a forced yield
 my $num_fibers      = 10;     # Number of competing CPU-bound fibers
 Acme::Parataxis::set_preempt_threshold($preempt_at);
 async {

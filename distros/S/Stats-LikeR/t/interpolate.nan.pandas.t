@@ -49,7 +49,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my $NaN = "nan" + 0;
 sub isnan { defined $_[0] && $_[0] != $_[0] }

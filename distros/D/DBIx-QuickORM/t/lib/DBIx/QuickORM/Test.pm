@@ -2,257 +2,231 @@ package DBIx::QuickORM::Test;
 use strict;
 use warnings;
 
-use Test2::V0 '!meta', '!pass';
+use Config qw/%Config/;
 use Test2::IPC qw/cull/;
-use List::Util qw/first/;
-use Time::HiRes qw/sleep/;
-use Importer Importer => 'import';
+use Test2::Tools::Basic qw/fail skip_all/;
+use Test2::Tools::Mock qw/mock/;
+use Test2::Tools::Subtest qw/subtest_buffered/;
 
-use DBIx::QuickORM::Util qw/debug/;
+use Exporter qw/import/;
+our @EXPORT    = qw/do_for_all_dbs/;
+our @EXPORT_OK = qw/db_sets on_execute/;
 
-our @EXPORT = qw{
-    psql
-    mysql
-    mariadb
-    percona
-    sqlite
-    duckdb
-    debug
+=pod
 
-    do_for_all_dbs
-    dialect_has_savepoints
-    curdb_version
-    pg_older_than
-    wait_ready
-};
+=encoding UTF-8
 
-use version ();
+=head1 NAME
 
-sub psql     { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'PostgreSQL', fast_destroy => 1, @args}) } or diag(clean_err($@)) }
-sub mysql    { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MySQL', fast_destroy => 1,      @args}) } or diag(clean_err($@)) }
-sub mysqlcom { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MySQLCom', fast_destroy => 1,   @args}) } or diag(clean_err($@)) }
-sub mariadb  { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MariaDB', fast_destroy => 1,    @args}) } or diag(clean_err($@)) }
-sub percona  { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'Percona', fast_destroy => 1,    @args}) } or diag(clean_err($@)) }
-sub sqlite   { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'SQLite', fast_destroy => 1,     @args}) } or diag(clean_err($@)) }
-sub duckdb   { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'DuckDB', fast_destroy => 1,     @args}) } or diag(clean_err($@)) }
+DBIx::QuickORM::Test - Run a test block against every available database.
 
-# Static sets that do not live under ~/dbs: the system-installed servers and
-# sqlite. These are always offered (and skipped at runtime if unavailable).
-my @STATIC_SETS = (
-    {name => 'system_postgresql', ver => '', db => \&psql,   dialect => 'PostgreSQL', dbi => ['Pg'],               quickdb => 'PostgreSQL', env => {}},
-    {name => 'sqlite',            ver => '', db => \&sqlite, dialect => 'SQLite',     dbi => ['SQLite'],           quickdb => 'SQLite',     env => {}},
-    {name => 'duckdb',            ver => '', db => \&duckdb, dialect => 'DuckDB',     dbi => ['DuckDB'],           quickdb => 'DuckDB',     env => {}},
-    {name => 'system_mysql',      ver => '', db => \&mysql,  dialect => 'MySQL',      dbi => ['mysql', 'MariaDB'], quickdb => 'MySQL',      env => {}},
+=head1 DESCRIPTION
+
+Runs a block once per database set, each set in its own child process and
+its own buffered subtest. The sets are SQLite and DuckDB (database files in a
+temporary directory), the PostgreSQL, MariaDB, MySQL, and Percona servers
+found on C<$PATH>, and every install under
+F<~/dbs/E<lt>engineE<gt>-E<lt>versionE<gt>/bin> for the engines
+C<postgresql>, C<mariadb>, C<mysql>, and C<percona>. A set that cannot run
+here is skipped.
+
+Every database comes from L<Test2::Tools::QuickDB>, loaded only in the child
+after the install's F<bin> is put first in C<$PATH>, because QuickDB finds
+its server programs when it loads. Test files must not load L<DBIx::QuickDB>
+themselves. MySQL-family sets connect through L<DBD::MariaDB>.
+
+=head1 SYNOPSIS
+
+    use Test2::V0;
+    use lib 't/lib';
+    use DBIx::QuickORM::Test;
+
+    do_for_all_dbs {
+        my ($db, $set) = @_;
+        my $dbh = $db->connect;
+        ok($dbh->do('SELECT 1'), "works on $set->{name}");
+    };
+
+    done_testing;
+
+=head1 EXPORTS
+
+=over 4
+
+=item do_for_all_dbs { my ($db, $set) = @_; ... }
+
+Runs the block for every set from C<db_sets>, at most
+C<QORM_TEST_CONCURRENCY> (default 4) at a time, and returns when all are
+done. C<$db> is a started L<DBIx::QuickDB> driver instance. A child that
+exits abnormally is a failure. Skips the whole test where C<fork> is only
+emulated.
+
+=cut
+
+sub do_for_all_dbs(&) {
+    my ($code) = @_;
+
+    skip_all "database sets each need a real child process" if $Config{d_pseudofork};
+
+    my $max = $ENV{QORM_TEST_CONCURRENCY} || 4;
+    my %running;
+    for my $set (db_sets()) {
+        _reap(\%running, $max - 1);
+        my $pid = fork // die "Could not fork: $!";
+        _run_set($code, $set) unless $pid;
+        $running{$pid} = $set->{name};
+    }
+    _reap(\%running, 0);
+
+    return;
+}
+
+=pod
+
+=item @sets = db_sets()
+
+Every set, as hashrefs with C<name>, C<driver> (the QuickDB driver),
+C<family> (C<PostgreSQL>, C<MariaDB>, C<MySQL>, C<SQLite>, or C<DuckDB>), and
+C<bin> (undef for the C<$PATH> sets). C<QORM_TEST_SETS>, a comma-separated
+list of names or families, narrows them.
+
+=cut
+
+my %FAMILY = (
+    SQLite     => 'SQLite',
+    DuckDB     => 'DuckDB',
+    PostgreSQL => 'PostgreSQL',
+    MariaDB    => 'MariaDB',
+    MySQLCom   => 'MySQL',
+    Percona    => 'MySQL',
 );
 
-# The quickdb name of the set currently running under do_for_all_dbs.
-our $CURRENT_QDB;
+my %ENGINE = (postgresql => 'PostgreSQL', mariadb => 'MariaDB', mysql => 'MySQLCom', percona => 'Percona');
 
-# The full set descriptor currently running under do_for_all_dbs.
-our $CURRENT_SET;
+sub db_sets {
+    my @sets = map { {name => lc($_), driver => $_, family => $FAMILY{$_}, bin => undef} } qw/SQLite DuckDB PostgreSQL MariaDB MySQLCom Percona/;
 
-# DuckDB has no savepoints, so it cannot run the nested-transaction (savepoint)
-# subtests. Tests that exercise nested transactions guard them with this.
-sub dialect_has_savepoints { ($CURRENT_QDB // '') ne 'DuckDB' }
-
-# Full version of the ~/dbs set currently running ("9.3.15"), parsed from its
-# name, or undef for the static system sets whose name carries no version.
-sub curdb_version {
-    my $set = $CURRENT_SET or return undef;
-    my ($v) = $set->{name} =~ m/-(\d[\d.]*)$/;
-    return $v;
-}
-
-# True when the running database is a versioned PostgreSQL install older than
-# the given major.minor (e.g. pg_older_than('9.5')). The static system
-# PostgreSQL set carries no version and is assumed current, so returns false.
-sub pg_older_than {
-    my ($want) = @_;
-    return 0 unless ($CURRENT_QDB // '') eq 'PostgreSQL';
-    my $have = curdb_version() or return 0;
-    return version->parse("v$have") < version->parse("v$want");
-}
-
-# Maps the engine prefix of a "~/dbs/<engine>-<version>" directory to its driver
-# metadata. 'server' is the binary that must exist under bin/ for the install to
-# count.
-my %ENGINE = (
-    postgresql => {db => \&psql,     dialect => 'PostgreSQL',       dbi => ['Pg'],               quickdb => 'PostgreSQL', server => 'postgres'},
-    mariadb    => {db => \&mariadb,  dialect => 'MySQL::MariaDB',   dbi => ['mysql', 'MariaDB'], quickdb => 'MariaDB',    server => 'mariadbd'},
-    mysql      => {db => \&mysqlcom, dialect => 'MySQL::Community', dbi => ['mysql', 'MariaDB'], quickdb => 'MySQLCom',   server => 'mysqld'},
-    percona    => {db => \&percona,  dialect => 'MySQL::Percona',   dbi => ['mysql', 'MariaDB'], quickdb => 'Percona',    server => 'mysqld'},
-);
-
-# Discover every versioned database install under ~/dbs. Each is a directory
-# named "<engine>-<version>" (e.g. postgresql-17.9, mariadb-12.2) holding a bin/
-# with the server binary; that bin/ is prepended to PATH so QuickDB boots that
-# exact version. 'ver' is the major version, used to pick a version-specific SQL
-# schema file (e.g. postgresql17.sql) when one exists, falling back otherwise.
-sub discover_db_sets {
-    my $root = "$ENV{HOME}/dbs";
-    return () unless -d $root;
-
-    opendir(my $dh, $root) or return ();
-    my @dirs = readdir($dh);
-    closedir($dh);
-
-    my @sets;
-    for my $dir (@dirs) {
-        next unless $dir =~ m/^([a-z]+)-(\d+(?:\.\d+)*)$/;
-        my ($engine, $version) = ($1, $2);
-        my $meta = $ENGINE{$engine} or next;
-
-        my $bin = "$root/$dir/bin";
-        next unless -d $bin && -x "$bin/$meta->{server}";
-
-        my ($major) = split /\./, $version;
-
-        push @sets => {
-            name    => $dir,
-            ver     => $major,
-            db      => $meta->{db},
-            dialect => $meta->{dialect},
-            dbi     => $meta->{dbi},
-            quickdb => $meta->{quickdb},
-            env     => {PATH => "$bin:$ENV{PATH}"},
-        };
+    for my $bin (glob("$ENV{HOME}/dbs/*/bin")) {
+        my ($name, $engine) = $bin =~ m{/(([a-z]+)-[\d.]+)/bin$} or next;
+        my $driver = $ENGINE{$engine} or next;
+        push @sets => {name => $name, driver => $driver, family => $FAMILY{$driver}, bin => $bin};
     }
 
-    # Stable order: engine name, then numeric major, then full dir name.
-    return sort {
-        my ($ae) = $a->{name} =~ m/^([a-z]+)/;
-        my ($be) = $b->{name} =~ m/^([a-z]+)/;
-        $ae cmp $be || $a->{ver} <=> $b->{ver} || $a->{name} cmp $b->{name};
-    } @sets;
+    my %want = map { lc($_) => 1 } split m/\s*,\s*/, $ENV{QORM_TEST_SETS} // '';
+    return @sets unless %want;
+    return grep { $want{lc $_->{name}} || $want{lc $_->{family}} } @sets;
 }
 
-my @SETS = (@STATIC_SETS, discover_db_sets());
+=pod
 
-sub clean_err {
-    my $err = shift;
+=item $guard = on_execute { my ($sql) = @_; ... }
 
-    my @lines = split /\n/, $err;
+Calls the block with the SQL of every statement just before it executes,
+prepared or cached, until C<$guard> is freed.
 
-    my $out = "";
-    while (@lines) {
-        my $line = shift @lines;
-        next unless $line;
-        last if $out && $line =~ m{^Aborting at.*DBIx/QuickDB\.pm};
+=back
 
-        $out = $out ? "$out\n$line" : $line;
-    }
+=cut
 
-    return $out;
-}
-
-# Poll an async/aside/forked object until it reports ready, bounded by a
-# timeout so a wedged or never-completing query cannot hang the whole suite.
-# Returns whatever ready() returned; bails out (fatal) once the timeout elapses.
-sub wait_ready {
-    my ($obj, $timeout) = @_;
-    $timeout //= 30;
-
-    my $start = time;
-    while (1) {
-        my $ready = $obj->ready;
-        return $ready if $ready;
-        bail_out("Timed out after ${timeout}s waiting for an async result to become ready") if time - $start > $timeout;
-        sleep 0.1;
-    }
-}
-
-our $END_DELAY = 0;
-sub do_for_all_dbs(&;@) {
-    my $code = shift;
-    my %only = map { $_ => 1 } @_;
-    require Parallel::Runner;
-    my $pr = Parallel::Runner->new(
-        $ENV{DBIXQORM_TEST_CONCURRENCY} // 4,
-        iteration_callback => \&cull,
+sub on_execute(&) {
+    my ($code) = @_;
+    return mock 'DBI::st' => (
+        around => [
+            execute => sub {
+                my $orig = shift;
+                $code->($_[0]->{Statement});
+                return $orig->(@_);
+            },
+        ],
     );
+}
 
-    my ($pkg, $file, $line) = caller;
+sub _reap {
+    my ($running, $limit) = @_;
 
-    for my $set (@SETS) {
-        next if @_ && !$only{$set->{name}};
-        for my $dbi (@{$set->{dbi}}) {
-            cull();
-            $pr->run(sub {
-                # Re-seed in the forked child. Test2::V0 seeds srand
-                # deterministically (from the date), and fork inherits that
-                # state, so sibling children otherwise produce identical
-                # File::Temp 'DB-QUICK-XXXX' names -> two databases collide on
-                # one temp dir -> initdb / disk I/O failures under concurrency.
-                srand();
-
-                subtest "$set->{name} x DBD::$dbi" => sub {
-                    local $CURRENT_QDB = $set->{quickdb};
-                    local $CURRENT_SET = $set;
-                    $ENV{$_} = $set->{env}->{$_} for keys %{$set->{env}};
-                    my $qdb = "DBIx::QuickDB::Driver::$set->{quickdb}";
-                    my %dbd_args = $dbi =~ m/^(?:mysql|MariaDB)$/ ? (dbd_driver => "DBD::$dbi") : ();
-                    my $have_qdb = eval { require "DBIx/QuickDB/Driver/$set->{quickdb}.pm"; my ($v, $why) = $qdb->viable({load_sql => 1, bootstrap => 1, %dbd_args}); $v || die $why } or note $@;
-                    my $have_dbi = eval { require "DBD/$dbi.pm"; 1 } or note $@;
-
-                    unless ($have_qdb && $have_dbi) {
-                        skip_all "Skipping $set->{name} (DBD::$dbi)...";
-                        return;
-                    }
-                    note "Running $set->{name} (DBD::$dbi)";
-
-                    {
-                        no strict 'refs';
-                        no warnings 'redefine';
-                        *{"$pkg\::curdb"}      = $set->{db};
-                        *{"$pkg\::curname"}    = sub { $set->{name} };
-                        *{"$pkg\::curdbi"}     = sub { "DBD::$dbi" };
-                        *{"$pkg\::curqdb"}     = sub { $set->{quickdb} };
-                        *{"$pkg\::curdialect"} = sub { $set->{dialect} };
-                    }
-
-                    my $lc_dial = lc($set->{dialect});
-                    $lc_dial =~ s/::/_/g;
-
-                    my $prefix;
-                    if ($pkg->can('SCHEMA_DIR')) {
-                        $prefix = $pkg->SCHEMA_DIR;
-                    }
-                    else {
-                        $prefix = $file;
-                        $prefix =~ s{\.t$}{}g;
-                    }
-
-                    my $sql_file = "${prefix}/$lc_dial";
-                    my @check = ( "${sql_file}$set->{ver}.sql", "${sql_file}.sql" );
-                    push @check => "${prefix}/mariadb.sql" if $sql_file =~ m/mariadb/;
-                    push @check => "${prefix}/mysql.sql" if $sql_file =~ m/(mysql|mariadb)/;
-                    $sql_file = first { -f $_ } @check;
-                    my $db;
-                    if ($sql_file) {
-                        note "Loading SQL file: $sql_file\n";
-                        $db = $set->{db}->(%dbd_args, load_sql => [quickdb => $sql_file]);
-                    }
-                    else {
-                        note "No sql file found, skipping...\n";
-                        $db = $set->{db}->(%dbd_args);
-                    }
-
-                    # The db getters return diag()'s value (false) when the boot
-                    # fails, so guard before handing a non-object to the test body.
-                    unless ($db) {
-                        skip_all "Failed to boot $set->{name}";
-                        return;
-                    }
-
-                    $code->($db);
-
-                    sleep $END_DELAY if $END_DELAY;
-                };
-            }, 'force_fork');
+    while (keys %$running > $limit) {
+        my $pid = waitpid(-1, 0);
+        if ($pid < 0) {
+            fail("$_: database child was lost") for values %$running;
+            %$running = ();
+            last;
         }
+        my $name = delete $running->{$pid} // next;
+        fail("$name: database child exited with wait status $?") if $?;
     }
 
-    $pr->finish;
+    cull();
+}
+
+sub _run_set {
+    my ($code, $set) = @_;
+
+    # Children inherit the parent's random seed, and temporary names would collide.
+    srand();
+    $ENV{PATH} = "$set->{bin}:$ENV{PATH}" if $set->{bin};
+
+    my %spec = (driver => $set->{driver}, fast_destroy => 1);
+    $spec{dbd_driver} = 'DBD::MariaDB' if $set->{family} =~ m/^(?:MariaDB|MySQL)$/;
+
+    my $ok = eval {
+        require Test2::Tools::QuickDB;
+        subtest_buffered $set->{name} => sub {
+            my $db = Test2::Tools::QuickDB::get_db_or_skipall(\%spec);
+            $code->($db, {%$set});
+        };
+        1;
+    };
+    warn $@ unless $ok;
+    exit($ok ? 0 : 255);
 }
 
 1;
+
+__END__
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item QORM_TEST_SETS
+
+Comma-separated set names or families to run, such as
+C<sqlite,postgresql-17> or C<MySQL>. Unset runs every set.
+
+=item QORM_TEST_CONCURRENCY
+
+The most database children one test file runs at once. Defaults to 4.
+
+=back
+
+=head1 SOURCE
+
+The source code repository for DBIx-QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

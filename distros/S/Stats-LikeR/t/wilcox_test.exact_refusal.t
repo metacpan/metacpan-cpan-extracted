@@ -22,7 +22,7 @@
 # (observed 3e-15).  The slow inputs -- the ones that took seconds before the fix -- run
 # under EXTENDED_TESTING only.
 require 5.010; use strict; use warnings FATAL => 'all';
-use Test::More; use Config; use Stats::LikeR;
+use Test::More; use Config; use Stats::LikeR qw(:all);
 my $msg = qr/overflow computing the exact distribution; use exact => 0/;
 sub sep { my ($m, $n) = @_;
 	return ([map { $_ + 0.5 } 1 .. $m], [map { $_ + $m + 1 } 1 .. $n]); }

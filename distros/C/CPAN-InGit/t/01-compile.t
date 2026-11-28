@@ -6,6 +6,9 @@ my @pkgs= qw(
    CPAN::InGit
    CPAN::InGit::MirrorTree
    CPAN::InGit::ArchiveTree
+   CPAN::InGit::DistTree
+   CPAN::InGit::Advisories
+   CPAN::InGit::Server
 );
 
 ok( eval "require $_", $_ )

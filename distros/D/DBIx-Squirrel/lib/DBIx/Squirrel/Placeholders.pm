@@ -10,7 +10,7 @@ use DBIx::Squirrel::Errors qw(croakf);
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v4.2.0';
+our $VERSION = 'v4.3.0';
 
 our @EXPORT_OK = qw(
     expand_lists

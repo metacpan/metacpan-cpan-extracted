@@ -75,7 +75,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use Test::Exception;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 
 # dyad("M/2^K") -- rebuild an exactly-representable argument by integer

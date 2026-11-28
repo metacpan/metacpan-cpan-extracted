@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use Test::More;
 use Test::Exception;
 use Test::LeakTrace;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # median() selects the middle order statistic(s) instead of sorting the whole
 # sample, so what needs covering is not just "is the answer right" but the

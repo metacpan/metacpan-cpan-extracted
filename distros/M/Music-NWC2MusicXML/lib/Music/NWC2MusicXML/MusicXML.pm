@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.003.0';
+our $VERSION = '0.003.1';
 
 use Carp qw(croak carp);
 use POSIX qw(floor);
@@ -168,7 +168,7 @@ Music::NWC2MusicXML::MusicXML - Convert an internal Score object to a MusicXML 4
 
 =head1 VERSION
 
-0.003.0
+0.003.1
 
 =head1 SYNOPSIS
 
@@ -1490,6 +1490,7 @@ sub _emit_note_event {
 	push @out, "${pad}${i}<dot/>" for 1 .. ($d->{dots} // 0);
 	push @out, "${pad}${i}<accidental>$pitch->{accidental}</accidental>"
 		if $pitch->{accidental};
+	push @out, $self->_emit_time_modification($d, "${pad}${i}");
 
 	# <notations> block
 	my @nots;
@@ -1498,6 +1499,7 @@ sub _emit_note_event {
 	push @nots, "${pad}${i}${i}<slur number=\"$slur_stop\" type=\"stop\"/>"   if $slur_stop;
 	push @nots, "${pad}${i}${i}<slur number=\"$slur_start\" type=\"start\"/>" if $slur_start;
 	push @nots, "${pad}${i}${i}<fermata/>" if !$is_chord_member && $ev_ann->{fermata};
+	push @nots, _emit_tuplet($d, "${pad}${i}${i}") unless $is_chord_member;
 
 	# Articulations: only on the first note of a chord (is_chord_member is false)
 	my @artic_tokens = !$is_chord_member
@@ -1572,14 +1574,40 @@ sub _emit_rest_event {
 		push @out, "${pad}${i}<voice>1</voice>";
 		push @out, "${pad}${i}<type>$type</type>";
 		push @out, "${pad}${i}<dot/>" for 1 .. ($d->{dots} // 0);
+		push @out, $self->_emit_time_modification($d, "${pad}${i}");
 	}
-	if ($ev_ann->{fermata}) {
+	my @nots;
+	push @nots, "${pad}${i}${i}<fermata/>" if $ev_ann->{fermata};
+	push @nots, _emit_tuplet($d, "${pad}${i}${i}");
+	if (@nots) {
 		push @out, "${pad}${i}<notations>";
-		push @out, "${pad}${i}${i}<fermata/>";
+		push @out, @nots;
 		push @out, "${pad}${i}</notations>";
 	}
 	push @out, "${pad}</note>";
 	return @out;
+}
+
+sub _emit_time_modification {
+	my ($self, $d, $pad) = @_;
+	return () unless defined $d->{triplet} && !$d->{is_grace};
+	my $i = $self->{_indent};
+	return (
+		"${pad}<time-modification>",
+		"${pad}${i}<actual-notes>3</actual-notes>",
+		"${pad}${i}<normal-notes>2</normal-notes>",
+		"${pad}</time-modification>",
+	);
+}
+
+# The bracket is marked only on the first and last members of a triplet.
+sub _emit_tuplet {
+	my ($d, $pad) = @_;
+	return () if $d->{is_grace};
+	my $position = $d->{triplet} // '';
+	return "${pad}<tuplet type=\"start\"/>" if $position eq 'First';
+	return "${pad}<tuplet type=\"stop\"/>"  if $position eq 'End';
+	return ();
 }
 
 sub _emit_chord_event {
@@ -1630,6 +1658,7 @@ sub _chord_note_event {
 			dots          => $d->{dots} // 0,
 			articulations => $d->{articulations} // [],
 			is_grace      => $d->{is_grace},
+			triplet       => $d->{triplet},
 		},
 	);
 }
@@ -2146,13 +2175,6 @@ B<Resolution:> a regular barline is used.
 =head1 LIMITATIONS
 
 =over 4
-
-=item *
-
-Tuplet C<< <time-modification> >> and C<< <tuplet> >> notation elements are
-not yet emitted.  Tuplet durations are stored correctly as rational numbers
-in the Score, so the audio timing is right, but the printed notation will
-show normal note values rather than tuplet brackets.
 
 =item *
 

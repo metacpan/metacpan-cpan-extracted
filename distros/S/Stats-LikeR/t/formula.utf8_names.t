@@ -19,7 +19,7 @@ require 5.010; use strict; use warnings FATAL => 'all';
 use utf8;
 use Test::More;
 use Encode ();
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my @y = (1,2,3.5,4,5.5,7);
 my %want = ("é" => [-0.26666666666666661, 1.17142857142857149],

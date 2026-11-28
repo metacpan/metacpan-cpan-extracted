@@ -1,5 +1,33 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.60 2026-11-27T19:07:11Z
+
+    - The WebSocket route now works behind an "under" that answers later
+      (returns undef and calls $c->continue afterwards), given through the
+      routes option. Until now the server closed such a connection right
+      after its first heartbeat, with code 1006. Headers that the "under"
+      sets on the response are sent with the answer to the handshake.
+      Nothing changes on the wire
+    - BoardStreams::Client: new options "headers" (headers for the
+      handshake request of every connection attempt, computed anew each
+      time if given as a sub) and "on_handshake" (a sub that is shown the
+      answer to each handshake, including a refusal such as 401 or 403,
+      and decides whether to use the connection, try again, or stop for
+      good with an error of its choosing). The JavaScript client has the
+      same two options under Node.js, with the NodeWebSocket of
+      "boardstreams/node"; a browser's WebSocket can do neither
+
+v0.0.59 2026-11-27T11:08:42Z
+
+    - INCOMPATIBLE: the protocol version is now 2, so this release needs
+      clients of this release, and its clients need a server of it.
+      Upgrade both together
+    - Changes at the ends of an array in a channel's state are now sent as
+      small diffs: items removed from the start or the end and items added
+      at the start, as well as items added at the end as before. That
+      covers push, pop, shift and unshift, alone or together. Previously
+      everything but a push sent the whole array
+
 v0.0.58 2026-11-26T13:50:09Z
 
     - A graceful stop (QUIT, a hypnotoad hot deployment, a worker reaching

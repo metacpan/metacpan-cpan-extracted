@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class', 'experimental::try', 'recursion';
 #
-class Acme::Parataxis::Channel v0.1.6 {
+class Acme::Parataxis::Channel v0.1.7 {
     use Acme::Parataxis qw[fiber await_sleep];
     use Acme::Parataxis::CancellationToken;
     use Acme::Parataxis::Semaphore;
@@ -57,16 +57,28 @@ class Acme::Parataxis::Channel v0.1.6 {
     }
 
     method put ($value) {
-        return $self->_with_deadline(
-            @data >= $capacity,
-            sub {
-                $sem_put->down( 'Channel put', 5 );
-                push @data, $value;
-                $sem_get->up;
-                $self->_wake_select_waiters('get');
-                1;
-            }
-        );
+
+        # The common no-timeout (or ready-channel) case needs no deadline wrapper at all: avoid building a closure and
+        # entering try/cleanup on every put. Only a genuinely blocking put under a channel timeout takes that path.
+        if ( defined $timeout && $timeout > 0 && @data >= $capacity ) {
+            return $self->_with_deadline(
+                1,
+                sub {
+                    $sem_put->down( 'Channel put', 5 );
+                    push @data, $value;
+                    $sem_get->up;
+                    $self->_wake_select_waiters('get');
+                    1;
+                }
+            );
+        }
+
+        # Three fewer wrapper frames on the inlined path, so _park()'s caller level still points at user code.
+        $sem_put->down( 'Channel put', 3 );
+        push @data, $value;
+        $sem_get->up;
+        $self->_wake_select_waiters('get');
+        return 1;
     }
 
     method put_priority ($value) {
@@ -85,16 +97,27 @@ class Acme::Parataxis::Channel v0.1.6 {
     }
 
     method get () {
-        return $self->_with_deadline(
-            @data == 0,
-            sub {
-                $sem_get->down( 'Channel get', 5 );
-                $sem_put->up;
-                my $v = shift @data;
-                $self->_wake_select_waiters('put');
-                return $v;
-            }
-        );
+
+        # Same fast path as put(): skip the deadline wrapper unless this get can actually block under a timeout.
+        if ( defined $timeout && $timeout > 0 && @data == 0 ) {
+            return $self->_with_deadline(
+                1,
+                sub {
+                    $sem_get->down( 'Channel get', 5 );
+                    $sem_put->up;
+                    my $v = shift @data;
+                    $self->_wake_select_waiters('put');
+                    return $v;
+                }
+            );
+        }
+
+        # Three fewer wrapper frames on the inlined path, so _park()'s caller level still points at user code.
+        $sem_get->down( 'Channel get', 3 );
+        $sem_put->up;
+        my $v = shift @data;
+        $self->_wake_select_waiters('put');
+        return $v;
     }
 
     method try_get () {

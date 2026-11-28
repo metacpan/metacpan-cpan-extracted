@@ -79,7 +79,7 @@ use Net::Tools::Socket::Err;
 use Data::Dumper;
 use Exception::Sink;
 
-our $VERSION = '1.60';
+our $VERSION = '1.61';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -223,17 +223,25 @@ sub fpool_fork_one
 sub fpool_wait_all
 {
   my $pool = uc shift; # pool name
+  my $to   = shift; # timeout in seconds, waits up to it for all to exit
+
   my $phr  = $POOLS{ $pool } or return undef;
   return undef unless $phr->{ 'FORKS_COUNT' } > 0;
 
   my $xc;
 
-  while( 42 )
+  $to = time() + $to if $to > 0;
+  while( $phr->{ 'FORKS_COUNT' } > 0 )
     {
     my ( $pid, $exit, $xsig ) = fpool_wait_one( $pool );
-    last unless $pid;
-    $xc++;
-    # print "    <-- exit ( $pid, $exit, $xsig, $name )\n";
+    if( $pid )
+      {
+      $xc++;
+      # print "    <-- exit ( $pid, $exit, $xsig, $pool )\n";
+      next;
+      }
+    last unless $to > 0 and time() < $to;
+    sleep(1);
     }
 
   return $xc;
@@ -496,6 +504,7 @@ Data::Tools::Process::ForkPool - pools of forked processes with messaging
     sleep( 0.1 );
     }
   fpool_stop_all( 'WORKERS' );
+  fpool_wait_all( 'WORKERS', 5 ); # wait up to 5 seconds for all to exit
 
   # forked worker
   sub worker
@@ -581,11 +590,14 @@ and exits with its return value. If \&sub dies, the error is printed to
 STDERR and it exits with 255. exit() runs END blocks and destructors in the
 forked process too.
 
-=head2 fpool_wait_all( $pool )
+=head2 fpool_wait_all( $pool, $timeout )
 
-Reaps all already exited processes of the pool, does not block. Returns
-the count of reaped processes, undef if none were reaped or there is no
-such pool. Unread messages of a reaped process are discarded.
+Reaps all already exited processes of the pool. Without $timeout (or with
+0 or a negative one) it does not block. With $timeout (seconds) it also
+waits for the rest to exit, checking once per second, and returns as soon
+as the pool is empty or the timeout expires. Returns the count of reaped
+processes, undef if none were reaped or there is no such pool. Unread
+messages of a reaped process are discarded.
 
 =head2 fpool_wait_one( $pool )
 

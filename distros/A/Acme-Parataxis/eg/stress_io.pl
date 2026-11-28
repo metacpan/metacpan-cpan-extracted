@@ -7,7 +7,7 @@ $|++;
 # Stress Test 2: Concurrent I/O (Background Thread Pool)
 # This tests the ability to handle many simultaneous blocking background tasks.
 async {
-    my $concurrency = 64;    # Half of MAX_FIBERS
+    my $concurrency = 64;    # Concurrent sleepers; the native pool grows up to 64 threads
     my $iterations  = 5;
     my $sleep_ms    = 500;
     say "Starting I/O Stress Test: $concurrency concurrent sleeps of ${sleep_ms}ms...";

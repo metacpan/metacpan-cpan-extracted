@@ -6,7 +6,7 @@ use File::Spec::Functions 'catdir';
 
 use Mojolicious::Plugin::Tables::Model;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -45,22 +45,19 @@ sub register {
     my $model = $schema->model;
     $app->config(model=>$model);
 
-
     $app->hook(before_dispatch => sub {
         my $c = shift;
         # Move first part and slash from path to base path when deployed under a path
         if ($c->app->config('deployed-under-path')) {
             my $part0 = shift @{$c->req->url->path->leading_slash(0)};
             push @{$c->req->url->base->path->trailing_slash(0)}, $part0;
-            $c->shipped(urlbase => $c->req->url->base);
-        } else {
-            $c->shipped(urlbase => '');
         }
         # capture https into base
         if ($c->req->headers->header('X-Forwarded-HTTPS')
         || ($c->req->headers->header('X-Forwarded-Proto')||'') eq 'https') {
             $c->req->url->base->scheme('https')
         }
+        $c->shipped(urlbase => $c->url_for('tables'));
     });
 
 
@@ -89,14 +86,16 @@ sub register {
         $base_ep->(@_)
     };
 
-    my $r = $app->routes;
-    $r->get('/' => sub{shift->redirect_to('tables')}) unless $conf->{nohome};
+    $app->routes->get('/' => sub{shift->redirect_to('tables')}) unless $conf->{nohome};
+
+    my $r = $conf->{route} || $app->routes->under('/tables');
+    $r->name('tables');
 
     my @crud_gets  = (qw/view edit del nuke navigate/);
     my @crud_posts = (qw/save/);
     my $fmts       = [format=>[qw/html json/]];
 
-    for ($r->under('tables')                          ->to('auth#ok'   )) {
+    for ($r->under('/')                               ->to('auth#ok'   )) {
         for ($_->under()                              ->to('tables#ok' )) {
             $_->get                                   ->to('#page'     );
             for ($_->under(':table')                  ->to('#table_ok' )) {
@@ -212,6 +211,10 @@ This lets you start to customise and grow your web app.
 
 Where the full list of configuration options is:
 
+=head3 route
+
+The L<Mojolicious::Routes::Route> object you want the "Tables" app to be deployed under, defaults to '/tables'.
+
 =head3 layout
 
 Provide an alternative 'wrapper' layout; typically the one from your own application.  If you prepare one of these you will need
@@ -231,15 +234,6 @@ See 'Customising Model Class'
 =head3 connect_info
 
 See 'Day One'
-
-=head3 deployed-under-path
-
-Set this to 1 if the Tables web app is deployed by a front-end proxy (e.g. nginx using proxy_pass) under a leading pathname,
-e.g. https:://mywebsite.com/tables/...
-
-Under an arrangement like this, Tables will know it has to strip the first word e.g. 'tables' from the path and include it in the 
-request basename prior to generating links in web pages.  See documentation for MOJO_REVERSE_PROXY which you probably also want in 
-this scenario.
 
 =head3 default_theme
 

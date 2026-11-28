@@ -1,0 +1,857 @@
+/*
+ * Shared stylesheet for the App::Actions, App::FileSync, App::Test::Generator
+ * and Database::BI static sites.
+ *
+ * One file, no imports, no web fonts, no CDN: the sites are copied straight
+ * into an Apache document root and served from disc.  The four copies are
+ * byte-identical on purpose, so a change here belongs in all four at once.
+ *
+ * Desktop is the primary target.  Everything is fluid and there are two
+ * breakpoints for phones and small tablets; the navigation becomes a single
+ * horizontally scrolling row so the sticky header stays short.
+ *
+ * Several class names are historical aliases kept so older pages keep
+ * rendering unchanged: .skip-link, .grid, .lede, .callout, .badges, .inner.
+ */
+
+:root {
+	--bg: #fbfaf7;
+	--surface: #ffffff;
+	--ink: #1b2026;
+	--muted: #5c6673;
+	--line: #e3e0d8;
+	--line-strong: #cfcabf;
+	--accent: #14664a;
+	--accent-soft: #e7f2ec;
+	--accent-2: #1f5d9c;
+	--warn: #8a5a06;
+	--warn-soft: #fdf3dc;
+	--code-bg: #ecebe5;
+	--code-ink: #23282f;
+	--term-bg: #16202a;
+	--term-ink: #e9eef3;
+	--radius: 10px;
+	--shadow: 0 1px 2px rgba(20, 25, 30, 0.05);
+	--header-h: 4.5rem;
+	--measure: 62rem;
+	--sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #12161b;
+		--surface: #191f26;
+		--ink: #e6eaef;
+		--muted: #a3aebb;
+		--line: #2b343e;
+		--line-strong: #3a4552;
+		--accent: #6fd0a8;
+		--accent-soft: #17332a;
+		--accent-2: #82b6ea;
+		--warn: #e5b567;
+		--warn-soft: #33290f;
+		--code-bg: #232b34;
+		--code-ink: #e6eaef;
+		--term-bg: #0d1319;
+		--term-ink: #e9eef3;
+		--shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+	scroll-behavior: smooth;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--ink);
+	font-family: var(--sans);
+	font-size: 17px;
+	line-height: 1.65;
+	text-rendering: optimizeLegibility;
+	overflow-wrap: break-word;
+}
+
+/* Single content column.  .inner is the Database::BI spelling of .wrap. */
+
+.wrap,
+.inner {
+	width: 100%;
+	max-width: var(--measure);
+	margin: 0 auto;
+	/* Inline only: a `padding` shorthand here would out-specify the block
+	   padding on main and on .header-inner, which are type/class siblings. */
+	padding-inline: 1.25rem;
+}
+
+/* Skip link */
+
+.skip,
+.skip-link {
+	position: absolute;
+	left: -9999px;
+	top: 0;
+	background: var(--surface);
+	color: var(--ink);
+	padding: 0.5rem 0.75rem;
+	border: 1px solid var(--line-strong);
+	border-radius: 0 0 var(--radius) 0;
+	z-index: 20;
+}
+
+.skip:focus,
+.skip-link:focus {
+	left: 0;
+	outline: 2px solid var(--accent-2);
+	outline-offset: -2px;
+}
+
+a {
+	color: var(--accent-2);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 2px;
+}
+
+a:hover {
+	color: var(--accent);
+}
+
+:focus-visible {
+	outline: 2px solid var(--accent-2);
+	outline-offset: 2px;
+	border-radius: 3px;
+}
+
+/* Header and navigation */
+
+.site-header {
+	background: var(--surface);
+	background: color-mix(in srgb, var(--surface) 94%, transparent);
+	border-bottom: 1px solid var(--line);
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	backdrop-filter: saturate(180%) blur(8px);
+}
+
+.header-inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.4rem 1.5rem;
+	padding-top: 0.8rem;
+	padding-bottom: 0.7rem;
+}
+
+.brand {
+	display: flex;
+	flex-direction: column;
+	text-decoration: none;
+	color: var(--ink);
+	line-height: 1.2;
+}
+
+.brand-name {
+	font-weight: 700;
+	font-size: 1.05rem;
+	letter-spacing: -0.01em;
+	font-family: var(--mono);
+}
+
+.brand:hover .brand-name {
+	color: var(--accent);
+}
+
+.brand-tag {
+	font-size: 0.78rem;
+	color: var(--muted);
+	letter-spacing: 0.01em;
+}
+
+.site-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.15rem 1rem;
+	font-size: 0.92rem;
+	margin-left: auto;
+}
+
+.site-nav a {
+	color: var(--muted);
+	text-decoration: none;
+	padding: 0.15rem 0;
+	border-bottom: 2px solid transparent;
+}
+
+.site-nav a:hover {
+	color: var(--ink);
+	border-bottom-color: var(--line-strong);
+}
+
+.site-nav a.current,
+.site-nav a[aria-current="page"] {
+	color: var(--accent);
+	border-bottom-color: var(--accent);
+	font-weight: 600;
+}
+
+/* Page content */
+
+main {
+	padding-top: 2.25rem;
+	padding-bottom: 4rem;
+}
+
+/* Anchors land below the sticky header rather than under it. */
+
+main [id] {
+	scroll-margin-top: calc(var(--header-h) + 0.5rem);
+}
+
+h1 {
+	font-size: clamp(1.8rem, 4.2vw, 2.4rem);
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+	margin: 0 0 0.6rem;
+}
+
+h2 {
+	font-size: 1.32rem;
+	line-height: 1.25;
+	letter-spacing: -0.01em;
+	margin: 2.6rem 0 0.75rem;
+	padding-top: 0.45rem;
+	border-top: 1px solid var(--line);
+}
+
+h3 {
+	font-size: 1.06rem;
+	margin: 1.8rem 0 0.4rem;
+}
+
+h4 {
+	font-size: 0.95rem;
+	margin: 1.4rem 0 0.3rem;
+	color: var(--muted);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+p,
+ul,
+ol,
+dl {
+	margin: 0 0 1rem;
+}
+
+ul,
+ol {
+	padding-left: 1.35rem;
+}
+
+li {
+	margin-bottom: 0.35rem;
+}
+
+li > ul,
+li > ol {
+	margin-top: 0.4rem;
+	margin-bottom: 0.6rem;
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid var(--line);
+	margin: 2.5rem 0;
+}
+
+.lead,
+.lede {
+	font-size: 1.12rem;
+	color: var(--muted);
+	max-width: 48rem;
+	margin-bottom: 1.4rem;
+}
+
+.section-intro {
+	color: var(--muted);
+	max-width: 48rem;
+	margin-bottom: 1.5rem;
+}
+
+.muted {
+	color: var(--muted);
+}
+
+.small {
+	font-size: 0.9rem;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+/* Hero */
+
+.hero {
+	padding: 0.5rem 0 1.2rem;
+}
+
+.eyebrow {
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: var(--accent);
+	margin: 0 0 0.6rem;
+}
+
+/* Headline facts, as chips.  .badges is the App::FileSync spelling. */
+
+.facts,
+.badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	list-style: none;
+	padding: 0;
+	margin: 0 0 1.6rem;
+}
+
+.facts li,
+.badges li {
+	margin: 0;
+	font-size: 0.78rem;
+	letter-spacing: 0.02em;
+	color: var(--muted);
+	background: var(--surface);
+	border: 1px solid var(--line-strong);
+	border-radius: 999px;
+	padding: 0.1rem 0.65rem;
+	white-space: nowrap;
+}
+
+/* Code */
+
+code,
+kbd,
+samp,
+pre {
+	font-family: var(--mono);
+}
+
+code,
+kbd,
+samp {
+	font-size: 0.9em;
+}
+
+:not(pre) > code {
+	background: var(--code-bg);
+	color: var(--code-ink);
+	padding: 0.1em 0.35em;
+	border-radius: 4px;
+	border: 1px solid var(--line);
+	overflow-wrap: break-word;
+}
+
+pre {
+	background: var(--term-bg);
+	color: var(--term-ink);
+	padding: 0.9rem 1.05rem;
+	border-radius: var(--radius);
+	overflow-x: auto;
+	font-size: 0.85rem;
+	line-height: 1.55;
+	margin: 0 0 1.25rem;
+	tab-size: 4;
+	-webkit-overflow-scrolling: touch;
+}
+
+pre code {
+	background: none;
+	border: 0;
+	padding: 0;
+	color: inherit;
+	font-size: inherit;
+	white-space: pre;
+}
+
+pre .comment {
+	color: #93a4b4;
+}
+
+pre.diagram {
+	font-size: 0.8rem;
+	line-height: 1.5;
+}
+
+.caption {
+	font-size: 0.82rem;
+	color: var(--muted);
+	margin: -0.9rem 0 1.4rem;
+}
+
+/* Cards.  .grid is the App::FileSync and Database::BI spelling. */
+
+.cards,
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+	gap: 1rem;
+	margin: 1.5rem 0 2rem;
+	padding: 0;
+	list-style: none;
+}
+
+.card {
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	padding: 1rem 1.1rem;
+	margin: 0;
+	box-shadow: var(--shadow);
+}
+
+.card h3 {
+	margin: 0 0 0.35rem;
+	font-size: 1rem;
+}
+
+.card h3 a {
+	text-decoration: none;
+}
+
+.card p {
+	margin: 0;
+	font-size: 0.92rem;
+	color: var(--muted);
+}
+
+.card p + p {
+	margin-top: 0.5rem;
+}
+
+.card .tag {
+	display: inline-block;
+	font-size: 0.72rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--accent);
+	background: var(--accent-soft);
+	border-radius: 4px;
+	padding: 0.05rem 0.4rem;
+	margin-bottom: 0.5rem;
+}
+
+/* Callouts.  .callout is the App::FileSync spelling. */
+
+.note,
+.warn,
+.callout {
+	border-left: 4px solid var(--accent);
+	background: var(--accent-soft);
+	border-radius: 0 var(--radius) var(--radius) 0;
+	padding: 0.85rem 1rem;
+	margin: 1.25rem 0;
+	font-size: 0.95rem;
+}
+
+.warn,
+.callout.warn {
+	border-left-color: var(--warn);
+	background: var(--warn-soft);
+	color: var(--warn);
+}
+
+.callout.warn a {
+	color: inherit;
+}
+
+.note p:last-child,
+.warn p:last-child,
+.callout p:last-child,
+.note pre:last-child,
+.warn pre:last-child {
+	margin-bottom: 0;
+}
+
+.note-title,
+.warn-title {
+	display: block;
+	font-weight: 700;
+	font-size: 0.78rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	margin-bottom: 0.25rem;
+}
+
+.note-title {
+	color: var(--accent);
+}
+
+.warn-title {
+	color: var(--warn);
+}
+
+/* Tables */
+
+.table-wrap {
+	overflow-x: auto;
+	margin: 1.25rem 0 1.75rem;
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	background: var(--surface);
+	-webkit-overflow-scrolling: touch;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.9rem;
+}
+
+caption {
+	caption-side: top;
+	text-align: left;
+	color: var(--muted);
+	font-size: 0.85rem;
+	padding-bottom: 0.4rem;
+}
+
+th,
+td {
+	text-align: left;
+	padding: 0.55rem 0.85rem;
+	border-bottom: 1px solid var(--line);
+	vertical-align: top;
+}
+
+th {
+	font-size: 0.76rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--muted);
+	background: var(--bg);
+	background: color-mix(in srgb, var(--bg) 60%, var(--surface));
+	white-space: nowrap;
+}
+
+tbody tr:last-child th,
+tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+td code,
+th code {
+	white-space: nowrap;
+}
+
+/* Command blocks */
+
+.cmd {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem 0.6rem;
+	align-items: baseline;
+	margin: 2.2rem 0 0.4rem;
+	padding-top: 0.45rem;
+	border-top: 1px solid var(--line);
+}
+
+.cmd h2 {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	font-family: var(--mono);
+	font-size: 1.2rem;
+}
+
+.cmd .tag {
+	font-size: 0.7rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--muted);
+	border: 1px solid var(--line-strong);
+	border-radius: 999px;
+	padding: 0.05rem 0.5rem;
+	white-space: nowrap;
+}
+
+/* Numbered steps */
+
+.steps {
+	counter-reset: step;
+	list-style: none;
+	padding: 0;
+	margin: 1.4rem 0;
+}
+
+.steps > li {
+	position: relative;
+	padding-left: 2.6rem;
+	margin: 0 0 1.5rem;
+	counter-increment: step;
+}
+
+.steps > li::before {
+	content: counter(step);
+	position: absolute;
+	left: 0;
+	top: 0.05rem;
+	width: 1.8rem;
+	height: 1.8rem;
+	display: grid;
+	place-items: center;
+	background: var(--accent-soft);
+	color: var(--accent);
+	border-radius: 50%;
+	font-family: var(--mono);
+	font-size: 0.85rem;
+	font-weight: 700;
+}
+
+.steps h3 {
+	margin-top: 0;
+}
+
+/* Contents list */
+
+.toc {
+	margin: 1.2rem 0 2rem;
+	padding: 0.9rem 1.1rem;
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+}
+
+.toc p {
+	margin: 0 0 0.4rem;
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--muted);
+}
+
+.toc ul {
+	margin: 0;
+	padding-left: 1.1rem;
+	columns: 2;
+	column-gap: 2rem;
+}
+
+.toc li {
+	font-size: 0.92rem;
+}
+
+/* Plain lists and two-column definition lists */
+
+ul.plain,
+ol.plain {
+	padding-left: 1.2rem;
+}
+
+dl.spec {
+	margin: 1.25rem 0;
+}
+
+dl.spec dt {
+	font-weight: 600;
+	margin-top: 0.9rem;
+}
+
+dl.spec dd {
+	margin: 0.15rem 0 0;
+	color: var(--muted);
+}
+
+/* Previous/next links */
+
+.pager {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-top: 3rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--line);
+	font-size: 0.92rem;
+}
+
+/* Footer */
+
+.site-footer {
+	border-top: 1px solid var(--line);
+	background: var(--surface);
+	color: var(--muted);
+	font-size: 0.85rem;
+	padding: 1.5rem 0 2rem;
+}
+
+.site-footer p {
+	margin: 0 0 0.4rem;
+}
+
+.site-footer a {
+	color: var(--muted);
+}
+
+.site-footer a:hover {
+	color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------
+ * Small screens.  The navigation becomes one horizontally scrolling row,
+ * so the sticky header stays two lines tall instead of stacking into five.
+ * ------------------------------------------------------------------ */
+
+@media (max-width: 46rem) {
+	body {
+		font-size: 16px;
+	}
+
+	.header-inner {
+		padding-top: 0.7rem;
+		padding-bottom: 0;
+		gap: 0.15rem;
+	}
+
+	.brand {
+		padding-bottom: 0.35rem;
+	}
+
+	.site-nav {
+		margin-left: 0;
+		width: 100%;
+		font-size: 0.9rem;
+		gap: 0 1.1rem;
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		scrollbar-width: none;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.site-nav::-webkit-scrollbar {
+		display: none;
+	}
+
+	.site-nav a {
+		white-space: nowrap;
+		padding: 0.55rem 0 0.6rem;
+	}
+
+	main {
+		padding-top: 1.6rem;
+		padding-bottom: 2.5rem;
+	}
+
+	h2 {
+		margin-top: 2.1rem;
+	}
+
+	th,
+	td {
+		padding: 0.5rem 0.65rem;
+	}
+
+	pre {
+		font-size: 0.8rem;
+		padding: 0.8rem 0.85rem;
+	}
+
+	.hero {
+		padding-top: 1.2rem;
+		padding-bottom: 1rem;
+	}
+}
+
+@media (max-width: 34rem) {
+	.wrap,
+	.inner {
+		padding-inline: 1rem;
+	}
+
+	h1 {
+		font-size: 1.65rem;
+	}
+
+	h2 {
+		font-size: 1.2rem;
+	}
+
+	.cards,
+	.grid {
+		grid-template-columns: 1fr;
+	}
+
+	.toc ul {
+		columns: 1;
+	}
+
+	.steps > li {
+		padding-left: 2.2rem;
+	}
+
+	.facts li,
+	.badges li {
+		font-size: 0.75rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+}
+
+@media print {
+	.site-header,
+	.site-footer,
+	.pager,
+	.toc,
+	.skip,
+	.skip-link {
+		display: none;
+	}
+
+	body {
+		background: #fff;
+		color: #000;
+		font-size: 11pt;
+	}
+
+	a {
+		color: #000;
+	}
+
+	pre {
+		background: #f2f2f2;
+		color: #111;
+		border: 1px solid #ccc;
+		white-space: pre-wrap;
+	}
+
+	.table-wrap {
+		overflow: visible;
+	}
+
+	.card,
+	table,
+	pre {
+		box-shadow: none;
+	}
+
+	h2 {
+		page-break-after: avoid;
+	}
+}

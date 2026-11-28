@@ -4,7 +4,7 @@ use Test::More;
 use Test::Exception;
 use Test::LeakTrace 'no_leaks_ok';
 use File::Temp 'tempdir';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my $dir = tempdir( CLEANUP => 1 );
 my $n = 0;

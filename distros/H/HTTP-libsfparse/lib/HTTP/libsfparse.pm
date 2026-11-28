@@ -6,7 +6,7 @@ use warnings;
 use Exporter   5.57 qw( import );
 use XSLoader   ();
 
-our $VERSION = 'v0.0.3';
+our $VERSION = 'v0.0.5';
 
 # ABSTRACT: parse RFC 9651 HTTP Structured Fields using libsfparse
 
@@ -97,6 +97,8 @@ which obsoletes RFC 8941) written for the ngtcp2 and nghttp3 QUIC/HTTP3
 stacks.
 
 It uses a bundled copy of libsfparse, and not a version that may already be installed on your system.
+
+You may prefer to use L<HTTP::StructuredField> instead.
 
 =head2 Format of the Parsed Data
 
@@ -242,6 +244,10 @@ collapses them the way RFC 9651 says to.
 Nothing is exported by default
 
 =head1 KNOWN ISSUES
+
+RFC 9651 specifies that integers can be up to 15 digits long, which
+makes decoding them into integers problematic for 32-bit systems.
+Numbers that are too large will be represented using L<Math::Int64>.
 
 libsfparse also provides C<sfparse_unescape>, C<sfparse_base64decode> and
 C<sfparse_pctdecode>. Those functions assume their input has already been

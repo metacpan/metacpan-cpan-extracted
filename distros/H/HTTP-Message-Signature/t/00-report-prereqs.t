@@ -61,6 +61,9 @@ sub _merge_prereqs {
 
 my @include = qw(
   HTTP::libsfparse
+  Math::Int64
+  Ref::Util
+  Sub::Util
 );
 
 my @exclude = qw(

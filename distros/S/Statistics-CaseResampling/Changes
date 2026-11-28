@@ -1,5 +1,87 @@
 Revision history for Perl extension Statistics::CaseResampling.
 
+1.01  Fri Nov 27 23:54:00 2026
+  - Remove duplicate Perl definition of Statistics::CaseResampling::RdGen::CLONE_SKIP
+    from CaseResampling.pm (already provided by XS in RdGen.xs.inc), fixing the
+    "Subroutine ... redefined" warning under perl -w (GH #3).
+  - Fix Neumaier compensated summation in cs_mean() / mean() on 32-bit x86
+    (x87 extended precision, FLT_EVAL_METHOD != 0) by rounding the running sum
+    to double before computing the compensation term.
+  - Preserve $Config{ccflags} (e.g. -D_FILE_OFFSET_BITS=64) when enabling strict
+    warning flags in .github/workflows/ci.yml (fixes 32-bit CI binary handshake
+    mismatch).
+
+1.00  Fri Nov 27 11:45:00 2026
+  - [BREAKING] Fix two-sided alpha/2 tail probabilities and Type 7 quantile
+    interpolation in simple_confidence_limits_from_samples() and
+    median_simple_confidence_limits() (previously used one-sided alpha
+    tails and truncated 1-based indices, giving 90% CIs at confidence=0.95
+    and inverted limits for confidence < 0.5).
+  - [BREAKING] Use Hyndman-Fan Type 7 linear interpolation for median(),
+    first_quartile(), and third_quartile() (averaging the two middle
+    elements for even N in median(), median_absolute_deviation(),
+    resample_medians(), and median_simple_confidence_limits()).
+  - [BREAKING] Fix domain checks on normal/erf helpers:
+      * Widen approx_erf_inv() from (0, 1) to its true domain (-1, 1).
+      * Enforce alpha in (0, 1] in alpha_to_nsigma() and nsigma >= 0 in
+        nsigma_to_alpha(), rejecting out-of-range and NaN inputs.
+  - [BREAKING] Croak cleanly on empty samples in mean(), median(),
+    median_absolute_deviation(), first_quartile(), third_quartile(),
+    median_simple_confidence_limits(), and
+    simple_confidence_limits_from_samples() instead of silently returning 0.
+    (resample(), resample_medians(), and resample_means() still return [].)
+  - [BREAKING] Reject undef and non-numeric elements in sample arrays and
+    mean arguments instead of silently coercing them to 0.0.
+  - Harden cs_select() with an introselect heapsort fallback to guarantee
+    O(n log n) worst-case time on adversarial pivot sequences, and link
+    explicitly against -lm in Makefile.PL.
+  - Add C-accelerated resample_quantiles(), mean_percentile_confidence_limits(),
+    mean_bca_confidence_limits(), and mean_studentized_confidence_limits().
+  - Add Monte Carlo empirical coverage tests in t/05_coverage.t, add
+    cross-platform GitHub Actions CI (.github/workflows/ci.yml), and
+    update POD/README to document all 1.00 fixes and new functions.
+  - Validate scalar numeric/undef parameters across all XS entrypoints,
+    prevent memory leak in bca_confidence_limits_from_samples() on invalid
+    jackknife elements, guard RdGen allocations against NULL/OOM, share
+    implementation via ALIAS for basic/simple_confidence_limits_from_samples,
+    and fix usage message typo in median_simple_confidence_limits.
+  - Add LICENSE, MIN_PERL_VERSION, TEST_REQUIRES, and META_MERGE CPAN
+    metadata to Makefile.PL, and add a 32-bit Perl job to CI.
+
+0.19  Fri Nov 27 10:15:00 2026
+  - Fix default PRNG seeding (previous setup(rand()) truncated to seed 0)
+    by seeding from native OS entropy (BCryptGenRandom/RtlGenRandom on
+    Windows, /dev/urandom on Unix) with a 32-bit-safe fallback that
+    preserves $!, and automatically reseed the default RNG after fork()
+    as well as ithreads CLONE.
+  - Use SvUV() in RdGen::setup_array() so full unsigned 32-bit seed words
+    are preserved on 32-bit-IV Perls.
+  - Eliminate modulo/scaling index bias in do_resample() via Lemire's
+    unbiased bounded 32-bit integer sampling.
+  - Propagate NaN deterministically across all input permutations in
+    cs_select() and derived order statistics, and reject NaN in
+    confidence level and approx_erf_inv() domain guards.
+  - Prevent signed 32-bit multiplication overflow in third_quartile() on
+    very large samples.
+  - Upgrade mean() to Neumaier compensated summation with overflow-safe
+    incremental fallback; upgrade standard deviation functions to scaled
+    single-pass summation (avoiding overflow/underflow) and allow optional
+    1-argument calling form sample_standard_deviation(\@sample) and
+    population_standard_deviation(\@sample).
+  - Replace low-precision erf/erfinv approximations with C99 erf()/erfc()
+    and Acklam + Halley normal quantile refinement for full double
+    precision across extreme tails.
+  - Add statistically sound, two-sided functions while preserving legacy
+    functions for backward compatibility:
+      * quantile() (Hyndman-Fan Type 7 in O(n) expected time)
+      * percentile_confidence_limits_from_samples()
+      * basic_confidence_limits_from_samples()
+      * bca_confidence_limits_from_samples()
+      * median_percentile_confidence_limits()
+      * median_exact_confidence_limits() (exact Binomial(n, 0.5) interval)
+  - Add comprehensive statistical correctness test suite in t/04_statistics.t.
+  - Fix POD documentation inaccuracies and add statistical caveats.
+
 0.18  Sun Oct 11 10:00:00 2026
   - Fix wild stack pointer deallocation (SIGABRT free() invalid pointer)
     when passing empty arrays to resampling/statistical functions (SCR-01).

@@ -1097,7 +1097,7 @@ include v5.28 and v5.40 then the release for v5.28 is installed.
 
 The currently supported Perl versions are:
 
-  v5.8
+  v5.8.1
   v5.14
   v5.28
   v5.40

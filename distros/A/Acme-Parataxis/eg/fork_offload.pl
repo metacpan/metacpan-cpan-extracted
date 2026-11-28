@@ -39,9 +39,10 @@ use Time::HiRes               qw[time];
 #   pool, counts how many scheduler ticks a plain fiber completes while they
 #   churn, checks every result, checks the concurrency cap, then demonstrates
 #   kill_blocking_fork() on a runaway child and exits 0.
-if ( !( defined $Config{d_fork} && $Config{d_fork} eq 'define' ) || $^O eq 'MSWin32' ) {
-    print "This platform has no real fork(2) (MSWin32 emulates it with threads.pm),\n",
-        "so spawn_blocking_fork() is unavailable here. Use perl eg/blocking_offload.pl\n", "on a useithreads build instead.\n";
+if ( !( defined $Config{d_fork} && $Config{d_fork} eq 'define' ) || $^O eq 'MSWin32' || $^O eq 'cygwin' ) {
+    print "This platform has no fork(2) usable from a fiber (MSWin32 emulates it with\n",
+        "threads.pm, and Cygwin's fork() cannot run from a fiber stack), so\n",
+        "spawn_blocking_fork() is unavailable here. Use perl eg/blocking_offload.pl\n", "on a useithreads build instead.\n";
     exit 0;
 }
 my $POOL = 2;      # concurrent children; --pool to raise
@@ -131,7 +132,7 @@ my $rv    = run(
             killed     => $killed,
             kill_took  => $kill_took,
             kill_err   => $err,
-            after_kill => $after_kill,
+            after_kill => $after_kill
         };
     }
 );

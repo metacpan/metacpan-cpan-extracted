@@ -61,7 +61,7 @@ function tables() {
     $('#tablesbuts button').removeClass('ui-state-highlight');
     $this.addClass('ui-state-highlight');
     $('.data-hdr h3').text($this.text());
-    $('#tablesbody button.add').button('enable').click(function(){ document.location = shipped.urlbase + '/tables/' + dtTableTabName + '/add' });
+    $('#tablesbody button.add').button('enable').click(function(){ document.location = shipped.urlbase + '/' + dtTableTabName + '/add' });
     dtTabInfo = shipped.bytable[dtTableTabName];
     var columns = $.map(dtTabInfo.columns, colmaker);
     //console.log("genned columns struct ", columns);
@@ -89,7 +89,7 @@ function dtTableEvents() {
         function(){$(this).css({cursor:'pointer','font-weight':'normal'}).addClass('ui-state-active')},
         function(){$(this).css({cursor:''}).removeClass('ui-state-active')}
     ).on('click',
-        function(){document.location = shipped.urlbase + '/tables/' + dtTableTabName + '/' + $(this).attr('id') + '/view'}
+        function(){document.location = shipped.urlbase + '/' + dtTableTabName + '/' + $(this).attr('id') + '/view'}
     );
 }
 
@@ -142,7 +142,7 @@ function init() {
     $('div.navigators button').click(function(){
         var $this = $(this);
         if ($this.hasClass('save' )) return true; // allows post to proceed
-        var newloc = shipped.urlbase + '/tables/' + shipped.table;
+        var newloc = shipped.urlbase + '/' + shipped.table;
         if ($this.hasClass('list' )) {
             document.location = newloc;
             return;
@@ -176,7 +176,7 @@ function init() {
         $fldset.find('div.stats button').click(function() {
             var $this = $(this);
             if ($this.hasClass('add'  )) {
-                var href = '/tables/' + shipped.table + '/' + shipped.id + '/add_child/' + cdata.collection;
+                var href = '/' + shipped.table + '/' + shipped.id + '/add_child/' + cdata.collection;
                 document.location = shipped.urlbase + href;
                 return false;
             }
@@ -185,12 +185,12 @@ function init() {
             if ($this.hasClass('next' )) cdata.offset += 10;
             if ($this.hasClass('end'  )) cdata.offset = -1;
             if ($this.hasClass('list' )) cdata.offset = -2;
-            var url = shipped.urlbase + '/tables/' + shipped.table + '/' + shipped.id + '/' + cdata.collection + '.json';
+            var url = shipped.urlbase + '/' + shipped.table + '/' + shipped.id + '/' + cdata.collection + '.json';
             $.post(url, {offset:cdata.offset})
              .done(function(rows){
                 $('table.rows', $fldset).empty().append(
                     $.map(rows, function(d,i){
-                        var href = shipped.urlbase + '/tables/' + cdata.ctable + '/' + d.id + '/view';
+                        var href = shipped.urlbase + '/' + cdata.ctable + '/' + d.id + '/view';
                         return '<tr><td><a href="' + href + '">'+d.label+'</a></td></tr>'
                     })
                 );

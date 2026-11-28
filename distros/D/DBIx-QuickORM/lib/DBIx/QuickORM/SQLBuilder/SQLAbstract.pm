@@ -2,13 +2,18 @@ package DBIx::QuickORM::SQLBuilder::SQLAbstract;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000031';
 
-use Carp qw/croak confess/;
-use Sub::Util qw/set_subname/;
+use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
-use DBIx::QuickORM::Util qw/literal_write_value/;
-use parent 'SQL::Abstract';
+use SQL::Abstract 2.000001;
+
+use DBIx::QuickORM::Value();
+use DBIx::QuickORM::WhereBuilder::SQLAbstract();
+
+use Object::HashBase qw{
+    +sqla
+};
 
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::SQLBuilder';
@@ -19,587 +24,509 @@ with 'DBIx::QuickORM::Role::SQLBuilder';
 
 =head1 NAME
 
-DBIx::QuickORM::SQLBuilder::SQLAbstract - SQL builder backed by SQL::Abstract.
+DBIx::QuickORM::SQLBuilder::SQLAbstract - The default SQL builder.
 
 =head1 DESCRIPTION
 
-An implementation of the SQL builder role (see
-L<DBIx::QuickORM::Role::SQLBuilder>) built on top of L<SQL::Abstract>. It
-takes ORM source objects and parameter hashes and produces statement-plus-bind
-structures the ORM can execute.
+The builder handles use unless the ORM is given another. It fulfils
+L<DBIx::QuickORM::Role::SQLBuilder> with L<SQL::Abstract> 2.x for the
+C<where>, C<having>, and order, and writes everything else itself.
 
-For each of C<insert>, C<update>, C<select>, C<delete>, and C<where> it
-provides a C<qorm_*> method that resolves the source to its db moniker, builds
-the statement via the corresponding C<SQL::Abstract> method, and normalizes
-the bind list into per-field bind specs. C<qorm_upsert> extends an insert with
-a dialect-specific conflict clause.
+The C<WHERE> is built by the request's C<where_builders>, the first whose
+C<can_build_where> is true (see L<DBIx::QuickORM::Role::WhereBuilder>). When
+no builder can, it croaks. Without C<where_builders> it is built as below, by
+L<DBIx::QuickORM::WhereBuilder::SQLAbstract>.
+
+A C<where> uses L<SQL::Abstract>'s syntax with its C<columns> bind type.
+Binds inside literal SQL are C<[$name, $value]> pairs, as in
+C<< \["age > ?", [age => 40]] >>. The name decides how the value is bound
+when it is a field of the table. A name with a dot is read as qualified
+(C<table.field>).
+
+C<having> uses the C<where> syntax, and C<order_by> L<SQL::Abstract>'s order
+syntax.
+
+C<limit> and C<offset> must be non-negative integers and are written into the
+SQL. An C<offset> without a C<limit> gets the largest limit every supported
+database accepts.
+
+Value markers (L<DBIx::QuickORM::Value>) may be values anywhere in a C<where>.
+An C<sql> marker becomes L<SQL::Abstract> literal SQL with its binds,
+C<< \[$sql, @binds] >>. The others become binds of the field they are under,
+resolved when the SQL runs.
+
+As with any L<SQL::Abstract> literal, an C<sql> marker directly under a field
+supplies its own operator: C<< {hits => sql('= 2 + ?', 5)} >>, or
+C<< {hits => {'=' => sql('2 + ?', 5)}} >>. Markers inside L<SQL::Abstract>'s
+own literal SQL are left to its binds.
 
 =head1 SYNOPSIS
 
-    my $builder = DBIx::QuickORM::SQLBuilder::SQLAbstract->new;
+    my $orm = DBIx::QuickORM->new(..., sql_builder => 'DBIx::QuickORM::SQLBuilder::SQLAbstract');
 
-    my $sql = $builder->qorm_select(
-        source => $source,
-        fields => $fields,
-        where  => \%where,
+    my ($sql, $binds) = $orm->sql_builder->select(
+        $source,
+        $dialect,
+        where => {name => 'bob'},
+        limit => 10,
     );
-
-    my ($statement, $bind) = @{$sql}{qw/statement bind/};
-
-=cut
-
-=pod
 
 =head1 PUBLIC METHODS
 
 =over 4
 
-=item $builder = DBIx::QuickORM::SQLBuilder::SQLAbstract->new(%args)
+=item $builder = DBIx::QuickORM::SQLBuilder::SQLAbstract->new
 
-Construct a builder. Defaults C<SQL::Abstract>'s C<bindtype> to C<'columns'> so
-binds carry their field names; a caller-supplied C<bindtype> overrides it.
+A new builder. It takes no arguments.
 
-=cut
+=item ($sql, \@binds) = $builder->select($source, $dialect, %request)
 
-sub new {
-    my $class = shift;
-    return $class->SUPER::new(bindtype => 'columns', @_);
-}
+=item ($sql, \@binds) = $builder->count($source, $dialect, where => $where)
 
-=pod
+=item ($sql, \@binds) = $builder->update($source, $dialect, \%values, where => $where)
 
-=item $sql = $builder->qorm_insert(source => $source, ...)
+=item ($sql, \@binds) = $builder->delete($source, $dialect, where => $where)
 
-=item $sql = $builder->qorm_update(source => $source, ...)
+=item $where = $builder->combine_where(op => $op, left => $left, right => $right)
 
-=item $sql = $builder->qorm_select(source => $source, ...)
+As L<DBIx::QuickORM::Role::SQLBuilder> describes. Each croaks on a request
+key it does not know.
 
-=item $sql = $builder->qorm_delete(source => $source, ...)
+A C<select> that adds nothing to a query source returns the query as it is.
 
-=item $sql = $builder->qorm_where(source => $source, ...)
+C<update> croaks without a hashref of at least one value. An C<sql> marker as
+a value is written into the SQL.
 
-Build a statement of the named kind for the given source. Each returns a
-hashref with C<statement>, C<bind> (an arrayref of per-field bind specs), and
-C<source>. A C<limit> param appends a C<LIMIT ?> clause, and an C<offset>
-param extends it to C<LIMIT ? OFFSET ?> (an offset without a limit croaks,
-since not every dialect allows a bare OFFSET). A true C<distinct> param turns
-a C<SELECT> into C<SELECT DISTINCT>. These methods are generated at compile
-time.
+C<combine_where> returns C<< {-and => [$left, $right]} >> or C<< {-or =>
+[$left, $right]} >>, and croaks on any other C<op>. A plain-string side is
+raw SQL, as a C<where>.
 
-=cut
+A side that is wholly literal SQL, a plain string, an C<sql> marker, or
+C<< \[...] >>, is wrapped in parentheses, so an C<OR> in it stays grouped.
+Literal SQL you nest inside C<-and> or C<-or> yourself is not touched.
 
-BEGIN {
-    for my $meth (qw/insert update select delete where/) {
-        my $arg_meth = "_${meth}_args";
-        my $new_meth = "qorm_${meth}";
-
-        my $code = sub {
-            my $self   = shift;
-            my %params = @_;
-
-            my $source = delete $params{source} or croak "No source provided";
-
-            $self->_translate_params($source, \%params) if blessed($source);
-
-            my @args = $self->$arg_meth(\%params);
-
-            my ($stmt, @bind);
-            if (blessed($source)) {
-                croak "'$source' does not implement the 'DBIx::QuickORM::Role::Source' role" unless $source->DOES('DBIx::QuickORM::Role::Source');
-                my $moniker = $source->source_db_moniker;
-                # Table/view monikers are identifiers and must let
-                # SQL::Abstract quote them. Literal, join, and subquery
-                # monikers are already complete FROM fragments.
-                my $from = $moniker;
-                $from = \$moniker unless ref($moniker) || $source->isa('DBIx::QuickORM::Schema::Table');
-                ($stmt, @bind) = $self->$meth($from, @args);
-            }
-            else {
-                ($stmt, @bind) = $self->$meth($source, @args);
-            }
-
-            # Not every dialect supports a bare OFFSET (MySQL requires a LIMIT
-            # before it), so OFFSET is only emitted as part of "LIMIT ? OFFSET ?".
-            croak "Cannot use 'offset' without a 'limit'"
-                if defined($params{offset}) && !defined($params{limit});
-
-            $stmt =~ s/^(\s*SELECT)\b/$1 DISTINCT/i if $params{distinct};
-
-            my $param = 1;
-            @bind = map { my ($f, $v) = @{$_}; +{param => $param++, value => $v, type => 'field', field => $f} } @bind;
-
-            if (defined(my $limit = $params{limit})) {
-                $stmt .= " LIMIT ?";
-                push @bind => {param => $param++, value => $limit, type => 'limit'};
-
-                if (defined(my $offset = $params{offset})) {
-                    $stmt .= " OFFSET ?";
-                    push @bind => {param => $param++, value => $offset, type => 'offset'};
-                }
-            }
-
-            return {statement => $stmt, bind => \@bind, source => $source};
-        };
-
-        no strict 'refs';
-        *$new_meth = set_subname $new_meth => $code;
-    }
-}
-
-=pod
-
-=item $sql = $builder->qorm_upsert(source => $source, insert => \%data, ...)
-
-Build an insert and append the dialect's upsert/conflict clause keyed on the
-source's primary key, with the non-key fields as the update set. When every
-field belongs to the primary key a no-op assignment is used as the update set
-so the statement stays valid and still returns the row on conflict. Croaks if
-the source has no primary key.
-
-=cut
-
-sub qorm_upsert {
-    my $self = shift;
-    my %params = @_;
-
-    my $data = delete $params{insert} // delete $params{update};
-
-    my $sql = $self->qorm_insert(%params, insert => $data);
-
-    my $source = $params{source};
-    my $pk = $source->primary_key;
-    confess "upsert cannot be used on a table without a primary key" unless $pk && @$pk;
-
-    my $changes = { %$data };
-    delete $changes->{$_} for @$pk;
-
-    my $binds = $sql->{bind} //= [];
-    my $counter = @$binds + 1;
-
-    my $returning = "";
-    my $statement = $sql->{statement};
-    # Only split off a trailing RETURNING clause if one was actually requested;
-    # otherwise a literal write value containing the word "returning" (on a
-    # dialect with no RETURNING support) would be mistaken for the clause.
-    ($statement, $returning) = ($1, $2) if $params{returning} && $statement =~ m/(.*)\s+(returning\b.*)\z/is;
-
-    my $pk_db = [ map { $source->field_db_name($_) } @$pk ];
-    my $dbh   = $params{dialect}->dbh;
-    my $conf  = $params{dialect}->upsert_statement($pk_db);
-    my @inject;
-    for my $field (sort keys %$changes) {
-        my $db_field = $source->field_db_name($field);
-        # Quote the identifier in the appended SET clause so a crafted or
-        # unknown column name cannot break out into raw SQL; this clause is
-        # built after SQL::Abstract runs, so its quote_char never reaches it.
-        # The bind spec keeps the raw db name because field_affinity/field_type
-        # look it up unquoted.
-        my $col = $dbh->quote_identifier($db_field);
-        my $v   = $changes->{$field};
-
-        # Mirror the literal handling in _format_insert_and_update_data so the
-        # conflict-UPDATE half stays symmetric with the INSERT half: a scalar
-        # ref is emitted as SQL, [\'sql ?', @binds] is emitted with its binds,
-        # and everything else is bound as data.
-        unless (literal_write_value($v)) {
-            push @inject => "$col = ?";
-            push @$binds => {field => $db_field, value => $v, type => 'field', param => $counter++};
-            next;
-        }
-
-        if (ref($v) eq 'SCALAR') {
-            push @inject => "$col = $$v";
-            next;
-        }
-
-        my ($lit_sql, @lits) = @$v;
-        push @inject => "$col = $$lit_sql";
-        push @$binds => {field => $db_field, value => $_, type => 'field', param => $counter++} for @lits;
-    }
-    # When every field is part of the primary key there is nothing to update
-    # on conflict, but the conflict clause still needs an assignment (and
-    # 'DO NOTHING' would suppress the RETURNING row). Inject a no-op
-    # assignment instead. The MySQL-family clause ('ON DUPLICATE KEY UPDATE')
-    # needs VALUES() so MySQL still reports the row via last_insert_id.
-    unless (@inject) {
-        my $col = $dbh->quote_identifier($pk_db->[0]);
-        push @inject => $params{dialect}->upsert_noop_assignment($col);
-    }
-
-    $conf .= " " . join(', ' => @inject);
-
-    $sql->{statement} = "$statement $conf $returning";
-
-    return $sql;
-}
-
-=pod
-
-=item @args = $builder->_insert_args(\%params)
-
-=item @args = $builder->_update_args(\%params)
-
-=item @args = $builder->_select_args(\%params)
-
-=item @args = $builder->_delete_args(\%params)
-
-=item @args = $builder->_where_args(\%params)
-
-Translate the ORM parameter hash into the positional argument list the
-corresponding C<SQL::Abstract> method expects. Insert, update, and delete
-reject unsupported C<limit> / C<offset> / C<order_by> / C<distinct> clauses;
-C<where> rejects C<distinct>.
-
-=item $builder->_reject_unsupported_clauses($verb, \%params, @clauses)
-
-Confess (naming C<$verb>) for each of the named clauses that is present in
-C<%params>. Shared by the C<_*_args> helpers so the messages stay identical.
-
-=cut
-
-# Clause name => [ human description, whether presence is tested with defined() ].
-my %UNSUPPORTED_CLAUSE = (
-    limit    => ["a 'limit' clause",     1],
-    offset   => ["an 'offset' clause",   1],
-    order_by => ["an 'order_by' clause", 0],
-    distinct => ["'distinct' set",       0],
-);
-
-sub _reject_unsupported_clauses {
-    my $self = shift;
-    my ($verb, $params, @clauses) = @_;
-
-    for my $clause (@clauses) {
-        my $spec = $UNSUPPORTED_CLAUSE{$clause} or confess "Unknown clause '$clause'";
-        my $present = $spec->[1] ? defined($params->{$clause}) : $params->{$clause};
-        confess "$verb() with $spec->[0] is not currently supported" if $present;
-    }
-}
-
-sub _insert_args {
-    my $self = shift;
-    my ($params) = @_;
-
-    $self->_reject_unsupported_clauses(insert => $params, qw/limit offset order_by distinct/);
-
-    my $values = $params->{insert} // croak "'insert' is required";
-    my $returning = $params->{returning};
-
-    $values = $self->_format_insert_and_update_data($values);
-
-    return ($values, $returning ? {returning => $returning} : ());
-}
-
-sub _delete_args {
-    my $self = shift;
-    my ($params) = @_;
-
-    $self->_reject_unsupported_clauses(delete => $params, qw/limit offset order_by distinct/);
-
-    my $where = $params->{where};
-    my $returning = $params->{returning};
-
-    return ($where, $returning ? {returning => $returning} : ());
-}
-
-sub _update_args {
-    my $self = shift;
-    my ($params) = @_;
-
-    $self->_reject_unsupported_clauses(update => $params, qw/limit offset order_by distinct/);
-
-    my $values    = $params->{update} or croak "'update' is required";
-    my $returning = $params->{returning};
-
-    $values = $self->_format_insert_and_update_data($values);
-
-    return ($values, $params->{where}, $returning ? {returning => $returning} : ());
-}
-
-sub _select_args {
-    my $self = shift;
-    my ($params) = @_;
-
-    my $fields = $params->{fields} or croak "'fields' is required";
-    my $where  = $params->{where};
-    my $order  = $params->{order_by};
-
-    return ($fields, $where, $order);
-}
-
-sub _where_args {
-    my $self = shift;
-    my ($params) = @_;
-
-    $self->_reject_unsupported_clauses(where => $params, 'distinct');
-
-    my $where = $params->{where};
-    my $order = $params->{order_by};
-
-    return ($where, $order);
-}
-
-=pod
-
-=item $cond = $builder->qorm_and($a, $b)
-
-=item $cond = $builder->qorm_or($a, $b)
-
-Combine two where-conditions with C<SQL::Abstract>'s C<-and> / C<-or>
-operators.
-
-=cut
-
-sub qorm_and {
-    my $self = shift;
-    my ($a, $b) = @_;
-    return +{'-and' => [$a, $b]}
-}
-
-sub qorm_or {
-    my $self = shift;
-    my ($a, $b) = @_;
-    return +{'-or' => [$a, $b]}
-}
-
-=pod
-
-=item $formatted = $builder->_format_insert_and_update_data(\%data)
-
-Wrap each data value in a C<< { -value => ... } >> so C<SQL::Abstract> binds it
-rather than interpreting a hashref or arrayref value as an operator expression.
-Intentional SQL literals are the exception: a scalar ref (C<\'NOW()'>) is emitted
-verbatim, and an arrayref whose first element is a scalar ref (C<[\'col + ?', $n]>)
-becomes a literal-with-bind expression whose bind values keep the column's
-affinity.
+A side that is undef, an empty string, or an empty hash or array matches
+every row: under C<and> the other side is returned as it is, and under C<or>
+the result is C<{}>.
 
 =back
 
 =cut
 
-sub _format_insert_and_update_data {
+my %SELECT  = map { $_ => 1 } qw/fields where where_builders order_by limit offset group_by having/;
+my %WHERE   = map { $_ => 1 } qw/where where_builders/;
+my %COMBINE = map { $_ => 1 } qw/op left right/;
+
+# Agent Note: the largest signed 64-bit integer, a limit PostgreSQL, SQLite, DuckDB, and the MySQL family all accept.
+my $NO_LIMIT = '9223372036854775807';
+
+sub select {
     my $self = shift;
-    my ($data) = @_;
+    my ($source, $dialect, %request) = @_;
+    $self->_check(select => \%SELECT, \%request);
 
-    my %out;
-    for my $field (keys %$data) {
-        my $v = $data->{$field};
-
-        unless (literal_write_value($v)) {
-            $out{$field} = {'-value' => $v};
-            next;
-        }
-
-        # A bare scalar ref is literal SQL; SQL::Abstract emits it verbatim.
-        if (ref($v) eq 'SCALAR') {
-            $out{$field} = $v;
-            next;
-        }
-
-        # [\'sql ?', @binds] -> SQL::Abstract's \[ $sql, [col => bind], ... ]
-        # literal-with-bind form. With bindtype 'columns' each bind must be a
-        # [column, value] pair, so tag every bind with this field so affinity
-        # and deflation still apply.
-        my ($sql, @binds) = @$v;
-        $out{$field} = \[ $$sql, map { [$field => $_] } @binds ];
+    my @given = grep { defined $request{$_} } keys %request;
+    if (!@given and my @query = $source->query_sql) {
+        return @query;
     }
 
-    return \%out;
+    my ($fields, $field_binds) = $self->_fields($dialect, $request{fields});
+    my $computed = $self->_having_computed($dialect, @request{qw/fields having/});
+    my ($sql, $binds) = $self->_from("SELECT $fields FROM", $source, $dialect, (map { ($_ => $request{$_}) } qw/where where_builders group_by having order_by/), computed => $computed);
+    unshift @$binds => @$field_binds;
+
+    my ($limit, $offset) = map { $self->_count_arg($_, $request{$_}) } qw/limit offset/;
+    $limit //= $NO_LIMIT if defined $offset;
+    $sql .= " LIMIT $limit"   if defined $limit;
+    $sql .= " OFFSET $offset" if defined $offset;
+
+    return ($sql, $binds);
+}
+
+sub count {
+    my $self = shift;
+    my ($source, $dialect, %request) = @_;
+    $self->_check(count => \%WHERE, \%request);
+    return $self->_from('SELECT COUNT(*) AS count FROM', $source, $dialect, %request);
+}
+
+sub update {
+    my $self = shift;
+    my ($source, $dialect, $values, %request) = @_;
+    $self->_check(update => \%WHERE, \%request);
+    croak "update() needs a hashref of at least one value" unless ref($values) eq 'HASH' && %$values;
+
+    my (@set, @binds);
+    for my $field (sort keys %$values) {
+        my ($sql, @value_binds) = $self->_value($field, $values->{$field});
+        push @set   => $dialect->quote_identifier($field) . " = $sql";
+        push @binds => @value_binds;
+    }
+
+    my ($from,  $from_binds)  = $source->from_sql($dialect);
+    my ($where, $where_binds) = $self->_where_clause($source, $dialect, @request{qw/where where_builders/});
+    return ("UPDATE $from SET " . join(', ' => @set) . $where, [@$from_binds, @binds, @$where_binds]);
+}
+
+sub delete {
+    my $self = shift;
+    my ($source, $dialect, %request) = @_;
+    $self->_check(delete => \%WHERE, \%request);
+    return $self->_from('DELETE FROM', $source, $dialect, %request);
+}
+
+sub combine_where {
+    my $self   = shift;
+    my %params = @_;
+    $self->_check(combine_where => \%COMBINE, \%params);
+
+    my ($op, $left, $right) = @params{qw/op left right/};
+    croak "combine_where() takes op 'and' or 'or'" unless defined($op) && $op =~ m/^(?:and|or)\z/;
+
+    my $empty = sub { my $r = ref($_[0]); !defined($_[0]) || ($r eq 'HASH' && !%{$_[0]}) || ($r eq 'ARRAY' && !@{$_[0]}) || ($r eq '' && $_[0] eq '') };
+    return {}     if $op eq 'or' && ($empty->($left) || $empty->($right));
+    return $right if $empty->($left);
+    return $left  if $empty->($right);
+    return {"-$op" => [map { $self->_group($_) } $left, $right]};
 }
 
 =pod
-
-=head1 PRIVATE METHODS
-
-These translate caller-facing ORM column names into database column names so
-that generated SQL always uses database names. They build fresh structures and
-never mutate the caller's data. Literal SQL (scalar refs and array-of-literal
-refs) is left untouched, and unknown names pass through unchanged.
 
 =over 4
 
-=item $builder->_translate_params($source, \%params)
+=item $sqla = $builder->sqla($dialect)
 
-Rewrite the C<insert>, C<update>, C<where>, C<fields>, C<returning>, and
-C<order_by> params in place (each replaced with a freshly built structure)
-from ORM names to database names for the given source.
-
-=cut
-
-sub _translate_params {
-    my $self = shift;
-    my ($source, $params) = @_;
-
-    return unless $source->source_has_aliases;
-
-    $params->{insert}    = $self->_translate_data($source, $params->{insert})     if $params->{insert};
-    $params->{update}    = $self->_translate_data($source, $params->{update})     if $params->{update};
-    $params->{fields}    = $self->_translate_fields($source, $params->{fields})   if $params->{fields};
-    $params->{returning} = $self->_translate_fields($source, $params->{returning}) if $params->{returning};
-    $params->{where}     = $self->_translate_where($source, $params->{where})     if defined $params->{where};
-    $params->{order_by}  = $self->_translate_order($source, $params->{order_by})  if defined $params->{order_by};
-
-    return;
-}
-
-=pod
-
-=item $db_name = $builder->_field_to_db($source, $name)
-
-Translate a single field name to its database name, leaving references (literal
-SQL) untouched.
-
-=cut
-
-sub _field_to_db {
-    my $self = shift;
-    my ($source, $name) = @_;
-    return $name if ref $name;
-    return $source->field_db_name($name);
-}
-
-=pod
-
-=item $hash = $builder->_translate_data($source, \%data)
-
-Return a new data hashref with its keys translated to database names.
-
-=cut
-
-sub _translate_data {
-    my $self = shift;
-    my ($source, $data) = @_;
-    return $data unless ref($data) eq 'HASH';
-    return { map { $source->field_db_name($_) => $data->{$_} } keys %$data };
-}
-
-=pod
-
-=item $fields = $builder->_translate_fields($source, \@fields)
-
-Return a new field-list arrayref with each plain-scalar field translated to its
-database name.
-
-=cut
-
-sub _translate_fields {
-    my $self = shift;
-    my ($source, $fields) = @_;
-    return $fields unless ref($fields) eq 'ARRAY';
-    return [ map { $self->_field_to_db($source, $_) } @$fields ];
-}
-
-=pod
-
-=item $where = $builder->_translate_where($source, $where)
-
-Recursively walk a C<SQL::Abstract> where-structure, returning a new structure
-with field-name hash keys translated to database names. A hash key is treated
-as a field when the source recognizes it; logic operators (C<-and>, C<-or>,
-C<-not>, ...) are recursed into. Operator-expression values under a field key
-(e.g. C<< { '>' => 5 } >>) and value arrayrefs are left as-is.
-
-=cut
-
-sub _translate_where {
-    my $self = shift;
-    my ($source, $where) = @_;
-
-    my $ref = ref $where;
-
-    if ($ref eq 'HASH') {
-        my %out;
-        for my $key (keys %$where) {
-            my $val = $where->{$key};
-            if ($key =~ m/^-/) {
-                $out{$key} = ref($val) ? $self->_translate_where($source, $val) : $self->_field_to_db($source, $val);
-            }
-            else {
-                $out{$self->_field_to_db($source, $key)} = $self->_translate_value($source, $val);
-            }
-        }
-        return \%out;
-    }
-
-    if ($ref eq 'ARRAY') {
-        # An arrayref is either a list of OR-ed conditions (refs) or a flat
-        # field => value pair list; walk pairwise so a bare field name is
-        # translated and its following value passed through untranslated, while
-        # a -op token or a nested condition is not treated as a field name.
-        my @in = @$where;
-        my @out;
-        while (@in) {
-            my $el = shift @in;
-            if (ref $el) {
-                push @out => $self->_translate_where($source, $el);
-            }
-            elsif ($el =~ m/^-/) {
-                push @out => $el;
-            }
-            else {
-                push @out => $self->_field_to_db($source, $el);
-                push @out => $self->_translate_value($source, shift(@in)) if @in;
-            }
-        }
-        return \@out;
-    }
-
-    return $where;
-}
-
-sub _translate_value {
-    my $self = shift;
-    my ($source, $val) = @_;
-
-    # A field value that is an -ident expression names another column, not data,
-    # so its identifier must be translated to the database name too.
-    if (ref($val) eq 'HASH' && exists $val->{'-ident'} && !ref($val->{'-ident'})) {
-        return {%$val, '-ident' => $self->_field_to_db($source, $val->{'-ident'})};
-    }
-
-    return $val;
-}
-
-=pod
-
-=item $order = $builder->_translate_order($source, $order_by)
-
-Return a new C<order_by> structure with column names translated to database
-names. Handles a bare column, an arrayref of columns, and the
-C<< { -asc => ... } >> / C<< { -desc => ... } >> hash forms (where the column
-lives in the value). Literal SQL refs are left untouched.
+The L<SQL::Abstract> for the dialect's quote character, made on first use.
 
 =back
 
 =cut
 
-sub _translate_order {
+sub sqla {
+    my $self      = shift;
+    my ($dialect) = @_;
+    my $q         = $dialect->quote_char;
+    return $self->{+SQLA}->{$q} //= SQL::Abstract->new(quote_char => $q, name_sep => '.', bindtype => 'columns');
+}
+
+=pod
+
+=over 4
+
+=item $where = $builder->convert_where($where)
+
+A copy of C<$where> with every value marker, at any depth, in the form
+L<SQL::Abstract> takes.
+
+A marker holding undef becomes a plain undef, so it gives C<IS NULL> (or
+C<IS NOT NULL> under C<!=>) as a plain undef does.
+
+=back
+
+=cut
+
+sub convert_where {
+    my $self    = shift;
+    my ($where) = @_;
+    my $type    = ref($where) or return $where;
+
+    if (blessed($where)) {
+        return $where             unless $where->isa('DBIx::QuickORM::Value');
+        return undef              unless $where->kind eq 'sql' || defined $where->value;    # so SQL::Abstract writes IS NULL
+        return {-value => $where} unless $where->kind eq 'sql';
+        return \[$where->value, map { [undef, $_] } @{$where->binds}];
+    }
+
+    return {map { ($_ => $self->convert_where($where->{$_})) } keys %$where} if $type eq 'HASH';
+    return [map { $self->convert_where($_) } @$where]                        if $type eq 'ARRAY';
+    return $where;
+}
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $builder->_check($method, \%known, \%request)
+
+Croaks naming every request key not in C<%known>.
+
+=back
+
+=cut
+
+sub _check {
     my $self = shift;
-    my ($source, $order) = @_;
+    my ($method, $known, $request) = @_;
+    my @unknown = sort grep { !$known->{$_} } keys %$request;
+    croak "Unknown request key(s) for $method(): " . join(', ' => @unknown) if @unknown;
+}
 
-    my $ref = ref $order;
+=pod
 
-    return $self->_field_to_db($source, $order) unless $ref;
+=over 4
 
-    if ($ref eq 'ARRAY') {
-        return [ map { $self->_translate_order($source, $_) } @$order ];
+=item ($sql, \@binds) = $builder->_from($prefix, $source, $dialect, where => $where, where_builders => \@chain, group_by => \@fields, having => $having, order_by => $order, computed => \%computed)
+
+C<$prefix>, the source's C<FROM> part, then the C<WHERE>, C<GROUP BY>,
+C<HAVING>, and C<ORDER BY> for the clauses given. With C<computed> (from
+C<_having_computed>), the C<HAVING> writes those names as their SQL.
+
+=back
+
+=cut
+
+sub _from {
+    my $self = shift;
+    my ($prefix, $source, $dialect, %clauses) = @_;
+
+    my $sqla = $self->sqla($dialect);
+    my ($from, $from_binds)   = $source->from_sql($dialect);
+    my ($where, $where_binds) = $self->_where_clause($source, $dialect, @clauses{qw/where where_builders/});
+    my $sql = "$prefix $from$where";
+
+    $sql .= ' GROUP BY ' . join(', ' => map { $self->_name($dialect, $_) } @{$clauses{group_by}}) if $clauses{group_by};
+
+    my $having_sqla = $clauses{computed} ? $self->_computed_sqla($dialect, $clauses{computed}) : $sqla;
+    my ($having, @having_binds) = $having_sqla->where($self->convert_where($clauses{having}));
+    $having =~ s/^ WHERE / HAVING /;
+    my ($order, @order_binds) = $sqla->where(undef, $clauses{order_by});
+
+    return ("$sql$having$order", [@$from_binds, @$where_binds, @having_binds, @order_binds]);
+}
+
+=pod
+
+=over 4
+
+=item ($sql, \@binds) = $builder->_where_clause($source, $dialect, $where, \@chain)
+
+The C<WHERE> clause, with a leading space, or an empty string, from the first
+where builder in C<@chain> that can build it, or
+L<DBIx::QuickORM::WhereBuilder::SQLAbstract> without a chain. Croaks when
+none can. An undef or empty-string C<where> asks no builder.
+
+=back
+
+=cut
+
+my @DEFAULT_CHAIN = ('DBIx::QuickORM::WhereBuilder::SQLAbstract');
+
+sub _where_clause {
+    my $self = shift;
+    my ($source, $dialect, $where, $chain) = @_;
+    return ('', []) unless defined($where) && (ref($where) || length($where));
+
+    for my $builder (@{$chain // \@DEFAULT_CHAIN}) {
+        next unless $builder->can_build_where($where);
+        my ($sql, $binds) = $builder->build_where($where, $source, $dialect);
+        return (length($sql) ? " WHERE $sql" : '', $binds);
     }
 
-    if ($ref eq 'HASH') {
-        my %out;
-        for my $key (keys %$order) {
-            my $val = $order->{$key};
-            if (ref($val) eq 'ARRAY') {
-                $out{$key} = [ map { $self->_field_to_db($source, $_) } @$val ];
-            }
-            else {
-                $out{$key} = $self->_field_to_db($source, $val);
-            }
-        }
-        return \%out;
+    croak "No where builder can build this where: " . (ref($where) || $where);
+}
+
+=pod
+
+=over 4
+
+=item ($sql, \@binds) = $builder->_fields($dialect, $fields)
+
+The select list: C<*> for undef, or the names of an arrayref quoted as
+C<_name> does. For a hashref, each expression (a field name, an C<sql()>
+marker, or C<FUNC(field)> from C<[$func, $field]>, the field C<*> left
+unquoted) C<AS> its quoted name, sorted by name.
+
+=back
+
+=cut
+
+sub _fields {
+    my $self = shift;
+    my ($dialect, $fields) = @_;
+
+    return ('*',                                                       []) unless $fields;
+    return (join(', ' => map { $self->_name($dialect, $_) } @$fields), []) if ref($fields) eq 'ARRAY';
+
+    my (@sql, @binds);
+    for my $name (sort keys %$fields) {
+        my ($sql, @expr_binds) = $self->_expr($dialect, $fields->{$name});
+        push @sql   => "$sql AS " . $dialect->quote_identifier($name);
+        push @binds => @expr_binds;
     }
 
-    return $order;
+    return (join(', ' => @sql), \@binds);
+}
+
+=pod
+
+=over 4
+
+=item ($sql, @binds) = $builder->_expr($dialect, $expr)
+
+One computed column's SQL: a field name, an C<sql()> marker, or
+C<FUNC(field)> from C<[$func, $field]>, the field C<*> left unquoted.
+
+=back
+
+=cut
+
+sub _expr {
+    my $self = shift;
+    my ($dialect, $expr) = @_;
+    return $self->_value(undef, $expr)                                                            if $self->_is_sql($expr);
+    return ("$expr->[0](" . ($expr->[1] eq '*' ? '*' : $self->_name($dialect, $expr->[1])) . ')') if ref($expr) eq 'ARRAY';
+    return ($self->_name($dialect, $expr));
+}
+
+=pod
+
+=over 4
+
+=item \%computed = $builder->_having_computed($dialect, $fields, $having)
+
+Each computed column's SQL and binds, C<< {$name => [$sql, @binds]} >>, an
+C<sql()> column's in parentheses, for a C<having> to name. Undef when there
+is no C<having>, no computed columns, or the dialect's C<having_uses_alias>
+is true.
+
+=item $sqla = $builder->_computed_sqla($dialect, \%computed)
+
+An L<SQL::Abstract> like C<sqla>'s that writes each name in C<%computed> as
+that column's SQL.
+
+=back
+
+=cut
+
+sub _having_computed {
+    my $self = shift;
+    my ($dialect, $fields, $having) = @_;
+    return undef unless defined($having) && ref($fields) eq 'HASH' && %$fields;
+    return undef if $dialect->having_uses_alias;
+    my %computed;
+    for my $name (keys %$fields) {
+        my ($sql, @binds) = $self->_expr($dialect, $fields->{$name});
+        $sql = "($sql)" if $self->_is_sql($fields->{$name});                # sql() may hold a low-precedence operator
+        $computed{$name} = [$sql, @binds];
+    }
+    return \%computed;
+}
+
+sub _computed_sqla {
+    my $self = shift;
+    my ($dialect, $computed) = @_;
+
+    my $sqla = SQL::Abstract->new(quote_char => $dialect->quote_char, name_sep => '.', bindtype => 'columns');
+    $sqla->wrap_expander(
+        ident => sub {
+            my ($orig) = @_;
+            return sub {
+                my ($sqla, $type, $ident) = @_;
+                my $name = ref($ident) ? join('.' => @$ident) : $ident;
+                if (my $expr = $computed->{$name}) {
+                    return {-literal => [@$expr]};    # the SQL, then its binds, already [undef, $value] pairs
+                }
+                return $orig ? $sqla->$orig($type, $ident) : {-ident => ref($ident) ? $ident : [split m/\./, $ident, -1]};
+            };
+        },
+    );
+
+    return $sqla;
+}
+
+=pod
+
+=over 4
+
+=item $sql = $builder->_name($dialect, $name)
+
+A field name quoted through the dialect, a dot separating a qualifier.
+
+=back
+
+=cut
+
+sub _name {
+    my $self = shift;
+    my ($dialect, $name) = @_;
+    return join '.' => map { $dialect->quote_identifier($_) } split m/\./, $name, -1;
+}
+
+=pod
+
+=over 4
+
+=item $n = $builder->_count_arg($name, $value)
+
+The value, or undef for undef. Croaks unless it is a non-negative integer.
+
+=back
+
+=cut
+
+sub _count_arg {
+    my $self = shift;
+    my ($name, $value) = @_;
+    return undef                                                 unless defined $value;
+    croak "'$name' must be a non-negative integer, got '$value'" unless $value =~ m/^\d+\z/;
+    return $value;
+}
+
+=pod
+
+=over 4
+
+=item ($sql, @binds) = $builder->_value($field, $value)
+
+C<?> and the bind for one value, or an C<sql> marker's SQL and binds.
+
+=back
+
+=cut
+
+sub _value {
+    my $self = shift;
+    my ($field, $value) = @_;
+    return ('?',           [$field => $value]) unless $self->_is_sql($value);
+    return ($value->value, map { [undef, $_] } @{$value->binds});
+}
+
+=pod
+
+=over 4
+
+=item $bool = $builder->_is_sql($value)
+
+True for an C<sql> marker.
+
+=back
+
+=cut
+
+sub _is_sql { blessed($_[1]) && $_[1]->isa('DBIx::QuickORM::Value') && $_[1]->kind eq 'sql' ? 1 : 0 }
+
+=pod
+
+=over 4
+
+=item $side = $builder->_group($side)
+
+A side of C<combine_where> in parentheses when the whole side is literal SQL:
+a plain string, an C<sql> marker, or C<< \[$sql, @binds] >>. Any other side
+is returned as it is. Nothing inside a side is touched.
+
+=back
+
+=cut
+
+sub _group {
+    my $self = shift;
+    my ($side) = @_;
+    return \["( $side )"] unless ref($side);
+    return DBIx::QuickORM::Value::sql("( " . $side->value . " )", @{$side->binds}) if $self->_is_sql($side);
+    return $side unless ref($side) eq 'REF' && ref($$side) eq 'ARRAY';
+    my ($sql, @binds) = @$$side;
+    return \["( $sql )", @binds];
 }
 
 1;
@@ -608,7 +535,7 @@ __END__
 
 =head1 SOURCE
 
-The source code repository for DBIx::QuickORM can be found at
+The source code repository for DBIx-QuickORM can be found at
 L<https://github.com/exodist/DBIx-QuickORM>.
 
 =head1 MAINTAINERS

@@ -2,24 +2,13 @@ package DBIx::QuickORM::ORM;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000031';
 
 use Carp qw/croak/;
 
-use DBIx::QuickORM::Connection;
+use DBIx::QuickORM::DSL();
 
-use Object::HashBase qw{
-    <name
-    +db
-    <schema
-    <autofill
-    <created
-    <compiled
-    <default_handle_class
-    <row_manager
-
-    +connection
-};
+use parent 'DBIx::QuickORM';
 
 =pod
 
@@ -27,177 +16,239 @@ use Object::HashBase qw{
 
 =head1 NAME
 
-DBIx::QuickORM::ORM - Binds a schema to a database for DBIx::QuickORM.
+DBIx::QuickORM::ORM - Base class for an ORM defined as classes.
 
 =head1 DESCRIPTION
 
-An ORM object pairs a database definition with a schema (or autofill) and
-owns the primary connection to that database. It is the entry point callers
-use to obtain a connection or a query handle; the connection is created lazily
-and reused.
+The C<orm> block of L<DBIx::QuickORM::DSL> makes its package a subclass of
+this one. C<new> gathers what the C<orm> block and the table classes collected
+into arguments for L<DBIx::QuickORM's C<new>|DBIx::QuickORM/"PUBLIC METHODS">,
+then constructs the ORM with them.
+
+The table classes are the modules directly under the ORM class's namespace
+(C<My::ORM::*> for C<My::ORM>), found in C<@INC>. Every module there is
+loaded, and those with a C<table> block are used. The C<tables> keyword
+replaces that search with another namespace or a list of classes. A table
+that needs nothing adjusted needs no class.
 
 =head1 SYNOPSIS
 
-    my $orm = DBIx::QuickORM::ORM->new(
-        db       => $db,
-        schema   => $schema,
+    package My::ORM;
+    use DBIx::QuickORM::DSL ':orm';
+
+    orm {
+        retain_cache 1;
+    };
+
+    package main;
+
+    my $orm = My::ORM->new(
+        dbh   => $dbh,
+        types => {users => {prefs => undef}},
     );
-
-    my $con    = $orm->connection;
-    my $handle = $orm->handle('users');
-
-=head1 ATTRIBUTES
-
-=over 4
-
-=item name
-
-The name of this ORM.
-
-=item db
-
-The L<DBIx::QuickORM::DB> definition. Settable once via C<db>.
-
-=item schema
-
-The schema object. Either this or C<autofill> is required.
-
-=item autofill
-
-When true, missing schema metadata is introspected from the live database.
-
-=item created
-
-=item compiled
-
-Provenance metadata describing where this ORM came from.
-
-=item default_handle_class
-
-Optional default handle class passed through to new connections.
-
-=item row_manager
-
-Optional row manager class (or instance) passed through to new connections
-as their C<manager>. When unset the connection uses its own default
-(L<DBIx::QuickORM::RowManager::Cached>).
-
-=item connection
-
-The active connection, created lazily and cached here.
-
-=back
 
 =head1 PUBLIC METHODS
 
 =over 4
 
-=item $orm->init
+=item $orm = My::ORM->new(%args)
 
-Object construction hook invoked by L<Object::HashBase>. Validates that a
-schema or autofill was provided. Not called directly.
+=item $orm = My::ORM->new(\%args)
 
-=cut
+Constructs the ORM from the collected specs and C<%args>, which takes the
+arguments of L<DBIx::QuickORM's C<new>|DBIx::QuickORM/"PUBLIC METHODS">.
 
-sub init {
-    my $self = shift;
+Precedence, lowest to highest: the C<orm> block's keywords, its C<override>,
+the table classes, then C<%args>. C<time_zone> and its alias C<tz> count as
+one argument, so either spelling in C<%args> beats either in C<override>.
 
-    delete $self->{+NAME} unless defined $self->{+NAME};
+C<types> merge per field and C<fks> per target table: a higher source's
+entry for a field (or target table) replaces the lower one's, and the rest
+stay.
 
-    croak "You must either provide the 'schema' attribute or enable 'autofill'"
-        unless $self->{+SCHEMA} || $self->{+AUTOFILL};
-}
+C<omit>, C<default_fields>, and C<row_classes> apply per table: a higher
+source's entry for a table replaces the lower one's entry for that table
+whole. C<omit> and C<default_fields> count as one setting there, so a higher
+source's C<omit> for a table also drops a lower one's C<default_fields> for
+it, and the other way around.
 
-=pod
+Croaks when:
 
-=item $db = $orm->db
+=over 4
 
-=item $orm->db($db)
+=item *
 
-Gets the database definition, or sets it once. Croaks on a second set or when
-fetched before being set.
+The class has no C<orm> block of its own. Specs are not inherited, so a
+subclass of an ORM class needs its own.
 
-=cut
+=item *
 
-sub db {
-    my $self = shift;
+Two table classes name one table.
 
-    if (@_) {
-        croak "'db' has already been set" if $self->{+DB};
-        croak "Too many arguments" if @_ > 1;
-        ($self->{+DB}) = @_;
-    }
+=item *
 
-    return $self->{+DB} // croak "'db' has not been set";
-}
+A table class names a table the database does not have.
 
-=pod
+=item *
 
-=item $con = $orm->connect
+C<tables> lists a class without a C<table> block.
 
-Builds and returns a new L<DBIx::QuickORM::Connection> for this ORM. Croaks
-when no database has been set.
-
-=cut
-
-sub connect {
-    my $self = shift;
-
-    croak "'db' has not been set" unless $self->{+DB};
-
-    my %params = (orm => $self);
-
-    $params{+DEFAULT_HANDLE_CLASS} = $self->{+DEFAULT_HANDLE_CLASS};
-
-    $params{manager} = $self->{+ROW_MANAGER} if $self->{+ROW_MANAGER};
-
-    return DBIx::QuickORM::Connection->new(%params);
-}
-
-=pod
-
-=item $con = $orm->connection
-
-Returns the active connection, creating it via C<connect> on first use.
-
-=item $orm->disconnect
-
-Disconnects and drops the cached connection. Croaks if the connection has
-active ORM-managed transactions.
-
-=item $con = $orm->reconnect
-
-Drops the cached connection and returns a fresh one.
-
-=item $handle = $orm->handle(...)
-
-Delegates to the active connection's C<handle>.
+=back
 
 =back
 
 =cut
 
-sub disconnect {
-    my $self = shift;
-    my $con = delete $self->{+CONNECTION} or return;
-    $con->disconnect;
-    return;
+my %TABLE_ARG = (
+    omit           => 'omit',
+    default_fields => 'default_fields',
+    types          => 'types',
+    fks            => 'fks',
+    row_class      => 'row_classes',
+);
+
+my %PER_TABLE = map { $_ => 1 } values %TABLE_ARG;
+my %PER_ENTRY = (types => 1, fks => 1);
+
+sub new {
+    my $class = shift;
+    my %args  = @_ == 1 && ref($_[0]) eq 'HASH' ? %{$_[0]} : @_;
+
+    my $spec = DBIx::QuickORM::DSL->orm_spec($class) or croak "$class has no orm block; DBIx::QuickORM::ORM specs are not inherited";
+
+    my %orm      = %$spec;
+    my $tables   = delete $orm{tables};
+    my $override = delete($orm{override}) // {};
+
+    my ($from_tables, $claimed) = $class->_table_args($tables);
+    my $self = $class->SUPER::new($class->_merge({%orm, %$override}, $from_tables, \%args), caller => [caller]);
+
+    for my $table (sort keys %$claimed) {
+        croak "$claimed->{$table} names the table '$table', which is not in the database map" unless $self->db_map->table($table);
+    }
+
+    return $self;
 }
 
-sub reconnect {
-    my $self = shift;
-    $self->disconnect;
-    return $self->connection;
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item (\%args, \%claimed) = $class->_table_args($tables)
+
+The table classes' C<new> arguments, and which class named each table.
+
+=back
+
+=cut
+
+sub _table_args {
+    my $class = shift;
+    my ($tables) = @_;
+
+    my (%args, %claimed);
+    for my $table_class ($class->_table_classes($tables)) {
+        my $spec = DBIx::QuickORM::DSL->table_spec($table_class);
+        my $name = $spec->{name};
+
+        croak "Both $claimed{$name} and $table_class name the table '$name'" if $claimed{$name};
+        $claimed{$name} = $table_class;
+
+        for my $key (keys %TABLE_ARG) {
+            $args{$TABLE_ARG{$key}}->{$name} = $spec->{$key} if exists $spec->{$key};
+        }
+    }
+
+    return (\%args, \%claimed);
 }
 
-sub connection {
-    my $self = shift;
-    return $self->{+CONNECTION} //= $self->connect;
+=pod
+
+=over 4
+
+=item @classes = $class->_table_classes($tables)
+
+The table classes: those listed, or those found under a namespace (the class's
+own unless C<$tables> names another). Loads each class it looks at.
+
+=back
+
+=cut
+
+sub _table_classes {
+    my $class = shift;
+    my ($tables) = @_;
+
+    if (ref($tables) eq 'ARRAY') {
+        for my $table_class (@$tables) {
+            $class->load_class("'tables' lists $table_class, which", $table_class) unless DBIx::QuickORM::DSL->table_spec($table_class);
+            croak "'tables' lists $table_class, which has no 'table' block"        unless DBIx::QuickORM::DSL->table_spec($table_class);
+        }
+        return @$tables;
+    }
+
+    my $namespace = $tables // $class;
+    croak "'tables' must be a namespace or an arrayref of class names" if ref($namespace) || !length($namespace);
+
+    (my $dir = $namespace) =~ s{::}{/}g;
+    my %found;
+    for my $inc (grep { !ref($_) } @INC) {
+        opendir(my $dh, "$inc/$dir") or next;
+        $found{"${namespace}::$_"} = 1 for map { m/^(\w+)\.pm$/ ? $1 : () } readdir($dh);
+    }
+
+    my @classes = sort keys %found;
+    $class->load_class("The table class '$_'", $_) for @classes;
+    return grep { DBIx::QuickORM::DSL->table_spec($_) } @classes;
 }
 
-sub handle {
-    my $self = shift;
-    return $self->connection->handle(@_);
+=pod
+
+=over 4
+
+=item %args = $class->_merge(\%lowest, ..., \%highest)
+
+Merges argument sets, a higher one replacing a lower one's argument, or for
+the per-table arguments its entry for each table it names. C<types> and
+C<fks> go one level deeper: per field and per target table. A table named in a
+higher set's C<omit> or C<default_fields> loses its entries in both from the
+lower sets. C<time_zone> and its alias C<tz> count as one argument.
+
+=back
+
+=cut
+
+sub _merge {
+    my $class = shift;
+
+    my %merged;
+    for my $args (@_) {
+        delete @merged{qw/time_zone tz/} if grep { exists $args->{$_} } qw/time_zone tz/;
+
+        my @named = map { ref($args->{$_}) eq 'HASH' ? keys %{$args->{$_}} : () } qw/omit default_fields/;
+        for my $key (grep { ref($merged{$_}) eq 'HASH' } qw/omit default_fields/) {
+            my %kept = %{$merged{$key}};
+            delete @kept{@named};
+            $merged{$key} = \%kept;
+        }
+
+        for my $key (keys %$args) {
+            my ($have, $new) = ($merged{$key}, $args->{$key});
+            unless ($PER_TABLE{$key} && ref($have) eq 'HASH' && ref($new) eq 'HASH') { $merged{$key} = $new; next }
+
+            my %both = (%$have, %$new);
+            if ($PER_ENTRY{$key}) {
+                for my $table (grep { ref($have->{$_}) eq 'HASH' && ref($new->{$_}) eq 'HASH' } keys %$new) {
+                    $both{$table} = {%{$have->{$table}}, %{$new->{$table}}};
+                }
+            }
+            $merged{$key} = \%both;
+        }
+    }
+
+    return %merged;
 }
 
 1;
@@ -206,7 +257,7 @@ __END__
 
 =head1 SOURCE
 
-The source code repository for DBIx::QuickORM can be found at
+The source code repository for DBIx-QuickORM can be found at
 L<https://github.com/exodist/DBIx-QuickORM>.
 
 =head1 MAINTAINERS

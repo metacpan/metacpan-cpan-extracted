@@ -1,6 +1,6 @@
 package CPAN::InGit;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # ABSTRACT: Manage custom CPAN trees to pin versions for your projects
 
 use Git::Raw::Repository;
@@ -8,9 +8,11 @@ use Archive::Tar;
 use Archive::Tar::Constant; # for constants to be avilable at compile time
 use Scalar::Util 'blessed';
 use CPAN::InGit::MirrorTree;
+use Fcntl 'LOCK_EX';
+use File::Temp;
+use POSIX ();
+use Log::Any '$log';
 use CPAN::Meta 2.150010;
-use Module::Metadata;
-use Fcntl qw( S_ISREG S_ISLNK S_IFMT S_ISDIR );
 use Carp;
 use Moo;
 use v5.36;
@@ -39,7 +41,108 @@ sub _build_useragent($self) {
    return Mojo::UserAgent->new;
 }
 
+has cve_feed_url              => ( is => 'rw', default => 'https://cpan-security.github.io/cpansa-feed/cpansa.json' );
+has cve_feed_path             => ( is => 'rw', lazy => 1, builder => 1 );
+has cve_feed_max_age          => ( is => 'rw', default => 12*60*60 );
+sub _build_cve_feed_path($self) {
+   return $self->git_repo->path . 'cpan-ingit-cpansa.json';
+}
+
+
+sub load_advisories($self, %options) {
+   require CPAN::InGit::Advisories;
+   my $path= $options{path} // $self->cve_feed_path;
+   my $refresh= $options{refresh};
+   my $mtime= (stat $path)[9];
+   my $bytes;
+   my $want_fetch= defined $refresh? $refresh : !defined $mtime || $mtime < time - $self->cve_feed_max_age;
+   if (!$want_fetch) {
+      defined $mtime or croak "No copy of the CVE list at '$path', and not allowed to download it";
+   }
+   else {
+      my $error;
+      eval {
+         require Mojo::Date;
+         my $url= $self->cve_feed_url;
+         my $tx= $self->useragent->get($url,
+            defined $mtime? { 'If-Modified-Since' => Mojo::Date->new($mtime)->to_string } : ());
+         my $res= $tx->result;
+         $log->debugf(" GET %s -> %s %s", $url, $res->code, $res->message);
+         if (defined $mtime && $res->code == 304) {
+            utime undef, undef, $path;
+         }
+         elsif ($res->is_success) {
+            $bytes= $res->body;
+            # Refuse to replace a good copy with something which isn't a feed
+            CPAN::InGit::Advisories->new_from_json($bytes);
+            my $tmp= File::Temp->new(TEMPLATE => "$path.XXXXXX");
+            binmode $tmp;
+            $tmp->print($bytes) && $tmp->close or die "write($tmp): $!\n";
+            chmod 0666 & ~umask, "$tmp";
+            rename "$tmp", $path or die "rename($tmp, $path): $!\n";
+            $tmp->unlink_on_destroy(0);
+         }
+         else {
+            die $res->code.' '.$res->message."\n";
+         }
+         $mtime= (stat $path)[9];
+         1;
+      } or do {
+         chomp($error= $@);
+         $error =~ s{ at \S+ line \d+\.\z}{};
+         undef $bytes;
+         defined $mtime or croak "Can't download the CVE list: $error";
+         $log->warnf("Can't refresh the CVE list (%s); using the copy from %s",
+            $error, POSIX::strftime('%Y-%m-%d %H:%M:%S UTC', gmtime $mtime));
+      };
+   }
+   unless (defined $bytes) {
+      open my $fh, '<:raw', $path or croak "open($path): $!";
+      local $/;
+      $bytes= <$fh>;
+   }
+   return CPAN::InGit::Advisories->new_from_json($bytes, source_path => $path, fetched => $mtime);
+}
+
+has dist_cache_path           => ( is => 'lazy' );
+sub _build_dist_cache_path($self) {
+   return $self->git_repo->path . 'cpan-ingit-cache.git';
+}
+
+has dist_cache_repo           => ( is => 'lazy' );
+sub _build_dist_cache_repo($self) {
+   my $path= $self->dist_cache_path;
+   my $repo= eval {
+      -d $path or Git::Raw::Repository->init($path, 1);
+      -w "$path/refs" or die "not writable\n";
+      $self->_link_dist_cache($path);
+   };
+   unless ($repo) {
+      $self->{_dist_cache_tmpdir}= File::Temp->newdir('cpan-ingit-cache-XXXXXXXX', TMPDIR => 1);
+      $path= $self->{_dist_cache_tmpdir}->dirname;
+      Git::Raw::Repository->init($path, 1);
+      $repo= $self->_link_dist_cache($path);
+   }
+   return $repo;
+}
+
+# Make the objects of the main repo readable from the cache repo, and return the cache repo
+sub _link_dist_cache($self, $path) {
+   my $git_dir= Git::Raw::Repository->open($path)->path;
+   my $alternates= $self->git_repo->path . "objects\n";
+   my $fname= $git_dir . 'objects/info/alternates';
+   my $current= '';
+   if (open my $in, '<:raw', $fname) { local $/; $current= <$in> // ''; }
+   if ($current ne $alternates) {
+      mkdir $git_dir . 'objects/info';
+      open my $out, '>:raw', $fname or die "open($fname): $!\n";
+      $out->print($alternates) && $out->close or die "write($fname): $!\n";
+   }
+   return Git::Raw::Repository->open($path);
+}
+
 sub _open_repo($thing) {
+
    return $thing if blessed($thing) && $thing->isa('Git::Raw::Repository');
    return Git::Raw::Repository->open("$thing");
 }
@@ -155,13 +258,14 @@ sub add_git_dirent_to_tar($self, $tar, $path, $dirent) {
          # Symlink: content is the target path
          $tar->add_data($path, $blob->content, { 
             mode => $mode,
+            mtime => 0,
             type => Archive::Tar::Constant::SYMLINK,
             linkname => $blob->content
          });
       }
       else {
          # Regular file
-         $tar->add_data($path, $blob->content, { mode => $mode });
+         $tar->add_data($path, $blob->content, { mode => $mode, mtime => 0 });
       }
    }
    elsif ($dirent->type == Git::Raw::Object::TREE()) {
@@ -185,90 +289,23 @@ sub lookup_versions($self, $module_name) {
 }
 
 
-sub process_distfile($self, %opts) {
-   my ($tree, $file_path, $file_data, $extract)= @opts{'tree','file_path','file_data','extract'};
-   # Decompress tar in memory.  The decompression gets complicated since it can be bz2 or gz
-   # so write to a temp file and then parse that with the auto-detection of "compress".
-   if ($file_path =~ /\.(tar\.gz|tar\.bz2|tgz)\z/) {
-      my $path_without_extension= substr($file_path, 0, $-[0]);
-      my $tmp= File::Temp->new;
-      $tmp->print($$file_data) or die "write: $!";
-      $tmp->flush;
+sub cached_dist_tree($self, $key, $builder=undef) {
+   my $repo= $self->dist_cache_repo;
+   # v1 is the version of the unpacking rules (such as removal of the wrapper directory)
+   $key =~ m{\A[a-z]+/[0-9a-f]+\z} or croak "Invalid dist cache key '$key'";
+   my $refname= "refs/dists/v1/$key";
+   my $ref= Git::Raw::Reference->lookup($refname, $repo);
+   return $ref->target if $ref;
+   return undef unless $builder;
 
-      # Iterate across the files in the tar archive
-      my $tar= Archive::Tar->new("$tmp", 1);
-      my @files= $tar->get_files;
-      if (!@files) {
-         croak "Failed to extract any files from archive $file_path";
-      }
-      # Remove prefix directory if every file in archive starts with the same directory
-      (my $prefix= $files[0]->name) =~ s,/.*,,;
-      $prefix .= '/';
-      for (@files) {
-         if (substr($_->name,0,length $prefix) ne $prefix) {
-            $prefix= '';
-            last;
-         }
-      }
-      # Build by-name hash of files
-      my %files= map +( substr($_->name, length $prefix) => $_ ), @files;
-      my $meta;
-      # Look for a META.json
-      if (my $meta_json= $files{'META.json'}) {
-         eval {
-            my $cm= CPAN::Meta->load_json_string($meta_json->get_content);
-            $meta= $cm->as_struct({ version => 2 });
-         } or warn "Failed to load $file_path/${prefix}META.json: $@";
-      }
-      # else look for META.yml
-      if (!$meta && (my $meta_yml= $files{'META.yml'})) {
-         eval {
-            my $cm= CPAN::Meta->load_yaml_string($meta_yml->get_content);
-            $meta= $cm->as_struct({ version => 2 });
-         } or warn "Failed to load $file_path/${prefix}META.yml: $@";
-      }
-      # TODO: add some fall-back that guesses at prereqs.
-      $meta //= {};
-      # If the meta didn't contain "provides", add that using Module::Metadata
-      if (!$meta->{provides}) {
-         my $provides= $meta->{provides}= {};
-         for my $pm_fname (grep /\.pm\z/ && !m{^(t|xt|inc|script|bin)/}, keys %files) {
-            eval {
-               open my $pm_fh, '<', $files{$pm_fname}->get_content_by_ref or die;
-               my $mm= Module::Metadata->new_from_handle($pm_fh, $pm_fname);
-               for my $pkg (grep $_ ne 'main', $mm->name, $mm->packages_inside) {
-                  $provides->{$pkg}{file}= $pm_fname;
-                  $provides->{$pkg}{version} //= $mm->version($pkg);
-               }
-               1;
-            } or warn "Failed to parse packages in $file_path/${prefix}$pm_fname: $@";
-         }
-      }
-      # If caller requests 'extract', add the tar's files and symlinks to the tree
-      if ($extract) {
-         for (keys %files) {
-            my $mode= $files{$_}->mode;
-            if (S_ISREG($mode)) {
-               # normalize to 644 or 755
-               $mode= S_IFMT($mode) | (($mode & 1)? 0755 : 0644);
-               $tree->set_path("$path_without_extension/$_", $files{$_}->get_content_by_ref, $mode);
-            } elsif (S_ISLNK($mode)) {
-               $tree->set_path("$path_without_extension/$_", \$files{$_}->linkname, S_IFMT($mode));
-            } elsif (!S_ISDIR($mode)) {
-               warn "Skipping tar entry for '$path_without_extension/$_' (mode=$mode)\n";
-            }
-         }
-      } else {
-         $tree->set_path($file_path, $file_data);
-      }
-      # Now serialzie the meta and write it to the tree alongside the TAR
-      my $json= CPAN::Meta->new($meta)->as_string({ version => 2 });
-      $tree->set_path($path_without_extension . '.json', \$json);
-   }
-   else {
-      warn "$file_path does not appear to be a TAR file.  Skipping metadata processing.";
-      $tree->set_path($file_path, $file_data);
-   }
+   # Publish only completed trees.  Recheck after locking in case another process built it.
+   open my $lock, '>>', $repo->path.'dist-cache.lock' or croak "Open dist cache lock: $!";
+   flock $lock, LOCK_EX or croak "Lock dist cache: $!";
+   $ref= Git::Raw::Reference->lookup($refname, $repo);
+   return $ref->target if $ref;
+   my $tree= $builder->() // return undef;
+   Git::Raw::Reference->create($refname, $repo, $tree);
+   return $tree;
 }
 
 #=method parse_cpanfile_snapshot
@@ -481,7 +518,63 @@ Email used for commits generated by this library.  Defaults to 'CPAN::InGit@loca
 
 The L<Mojo::UserAgent> object used when downloading files from the real CPAN.
 
+=head2 dist_cache_path
+
+Path of the Git repository used for L</dist_cache_repo>.  The default is a directory named
+C<cpan-ingit-cache.git> inside of the Git directory of L</git_repo>.
+
+=head2 dist_cache_repo
+
+A bare L<Git::Raw::Repository> holding the unpacked contents of distribution archives, so
+that they can be browsed and compared as Git trees.  (see L<CPAN::InGit::DistTree>)
+It is created on demand.  It has the object store of L</git_repo> as an "alternate", so it
+can read every object of the main repository, but everything written to it stays out of your
+main repository.  It only holds data that can be re-created, and can be deleted at any time.
+
+If L</dist_cache_path> can't be created or written, a temporary directory is used instead
+and removed when this object is destroyed.
+
+=head2 cve_feed_url
+
+URL of the CPAN Security Advisory feed.  This is the same file the web interface uses.
+
+=head2 cve_feed_path
+
+Path of the file holding the latest downloaded copy of the feed.  The default is a file named
+C<cpan-ingit-cpansa.json> inside of the Git directory of L</git_repo>.  There is only ever
+one copy; it is replaced when a newer one is downloaded, and can be deleted at any time.
+
+=head2 cve_feed_max_age
+
+Number of seconds for which the downloaded feed is used without asking the server whether
+there is a newer one.  Defaults to 12 hours.
+
 =head1 METHODS
+
+=head2 load_advisories
+
+  my $advisories= $cpan_repo->load_advisories(%options);
+
+Return a L<CPAN::InGit::Advisories> object for the CPAN Security Advisory feed, downloading
+it to L</cve_feed_path> when there is no copy or the copy is older than
+L</cve_feed_max_age>.  The download is conditional, so an unchanged feed is not transferred
+again.  If the download fails and there is an older copy, a warning is logged and the older
+copy is used.  If there is no copy at all, this dies.
+
+Options:
+
+=over
+
+=item path
+
+Use this file instead of L</cve_feed_path>
+
+=item refresh
+
+True to ask the server for a newer feed regardless of the age of the copy.  False (but
+defined) to never use the network, and die if there is no copy.
+
+=back
 
 =head2 get_archive_tree
 
@@ -539,14 +632,17 @@ This returns a list of all versions of that module which are already cached in a
 this repo, and also any version which is available from any of the upstream mirrors listed in
 L</upstream_mirrors>.
 
-=head2 process_distfile
+=head2 cached_dist_tree
 
-  my $index= $darkpan->process_distfile(
-    tree      => $mirror_tree,
-    file_path => $path,
-    file_data => \$bytes,
-    untar     => $bool,   # whether to extract tar file into the tree
-  );
+  $git_tree= $cpan_repo->cached_dist_tree($key);
+  $git_tree= $cpan_repo->cached_dist_tree($key, sub { ...; return $git_tree });
+
+Look up a L<Git::Raw::Tree> of an unpacked distribution in the L</dist_cache_repo> by a
+key (any string, by convention prefixed with the kind of key such as C<"blob/$blob_id">).
+If it isn't cached and you supply a coderef, the coderef is called to build the tree in
+L</dist_cache_repo> and the result is cached.  Builders are serialized by a lock file so
+that concurrent processes don't unpack the same archive twice.  The coderef may return
+C<undef> to cache nothing.
 
 =head1 SEE ALSO
 
@@ -583,7 +679,7 @@ before installing them.
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

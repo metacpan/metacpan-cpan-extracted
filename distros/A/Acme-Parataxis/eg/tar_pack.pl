@@ -40,11 +40,14 @@ my $CHUNK      = 65_536;
 # How many await boundaries a single file is divided into. This is the granularity a cancel gets, so
 # the demo reports it rather than leaving it to be inferred.
 my $CHUNKS_PER_FILE = int( ( $FILE_BYTES + $CHUNK - 1 ) / $CHUNK );
+my $NULL            = $^O eq 'MSWin32'                              ? 'NUL' : '/dev/null';
+my $HAVE_GZIP       = ( system("gzip --version >$NULL 2>&1") == 0 ) ? 1     : 0;
+my $HAVE_TAR        = ( system("tar --version >$NULL 2>&1") == 0 )  ? 1     : 0;
 
-# NOTE: this file deliberately does NOT call enable_transparent_unblocking(). That feature and
-# spawn_blocking do not mix - see section 5, which is a bug report rather than a demonstration.
-# The point here is explicit await boundaries that you place on purpose, and a transparently
-# unblocked sysread() would take the placement away and hand it to the scheduler.
+# NOTE: this file deliberately does NOT call enable_transparent_unblocking(). The point here is
+# explicit await boundaries that you place on purpose; a transparently unblocked sysread() would
+# take the placement away and hand it to the scheduler. The old spawn_blocking incompatibility
+# has been fixed and is covered by t/357_clone_unblocking.t.
 #
 # A tree to pack.
 my $TREE = File::Temp->newdir( CLEANUP => 0 );
@@ -260,10 +263,10 @@ say '';
         sub {
             eval {
                 # 0 means "no deadline" - this scope exists only to register the fiber with $tok, so
-                # that any wait entered inside it is interruptible. with_cancel() would not do here:
-                # it registers the fiber with its own scope token, and that token is not assigned
-                # until the block returns, so a signal handler could not reach it. with_timeout()
-                # takes a token you already hold.
+                # that any wait entered inside it is interruptible. with_cancel() can also register a
+                # scope token (it passes the token into the block and returns it in scalar context),
+                # but the signal handler already holds $tok, and with_timeout() takes a token you
+                # already hold.
                 with_timeout(
                     0, $tok,
                     sub {
@@ -323,8 +326,12 @@ say '';
     print {$cfh} substr( $all, 0, int( $full * 0.6 ) );
     close $cfh;
     printf "  %-34s %d of %d bytes\n", 'archive cut to 60%', ( -s $cut ), $full;
-    for my $tool ( [ 'gzip -t', "gzip -t $cut" ], [ 'tar tzf', "tar tzf $cut" ] ) {
-        my ( $label, $cmd ) = @$tool;
+    for my $tool ( [ 'gzip -t', "gzip -t $cut", $HAVE_GZIP ], [ 'tar tzf', "tar tzf $cut", $HAVE_TAR ] ) {
+        my ( $label, $cmd, $have ) = @$tool;
+        if ( !$have ) {
+            printf "  %-34s skipped (%s not installed)\n", $label, ( split ' ', $label )[0];
+            next;
+        }
         my @lines = split m/\n/, `$cmd 2>&1`;
         my $rc    = $? >> 8;
         printf "  %-34s exit %d, %d entries named\n", $label, $rc, scalar( grep {/part\d+\.dat/} @lines );
@@ -333,9 +340,14 @@ say '';
     # Extraction is the dangerous one, because the files land on disk before tar gives up.
     my $dest = File::Spec->catdir( "$TREE", 'extracted' );
     File::Path::make_path($dest);
-    my @out = split m/\n/, `tar xzf $cut -C $dest 2>&1`;
-    my @ext = glob( File::Spec->catfile( $dest, '*' ) );
-    printf "  %-34s exit %d, %d files left on disk\n", 'tar xzf into a fresh directory', $? >> 8, scalar @ext;
+    if ($HAVE_TAR) {
+        my @out = split m/\n/, `tar xzf $cut -C $dest 2>&1`;
+        my @ext = glob( File::Spec->catfile( $dest, '*' ) );
+        printf "  %-34s exit %d, %d files left on disk\n", 'tar xzf into a fresh directory', $? >> 8, scalar @ext;
+    }
+    else {
+        printf "  %-34s skipped (tar not installed)\n", 'tar xzf into a fresh directory';
+    }
 
     # And the iterator this program uses to verify, which is the one a reader would most trust. It is
     # the worst of the four: it does not exit, and it does not die either. It warns once and hands
@@ -481,13 +493,18 @@ if ( $have_blocking && $ithreads ) {
     printf "  %-34s %s\n", 'awaited again, outside the scope',
         ( $await_died ? do { my $x = $await_died; $x =~ s/\n.*//s; "died: $x" } : "'$await_result' (bytes read / chunk passes)" );
     if ( -e $out ) {
-        printf "  %-34s %s\n", 'and it is a valid gzip stream', ( system( 'gzip -t ' . quotemeta($out) . ' >/dev/null 2>&1' ) == 0 ? 'yes' : 'NO' );
+        if ($HAVE_GZIP) {
+            printf "  %-34s %s\n", 'and it is a valid gzip stream', ( system( 'gzip -t ' . quotemeta($out) . " >$NULL 2>&1" ) == 0 ? 'yes' : 'NO' );
+        }
+        else {
+            printf "  %-34s %s\n", 'and it is a valid gzip stream', 'skipped (gzip not installed)';
+        }
         unlink $out;
         printf "  %-34s %s\n", 'after unlink', ( -e $out ? 'STILL THERE' : 'gone' );
     }
 }
 else {
-    say '  Acme::Parataxis::Blocking, the separate distribution that provides spawn_blocking, is not';
+    say '  The bundled Acme::Parataxis::Blocking module, which provides spawn_blocking, is not';
     say '  available here, so the build stays on this thread:';
     printf "    %-38s %s\n", 'Blocking installed:',        ( $have_blocking               ? 'yes'                            : 'no' );
     printf "    %-38s %s\n", 'an ithreads perl to clone:', ( $ithreads                    ? 'yes'                            : 'no' );
@@ -504,43 +521,5 @@ else {
     say '  moving while this thread does something else.';
 }
 
-# Two features in this distribution that must not be used in the same program.
-#
-# This section is a bug report, not a demonstration, and the numbers in it were measured on the
-# threaded 5.44.0 build. It is here because the combination is easy to reach by accident: a program
-# that turns on transparent unblocking to stop writing await_sleep(0) by hand, and then reaches for
-# spawn_blocking for one long job.
-#
-# enable_transparent_unblocking() installs Acme::Parataxis::Compat, which overrides core file and
-# pipe operations process-wide. threads->create clones the interpreter, overrides included, so a
-# worker thread inherits them - and inside that worker there is no scheduler and no fiber, so the
-# override tries to park a wait that cannot exist.
-#
-# What that costs, measured, reading a 12MB file in 64KB passes from a spawn_blocking closure:
-#
-#   transparent unblocking off   192 passes, 12582912 bytes read, exit 0
-#   transparent unblocking on    the closure stops partway, and the Future carries
-#                                "_park() must be called from inside a scheduled fiber"
-#                                instead of anything to do with the file
-#
-# The second case is not a tidy error, though. At 4MB it prints
-# "Attempt to free unreferenced scalar" and then returns the right answer anyway; at 12MB it
-# segfaults. A bare threads->create with the overrides installed and no scheduler involved is fine,
-# so it takes both features together to corrupt the heap.
-#
-# Nothing in this file needs transparent unblocking - the reads are chunked by hand precisely so the
-# await boundaries are visible and movable. If you do want both features in one program, keep the
-# worker free of the wrapped operations, or do the I/O before the thread exists.
-say '';
-say '5. enable_transparent_unblocking() and spawn_blocking do not mix.';
-say '';
-printf "  %-34s %s\n", 'transparent unblocking', Acme::Parataxis->transparent_unblocking ? 'on' : 'off';
-printf "  %-34s %s\n", 'blocking available here', ( $have_blocking ? 'yes' : 'no' );
-say '';
-say '  The compatibility layer overrides core file operations process-wide, and a cloned thread';
-say '  inherits the overrides but has no scheduler to park in. The symptom is a Future that fails';
-say '  with a scheduler error on a closure that never mentioned a scheduler, and at larger sizes a';
-say '  segfault. This file leaves transparent unblocking off on purpose, and the sections above do';
-say '  their own chunking so the await boundaries stay visible.';
-say '';
-say '';
+# This file keeps transparent unblocking off so the await boundaries stay visible and movable.
+# The old spawn_blocking incompatibility was fixed; see t/357_clone_unblocking.t.

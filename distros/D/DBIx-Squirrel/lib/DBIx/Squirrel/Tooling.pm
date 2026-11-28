@@ -26,15 +26,17 @@ use Ekorn::Pipeline::Factories qw(
     pipeline stage source generator yield
     sink_one sink_many);
 
-use DBIx::Squirrel::Stop          qw(Stop is_stop);
-use DBIx::Squirrel::Gather        qw(gather);
-use DBIx::Squirrel::Context       qw(iterator result_number result_original);
+use DBIx::Squirrel::Stop    qw(Stop is_stop);
+use DBIx::Squirrel::Gather  qw(gather);
+use DBIx::Squirrel::Context qw(
+    iterator kept_origin result_number result_original
+);
 use DBIx::Squirrel::Stages::Flow  qw(:all);
 use DBIx::Squirrel::Stages::Batch qw(:all);
 use DBIx::Squirrel::Stages::Taps  qw(:all);
 use DBIx::Squirrel::Stages::Rows  qw(:all);
 
-our $VERSION = 'v4.2.0';
+our $VERSION = 'v4.3.0';
 
 our %EXPORT_TAGS = (
     core => [qw(Stop is_stop gather is_stage)],
@@ -45,8 +47,8 @@ our %EXPORT_TAGS = (
     batch   => [qw(batch      collect)],
     taps    => [qw(peek       count_into dump_to tee)],
     rows    => [qw(pluck      as_hash)],
-    context => [qw(iterator   result_number result_original)],
-    sources => [qw(from_array from_fh from_file counter)],
+    context => [qw(iterator   kept_origin result_number result_original)],
+    sources => [qw(from_array from_fh     from_file     counter)],
     sinks   => [
         qw(count_items keep keep_all keep_first keep_last keep_single),
         qw(to_fh to_file),
@@ -165,7 +167,7 @@ C<:flow>, C<:batch>, C<:taps> and C<:rows>.
 =item C<:context>
 
 Everything L<DBIx::Squirrel::Context> exports: C<iterator>,
-C<result_number> and C<result_original>.
+C<kept_origin>, C<result_number> and C<result_original>.
 
 =item C<:sources>
 

@@ -6,7 +6,7 @@ use Scalar::Util 'refaddr';
 use Test::Exception; # dies_ok, throws_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # Custom helper for floating-point comparisons
 sub is_approx {

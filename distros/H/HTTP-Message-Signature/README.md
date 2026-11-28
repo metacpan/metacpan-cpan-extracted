@@ -15,22 +15,42 @@ See also ["KNOWN ISSUES"](#known-issues) and ["SECURITY CONSIDERATIONS"](#securi
 ```perl
 use HTTP::Message::Signature;
 
+# To verify a request
+
 try {
 
     my $sig = HTTP::Message::Signature->new(
-        message     => $request,         # HTTP::Request, Plack::Request or PSGI env hash
+        request     => $request,         # HTTP::Message, Plack::Request or PSGI env hash
         require_tag => 'web-bot-auth',
     );
-
-    $sig->is_expired and die "expired signature";
 
     $sig->verify or die "bad signature";
 
 }
 catch ($e) {
-
     ...
+}
 
+# To verify a response
+
+use LWP::UserAgent;
+
+my $agent    = LWP::UserAgent->new(...);
+my $request  = HTTP::Request->new(...);
+my $response = $agent->request($request);
+
+try {
+
+    my $sig = HTTP::Message::Signature->new(
+        response => $response,
+        request  => $request,
+    );
+
+    $sig->verify or die "bad signature";
+
+}
+catch (e) {
+    ...
 }
 ```
 
@@ -40,16 +60,21 @@ This module supports verifying HTTP Message Signatures (RFC 9421), notably those
 
 # RECENT CHANGES
 
-Changes for version v0.0.3 (2026-11-26)
+Changes for version v0.1.0 (2026-11-27)
 
 - Enhancements
-    - Changed the internals to use HTTP::libsfparse (via HTTP::StructuredField) for parsing structured fields.
-    - Added support for the rsa-pss-sha512 algorithm.
-    - The public key is checked if it corresponds to the algorithm.
+    - Added an options hash reference to the verify method.
+    - Changed the verify method to check expiration and creation times by default.
+    - Added support for verifying responses.
+    - The signature\_agent attribute will coerce a URI.
+    - Added alias request and response constructor attributes.
+    - Added option to verify public keys when they are retrieved from the signatures-directory.
 - Bug Fixes
-    - Fixed the regex used to match dictionary keys.
+    - Bumped minimum version of HTTP::libsfparse to a non-broken version.
 - Documentation
-    - Added a section to KNOWN ISSUES about Content-Digests.
+    - Amended Changes.
+- Tests
+    - Report versions of additional prereqs of HTTP::libsfparse.
 
 See the `Changes` file for more details.
 
@@ -61,11 +86,11 @@ This module lists the following modules as runtime dependencies:
 - [Crypt::PK::Ed25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AEd25519)
 - [Crypt::PK::RSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ARSA)
 - [HTTP::Message](https://metacpan.org/pod/HTTP%3A%3AMessage)
-- [HTTP::StructuredField](https://metacpan.org/pod/HTTP%3A%3AStructuredField) version v0.0.3 or later
-- [HTTP::Tiny](https://metacpan.org/pod/HTTP%3A%3ATiny)
-- [Hash::MultiValue](https://metacpan.org/pod/Hash%3A%3AMultiValue)
+- [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest)
+- [HTTP::StructuredField](https://metacpan.org/pod/HTTP%3A%3AStructuredField) version v0.0.5 or later
 - [Hash::Ordered](https://metacpan.org/pod/Hash%3A%3AOrdered)
 - [JSON](https://metacpan.org/pod/JSON)
+- [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)
 - [List::Util](https://metacpan.org/pod/List%3A%3AUtil) version 1.29 or later
 - [MIME::Base64](https://metacpan.org/pod/MIME%3A%3ABase64)
 - [Moo](https://metacpan.org/pod/Moo)

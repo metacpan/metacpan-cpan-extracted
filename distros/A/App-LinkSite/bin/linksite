@@ -10,9 +10,9 @@ use File::Basename;
 use App::LinkSite;
 
 my %opt;
-GetOptions(\%opt, 'help', 'version', 'file=s');
+GetOptions(\%opt, 'help', 'version', 'file=s') or exit 2;
 
-if (keys %opt) {
+if ($opt{help} || $opt{version}) {
   my $me = basename $0;
   if ($opt{version}) {
     say "$me $App::LinkSite::VERSION";
@@ -20,14 +20,14 @@ if (keys %opt) {
   }
 
   if ($opt{help}) {
-    say "Usage: $me [--file <filename>]";
+    say "Usage: $me [--file <filename>] [--help] [--version]";
     say "\nCreate a link site from a simple input file. See 'man $me' for details";
   }
 
   exit;
 }
 
-App::LinkSite->new($opt{file} ? (file => $opt{file}) : ())->run;
+App::LinkSite->new(exists $opt{file} ? (file => $opt{file}) : ())->run;
 
 =head1 linksite
 
@@ -57,6 +57,12 @@ Display usage information.
 Display the version number.
 
 =back
+
+=head1 EXIT STATUS
+
+Returns zero after a successful build or an informational option. Invalid
+options, including C<--file> without a filename, return status 2 without building.
+Input or build failures return a non-zero status.
 
 For more information see L<https://linksite.davecross.co.uk/>.
 

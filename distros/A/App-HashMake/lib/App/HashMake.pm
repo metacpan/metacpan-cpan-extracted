@@ -17,11 +17,11 @@ App::HashMake - Perform make-like actions based on target file's MD5 hash value
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our $default_hash_makefile = 'Hash.Makefile';
 our $index_file = '.hash_index';
@@ -298,6 +298,9 @@ sub run
     dbg ( "Checking targets" );
 
     my $action_count = 0;
+    my %cmd_history;        #  For recording commands that we've done so that
+                            #  don't get run again.
+
     foreach my $t ( keys %config ) {
 
       dbg ( "Checking target $t" );
@@ -345,9 +348,19 @@ sub run
       if ( $action ) {
 
         #  See if the magic variable $@ is on any of the lines -- and if so,
-        #  replace it with the current target.
+        #  replace it with the current target. Collect the commands that we
+        #  haven't already run.
 
-        my @cmds = map { s/\$\@/$t/ge; $_ } @{ $config{ $t } };
+        my @cmds = grep { !exists ( $cmd_history{ $_ } ) }
+                   map { s/\$\@/$t/ge; $_ } @{ $config{ $t } };
+
+        #  No commands left? Nothing further to do.
+
+        next unless ( @cmds );
+
+        #  OK, moving on .. after we note that we've done these commands.
+
+        @cmd_history{ @cmds } = undef;
 
         if ( $print_only ) {
 
@@ -384,7 +397,7 @@ sub run
       close ( $fh );
 
       dbg ( "Updated full_index file $full_index_file." );
-      dbg ( "--> keys updated: " . join ( '/', keys %hash_values ) );
+      dbg ( "--> keys updated: " . join ( ' / ', keys %hash_values ) );
     }
     return ( $something, { out => \@out, err => \@err } );
 }

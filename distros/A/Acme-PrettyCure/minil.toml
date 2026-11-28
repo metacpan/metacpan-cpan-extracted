@@ -1,0 +1,12 @@
+name = "Acme-PrettyCure"
+badges = ['github-actions/ci']
+# Build.PL is made for Module::Build::Tiny (the configure requirement of cpanfile).
+module_maker = "ModuleBuildTiny"
+markdown_maker = "Pod::Markdown::Github"
+# The change log is CHANGELOG.md, written for tagpr (scripts/tagpr/README.md). Without this,
+# minil dist tries to rewrite a `Changes` file that no longer exists.
+manage_changes = false
+
+[FileGatherer]
+# scripts/tagpr/ is the git subtree of kan/tagpr-scripts; it is not part of the distribution.
+exclude_match = ["^scripts/"]

@@ -3,7 +3,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # croak() formats through perl's own engine, not the C library's, and that
 # engine does not understand C99's 'z' length modifier: a "%zu" in a croak

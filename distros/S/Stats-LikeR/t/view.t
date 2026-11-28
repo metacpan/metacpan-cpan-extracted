@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # Column chunking depends on the terminal width (explicit 'width' arg, then
 # $ENV{COLUMNS}, then 80). Pin COLUMNS wide so every single-block layout test

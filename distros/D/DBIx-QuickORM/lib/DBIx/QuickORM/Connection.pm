@@ -2,32 +2,37 @@ package DBIx::QuickORM::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000031';
 
-use Carp qw/confess croak carp/;
-use Scalar::Util qw/blessed weaken/;
-use DBIx::QuickORM::Util qw/load_class/;
+use Carp qw/croak confess/;
+use Scalar::Util qw/blessed refaddr weaken/;
 
-use DBIx::QuickORM::Handle;
-use DBIx::QuickORM::Connection::Transaction;
+use DBIx::QuickORM::Dialect();
+use DBIx::QuickORM::Exception::DB();
+use DBIx::QuickORM::LookupTable();
+use DBIx::QuickORM::Map();
+use DBIx::QuickORM::Txn();
 
 use Object::HashBase qw{
-    <orm
     <dbh
+    <db_map
+    <time_zone
+    <datetime_parsers
+    <retain_cache
+    <enforce_canon
+    <isolation
     <dialect
+    <namespace
     <pid
-    <schema
-    <transactions
-    +_savepoint_counter
-    +_txn_counter
-    <manager
-    <in_async
-    <asides
-    <forks
-    <default_sql_builder
-    <default_internal_txn
-    <default_handle_class
+    +lookup
+    <txns
+    +txn_count
+    +busy
+    +statements
 };
+
+# Connections with an async query pending, so a forked child can release them at exit (see END).
+my %PENDING;
 
 =pod
 
@@ -35,1319 +40,1890 @@ use Object::HashBase qw{
 
 =head1 NAME
 
-DBIx::QuickORM::Connection - ORM connection to database.
+DBIx::QuickORM::Connection - One database handle and the state tied to it.
 
 =head1 DESCRIPTION
 
-This module is the primary interface when using the ORM to connect to a
-database. This contains the database connection itself, a clone of the original
-schema along with any connection specific changes (temp tables, etc). You use
-this class to interact with the database, manage transactions, and get
-L<DBIx::QuickORM::Handle> objects that can be used to make queries against the
-database.
+A Connection holds one database handle and everything that must be reset when
+that handle is replaced: its dialect, its namespace, the pid that opened it,
+the open transactions (L<DBIx::QuickORM::Txn>), and the lookup table of canon
+rows (L<DBIx::QuickORM::LookupTable>). The ORM replaces the whole Connection
+at once, as it does in a forked child. The new one starts with no transaction
+and an empty lookup table.
 
-=head1 SYNOPSIS
+It implements the ORM's CRUD operations on plain row data and knows nothing of
+the ORM: it returns hashrefs, which L<DBIx::QuickORM> wraps. A row object
+given is read through its C<row_data>. The rules shared by every CRUD
+operation (row data, C<raw>, value markers, what comes back with and without
+C<RETURNING>) are in L<DBIx::QuickORM/"CRUD operations">. The entries here add
+what the Connection itself does.
 
-    use My::Orm qw/orm/;
-
-    # Get the orm's connection.
-    # Note: This will return the same connection each time, no need to cache it yourself.
-    my $con = orm('my_orm')->connection;
-
-    # Do something to all rows in the 'people' table.
-    my $people_handle = $con->handle('people');
-    for my $person ($people_handle->all) {
-        ...
-    }
-
-    # Find all people with the surname 'smith' and print their first names.
-    my $smith_handle = $people_handle->where({surname => 'smith'});
-    for my $person ($smith_handle->all) {
-        print $person->field('first_name') . "\n";
-    }
-
-    # Do a transaction that is managed by the ORM.
-    $con->txn(sub {
-        my $txn = shift;
-
-        ...
-
-        if (good()) {
-            # Can call commit or rollback manually. Or, if all is good just let
-            # the sub exit and the transaction will commit itself.
-            $txn->commit; # This will exit the subroutine
-        }
-        else {
-            # Can call rollback manually, or if the sub exits due to an
-            # exception being thrown, rollback will happen automatically.
-            $txn->rollback; # This will exit the subroutine
-        }
-    });
-
-=head1 ATTRIBUTES
-
-These are accessed via read-only accessors of the same name.
+Construction prepares the handle:
 
 =over 4
 
-=item orm
+=item *
 
-The L<DBIx::QuickORM::ORM> object this connection belongs to.
+C<RaiseError> must be on. C<PrintError> is turned off and
+C<AutoInactiveDestroy> on.
 
-=item dbh
+=item *
 
-The C<DBI> database handle for this connection.
+C<AutoCommit> must be on, with no transaction open: the ORM manages
+transactions.
 
-=item dialect
+=item *
 
-The L<DBIx::QuickORM::Dialect> subclass instance for this connection.
+Every database error on the handle is thrown as a
+L<DBIx::QuickORM::Exception::DB>, classified by the dialect.
 
-=item pid
+=item *
 
-The PID the connection was established under.
+The dialect sets up the session.
 
-=item schema
+=item *
 
-The connection-local L<DBIx::QuickORM::Schema> (a clone of the ORM's schema).
-
-=item transactions
-
-Arrayref forming the active transaction/savepoint stack. Internal use only.
-
-=item manager
-
-The L<DBIx::QuickORM::RowManager> instance managing row cache and state.
-
-=item in_async
-
-The active L<DBIx::QuickORM::STH::Async> object, if an async query is running.
-
-=item asides
-
-Hashref of active "aside" queries.
-
-=item forks
-
-Hashref of active "forked" queries.
-
-=item default_sql_builder
-
-Default SQL builder, normally L<DBIx::QuickORM::SQLBuilder::SQLAbstract>.
-
-=item default_internal_txn
-
-Boolean default for whether handles may use internal transactions.
-
-=item default_handle_class
-
-Default handle class, normally L<DBIx::QuickORM::Handle>.
+The connection must have a current schema or database, or construction
+croaks.
 
 =back
 
-=head1 PUBLIC METHODS
+Rows read go through the lookup table's C<ingest>. Rows written replace its
+entry.
+
+The single-row CRUD operations build their SQL once per table and set of fields
+and run it through C<prepare_cached>. SQL holding an C<sql()> or C<binary()>
+marker, C<insert_many>, and queries built elsewhere are prepared each time.
+
+In a forked child, a Connection that is freed, or still held at exit, lets go
+of its inherited handle (C<release_inherited>), so the parent's session
+survives.
+
+=head1 SYNOPSIS
+
+    my $conn = $orm->connection;    # the ORM's current Connection (a forked child gets a new one)
+
+    my $dialect = $conn->dialect;
+    my $schema  = $conn->namespace;
+    my $lookup  = $conn->lookup;
+
+=head1 ATTRIBUTES
 
 =over 4
 
-=item $con->init
+=item $dbh = $conn->dbh
 
-Object construction hook invoked by L<Object::HashBase>. Establishes the
-database handle, dialect, schema, and row manager. Not called directly.
+The database handle. Required.
+
+=item $map = $conn->db_map
+
+The L<DBIx::QuickORM::Map>. When none is given the database is scanned into a
+new one, which the ORM then adjusts in place.
+
+=item $tz = $conn->time_zone
+
+The session time zone, C<UTC> unless given.
+
+=item \@parsers = $conn->datetime_parsers
+
+The ORM's C<datetime_parsers>, for the DateTime type. Empty unless given.
+Checked as the ORM's C<new> describes. C<set_datetime_parsers> changes it.
+
+=item $bool = $conn->retain_cache
+
+Passed to the lookup table as C<retain>. 0 unless given.
+
+=item $bool = $conn->enforce_canon
+
+The default C<enforce_canon> for C<update_row> and C<delete_row> outside a
+transaction. 1 unless given. C<set_enforce_canon> changes it.
+
+=item $level = $conn->isolation
+
+The isolation level a root transaction opens at when C<txn> names none, in
+lower case: a level C<txn> takes, or C<'server'>. Undef unless given: then
+C<'read committed'> where the dialect C<supports_isolation>, otherwise
+C<'server'>. An unknown level croaks.
+
+=item $dialect = $conn->dialect
+
+The L<DBIx::QuickORM::Dialect> object for the handle, holding the server
+version.
+
+=item $ns = $conn->namespace
+
+The current schema or database, from the dialect.
+
+=item $pid = $conn->pid
+
+The process that opened the connection.
+
+=item \@txns = $conn->txns
+
+The open transactions, outermost first, as L<DBIx::QuickORM::Txn> objects
+(held weakly). Empty outside a transaction.
+
+=back
 
 =cut
 
 sub init {
     my $self = shift;
 
-    my $orm = $self->{+ORM} or croak "An orm is required";
-    my $db = $orm->db;
+    my $dbh = $self->{+DBH};
+    croak "The connection did not produce a DBI database handle" unless blessed($dbh) && $dbh->isa('DBI::db');
+    croak "The database handle must have RaiseError on"          unless $dbh->{RaiseError};
+    croak "The database handle must have AutoCommit on and no transaction open; the ORM manages transactions"
+        unless $dbh->{AutoCommit};
 
-    $self->{+_SAVEPOINT_COUNTER} //= 1;
-    $self->{+_TXN_COUNTER} //= 1;
+    $self->{+TIME_ZONE} //= 'UTC';
+    $self->{+DATETIME_PARSERS} = exists($self->{+DATETIME_PARSERS}) ? $self->_check_datetime_parsers($self->{+DATETIME_PARSERS}) : [];
+    $self->{+RETAIN_CACHE}  //= 0;
+    $self->{+ENFORCE_CANON} //= 1;
+    $self->{+ISOLATION} = $self->_isolation($self->{+ISOLATION}) if defined $self->{+ISOLATION};
 
+    $dbh->{PrintError}          = 0;
+    $dbh->{AutoInactiveDestroy} = 1;
+
+    my $dialect = $self->{+DIALECT} = DBIx::QuickORM::Dialect->for_dbh($dbh);
+    $dbh->{HandleError} = $self->_error_handler($dialect, $self->{+TXNS} = []);
+    $dialect->init_session($dbh, $self->{+TIME_ZONE});
+
+    my $ns = $self->{+NAMESPACE} = $dialect->namespace($dbh);
+    croak "The connection has no current schema or database; select one in the DSN" unless defined $ns;
+
+    $self->{+DB_MAP} //= DBIx::QuickORM::Map->new(tables => $dialect->scan($dbh));
     $self->{+PID} = $$;
-
-    $self->{+DBH} = $db->new_dbh;
-
-    $self->{+DIALECT} = $self->_build_dialect;
-
-    $self->{+DEFAULT_INTERNAL_TXN} //= 1;
-
-    $self->{+ASIDES} = {};
-    $self->{+FORKS}  = {};
-
-    $self->{+DEFAULT_HANDLE_CLASS} //= $orm->default_handle_class // 'DBIx::QuickORM::Handle';
-
-    $self->{+DEFAULT_SQL_BUILDER} //= do {
-        require DBIx::QuickORM::SQLBuilder::SQLAbstract;
-        # Quote identifiers so attacker-influenceable names (order_by, where
-        # keys, field and returning lists) cannot break out of their identifier
-        # slot into raw SQL. Without quote_char SQL::Abstract emits identifiers
-        # verbatim, and field_db_name() passes unknown names through unchanged,
-        # which together allow SQL injection at any identifier position. The
-        # quote char comes from the live driver (SQL_IDENTIFIER_QUOTE_CHAR) so
-        # it is correct per-dialect (double-quote for SQLite/Postgres, backtick
-        # for MySQL); fall back to the ANSI double-quote when the driver reports
-        # nothing usable (a single space means quoting is unsupported).
-        my $qc = eval { $self->dbh->get_info(29) };
-        $qc = '"' unless defined($qc) && $qc =~ /\S/;
-        DBIx::QuickORM::SQLBuilder::SQLAbstract->new(quote_char => $qc, name_sep => '.');
-    };
-
-    my $txns = $self->{+TRANSACTIONS} = [];
-    my $manager = $self->{+MANAGER} // 'DBIx::QuickORM::RowManager::Cached';
-    if (blessed($manager)) {
-        croak "Manager '$manager' does not subclass 'DBIx::QuickORM::RowManager'"
-            unless $manager->DOES('DBIx::QuickORM::RowManager');
-
-        # A blessed manager instance carries per-connection state (its connection
-        # and transaction stack). If it is still the live manager of a different,
-        # still-connected connection, rebinding it here would silently repoint
-        # that connection's row cache and transaction stack at us, so refuse. A
-        # manager whose previous connection has been disconnected is free to
-        # rebind: disconnecting the old connection first is the supported way to
-        # move a blessed manager to a new connection.
-        if (my $other = $manager->connection) {
-            croak "This row_manager instance is already in use by another live connection; one row_manager cannot be shared across connections. Pass a class name (each connection builds its own manager), pass a fresh instance per connection, or disconnect the other connection first."
-                if $other != $self && $other->manager && $other->manager == $manager && $other->connected;
-        }
-
-        $manager->set_connection($self);
-
-        # The HashBase setter stores a strong reference, which would create a
-        # connection <-> manager cycle; the manager holds its connection weakly.
-        weaken($manager->{DBIx::QuickORM::RowManager::CONNECTION()});
-
-        $manager->set_transactions($txns);
-    }
-    else {
-        my $class = load_class($manager) or die $@;
-        $self->{+MANAGER} = $class->new(transactions => $txns, connection => $self);
-    }
-
-    if (my $autofill = $orm->autofill) {
-        # Tables asserted to have no volatile columns (so the introspection
-        # trigger warning is silenced): the autofill/quick assertion plus any
-        # table the declared schema marked no_volatile.
-        my %no_volatile;
-        if (my $nv = $autofill->no_volatile) {
-            if (ref($nv) eq 'ARRAY') { $no_volatile{$_} = 1 for @$nv }
-            else                     { $no_volatile{'*'} = 1 }
-        }
-        if (my $schema2 = $orm->schema) {
-            for my $tbl ($schema2->tables) {
-                $no_volatile{$tbl->name} = 1 if $tbl->can('no_volatile') && $tbl->no_volatile;
-            }
-        }
-
-        my $schema = $self->{+DIALECT}->build_schema_from_db(autofill => $autofill, no_volatile => \%no_volatile);
-
-        if (my $schema2 = $orm->schema) {
-            $self->{+SCHEMA} = $schema->merge($schema2);
-        }
-        else {
-            $self->{+SCHEMA} = $schema->clone;
-        }
-    }
-    else {
-        $self->{+SCHEMA} = $orm->schema->clone;
-    }
 }
 
-########################
-# {{{ Async/Aside/Fork #
-########################
+=head1 PUBLIC METHODS
 
-=pod
+=over 4
 
-=item $con->set_async($async)
+=item $conn->set_enforce_canon($bool)
 
-Change state to be inside an async query, argument must be an
-L<DBIx::QuickORM::STH::Async> instance.
+Changes C<enforce_canon>. Each C<update_row> and C<delete_row> reads it when
+it runs.
 
-=item $con->add_aside($aside)
+=item $conn->set_datetime_parsers(\@parsers)
 
-Register an "aside" query.
+Replaces C<datetime_parsers> with a copy of C<@parsers>, checked as the ORM's
+C<new> checks them: it loads each class, and croaks on a bad parser.
 
-=item $con->add_fork($fork)
-
-Register a "forked" query.
-
-=item $con->clear_async($async)
-
-Change state to be outside of an async query. The argument must be an
-L<DBIx::QuickORM::STH::Async> instance, and it must be the same object as the
-one returned by C<in_async()>.
-
-=item $con->clear_aside($aside)
-
-Clear a previously registered "aside" query.
-
-=item $con->clear_fork($fork)
-
-Clear a previously registered "forked" query.
-
-=cut
-
-sub set_async {
-    my $self = shift;
-    my ($async) = @_;
-
-    croak "There is already an async query in progress" if $self->{+IN_ASYNC} && !$self->{+IN_ASYNC}->done;
-
-    $self->{+IN_ASYNC} = $async;
-    weaken($self->{+IN_ASYNC});
-
-    return $async;
-}
-
-sub add_aside {
-    my $self = shift;
-    my ($aside) = @_;
-
-    $self->{+ASIDES}->{$aside} = $aside;
-    weaken($self->{+ASIDES}->{$aside});
-
-    return $aside;
-}
-
-sub add_fork {
-    my $self = shift;
-    my ($fork) = @_;
-
-    $self->{+FORKS}->{$fork} = $fork;
-    weaken($self->{+FORKS}->{$fork});
-
-    return $fork;
-}
-
-sub clear_async {
-    my $self = shift;
-    my ($async) = @_;
-
-    # A reconnect drops the async registry; a handle that survived it (it ran on
-    # the now-dead handle) can still try to clear itself as it finalizes. Treat a
-    # missing or mismatched entry as an already-cleared no-op rather than an error.
-    my $current = $self->{+IN_ASYNC} or return;
-    return unless $async == $current;
-
-    delete $self->{+IN_ASYNC};
-}
-
-sub clear_aside {
-    my $self = shift;
-    my ($aside) = @_;
-
-    # A reconnect drops the aside registry; a surviving handle can still clear
-    # itself as it finalizes, so a missing entry is an already-cleared no-op.
-    return unless $self->{+ASIDES}->{$aside};
-
-    delete $self->{+ASIDES}->{$aside};
-}
-
-sub clear_fork {
-    my $self = shift;
-    my ($fork) = @_;
-
-    # A reconnect drops the fork registry; a surviving handle can still clear
-    # itself as it finalizes, so a missing entry is an already-cleared no-op.
-    return unless $self->{+FORKS}->{$fork};
-
-    delete $self->{+FORKS}->{$fork};
-}
-
-########################
-# }}} Async/Aside/Fork #
-########################
-
-#####################
-# {{{ SANITY CHECKS #
-#####################
-
-=pod
-
-=item $con->pid_and_async_check
-
-Throws an exception if the PID does not match, or if there is an async query
-running.
-
-=item $con->pid_check
-
-Throws an exception if the current PID does not match the connection's PID.
-
-=item $con->async_check
-
-Throws an exception if there is an async query running.
-
-=cut
-
-sub pid_and_async_check {
-    my $self = shift;
-    return $self->pid_check && $self->async_check;
-}
-
-sub pid_check {
-    my $self = shift;
-    confess "Connections cannot be used across multiple processes, you must reconnect post-fork" unless $$ == $self->{+PID};
-    return 1;
-}
-
-sub async_check {
-    my $self = shift;
-
-    my $async = $self->{+IN_ASYNC} or return 1;
-    confess "There is currently an async query running, it must be completed before you run another query" unless $async->done;
-    delete $self->{+IN_ASYNC};
-    return 1;
-}
-
-#####################
-# }}} SANITY CHECKS #
-#####################
-
-########################
-# {{{ SIMPLE ACCESSORS #
-########################
-
-=pod
-
-=item $db = $con->db
-
-Shortcut for C<< $con->orm->db >>. Returns an L<DBIx::QuickORM::DB> object.
-
-=item $bool = $con->cas_count_reliable
-
-True if this connection reports the affected-row count that compare-and-set
-needs (rows matched, not rows changed). See L<DBIx::QuickORM::DB/cas_count_reliable>.
-
-=item $dbh = $con->aside_dbh
-
-Returns a completely new and independent C<$dbh> connected to the database.
-
-=item @names = $con->volatile_free_tables
-
-The sorted names of tables that have no volatile columns -- the tables whose
-written values can be trusted without a re-read. Delegates to the schema.
-
-=cut
-
-sub db { $_[0]->{+ORM}->db }
-sub cas_count_reliable { $_[0]->db->cas_count_reliable }
-sub aside_dbh { $_[0]->{+ORM}->db->new_dbh }
-
-# The sorted names of tables that have no volatile columns (see the volatile
-# column marker) -- the tables whose written values can be trusted as-is.
-sub volatile_free_tables { $_[0]->{+SCHEMA}->volatile_free_tables }
-
-########################
-# }}} SIMPLE ACCESSORS #
-########################
-
-#####################
-# {{{ STATE CHANGES #
-#####################
-
-=pod
-
-=item $bool = $con->connected
-
-True while this connection has a live database handle, false once it has been
-disconnected.
-
-=item $con->disconnect
-
-Disconnect the current dbh (if any) without establishing a new one. Croaks if
-any ORM-managed transactions are open. Any in-progress async query is abandoned
-and the aside/forked query registries are cleared, exactly as for C<reconnect>.
-After this the connection reports C<< connected >> false, and a blessed
-C<row_manager> it held can be rebound to a new connection.
-
-=item $con->reconnect
-
-Disconnect the current dbh (if any) and establish a fresh one, typically after
-a fork or a lost connection. Croaks if any ORM-managed transactions are open.
-Any in-progress async query is abandoned (it ran on the old handle), and the
-aside/forked query registries are cleared; those queries keep their own
-private connections but are no longer tracked by this connection.
-
-=cut
-
-sub connected {
-    my $self = shift;
-    return $self->{+DBH} ? 1 : 0;
-}
-
-sub _release_dbh {
-    my $self = shift;
-
-    if (my $dbh = delete $self->{+DBH}) {
-        if ($self->{+PID} == $$) {
-            # Our own handle: close it cleanly.
-            $dbh->disconnect;
-        }
-        else {
-            # Inherited across a fork: the socket is shared with the parent.
-            # DBI's InactiveDestroy suppresses the implicit disconnect at
-            # DESTROY, but NOT an explicit disconnect(), which would send a
-            # protocol-level terminate and tear down the parent's server
-            # session. Detach without disconnecting.
-            $dbh->{InactiveDestroy} = 1;
-        }
-    }
-
-    # The old handle is gone, so an in-progress async query on it can never
-    # complete. Mark a surviving async handle invalidated so an attempt to use
-    # it gives a clear error instead of a raw driver failure, and so its
-    # finalizer does not read the dead handle. (Aside/forked queries hold their
-    # own private connections and legitimately survive, so they are not
-    # invalidated; they belong to the pre-release (possibly pre-fork) state, so
-    # stop tracking them.)
-    if (my $async = $self->{+IN_ASYNC}) {
-        $async->mark_invalidated if $async->can('mark_invalidated');
-    }
-    delete $self->{+IN_ASYNC};
-    $self->{+ASIDES} = {};
-    $self->{+FORKS}  = {};
-
-    return;
-}
-
-sub disconnect {
-    my $self = shift;
-
-    croak "Cannot disconnect while there are active ORM-managed transactions"
-        if @{$self->{+TRANSACTIONS} // []};
-
-    $self->_release_dbh;
-
-    return;
-}
-
-sub reconnect {
-    my $self = shift;
-
-    croak "Cannot reconnect while there are active ORM-managed transactions"
-        if @{$self->{+TRANSACTIONS} // []};
-
-    $self->_release_dbh;
-
-    $self->{+PID} = $$;
-    $self->{+DBH} = $self->{+ORM}->db->new_dbh;
-
-    # The dialect holds its own copy of the dbh and issues all transaction
-    # control statements (BEGIN/COMMIT/savepoints). It must be rebuilt so it
-    # does not keep operating on the dead handle.
-    $self->{+DIALECT} = $self->_build_dialect;
-}
-
-#####################
-# }}} STATE CHANGES #
-#####################
-
-###########################
-# {{{ TRANSACTION METHODS #
-###########################
-
-=pod
-
-=item $txn = $con->transaction(sub { my $txn = shift; ... })
-
-=item $txn = $con->txn(sub { my $txn = shift; ... })
-
-=item $txn = $con->transaction(%params)
-
-=item $txn = $con->txn(%params)
-
-This will start a transaction or create a savepoint to emulate nested
-transactions. Calls to this method can be nested.
-
-    $con->txn(sub {
-        $con->txn(sub { ... }); # Nested! uses savepoints
-    });
-
-If an action sub is provided then the transaction will be started, and the
-action sub will be executed. If the action sub returns then the transaction
-will be committed. If the action sub throws an exception the transaction will be
-rolled back.
-
-You can also manually commit/rollback which will exit the action subroutine.
-
-    $txn->commit;
-    $txn->rollback;
-
-If you need to start a transaction that is not limited to a single subroutine,
-you can call this method without an action sub, it will return an
-L<DBIx::QuickORM::Connection::Transaction> instance that can be used to commit
-or rollback the transaction when you are ready. If the object falls completely
-out of scope and is destroyed then the transaction will be rolled back.
-
-All possible arguments:
-
-    my $txn = $con->txn(
-        # Action sub for this transaction, transaction ends when sub does.
-        action => sub { my $txn = shift; ... },
-
-        # Used to force a transaction even if there are aside or forked queries running.
-        force        => $BOOL, # Basically a combination of the next 2 options
-        ignore_aside => $BOOL, # Allow a transaction even if an aside query is active
-        ignore_forks => $BOOL, # Allow a transaction even if a forked query is active
-
-        # Things to run at the end of the transaction.
-        on_fail       => sub { ... }, # Only runs if the txn is rolled back
-        on_success    => sub { ... }, # Only runs if the txn is committed
-        on_completion => sub { ... }, # Runs when the txn is done regardless of status.
-
-        # Same as above, except you are adding them to a direct parent txn (if one exists, otherwise they are no-ops)
-        on_parent_fail       => sub { ... },
-        on_parent_success    => sub { ... },
-        on_parent_completion => sub { ... },
-
-        # Same as above, except they are applied to the root transaction, no
-        # matter how deeply nested it is.
-        on_root_fail       => sub { ... },
-        on_root_success    => sub { ... },
-        on_root_completion => sub { ... },
-    );
-
-An L<DBIx::QuickORM::Connection::Transaction> instance is always returned. If
-an action callback was provided then the instance will already be complete, but
-you can check and see what the status was. If you did not provide an action
-callback then the txn will be "live" and you can use the instance to commit it
-or roll it back.
-
-=cut
-
-{
-    no warnings 'once';
-    *transaction = \&txn;
-}
-sub txn {
-    my $self = shift;
-    $self->pid_check;
-
-    my @caller = caller;
-
-    my $cb = (@_ && ref($_[0]) eq 'CODE') ? shift : undef;
-    my %params = @_;
-    $cb //= $params{action};
-
-    $self->_txn_guards(\%params);
-
-    my $txns = $self->{+TRANSACTIONS};
-
-    my $sp = $self->_txn_begin;
-
-    my $txn = DBIx::QuickORM::Connection::Transaction->new(
-        id            => $self->{+_TXN_COUNTER}++,
-        connection    => $self,
-        savepoint     => $sp,
-        trace         => \@caller,
-        on_fail       => $params{on_fail},
-        on_success    => $params{on_success},
-        on_completion => $params{on_completion},
-    );
-
-    $self->_txn_attach_relative_callbacks($txn, \%params);
-
-    push @{$txns} => $txn;
-    weaken($txns->[-1]);
-
-    my $finalize = $self->_txn_finalizer($sp);
-
-    unless($cb) {
-        $txn->set_no_last(1);
-        $txn->set_finalize($finalize);
-        return $txn;
-    }
-
-    local $@;
-    my $ok = eval {
-        QORM_TRANSACTION: { $cb->($txn) };
-        1;
-    };
-    my $err = $@;
-
-    # The body threw - record the exception that forced the rollback.
-    $txn->set_exception($err) unless $ok;
-
-    $finalize->($txn, $ok, $err);
-
-    return $txn;
-}
-
-=pod
-
-=item $bool_or_txn = $con->in_transaction
-
-=item $bool_or_txn = $con->in_txn
-
-Returns true if there is a transaction active. If the transaction is managed by
-L<DBIx::QuickORM> then the L<DBIx::QuickORM::Connection::Transaction> object
-will be returned.
-
-=cut
-
-{
-    no warnings 'once';
-    *in_transaction = \&in_txn;
-}
-sub in_txn {
-    my $self = shift;
-    return $self->current_txn // $self->dialect->in_txn;
-}
-
-=pod
-
-=item $txn = $con->current_transaction
-
-=item $txn = $con->current_txn
-
-Return the current L<DBIx::QuickORM::Connection::Transaction> if one is active.
-
-B<Note:> Do not use this to check for a transaction, it will return false if
-there is a transaction that is not managed by L<DBIx::QuickORM>.
-
-=cut
-
-{
-    no warnings 'once';
-    *current_transaction = \&current_txn;
-}
-sub current_txn {
-    my $self = shift;
-    $self->pid_check;
-
-    if (my $txns = $self->{+TRANSACTIONS}) {
-        return $txns->[-1] if @$txns;
-    }
-
-    return undef;
-}
-
-=pod
-
-=item $con->auto_retry_txn(sub { my $txn = shift; ... })
-
-=item $con->auto_retry_txn(\%params, sub { my $txn = shift; ... })
-
-=item $con->auto_retry_txn(%params, action => sub { my $txn = shift; ... })
-
-Run the specified action in a transaction, retry if an exception is thrown.
-
-This is a convenience method that boils down to:
-
-    $con->auto_retry(sub { $con->txn(sub { ... }) });
-
-C<< count => $NUM >> can be used to specify a maximum number of retries, the default is 1.
-
-All other params are passed to C<txn()>.
-
-=cut
-
-sub auto_retry_txn {
-    my $self = shift;
-    $self->pid_check;
-    $self->async_check;
-
-    my $count;
-    my %params;
-
-    if (!@_) {
-        croak "Not enough arguments";
-    }
-    elsif (@_ == 1 && ref($_[0]) eq 'CODE') {
-        $count = 1;
-        $params{action} = $_[0];
-    }
-    elsif (@_ == 2) {
-        my $ref0 = ref($_[0]);
-        my $ref1 = ref($_[1]);
-        my $count_like = !$ref0 && defined($_[0]) && $_[0] =~ /^\d+$/;
-        if ($ref0 eq 'HASH' && $ref1 eq 'CODE') {
-            %params = %{$_[0]};
-            $params{action} = $_[1];
-            $count = delete $params{count};
-        }
-        elsif ($count_like && $ref1 eq 'CODE') {
-            $count = $_[0];
-            $params{action} = $_[1];
-        }
-        elsif ($count_like && $ref1 eq 'HASH') {
-            $count  = $_[0];
-            %params = %{$_[1]};
-        }
-        elsif ($count_like) {
-            croak "Not sure what to do with second argument '$_[1]'";
-        }
-        else {
-            # Flat key => value form, e.g. (action => sub {...}). A positional
-            # ($count, $cb) only matches the branches above, where the first
-            # argument actually looks like a count.
-            %params = @_;
-            $count  = delete $params{count};
-        }
-    }
-    else {
-        %params = @_;
-        $count  = delete $params{count};
-    }
-
-    $count ||= 1;
-
-    $self->auto_retry($count => sub { $self->txn(%params) });
-}
-
-###########################
-# }}} TRANSACTION METHODS #
-###########################
-
-#######################
-# {{{ UTILITY METHODS #
-#######################
-
-=pod
-
-=item $res = $con->auto_retry(sub { ... })
-
-=item $res = $con->auto_retry($count, sub { ... })
-
-Run the provided sub multiple times until it succeeds or the count is exceeded.
-Default count is 1. An exception will be thrown if it never succeeds. Cannot be
-used inside a transaction.
-
-Returns whatever the provided coderef returns; scalar context is always
-assumed.
-
-=cut
-
-sub auto_retry {
-    my $self  = shift;
-    my $cb    = pop;
-    my $count = shift || 1;
-    $self->pid_check;
-    $self->async_check;
-
-    croak "Cannot use auto_retry inside a transaction" if $self->in_txn;
-
-    my ($ok, $out, $err);
-    for my $attempt (0 .. $count) {
-        $ok = eval { $out = $cb->(); 1 };
-        last if $ok;
-        $err = $@;
-        last if $attempt == $count;
-        warn "Error encountered in auto-retry, will retry...\n Exception was: $err\n";
-        $self->reconnect unless $self->{+DBH} && $self->{+DBH}->ping;
-    }
-
-    croak "auto_retry did not succeed (attempted " . ($count + 1) . " times). Last exception: $err"
-        unless $ok;
-
-    return $out;
-}
-
-=pod
-
-=item $source = $con->source($in, %params)
-
-Resolve C<$in> to an object implementing L<DBIx::QuickORM::Role::Source>. C<$in>
-may be such an object, a scalar reference (treated as literal SQL), or a table
-name looked up in the schema. Croaks on failure unless C<< no_fatal => 1 >> is
-passed, in which case it returns undef.
-
-This is B<NOT> like calling C<source()> from L<DBIx::Class>; you cannot use the
-source directly to make queries, look at the C<handle()> method instead.
-
-=cut
-
-sub source {
-    my $self = shift;
-    my ($in, %params) = @_;
-
-    if (blessed($in)) {
-        return $in if $in->DOES('DBIx::QuickORM::Role::Source');
-        return undef if $params{no_fatal};
-        croak "'$in' does not implement the 'DBIx::QuickORM::Role::Source' role";
-    }
-
-    if (my $r = ref($in)) {
-        if ($r eq 'SCALAR') {
-            require DBIx::QuickORM::LiteralSource;
-            return DBIx::QuickORM::LiteralSource->new($in);
-        }
-
-        return undef if $params{no_fatal};
-        croak "Not sure what to do with '$r'";
-    }
-
-    my $source = $self->schema->maybe_table($in);
-    return $source if $source;
-
-    return undef if $params{no_fatal};
-    croak "Could not find the '$in' table in the schema";
-}
-
-#######################
-# }}} UTILITY METHODS #
-#######################
-
-#########################
-# {{{ HANDLE OPERATIONS #
-#########################
-
-=pod
-
-See L<DBIx::QuickORM::Handle> for more information on handles.
-
-=item $h = $con->handle(...)
-
-Get an L<DBIx::QuickORM::Handle> object that operates on this connection. Any
-argument accepted by the C<new()> or C<handle()> methods on
-L<DBIx::QuickORM::Handle> can be provided here as arguments.
-
-B<Passing an existing handle uses it as a subquery source.> A
-L<DBIx::QuickORM::Handle> is itself a source, so handing one to C<handle()>
-splices its query in as a derived table, C<< ( <inner query> ) AS <alias> >>:
-
-    my $recent = $con->handle('events')->where({ts => {'>' => $cutoff}});
-    $con->handle($recent)->where({kind => 'click'})->all;
-    # SELECT * FROM ( SELECT ... FROM events WHERE ts > ? ) AS subquery
-    #   WHERE kind = ?
-
-Use C<< $recent->subquery_alias('name') >> to control the derived-table alias
-(default C<subquery>). To refine an existing handle B<without> wrapping it in
-a subquery, call refining methods on the handle directly (e.g.
-C<< $recent->where(...) >>), which return a refined clone.
-
-B<Note:> unlike C<source()>, C<handle()> does not accept a scalar reference
-(literal SQL) directly; passing one throws. Build the source first and pass
-the object:
-
-    $con->handle($con->source(\$sql))->all;
-
-=cut
-
-sub handle {
-    my $self = shift;
-    my ($in) = @_;
-
-    croak "handle() requires a source, a handle, or handle constructor arguments; got undef" unless defined $in;
-
-    # A handle passed here is consumed as a query source (a derived table),
-    # because Handle DOES Role::Source: the new handle wraps it as
-    # ( <inner query> ) AS <alias>. To refine an existing handle without
-    # wrapping it, call refining methods on the handle itself (e.g.
-    # $h->where(...)), which already return a refined clone.
-    return $self->{+DEFAULT_HANDLE_CLASS}->handle(connection => $self, @_);
-}
-
-=pod
-
-=item $h = $con->async(@handle_constructor_args)
-
-=item $h = $con->aside(@handle_constructor_args)
-
-=item $h = $con->forked(@handle_constructor_args)
-
-=item $h = $con->all(@handle_constructor_args)
-
-=item $h = $con->iterator(@handle_constructor_args)
-
-=item $h = $con->any(@handle_constructor_args)
-
-=item $h = $con->first(@handle_constructor_args)
-
-=item $h = $con->one(@handle_constructor_args)
-
-=item $h = $con->count(@handle_constructor_args)
-
-=item $h = $con->delete(@handle_constructor_args)
-
-These are convenience methods that simply proxy to handle objects:
-
-    my $h = $con->handle(@handle_constructor_args)->NAME();
-
-See the methods in L<DBIx::QuickORM::Handle> for more info.
-
-=item $h = $con->by_id(@handle_constructor_args, $method_arg)
-
-=item $h = $con->iterate(@handle_constructor_args, $method_arg)
-
-=item $h = $con->insert(@handle_constructor_args, $method_arg)
-
-=item $h = $con->vivify(@handle_constructor_args, $method_arg)
-
-=item $h = $con->update(@handle_constructor_args, $method_arg)
-
-=item $h = $con->update_or_insert(@handle_constructor_args, $method_arg)
-
-=item $h = $con->find_or_insert(@handle_constructor_args, $method_arg)
-
-These are convenience methods that simply proxy to handle objects:
-
-    my $h = $con->handle(@handle_constructor_args)->NAME($method_arg);
-
-See the methods in L<DBIx::QuickORM::Handle> for more info.
-
-=cut
-
-sub async  { my $self = shift; $self->handle(@_)->async }
-sub aside  { my $self = shift; $self->handle(@_)->aside }
-sub forked { my $self = shift; $self->handle(@_)->forked }
-
-sub all      { my $self = shift; $self->handle(@_)->all }
-sub iterator { my $self = shift; $self->handle(@_)->iterator }
-sub any      { my $self = shift; $self->handle(@_)->any }
-sub first    { my $self = shift; $self->handle(@_)->first }
-sub one      { my $self = shift; $self->handle(@_)->one }
-sub count    { my $self = shift; $self->handle(@_)->count }
-sub delete   { my $self = shift; $self->handle(@_)->delete }
-
-sub by_id   { my $self = shift; my $arg = pop; $self->handle(@_)->by_id($arg) }
-sub iterate { my $self = shift; my $arg = pop; $self->handle(@_)->iterate($arg) }
-sub insert  { my $self = shift; my $arg = pop; $self->handle(@_)->insert($arg) }
-sub vivify  { my $self = shift; my $arg = pop; $self->handle(@_)->vivify($arg) }
-sub update  { my $self = shift; my $arg = pop; $self->handle(@_)->update($arg) }
-
-sub update_or_insert { my $self = shift; my $arg = pop; $self->handle(@_)->upsert($arg) }
-sub find_or_insert   { my $self = shift; my $arg = pop; my $h = $self->handle(@_); $h->one($arg) // $h->insert($arg) }
-
-=pod
-
-=item $rows_arrayref = $con->by_ids($source, @ids)
-
-Fetch rows in the specified source by their ids.
-
-B<NOTE:> If all the specified rows are already cached, no DB query will occur.
-
-C<$source> can be a table name, or any object that implements
-L<DBIx::QuickORM::Role::Source>.
-
-C<@ids> contains one or more row primary keys. The keys may be a scalar value
-such as C<12> if the primary key is a single column. If the source has a
-compound primary key you may provide an arrayref with all the key field values,
-or a hashref with the C<< field => val >> pairs.
-
-An arrayref of L<DBIx::QuickORM::Row> objects will be returned.
-
-For a table name or source object this is a convenience method that boils down
-to:
-
-    $con->handle($source)->by_ids(@ids);
-
-B<Note:> when C<$source> is itself a L<DBIx::QuickORM::Handle>, it is used
-directly as the handle rather than wrapped as a subquery source the way
-C<< handle() >> would treat it. A primary-key lookup over a derived table is
-not meaningful, so the handle is reused as-is.
-
-=cut
-
-sub by_ids {
-    my $self = shift;
-    my ($from, @ids) = @_;
-
-    my $handle;
-    if (blessed($from) && $from->isa('DBIx::QuickORM::Handle')) {
-        $handle = $from;
-    }
-    else {
-        $handle = $self->handle(source => $from);
-    }
-
-    return $handle->by_ids(@ids);
-}
-
-#########################
-# }}} HANDLE OPERATIONS #
-#########################
-
-########################
-# {{{ STATE OPERATIONS #
-########################
-
-=pod
-
-=item $bool = $con->state_does_cache
-
-Check if the current row manager handles caching of rows.
-
-=item $row = $con->state_cache_lookup($source, $pk)
-
-Find an in-cache row by source and primary key. Source can be a table name or
-object that implements L<DBIx::QuickORM::Role::Source>. The primary key should
-be a hashref:
-
-    {pk_field1 => $pk_val1, pk_field2 => $pk_val2, ... }
-
-=item $con->state_delete_row(...)
-
-=item $con->state_insert_row(...)
-
-=item $con->state_select_row(...)
-
-=item $con->state_update_row(...)
-
-=item $con->state_vivify_row(...)
-
-=item $con->state_invalidate(...)
-
-These are shortcuts for:
-
-    $self->manager->METHOD(connection => $self, ...);
+Values read after the call use the new parsers. A DateTime field read before
+the call keeps the parsers it was read with, even while still unparsed.
 
 =back
 
 =cut
 
-sub state_does_cache   { $_[0]->{+MANAGER}->does_cache }
-sub state_delete_row   { my $self = shift; $self->{+MANAGER}->delete(connection => $self, @_) }
-sub state_insert_row   { my $self = shift; $self->{+MANAGER}->insert(connection => $self, @_) }
-sub state_select_row   { my $self = shift; $self->{+MANAGER}->select(connection => $self, @_) }
-sub state_update_row   { my $self = shift; $self->{+MANAGER}->update(connection => $self, @_) }
-sub state_vivify_row   { my $self = shift; $self->{+MANAGER}->vivify(connection => $self, @_) }
-sub state_invalidate   { my $self = shift; $self->{+MANAGER}->invalidate(connection => $self, @_) }
-sub state_cache_lookup {
+sub set_enforce_canon { $_[0]->{+ENFORCE_CANON} = $_[1] }
+
+sub set_datetime_parsers {
     my $self = shift;
-    my ($in, $pk) = @_;
-
-    my $source = $self->source($in);
-
-    if (ref($pk) eq 'HASH') {
-        my $fields = $source->primary_key // [];
-        $pk = [map { $pk->{$_} } @$fields];
-    }
-
-    return $self->{+MANAGER}->do_cache_lookup($source, undef, undef, $pk);
+    my ($parsers) = @_;
+    $self->{+DATETIME_PARSERS} = $self->_check_datetime_parsers($parsers);
 }
 
-########################
-# }}} STATE OPERATIONS #
-########################
+=over 4
 
-#######################
-# {{{ PRIVATE METHODS #
-#######################
+=item $lookup = $conn->lookup
+
+The Connection's L<DBIx::QuickORM::LookupTable>, built on first use.
+
+=back
+
+=cut
+
+sub lookup {
+    my $self = shift;
+    return $self->{+LOOKUP} //= DBIx::QuickORM::LookupTable->new(db_map => $self->{+DB_MAP}, connection => $self, retain => $self->{+RETAIN_CACHE});
+}
+
+=over 4
+
+=item $bool = $conn->is_canon($table, $row_or_data)
+
+True when the row data (or a row object's C<row_data>) is the lookup table's
+entry for its primary key. Croaks when the primary key cannot be determined.
+
+=back
+
+=cut
+
+sub is_canon {
+    my $self = shift;
+    my ($table, $data) = @_;
+    return $self->lookup->is_canon($table, $self->_row_data($data));
+}
+
+=over 4
+
+=item $data = $conn->insert($table, \%fields, raw => $bool, as_given => $bool, void => $bool)
+
+Inserts one row and returns its new row data, now the lookup table's entry.
+Where the primary key comes from, C<as_given>, and the croaks, are as
+L<DBIx::QuickORM/"CRUD operations"> describes for C<insert>.
+
+Primary key fields left out may get generated values first (see
+C<_generate_keys>). C<as_given> includes them.
+
+A table without a primary key returns the C<RETURNING> row without storing it
+in the lookup table.
+
+With C<as_given>, C<RETURNING> names only the primary key fields, and the
+result is never stored.
+
+C<< void => 1 >> is what the ORM passes in void context: the row is inserted
+without C<RETURNING>, nothing is stored or returned, and none of the primary
+key croaks apply.
+
+=back
+
+=cut
+
+my %INSERT_ARGS = map { $_ => 1 } qw/raw void as_given/;
+
+sub insert {
+    my $self = shift;
+    my ($table, $fields, %params) = @_;
+
+    $self->_check_params(insert => \%INSERT_ARGS, \%params);
+    my $t      = $self->_table($table);
+    my $values = $self->_row_data($fields);
+    confess "insert() into '$table' needs at least one field" unless %$values;
+    my $generated = $self->_generate_keys($t, $values);
+    $values = {%{$self->deflate($table, $values, raw => $params{raw})}, %{$self->deflate($table, $generated)}};
+    my @names = sort keys %$values;
+
+    my $void      = $params{void};
+    my $as_given  = $params{as_given};
+    my $dialect   = $self->{+DIALECT};
+    my $pk        = $t->{pk} && @{$t->{pk}} ? $t->{pk} : undef;
+    my $returning = !$void   && ($pk || !$as_given) && $dialect->supports_returning_insert;
+    my $given_pk  = $pk      && !grep { !defined($values->{$_}) || $self->_is_sql($values->{$_}) } @$pk;
+    unless ($void || $returning) {
+        confess "insert() into '$table' has nothing to return: the table has no primary key and the database cannot return the row; call it in void context" unless $pk || $as_given;
+        confess "insert() into '$table' needs every primary key field, since the database cannot return a compound key it generates" if $pk && !$given_pk && @$pk > 1;
+    }
+
+    my ($places, $binds, $marked) = $self->_value_sql($values, @names);
+    my $shape = $marked ? undef : join("\0" => 'insert', $table, ($returning ? ($as_given ? 'pk' : 'all') : ''), @names);
+    my $sql   = $self->_statement(
+        $shape,
+        sub {
+            my $sql = 'INSERT INTO ' . $dialect->quote_identifier($table) . ' (' . join(', ' => map { $dialect->quote_identifier($_) } @names) . ') VALUES (' . join(', ' => @$places) . ')';
+            $returning ? $sql . $self->_returning_sql($table, $as_given ? $pk : undef) : $sql;
+        }
+    );
+    my $sth = $self->_run($t->{fields}, $sql, $binds, undef, defined $shape);
+    return if $void;
+
+    my $data = $returning ? $self->_fetch($t->{fields}, $sth)->[0] : undef;
+    if ($pk && !$data && $given_pk) {
+        $data = $self->_plain({map { $_ => $values->{$_} } @$pk});
+    }
+    elsif ($pk && !$data) {
+        # Only MySQL gets here (no RETURNING). DBD::MariaDB gives 0 when the insert
+        # generated no key, and AUTO_INCREMENT never generates 0, so 0 is "none".
+        my $id = $dialect->last_insert_id($self->{+DBH}, $table, $pk->[0]) or confess "insert() into '$table' did not give a value for the primary key '$pk->[0]', and the database generated none";
+        $data = {$pk->[0] => $id};
+    }
+
+    my $lookup = $self->lookup;
+    my $out;
+    if ($as_given) {
+        my %copy = map { $_ => $values->{$_} } grep { !$self->_is_sql($values->{$_}) } @names;
+        $out = {%{$self->_plain(\%copy)}, %{$data // {}}};
+    }
+    else {
+        $out = $pk ? $lookup->store($table, $data) : $data;
+    }
+
+    $lookup->mark_inserted($out);
+    return $out;
+}
+
+=over 4
+
+=item \@data = $conn->insert_many($table, \@rows, raw => $bool)
+
+=item $count = $conn->insert_many($table, \@rows, count => 1, raw => $bool)
+
+=item $conn->insert_many($table, \@rows, void => 1, raw => $bool)
+
+Generates missing primary key values for each row as C<insert> does, then
+inserts the rows in multi-row C<INSERT> statements, each holding as many rows
+as the dialect's C<bind_limit> allows. The batching, the transaction around
+it, and the croaks are as L<DBIx::QuickORM/"CRUD operations"> describes for
+C<insert_many>.
+
+It returns an arrayref of the new rows' row data, now the lookup table's
+entries (a table without a primary key bypasses it). Without C<RETURNING> each
+holds the primary key taken from the given values.
+
+C<< count => 1 >> returns how many rows the database reports inserted
+instead, and C<< void => 1 >> (what the ORM passes in void context) returns
+nothing useful. Neither sends C<RETURNING> or stores anything.
+
+An empty C<\@rows> sends nothing and returns an empty arrayref, or 0 with
+C<count>.
+
+The field list is checked once per call. Each value is deflated as
+C<deflate> would, through C<_deflate_value>.
+
+=back
+
+=cut
+
+my %INSERT_MANY_ARGS = map { $_ => 1 } qw/raw count void/;
+
+sub insert_many {
+    my $self = shift;
+    my ($table, $rows, %params) = @_;
+
+    $self->_check_params(insert_many => \%INSERT_MANY_ARGS, \%params);
+    my $t = $self->_table($table);
+    confess "insert_many() needs an arrayref of rows" unless ref($rows) eq 'ARRAY';
+    my $returning = !$params{void} && !$params{count};
+    return $returning ? [] : 0 unless @$rows;
+    my @values = map { $self->_row_data($_) } @$rows;
+    my @names  = sort keys %{$values[0]};
+    confess "insert_many() into '$table' needs at least one field in each row" unless @names;
+
+    for my $i (1 .. $#values) {
+        my $v = $values[$i];
+        confess "insert_many() into '$table' needs the same fields in every row, but row $i differs from the first" unless keys(%$v) == @names && !grep { !exists $v->{$_} } @names;
+    }
+
+    # The fields are checked once, and each value deflated as deflate() would, with its field record at hand.
+    $self->_check_fields($table, @names);
+    my ($fields, $raw) = ($t->{fields}, $params{raw});
+    @values = map {
+        my $v         = $_;
+        my $generated = $self->_generate_keys($t, $v);
+        my %out       = map { ($_ => $self->_deflate_value($table, $_, $fields->{$_}, $v->{$_}, $raw)) } @names;
+        $out{$_} = $self->_deflate_value($table, $_, $fields->{$_}, $generated->{$_}) for keys %$generated;
+        \%out;
+    } @values;
+    @names = sort keys %{$values[0]};
+
+    my $dialect = $self->{+DIALECT};
+    my $pk      = $t->{pk}   && @{$t->{pk}} ? $t->{pk} : undef;
+    my $sql_ret = $returning && $dialect->supports_returning_insert;
+    if ($returning && !$sql_ret) {
+        confess "insert_many() into '$table' cannot return rows: the table has no primary key and the database cannot return them; pass count => 1 for how many went in" unless $pk;
+        my @short = grep {
+            my $v = $_;
+            grep { !defined($v->{$_}) || $self->_is_sql($v->{$_}) } @$pk
+        } @values;
+        confess "insert_many() into '$table' cannot return rows unless every row carries its whole primary key, since the database cannot return the keys it generates; pass count => 1 for how many went in" if @short;
+    }
+
+    my $into    = 'INSERT INTO ' . $dialect->quote_identifier($table) . ' (' . join(', ' => map { $dialect->quote_identifier($_) } @names) . ') VALUES ';
+    my @batches = $self->_batches(\@values, \@names);
+    my $send    = sub {
+        my ($count, @got) = (0);
+        for my $batch (@batches) {
+            my ($places, $binds) = @$batch;
+            my $sth = $self->_run($t->{fields}, $into . join(', ' => @$places) . ($sql_ret ? $self->_returning_sql($table) : ''), $binds);
+            if ($sql_ret) { push @got => @{$self->_fetch($t->{fields}, $sth)} }
+            else          { $count += $sth->rows }
+        }
+        return $sql_ret ? \@got : $count;
+    };
+
+    my $own_txn = @{$self->{+TXNS}} ? $dialect->supports_savepoints : @batches > 1;
+    my $out     = $own_txn          ? $self->txn($send)             : $send->();
+    return $out unless $returning;
+
+    # Without RETURNING each row is its primary key, taken from the given values.
+    my @got = $sql_ret ? @$out : map {
+        my $v = $_;
+        $self->_plain({map { ($_ => $v->{$_}) } @$pk})
+    } @values;
+
+    my $lookup = $self->lookup;
+    @got = map { $lookup->store($table, $_) } @got if $pk;
+    $lookup->mark_inserted(@got);
+    return \@got;
+}
+
+=over 4
+
+=item $data = $conn->update_row($table, \%data, \%changes, %opts)
+
+Updates one row, found by the primary key in the row data, and returns its new
+row data, or undef when no row matched.
+
+The new row data replaces the old in the lookup table, re-keyed when the
+primary key changed. Undef leaves the lookup table alone. At least one change
+is required. Setting a primary key field with C<sql()> croaks on a database
+without C<RETURNING> for C<UPDATE>, since the new key could not be known.
+
+The options C<enforce_canon>, C<cas>, and C<auto_cas> are as
+L<DBIx::QuickORM/"CRUD operations"> describes for C<update_row>. Each C<cas>
+field must be in the row data.
+
+=back
+
+=cut
+
+my %UPDATE_ARGS = map { $_ => 1 } qw/enforce_canon cas auto_cas raw/;
+
+sub update_row {
+    my $self = shift;
+    my ($table, $data, $changes, %params) = @_;
+
+    $self->_check_params(update_row => \%UPDATE_ARGS, \%params);
+    my $t = $self->_table($table);
+    $data = $self->_row_data($data);
+    confess "update_row() needs a hashref of at least one change" unless ref($changes) eq 'HASH' && %$changes;
+    my @set = sort keys %$changes;
+
+    my $pk = $self->_pk_values($table, $data, $params{raw});
+    $self->_enforce_canon($table, $data, $params{enforce_canon});
+    my $where = {%{$self->deflate($table, {$self->_cas_values($table, $data, $changes, \%params)}, raw => $params{raw})}, %$pk};
+    $changes = $self->deflate($table, $changes, raw => $params{raw});
+
+    my $dialect   = $self->{+DIALECT};
+    my $returning = $dialect->supports_returning_update;
+    my @sql_pk    = grep { $self->_is_sql($changes->{$_}) } keys %$pk;
+    confess "update_row() cannot set the primary key of '$table' with sql() on a database without RETURNING for UPDATE, since the new key could not be known" if @sql_pk && !$returning;
+
+    my ($where_sql, $where_binds, $where_marked) = $self->_where_sql($where);
+    my ($places, $set_binds, $marked)            = $self->_value_sql($changes, @set);
+    my $shape = $marked || $where_marked ? undef : join("\0" => 'update', $table, @set, $where_sql);
+    my $sql   = $self->_statement(
+        $shape,
+        sub {
+            my $sql = 'UPDATE ' . $dialect->quote_identifier($table) . ' SET ' . join(', ' => map { $dialect->quote_identifier($set[$_]) . " = $places->[$_]" } 0 .. $#set) . " WHERE $where_sql";
+            $returning ? $sql . $self->_returning_sql($table) : $sql;
+        }
+    );
+    my $sth = $self->_run($t->{fields}, $sql, [@$set_binds, @$where_binds], undef, defined $shape);
+
+    my $new;
+    if ($returning) {
+        $new = $self->_fetch($t->{fields}, $sth)->[0] or return undef;
+    }
+    else {
+        return undef unless $sth->rows > 0;
+        $new = $self->_plain({map { $_ => exists($changes->{$_}) ? $changes->{$_} : $pk->{$_} } keys %$pk});
+    }
+
+    my $lookup = $self->lookup;
+    $lookup->forget($table, $self->_plain($pk));
+    $lookup->carry_inserted($data, $new);
+    return $lookup->store($table, $new);
+}
+
+=over 4
+
+=item $count = $conn->delete_row($table, \%data, enforce_canon => $bool, raw => $bool)
+
+Deletes one row, found by the primary key in the row data, and returns how
+many rows were deleted (0 or 1). Its lookup table entry is removed, and the
+row data and that entry are marked deleted (see L<DBIx::QuickORM::LookupTable/Row state>).
+C<enforce_canon> is as for C<update_row>.
+
+=back
+
+=cut
+
+my %DELETE_ARGS = map { $_ => 1 } qw/enforce_canon raw/;
+
+sub delete_row {
+    my $self = shift;
+    my ($table, $data, %params) = @_;
+
+    $self->_check_params(delete_row => \%DELETE_ARGS, \%params);
+    my $t = $self->_table($table);
+    $data = $self->_row_data($data);
+    my $pk = $self->_pk_values($table, $data, $params{raw});
+    $self->_enforce_canon($table, $data, $params{enforce_canon});
+
+    my ($where_sql, $where_binds, $marked) = $self->_where_sql($pk);
+    my $sql = $self->_statement($marked ? undef : join("\0" => 'delete', $table, $where_sql), sub { 'DELETE FROM ' . $self->{+DIALECT}->quote_identifier($table) . " WHERE $where_sql" });
+    my $sth = $self->_run($t->{fields}, $sql, $where_binds, undef, !$marked);
+
+    $self->lookup->gone($table, $self->_plain($pk), $data);
+    return $sth->rows;
+}
+
+=over 4
+
+=item $data = $conn->refresh_row($table, $pk, cache => $bool, db => $bool, fields => \@fields, raw => $bool)
+
+The canon row data for the primary key, or undef when there is no such row.
+C<$pk> is the key in any form C<_pk_values> takes, so row data works and its
+other fields are ignored. This is also C<find>.
+
+C<fields> must be fields of the table. C<cache>, C<db>, and C<fields> are as
+L<DBIx::QuickORM/"CRUD operations"> describes for C<refresh_row>: the lookup
+table's entry when it holds every field asked for, otherwise those fields read
+from the database and ingested.
+
+A row the database no longer has is removed from the lookup table, and the
+row data given and that entry are marked deleted.
+
+=back
+
+=cut
+
+my %REFRESH_ARGS = map { $_ => 1 } qw/cache db fields raw/;
+
+sub refresh_row {
+    my $self = shift;
+    my ($table, $data, %params) = @_;
+
+    $self->_check_params(refresh_row => \%REFRESH_ARGS, \%params);
+    my $t     = $self->_table($table);
+    my $pk    = $self->_pk_values($table, $data, $params{raw});
+    my $key   = $self->_plain($pk);
+    my $cache = $params{cache} // 1;
+    my $db    = $params{db}    // 1;
+    confess "refresh_row() needs 'cache' or 'db' to be true" unless $cache || $db;
+
+    my $fields = $params{fields};
+    confess "'fields' must be an arrayref of field names" if defined($fields) && ref($fields) ne 'ARRAY';
+    $self->_check_fields($table, @$fields)                if $fields;
+
+    my %seen;
+    my @select = $fields ? grep { !$seen{$_}++ } sort(@$fields, @{$t->{pk}}) : @{$self->_default_fields($table)};
+
+    my $lookup = $self->lookup;
+    if ($cache) {
+        my $canon = $lookup->lookup($table, $key);
+        return $canon if $canon && (!$db || !grep { !exists $canon->{$_} } @select);
+    }
+    return undef unless $db;
+
+    my $dialect = $self->{+DIALECT};
+    my ($where_sql, $where_binds, $marked) = $self->_where_sql($pk);
+    my $sql = $self->_statement(
+        $marked ? undef : join("\0" => 'select', $table, @select, $where_sql),
+        sub {
+            'SELECT ' . join(', ' => map { $dialect->quote_identifier($_) } @select) . ' FROM ' . $dialect->quote_identifier($table) . " WHERE $where_sql";
+        }
+    );
+
+    my $row   = $self->_fetch($t->{fields}, $self->_run($t->{fields}, $sql, $where_binds, undef, !$marked))->[0];
+    my $given = blessed($data) && $data->can('row_data') ? $data->row_data : ref($data) eq 'HASH' ? $data : undef;
+    if ($row) {
+        my $canon = $lookup->ingest($table, $row);
+        $lookup->carry_inserted($given, $canon) if $given;
+        return $canon;
+    }
+
+    $lookup->gone($table, $key, $given);
+    return undef;
+}
+
+=over 4
+
+=item \@rows = $conn->select($source, $sql, \@binds)
+
+=item \%pending = $conn->select($source, $sql, \@binds, async => 1)
+
+Runs SQL built elsewhere for a source (a L<DBIx::QuickORM::Role::Source>) and
+returns every row as fetched.
+
+Binds are C<[$name, $value]> pairs. The name (undef for none) is one of the
+source's C<field_records>, which also decide how fetched columns are read.
+Nothing is ingested here. The source's C<results> ingests the rows that
+belong to a table.
+
+With C<async>, on a dialect that C<supports_async>, the query is started
+without waiting for it and a hash of three code references is returned:
+C<ready> (true once the result has arrived), C<collect> (waits for the result
+and returns the rows), and C<cancel> (gives up on the query). Call C<collect>
+or C<cancel> once. A dialect without async queries croaks.
+
+While the query is pending the Connection is busy: every query, CRUD operation,
+and transaction statement that would send SQL croaks (a C<find> answered from
+the cache does not), including an explicit C<rollback>.
+
+A rollback forced by a block's exception, or by a L<DBIx::QuickORM::Txn>
+going out of scope, cancels the query first. After that C<collect> throws and
+C<cancel> does nothing.
+
+=back
+
+=cut
+
+my %SELECT_ARGS = (async => 1);
+
+sub select {
+    my $self = shift;
+    my ($source, $sql, $binds, %params) = @_;
+
+    $self->_check_params(select => \%SELECT_ARGS, \%params);
+    confess "select() needs a source (a DBIx::QuickORM::Role::Source)" unless blessed($source) && $source->DOES('DBIx::QuickORM::Role::Source');
+    confess "'binds' must be an arrayref" if defined($binds) && ref($binds) ne 'ARRAY';
+
+    my $fields = $source->field_records;
+    $binds = $self->_resolve_binds($source, $binds);
+    return $self->_fetch($fields, $self->_run($fields, $sql, $binds)) unless $params{async};
+
+    my ($dbh, $dialect) = @{$self}{+DBH, +DIALECT};
+    confess "The " . $dialect->name . " dialect has no async queries" unless $dialect->supports_async;
+    my $sth = $self->_run($fields, $sql, $binds, $dialect->async_prepare_attrs);
+    weaken($PENDING{refaddr($self)} = $self);
+
+    # The statement is freed as soon as the query is over, before another can start beside it.
+    my $done    = sub { undef $sth; delete $self->{+BUSY}; delete $PENDING{refaddr($self)} };
+    my $pending = {
+        ready   => sub { $sth ? $dialect->async_ready($dbh, $sth) : 1 },
+        collect => sub {
+            die "This async query was cancelled when the transaction it ran in was rolled back\n" unless $sth;
+            my $rows;
+            my $ok  = eval { $dialect->async_result($dbh, $sth); $rows = $self->_fetch($fields, $sth); 1 };
+            my $err = $@;
+            $done->();
+            die $err unless $ok;
+            return $rows;
+        },
+        cancel => sub {
+            return unless $sth;
+            my $ok  = eval { $dialect->cancel_async($dbh, $sth); 1 };
+            my $err = $@;
+            $done->();
+            die $err unless $ok;
+        },
+    };
+    $self->{+BUSY} = {sth => $sth, cancel => $pending->{cancel}};
+    return $pending;
+}
+
+=over 4
+
+=item $count = $conn->bulk_write($source, $sql, \@binds)
+
+=item $count = $conn->bulk_write($source, $sql, \@binds, mark_deleted => 1, keys => [$select_sql, \@select_binds])
+
+Runs an C<UPDATE> or C<DELETE> built elsewhere for a table source and returns
+the number of rows the database reports. Binds are as for C<select>.
+
+It cannot tell which rows changed, so it clears the table from the lookup
+table's top level and, inside a transaction, from its outside level. A source
+without a table croaks.
+
+With C<mark_deleted>, C<$sql> must be a C<DELETE>. The deleted rows' primary
+keys are also learned, and each is passed to the lookup table's C<gone>
+before the table is cleared: held rows for those keys are marked deleted (a
+rollback unmarks them).
+
+The count is still the rows the database reports deleted. With C<RETURNING>
+that equals the keys returned. On MySQL it can exceed them (see below).
+
+=over 4
+
+=item *
+
+Where the dialect C<supports_returning_delete>, C<$sql> gets C<RETURNING>
+and the key columns.
+
+=item *
+
+Otherwise (MySQL) C<keys> is required: a C<SELECT> of the key columns with
+the same C<where>. It runs with C<FOR UPDATE>, locking those rows, then
+C<$sql> runs. Both run in a transaction of their own when none is open.
+Nothing is marked unless the C<DELETE> succeeds. At C<READ COMMITTED> a row
+another session commits between the two is deleted and counted, but not
+marked.
+
+=back
+
+=back
+
+=cut
+
+my %BULK_ARGS = map { $_ => 1 } qw/mark_deleted keys/;
+
+sub bulk_write {
+    my $self = shift;
+    my ($source, $sql, $binds, %params) = @_;
+
+    $self->_check_params(bulk_write => \%BULK_ARGS, \%params);
+    confess "bulk_write() needs a source (a DBIx::QuickORM::Role::Source)" unless blessed($source) && $source->DOES('DBIx::QuickORM::Role::Source');
+    my $table = $source->table;
+    confess "bulk_write() needs a source with a table" unless defined $table;
+    confess "'binds' must be an arrayref" if defined($binds) && ref($binds) ne 'ARRAY';
+
+    my $fields = $source->field_records;
+    $binds = $self->_resolve_binds($source, $binds);
+    my $lookup = $self->lookup;
+
+    unless ($params{mark_deleted}) {
+        my $sth = $self->_run($fields, $sql, $binds);
+        $lookup->forget($table);
+        return $sth->rows;
+    }
+
+    my $dialect = $self->{+DIALECT};
+    if ($dialect->supports_returning_delete) {
+        my $returning = join ', ' => map { $dialect->quote_identifier($_) } @{$self->_table($table)->{pk}};
+        my $keys      = $self->_fetch($fields, $self->_run($fields, "$sql RETURNING $returning", $binds));
+        $lookup->gone($table, $_) for @$keys;
+        $lookup->forget($table);
+        return scalar @$keys;
+    }
+
+    my $select = $params{keys};
+    confess "bulk_write() needs 'keys' to mark deleted rows: the " . $dialect->name . " dialect has no RETURNING on DELETE" unless ref($select) eq 'ARRAY';
+    my $run = sub {
+        my $keys = $self->_fetch($fields, $self->_run($fields, "$select->[0] FOR UPDATE", $self->_resolve_binds($source, $select->[1])));
+        my $sth  = $self->_run($fields, $sql, $binds);
+        $lookup->gone($table, $_) for @$keys;
+        $lookup->forget($table);
+        return $sth->rows;
+    };
+    return @{$self->{+TXNS}} ? $run->() : $self->txn($run);
+}
 
 =pod
+
+=over 4
+
+=item $txn = $conn->txn(caller => \@frame)
+
+=item $txn = $conn->txn(isolation => $level, caller => \@frame)
+
+=item @result = $conn->txn(sub { my $txn = shift; ... }, retry => $n, isolation => $level, caller => \@frame)
+
+Opens a transaction, or a savepoint when one is already open, and returns its
+L<DBIx::QuickORM::Txn>. Given a block, runs it in the transaction and returns
+what the block returns.
+
+The transaction statements are sent as SQL, never through DBI's
+C<begin_work>. Nesting croaks on a dialect without savepoints (DuckDB).
+C<caller> is where it was opened, for warnings and errors. It is the caller of
+this method unless given.
+
+Opening one begins a lookup table level (see L<DBIx::QuickORM::LookupTable>).
+
+The block is called in list context when C<txn> is, otherwise in scalar
+context. A normal return commits,
+unless the block already committed or rolled back itself. An exception rolls
+back and is rethrown.
+
+With C<retry>, the block of a root transaction runs again in a new
+transaction, up to C<$n> more times, while the exception is a
+L<DBIx::QuickORM::Exception::DB> whose C<retriable> is true. A
+C<retry> above 0 croaks inside another transaction or without a block. One
+that is not a count croaks.
+
+C<isolation> is the root transaction's level: C<read uncommitted>, C<read
+committed>, C<repeatable read>, or C<serializable>, in any case, or
+C<'server'> for the database's own default. Without it the Connection's
+C<isolation> applies. Every retry begins at the same level. It croaks inside
+another transaction and for any other value. A level on a database without
+settable levels (SQLite, DuckDB) croaks when the transaction opens.
+
+=back
+
+=cut
+
+my %TXN_ARGS  = map { $_ => 1 } qw/retry isolation caller/;
+my @ISOLATION = ('read committed', 'read uncommitted', 'repeatable read', 'serializable', 'server');
+my %ISOLATION = map { $_ => 1 } @ISOLATION;
+
+sub txn {
+    my $self   = shift;
+    my $code   = ref($_[0]) eq 'CODE' ? shift : undef;
+    my %params = @_;
+
+    $self->_check_params(txn => \%TXN_ARGS, \%params);
+    my $caller = $params{caller} // [caller];
+    my $retry  = $params{retry}  // 0;
+    confess "'retry' must be a count of retries" unless $retry =~ m/^\d+\z/;
+    confess "'retry' needs a block: txn(sub { ... }, retry => \$n)"                     if $retry && !$code;
+    confess "'retry' is only for a root transaction, and a transaction is already open" if $retry && @{$self->{+TXNS}};
+
+    my $level = $params{isolation};
+    if (defined $level) {
+        $level = $self->_isolation($level);
+        confess "'isolation' is only for a root transaction, and a transaction is already open" if @{$self->{+TXNS}};
+    }
+    return $self->_begin($caller, $level) unless $code;
+
+    my $list = wantarray;
+    for (my $tries = 0;; $tries++) {
+        my ($ok, $err, @out) = $self->_run_block($code, $caller, $list, $level);
+        return $list ? @out : $out[0] if $ok;
+        die $err unless $tries < $retry && $self->_retriable($err);
+    }
+}
+
+=pod
+
+=over 4
+
+=item $conn->commit_txn($txn)
+
+=item $conn->rollback_txn($txn)
+
+What C<< $txn->commit >> and C<< $txn->rollback >> do (see
+L<DBIx::QuickORM::Txn>).
+
+Either croaks unless the transaction is open and innermost, this is the
+process that opened it, and no async query is pending.
+
+Committing a transaction marked failed rolls it back instead, then croaks
+(see C<_run>).
+
+Ending a transaction ends its lookup table level, as
+L<DBIx::QuickORM::LookupTable> describes. A failed commit or rollback is
+handled as L<DBIx::QuickORM::Txn> describes.
+
+=back
+
+=cut
+
+sub commit_txn {
+    my $self = shift;
+    my ($txn) = @_;
+
+    $self->_check_open($txn, 'commit');
+    $self->_check_idle;    # Before the commit, whose failure would roll back.
+    if (defined(my $failed = $txn->failed)) {
+        $self->_unwind($txn);
+        confess "The transaction opened at " . $txn->opened_at . " was rolled back instead of committed, since a statement in it failed.\nThe failure: $failed\n";
+    }
+    my $sql = $txn->depth == 1 ? 'COMMIT' : 'RELEASE SAVEPOINT ' . $txn->name;
+    unless (eval { $self->_do($sql); 1 }) {
+        my $err = $@;
+        die $err if eval { $self->_unwind($txn); 1 };
+        my $rollback_err = $@;
+        $self->_abandon($txn);
+        chomp($err, $rollback_err);
+        die "The outcome of the transaction opened at " . $txn->opened_at . " is unknown: committing it failed, and so did rolling it back.\nCommit error: $err\nRollback error: $rollback_err\n";
+    }
+
+    pop @{$self->{+TXNS}};
+    $self->lookup->commit_level;
+    return 1;
+}
+
+sub rollback_txn {
+    my $self = shift;
+    my ($txn) = @_;
+    $self->_check_open($txn, 'roll back');
+    $self->_check_idle;
+    $self->_unwind($txn);
+    return 1;
+}
+
+=pod
+
+=over 4
+
+=item \%values = $conn->deflate($table, \%values, raw => $bool)
+
+The values in a new hashref (under C<raw> with no marker, the one given),
+deflated as L<DBIx::QuickORM/"CRUD operations"> describes. The CRUD operations
+use it on every value they send. Row objects use it for the changes they send
+raw.
+
+Value markers (L<DBIx::QuickORM::Value>) are handled even under C<raw>: a
+C<raw> marker is unwrapped, an C<inflated> one is deflated through the type
+whatever C<is_inflated> says, and C<binary> and C<sql> markers are kept for
+the SQL. With C<raw> nothing else changes, and values holding no marker are
+returned as they are.
+
+Croaks for a table not in the map, or a field the table does not have, before
+deflating anything.
+
+=back
+
+=cut
+
+sub deflate {
+    my $self = shift;
+    my ($table, $values, %params) = @_;
+    my $fields = $self->_table($table)->{fields};
+    $self->_check_fields($table, sort keys %$values);
+
+    my $raw = $params{raw};
+    return $values if $raw && !grep { $self->_is_marker($_) } values %$values;
+
+    return {map { $_ => $self->_deflate_value($table, $_, $fields->{$_}, $values->{$_}, $raw) } keys %$values};
+}
+
+=over 4
+
+=item $conn->release_inherited
+
+In a forked child, lets go of the handle inherited from the parent without
+touching the parent's session.
+
+An async query the parent left pending is cleared too, so nothing the child
+does later, or at exit, waits on it. It does nothing in the process that
+opened the Connection, and calling it again is harmless.
+
+=back
+
+=cut
+
+sub release_inherited {
+    my $self = shift;
+    return if $self->{+PID} == $$;
+    $self->{+DIALECT}->release_inherited($self->{+DBH});
+
+    my $busy = delete $self->{+BUSY} or return;
+    my $sth  = $busy->{sth};
+    delete $PENDING{refaddr($self)};
+    @{$sth}{qw/InactiveDestroy RaiseError PrintError PrintWarn HandleError/} = (1, 0, 0, 0, sub { 1 });
+    local $@;
+    eval { $sth->finish; 1 } or warn $@;    # Against the released socket: it reads nothing of the parent's.
+    return;
+}
 
 =head1 PRIVATE METHODS
 
 =over 4
 
-=item $dialect = $con->_build_dialect
+=item $code = $conn->_error_handler($dialect, \@txns)
 
-Construct a fresh dialect instance bound to the current C<dbh>. Used at init
-time and again by C<reconnect> so the dialect never operates on a dead handle.
-
-=cut
-
-sub _build_dialect {
-    my $self = shift;
-
-    my $db = $self->{+ORM}->db;
-    return $db->dialect->new(dbh => $self->{+DBH}, db_name => $db->db_name);
-}
-
-=pod
-
-=item $con->_txn_guards(\%params)
-
-Croaks when starting a transaction is not currently allowed (active async,
-aside, or forked queries). C<force>, C<ignore_aside>, and C<ignore_forks>
-params relax the aside/fork checks.
-
-=cut
-
-sub _txn_guards {
-    my $self = shift;
-    my ($params) = @_;
-
-    croak "Cannot start a transaction while there is an active async query" if $self->{+IN_ASYNC} && !$self->{+IN_ASYNC}->done;
-
-    return if $params->{force};
-
-    unless ($params->{ignore_aside}) {
-        my $count = grep { $_ && !$_->done } values %{$self->{+ASIDES} // {}};
-        croak "Cannot start a transaction while there is an active aside query (unless you use ignore_aside => 1, or force => 1)" if $count;
-    }
-
-    unless ($params->{ignore_forks}) {
-        my $count = grep { $_ && !$_->done } values %{$self->{+FORKS} // {}};
-        croak "Cannot start a transaction while there is an active forked query (unless you use ignore_forks => 1, or force => 1)" if $count;
-    }
-
-    return;
-}
-
-=pod
-
-=item $savepoint_or_undef = $con->_txn_begin
-
-Issues the database-side transaction start: a savepoint (returning its name)
-when a managed transaction is already open, otherwise a real C<BEGIN>
-(returning undef). Croaks when an unmanaged transaction is already open.
-
-=cut
-
-sub _txn_begin {
-    my $self = shift;
-
-    my $dialect = $self->dialect;
-
-    if (@{$self->{+TRANSACTIONS}}) {
-        my $sp = "SAVEPOINT_${$}_" . $self->{+_SAVEPOINT_COUNTER}++;
-        $dialect->create_savepoint(savepoint => $sp);
-        return $sp;
-    }
-
-    croak "A transaction is already open, but it is not controlled by DBIx::QuickORM" if $dialect->in_txn;
-
-    $dialect->start_txn;
-    return undef;
-}
-
-=pod
-
-=item $con->_txn_attach_relative_callbacks($txn, \%params)
-
-Attaches C<on_parent_*> callbacks to the current innermost transaction and
-C<on_root_*> callbacks to the outermost one. Called before C<$txn> is pushed
-onto the stack.
-
-=cut
-
-sub _txn_attach_relative_callbacks {
-    my $self = shift;
-    my ($txn, $params) = @_;
-
-    my $txns = $self->{+TRANSACTIONS};
-
-    # With an empty stack the new txn is its own root, but it has no parent;
-    # on_parent_* callbacks are documented as no-ops in that case. Stack
-    # entries are weak references, so check definedness before using them.
-    my $parent = @$txns ? $txns->[-1] : undef;
-    my $root   = @$txns ? $txns->[0]  : $txn;
-
-    if ($parent) {
-        $parent->add_fail_callback($params->{'on_parent_fail'})             if $params->{on_parent_fail};
-        $parent->add_success_callback($params->{'on_parent_success'})       if $params->{on_parent_success};
-        $parent->add_completion_callback($params->{'on_parent_completion'}) if $params->{on_parent_completion};
-    }
-
-    if ($root) {
-        $root->add_fail_callback($params->{'on_root_fail'})             if $params->{on_root_fail};
-        $root->add_success_callback($params->{'on_root_success'})       if $params->{on_root_success};
-        $root->add_completion_callback($params->{'on_root_completion'}) if $params->{on_root_completion};
-    }
-
-    return;
-}
-
-=pod
-
-=item $cb = $con->_txn_finalizer($savepoint_or_undef)
-
-Builds the one-shot finalize callback that pops the transaction off the
-stack, commits or rolls back (savepoint or real transaction), and fires the
-transaction's callbacks via C<terminate>.
-
-=cut
-
-sub _txn_finalizer {
-    my $self = shift;
-    my ($sp) = @_;
-
-    my $txns    = $self->{+TRANSACTIONS};
-    my $dialect = $self->dialect;
-
-    my $ran = 0;
-    return sub {
-        my ($txnx, $ok, @errors) = @_;
-
-        return if $ran;
-
-        # Guards must run before the one-shot state is consumed so a failed
-        # commit/rollback (e.g. during an active async query) leaves the
-        # transaction recoverable by a later commit/rollback.
-        $txnx->throw("Cannot stop a transaction while there is an active async query")
-            if $self->{+IN_ASYNC} && !$self->{+IN_ASYNC}->done;
-
-        $ran++;
-
-        my $aborted = $txnx->aborted;
-        my $res     = $ok && !$aborted;
-
-        # Find our own entry by identity rather than assuming we are top of the
-        # stack. Perl does not guarantee the destruction order of lexicals, so a
-        # parent transaction can be destroyed while a child savepoint is still
-        # live on the stack; a blind pop there would remove the child and leave
-        # the root BEGIN open forever, wedging the connection. Weak entries
-        # anywhere may already be dead, so skip them.
-        my $idx;
-        for (my $i = $#$txns; $i >= 0; $i--) {
-            my $e = $txns->[$i];
-            next unless defined($e) && $e == $txnx;
-            $idx = $i;
-            last;
-        }
-
-        if (defined $idx) {
-            # Live entries above us are inner transactions orphaned by our
-            # resolution (their enclosing transaction is closing). Resolving us
-            # at the dialect level already discards their work in the database,
-            # so neuter and roll back their objects here — their own DESTROY then
-            # becomes a no-op.
-            my @orphans = grep { defined } @{$txns}[$idx + 1 .. $#$txns];
-            splice(@$txns, $idx);
-
-            if ($sp) {
-                if   ($res) { $dialect->commit_savepoint(savepoint => $sp) }
-                else        { $dialect->rollback_savepoint(savepoint => $sp) }
-            }
-            else {
-                if   ($res) { $dialect->commit_txn }
-                else        { $dialect->rollback_txn }
-            }
-
-            for my $orphan (reverse @orphans) {
-                $orphan->set_finalize(undef);
-                $orphan->terminate(0, ["Enclosing transaction was resolved"]);
-            }
-        }
-        # else: an enclosing transaction's finalizer already resolved and removed
-        # us; skip the dialect (avoid a double rollback) and just run our own
-        # termination bookkeeping below.
-
-        my ($ok2, $err2) = $txnx->terminate($res, \@errors);
-        unless ($ok2) {
-            $ok = 0;
-            push @errors => @$err2;
-        }
-
-        return if $ok;
-
-        # When the transaction fell out of scope, DESTROY runs this as a safety
-        # net and has already rolled it back. We cannot propagate an exception
-        # from a destructor (Perl turns it into a noisy "(in cleanup)" stack
-        # trace), so warn concisely instead of confessing.
-        if ($txnx->in_destroy) {
-            my $trace = $txnx->trace // [];
-            carp "Transaction started at $trace->[1] line $trace->[2] fell out of scope and was rolled back"
-                if @$trace > 2;
-            return;
-        }
-
-        $txnx->throw(join "\n" => @errors);
-    };
-}
-
-=pod
+The C<HandleError> callback: dies with a L<DBIx::QuickORM::Exception::DB>
+built from the failing handle. First it marks the innermost open transaction
+failed, with the error (see C<_run>). It holds the dialect and the
+transaction stack, not the Connection.
 
 =back
 
 =cut
 
-#######################
-# }}} PRIVATE METHODS #
-#######################
+sub _error_handler {
+    my $self = shift;
+    my ($dialect, $txns) = @_;
+
+    return sub {
+        my ($msg, $h) = @_;
+        my ($native, $state, $errstr) = ($h->err, $h->state, $h->errstr);
+        $state = undef unless defined($state) && length($state);
+
+        my $txn = $txns->[-1];
+        $txn->{failed} //= $errstr // $msg if $txn;
+
+        die DBIx::QuickORM::Exception::DB->new(
+            kind      => $dialect->error_kind($native, $state, $errstr),
+            state     => $state,
+            native    => $native,
+            errstr    => $errstr,
+            statement => $h->{Statement},
+            message   => $msg,
+        );
+    };
+}
+
+=pod
+
+=over 4
+
+=item \%generated = $conn->_generate_keys(\%table, \%values)
+
+New values for the table's primary key fields missing from C<%values>, from
+each field's type's C<generate_key_value>. A field's C<generate> hint
+decides: C<none> never, C<prefer_orm> always, and C<prefer_db> (the default)
+unless the column has C<db_fills> and the dialect can return the inserted
+key (C<supports_returning_insert>). Fields without a type, or whose
+type cannot generate, are left out. The values are inflated. The caller
+deflates them, even for C<raw> inserts.
+
+=back
+
+=cut
+
+sub _generate_keys {
+    my $self = shift;
+    my ($t, $values) = @_;
+
+    my %generated;
+    for my $name (@{$t->{pk} // []}) {
+        next if exists $values->{$name};
+        my $field = $t->{fields}->{$name};
+        my $type  = $field->{orm_type};
+        next unless $type && $type->can('generate_key_value');
+
+        my $mode = $field->{generate} // 'prefer_db';
+        next if $mode eq 'none' || ($mode eq 'prefer_db' && $field->{db_fills} && $self->{+DIALECT}->supports_returning_insert);
+        $generated{$name} = $type->generate_key_value($field, $self);
+    }
+
+    return \%generated;
+}
+
+=pod
+
+=over 4
+
+=item \%data = $conn->_row_data($row_or_data)
+
+The row data: a hashref as given, or a row object's C<row_data>. Croaks on
+anything else.
+
+=back
+
+=cut
+
+sub _row_data {
+    my $self = shift;
+    my ($data) = @_;
+    $data = $data->row_data if blessed($data) && $data->can('row_data');
+    confess "Expected row data (a hashref) or a row object, got " . ($data // 'undef') unless ref($data) eq 'HASH';
+    return $data;
+}
+
+=pod
+
+=over 4
+
+=item $value = $conn->_deflate_value($table, $name, \%field, $value, $raw)
+
+One value deflated as C<deflate> describes. C<\%field> is undef for a name
+that is not a field.
+
+A value the type deflated to plain text then goes through the field's
+C<format>, if it has one and is not binary.
+
+=back
+
+=cut
+
+sub _deflate_value {
+    my $self = shift;
+    my ($table, $name, $field, $value, $raw) = @_;
+    my $type = $field ? $field->{orm_type} : undef;
+
+    if (ref($value) && $self->_is_marker($value)) {
+        my $kind = $value->kind;
+        return $value if $kind eq 'binary' || $kind eq 'sql';
+        $value = $value->value;
+        return $value if $kind eq 'raw' || !defined($value);
+    }
+    elsif ($raw || !defined($value)) {
+        return $value;
+    }
+    elsif ($type && !ref($value)) {
+        return $value unless $type->can('is_inflated') && $type->is_inflated($value);
+    }
+
+    unless ($type) {
+        confess "The field '$name' of '$table' has no type to deflate a reference with; deflate it yourself and pass raw => 1" if ref $value;
+        return $value;
+    }
+
+    my $out    = $type->deflate($value, $field, $self);
+    my $format = $field->{format};
+    return $out unless $format && defined($out) && !ref($out) && ($field->{affinity} // '') ne 'binary';
+    return $format->($out);
+}
+
+=pod
+
+=over 4
+
+=item $bool = $conn->_is_marker($value)
+
+=item $bool = $conn->_is_sql($value)
+
+True for a value marker, or an C<sql> marker.
+
+=back
+
+=cut
+
+sub _is_marker { blessed($_[1])           && $_[1]->isa('DBIx::QuickORM::Value') ? 1 : 0 }
+sub _is_sql    { $_[0]->_is_marker($_[1]) && $_[1]->kind eq 'sql'                ? 1 : 0 }
+
+=pod
+
+=over 4
+
+=item \%values = $conn->_plain(\%values)
+
+A copy with each C<binary> marker replaced by its value, for lookup keys and
+row data.
+
+=back
+
+=cut
+
+sub _plain {
+    my $self = shift;
+    my ($values) = @_;
+    return {map { my $v = $values->{$_}; ($_ => $self->_is_marker($v) ? $v->value : $v) } keys %$values};
+}
+
+=pod
+
+=over 4
+
+=item (\@places, \@binds, $marked) = $conn->_value_sql(\%values, @names)
+
+The SQL for each named value, C<?> or an C<sql> marker's SQL, and the binds,
+in order. C<$marked> is true when any value was a marker: its SQL or bind
+attributes make the statement one of a kind, never cached.
+
+=back
+
+=cut
+
+sub _value_sql {
+    my $self = shift;
+    my ($values, @names) = @_;
+
+    my (@places, @binds, $marked);
+    for my $name (@names) {
+        my $value = $values->{$name};
+        $marked = 1 if ref($value) && $self->_is_marker($value);
+        if (ref($value) && $self->_is_sql($value)) {
+            push @places => $value->value;
+            push @binds  => map { [undef, $_] } @{$value->binds};
+            next;
+        }
+        push @places => '?';
+        push @binds  => [$name => $value];
+    }
+
+    return (\@places, \@binds, $marked);
+}
+
+=pod
+
+=over 4
+
+=item @batches = $conn->_batches(\@values, \@names)
+
+The rows of a multi-row insert, as C<[\@places, \@binds]> pairs: each place is
+one row's C<(...)>, and each pair holds as many rows as fit in the dialect's
+C<bind_limit>, at least one.
+
+=back
+
+=cut
+
+sub _batches {
+    my $self = shift;
+    my ($values, $names) = @_;
+
+    my $limit   = $self->{+DIALECT}->bind_limit;
+    my $plain   = '(' . join(', ' => ('?') x @$names) . ')';
+    my @batches = ([[], []]);
+    for my $row (@$values) {
+        my ($places, $binds, $marked) = $self->_value_sql($row, @$names);
+        push @batches             => [[], []] if @{$batches[-1]->[0]} && @{$batches[-1]->[1]} + @$binds > $limit;
+        push @{$batches[-1]->[0]} => $marked ? '(' . join(', ' => @$places) . ')' : $plain;
+        push @{$batches[-1]->[1]} => @$binds;
+    }
+
+    return @batches;
+}
+
+=pod
+
+=over 4
+
+=item \@binds = $conn->_resolve_binds($source, \@binds)
+
+Binds built elsewhere with their C<raw> and C<inflated> markers resolved, as
+C<deflate> with C<raw> resolves them, by the source's field each bind names.
+
+=back
+
+=cut
+
+sub _resolve_binds {
+    my $self = shift;
+    my ($source, $binds) = @_;
+
+    my $table  = $source->table // '';
+    my $fields = $source->field_records;
+    return [map { my ($name, $value) = @$_; [$name, $self->_deflate_value($table, $name // '', defined($name) ? $fields->{$name} : undef, $value, 1)] } @{$binds // []}];
+}
+
+=pod
+
+=over 4
+
+=item $conn->_check_params($name, \%known, \%params)
+
+Croaks naming every key of C<%params> not in C<%known>.
+
+=back
+
+=cut
+
+sub _check_params {
+    my $self = shift;
+    my ($name, $known, $params) = @_;
+    my @unknown = sort grep { !$known->{$_} } keys %$params;
+    confess "Unknown argument(s) to $name(): " . join(', ' => @unknown) if @unknown;
+}
+
+=pod
+
+=over 4
+
+=item \%table = $conn->_table($table)
+
+The map's record for the table. Croaks when there is none.
+
+=back
+
+=cut
+
+sub _table {
+    my $self = shift;
+    my ($table) = @_;
+    confess "A table name is required" unless defined($table) && length($table);
+    return $self->_map->table($table) // confess "The table '$table' is not in the database map";
+}
+
+=pod
+
+=over 4
+
+=item $conn->_check_fields($table, @fields)
+
+Croaks for the first field not in the table.
+
+=back
+
+=cut
+
+sub _check_fields {
+    my $self = shift;
+    my ($table, @fields) = @_;
+    my $known = $self->_map->table($table)->{fields};
+    for my $field (@fields) {
+        confess "The table '$table' has no field '$field'" unless $known->{$field};
+    }
+}
+
+=pod
+
+=over 4
+
+=item \%pk = $conn->_pk_values($table, $pk)
+
+=item \%pk = $conn->_pk_values($table, $pk, $raw)
+
+The key-field hash from a primary key in any form C<normalize_pk> in
+L<DBIx::QuickORM::Map> takes, each value put through C<deflate> (with C<raw>
+when C<$raw> is true). Every key argument takes this path. A C<binary> marker
+is kept for binding. C<_plain> of the hash is the raw key the lookup table
+takes. Croaks as C<normalize_pk> does, and on an C<sql> marker.
+
+=back
+
+=cut
+
+sub _pk_values {
+    my $self = shift;
+    my ($table, $pk, $raw) = @_;
+
+    my $map    = $self->_map;
+    my $values = $map->normalize_pk($table, $pk);
+    my $fields = $map->pk($table);
+    my $out    = $self->deflate($table, {map { $fields->[$_] => $values->[$_] } 0 .. $#$fields}, raw => $raw);
+    for my $field (@$fields) {
+        confess "sql() cannot be used in a primary key (the field '$field')" if $self->_is_sql($out->{$field});
+    }
+    return $out;
+}
+
+=pod
+
+=over 4
+
+=item \@copy = $conn->_check_datetime_parsers(\@parsers)
+
+A copy of C<@parsers> once each is a code reference, an object with
+C<parse_datetime>, or a class name. Loads each class not yet loaded. Croaks
+when the shape is wrong, or a class cannot be loaded or has no
+C<parse_datetime>.
+
+=back
+
+=cut
+
+sub _check_datetime_parsers {
+    my $self = shift;
+    my ($parsers) = @_;
+
+    croak "'datetime_parsers' must be an arrayref of parsers: classes or objects with parse_datetime, or code references"
+        unless ref($parsers) eq 'ARRAY' && !grep { ref($_) ne 'CODE' && !(blessed($_) ? $_->can('parse_datetime') : defined($_) && !ref($_) && m/^\w+(?:::\w+)*\z/) } @$parsers;
+
+    for my $parser (grep { !ref($_) } @$parsers) {
+        next if $parser->can('parse_datetime');
+        require DBIx::QuickORM;
+        DBIx::QuickORM->load_class("'datetime_parsers' names the class '$parser', which", $parser);
+        croak "'datetime_parsers' names the class '$parser', which has no parse_datetime" unless $parser->can('parse_datetime');
+    }
+
+    return [@$parsers];
+}
+
+=pod
+
+=over 4
+
+=item $conn->_enforce_canon($table, \%data, $flag)
+
+Croaks unless the data is canon, when C<$flag> (or its default) says to check.
+
+=back
+
+=cut
+
+sub _enforce_canon {
+    my $self = shift;
+    my ($table, $data, $flag) = @_;
+
+    my $lookup = $self->lookup;
+    $flag //= $lookup->in_txn ? 1 : $self->{+ENFORCE_CANON};
+    return unless $flag;
+    return if $lookup->is_canon($table, $data);
+    confess "The row data for '$table' is not canon (not the ORM's current copy of that row); refresh the row, or pass enforce_canon => 0; for an update, a row's cas_update() writes only while the database still holds what the row read";
+}
+
+=pod
+
+=over 4
+
+=item %cas = $conn->_cas_values($table, \%data, \%changes, \%params)
+
+The compare-and-swap fields and their values from the row data.
+
+=back
+
+=cut
+
+sub _cas_values {
+    my $self = shift;
+    my ($table, $data, $changes, $params) = @_;
+
+    my $cas = $params->{cas} // [];
+    confess "'cas' must be an arrayref of field names" unless ref($cas) eq 'ARRAY';
+    my @fields = @$cas;
+    push @fields => grep { exists $data->{$_} } keys %$changes if $params->{auto_cas};
+    $self->_check_fields($table, @fields);
+
+    for my $field (@fields) {
+        confess "The 'cas' field '$field' is not in the row data" unless exists $data->{$field};
+    }
+
+    return map { $_ => $data->{$_} } @fields;
+}
+
+=pod
+
+=over 4
+
+=item $map = $conn->_map
+
+The map.
+
+=back
+
+=cut
+
+sub _map { $_[0]->{+DB_MAP} }
+
+=pod
+
+=over 4
+
+=item \@fields = $conn->_default_fields($table)
+
+The fields a table's queries select: C<default_fields>, or every field.
+
+=back
+
+=cut
+
+sub _default_fields {
+    my $self    = shift;
+    my ($table) = @_;
+    my $t       = $self->_map->table($table);
+    return $t->{default_fields} // [sort keys %{$t->{fields}}];
+}
+
+=pod
+
+=over 4
+
+=item $sql = $conn->_returning_sql($table)
+
+=item $sql = $conn->_returning_sql($table, \@fields)
+
+A C<RETURNING> clause, with a leading space, naming the fields, or the
+table's default fields, quoted.
+
+=back
+
+=cut
+
+sub _returning_sql {
+    my $self = shift;
+    my ($table, $fields) = @_;
+    my $dialect = $self->{+DIALECT};
+    return ' RETURNING ' . join(', ' => map { $dialect->quote_identifier($_) } @{$fields // $self->_default_fields($table)});
+}
+
+=pod
+
+=over 4
+
+=item ($sql, \@binds, $marked) = $conn->_where_sql(\%pairs)
+
+A C<WHERE> body comparing each field to its value, in field order. An undef
+value becomes C<IS NULL>. Binds are C<[$field, $value]> pairs. An C<sql>
+marker croaks. C<$marked> is true when a value is another marker, as for
+C<_value_sql>. The SQL is built once per set of fields and null values (see
+C<_statement>).
+
+=back
+
+=cut
+
+sub _where_sql {
+    my $self = shift;
+    my ($pairs) = @_;
+
+    my (@shape, @binds, $marked);
+    for my $field (sort keys %$pairs) {
+        my $value = $pairs->{$field};
+        confess "sql() cannot be used in a primary key or compare-and-swap value (the field '$field')" if $self->_is_sql($value);
+        $marked = 1                                                                                    if ref($value) && $self->_is_marker($value);
+        if (defined $value) {
+            push @shape => $field;
+            push @binds => [$field => $value];
+        }
+        else {
+            push @shape => "\x01$field";
+        }
+    }
+
+    my $dialect = $self->{+DIALECT};
+    my $sql     = $self->_statement(
+        join("\0" => 'where', @shape),
+        sub {
+            join ' AND ' => map { m/^\x01(.*)\z/s ? $dialect->quote_identifier($1) . ' IS NULL' : $dialect->quote_identifier($_) . ' = ?' } @shape;
+        }
+    );
+
+    return ($sql, \@binds, $marked);
+}
+
+=pod
+
+=over 4
+
+=item $sql = $conn->_statement($shape, \&build)
+
+The SQL C<build> returns, kept by C<$shape> so it is built once per shape: a
+key naming the statement kind, the table, and its fields in order. An undef
+shape (a statement with a marker, see C<_value_sql>) builds it every time.
+
+=back
+
+=cut
+
+sub _statement {
+    my $self = shift;
+    my ($shape, $build) = @_;
+    return $build->() unless defined $shape;
+    return $self->{+STATEMENTS}->{$shape} //= $build->();
+}
+
+=pod
+
+=over 4
+
+=item $sth = $conn->_run(\%fields, $sql, \@binds)
+
+=item $sth = $conn->_run(\%fields, $sql, \@binds, \%prepare_attrs, $cached)
+
+Prepares and executes the SQL, the one place the CRUD operations bind values.
+With C<$cached> the statement comes from C<prepare_cached>, for the
+single-row CRUD operations' fixed SQL only.
+
+Every statement the Connection sends comes through here, so here it croaks
+while an async query is pending (see C<select>), and while the innermost
+transaction is marked failed, unless the statement rolls it back. Each bind is
+C<[$name, $value]>. The field record C<$fields{$name}> (none for an undef
+name) decides the bind attributes, except that a C<binary> marker is bound as
+binary. The SQL and every value not going to a binary field pass through the
+dialect's C<text_to_db>.
+
+=back
+
+=cut
+
+sub _run {
+    my $self = shift;
+    my ($fields, $sql, $binds, $attrs, $cached) = @_;
+
+    $self->_check_idle;
+    if (my $txn = $self->{+TXNS}->[-1]) {
+        # RELEASE SAVEPOINT reaches a failed level only after ROLLBACK TO it: commit_txn rolls a failed level back first.
+        confess "A statement in the transaction opened at " . $txn->opened_at . " failed, so the transaction can only be rolled back; to recover from a failure and go on, run the work that may fail in a nested transaction.\nThe failure: " . $txn->failed . "\n"
+            if defined($txn->failed) && $sql !~ m/^(?:ROLLBACK|RELEASE SAVEPOINT)\b/;
+    }
+    my $dialect = $self->{+DIALECT};
+
+    my (@values, @attrs, @text, %attrs_of);
+    for my $bind (@$binds) {
+        my ($name, $value) = @$bind;
+        my $field = defined($name) ? $fields->{$name}                                            : undef;
+        my $attrs = $field         ? ($attrs_of{$field} //= [$dialect->bind_attrs($field)])->[0] : undef;    # once per field record
+        if (ref($value) && $self->_is_marker($value)) {
+            confess "A " . $value->kind . "() marker cannot be bound here" unless $value->kind eq 'binary';
+            ($field, $value) = ({affinity => 'binary'}, $value->value);
+            $attrs = $dialect->bind_attrs($field);
+        }
+        push @text   => scalar(@values) unless $field && $field->{affinity} eq 'binary';
+        push @values => $value;
+        push @attrs  => $attrs;
+    }
+    $dialect->text_to_db($sql, @values[@text]);
+
+    # 3: a cached statement still active is left alone and a new one prepared.
+    my $sth = $cached ? $self->{+DBH}->prepare_cached($sql, $attrs, 3) : $self->{+DBH}->prepare($sql, $attrs);
+    $sth->bind_param($_ + 1, $values[$_], $attrs[$_]) for 0 .. $#values;
+    $sth->execute;
+
+    return $sth;
+}
+
+=pod
+
+=over 4
+
+=item $conn->_check_idle
+
+Croaks while an async query is pending.
+
+=back
+
+=cut
+
+sub _check_idle {
+    my $self = shift;
+    confess "An async query is still pending on this connection; collect its iterator (ready, next, or all) first" if $self->{+BUSY};
+}
+
+=pod
+
+=over 4
+
+=item $conn->_do($sql)
+
+Runs a transaction statement through C<_run>.
+
+=back
+
+=cut
+
+sub _do { $_[0]->_run({}, $_[1], []) }
+
+=pod
+
+=over 4
+
+=item \@rows = $conn->_fetch(\%fields, $sth)
+
+Every remaining row of an executed statement, as hashes keyed by column name.
+It is the one place the CRUD operations fetch rows. The names and every value
+not from a binary field (by C<$fields{$name}>) pass through the dialect's
+C<text_from_db>.
+
+=back
+
+=cut
+
+sub _fetch {
+    my $self = shift;
+    my ($fields, $sth) = @_;
+
+    my $dialect = $self->{+DIALECT};
+
+    my @names = @{$sth->{NAME}};
+    $dialect->text_from_db(@names);
+    my @text = grep { (($fields->{$names[$_]} // {})->{affinity} // '') ne 'binary' } 0 .. $#names;
+
+    my @rows;
+    while (my $row = $sth->fetchrow_arrayref) {
+        my @values = @$row;
+        $dialect->text_from_db(@values[@text]);
+        push @rows => {map { $names[$_] => $values[$_] } 0 .. $#names};
+    }
+
+    return \@rows;
+}
+
+=pod
+
+=over 4
+
+=item $level = $conn->_isolation($level)
+
+The level in lower case. Confesses unless it is one C<txn> takes or
+C<'server'>.
+
+=back
+
+=cut
+
+sub _isolation {
+    my $self = shift;
+    my ($level) = @_;
+    return lc $level if defined($level) && !ref($level) && $ISOLATION{lc $level};
+    confess "'isolation' must be one of: " . join(', ' => map { "'$_'" } @ISOLATION);
+}
+
+=pod
+
+=over 4
+
+=item $txn = $conn->_begin(\@caller, $level)
+
+Opens a transaction or savepoint and pushes it onto the stack. C<$level> is
+the root transaction's isolation level from C<txn>, or undef.
+
+A root transaction always states its level: C<$level>, else the Connection's
+C<isolation>, else C<'read committed'> where the dialect
+C<supports_isolation>. C<'server'> sends the dialect's plain C<begin_sql>.
+
+=back
+
+=cut
+
+sub _begin {
+    my $self = shift;
+    my ($caller, $level) = @_;
+
+    my $txns    = $self->{+TXNS};
+    my $dialect = $self->{+DIALECT};
+    my $name    = 'qorm_txn_' . ++$self->{+TXN_COUNT};
+    if (@$txns) {
+        confess "The " . $dialect->name . " dialect has no savepoints, so transactions cannot be nested" unless $dialect->supports_savepoints;
+        $self->_do("SAVEPOINT $name");
+        $self->lookup->push_level;
+    }
+    else {
+        $level //= $self->{+ISOLATION} // ($dialect->supports_isolation ? 'read committed' : 'server');
+        $self->_do($_) for $dialect->begin_sql($level eq 'server' ? undef : uc $level);
+        $self->lookup->begin_root;
+    }
+
+    my $txn = DBIx::QuickORM::Txn->new(connection => $self, name => $name, depth => @$txns + 1, caller => $caller);
+    weaken($txns->[@$txns] = $txn);
+    return $txn;
+}
+
+=pod
+
+=over 4
+
+=item ($ok, $err, @out) = $conn->_run_block($code, \@caller, $list, $level)
+
+Runs one attempt of a transaction block, as C<txn> describes, and reports how
+it ended, including a failure to open the transaction. A failed rollback after
+the block threw is a warning, so the block's exception is what propagates. The
+transaction is then abandoned (C<_abandon>).
+
+=back
+
+=cut
+
+sub _run_block {
+    my $self = shift;
+    my ($code, $caller, $list, $level) = @_;
+
+    my $txn = eval { $self->_begin($caller, $level) } or return (0, $@);
+    my @out;
+    my $ok = eval {
+        if   ($list) { @out    = $code->($txn) }
+        else         { $out[0] = $code->($txn) }
+        $self->commit_txn($txn) if $self->_is_open($txn);
+        1;
+    };
+    return (1, undef, @out) if $ok;
+
+    my $err = $@;
+    if ($self->_is_open($txn) && !eval { $self->_unwind($txn); 1 }) {
+        warn "Rolling back the transaction opened at " . $txn->opened_at . " after its block threw an exception failed: $@";
+        $self->_abandon($txn);
+    }
+    return (0, $err);
+}
+
+=pod
+
+=over 4
+
+=item $bool = $conn->_retriable($err)
+
+True for a L<DBIx::QuickORM::Exception::DB> whose C<retriable> is true.
+
+=back
+
+=cut
+
+sub _retriable {
+    my $self = shift;
+    my ($err) = @_;
+    return 0 unless blessed($err) && $err->isa('DBIx::QuickORM::Exception::DB');
+    return $err->retriable ? 1 : 0;
+}
+
+=pod
+
+=over 4
+
+=item $bool = $conn->_is_open($txn)
+
+True while the transaction is on the stack.
+
+=back
+
+=cut
+
+sub _is_open {
+    my $self  = shift;
+    my ($txn) = @_;
+    my $open  = $self->{+TXNS}->[$txn->depth - 1];
+    return $open && $open == $txn ? 1 : 0;
+}
+
+=pod
+
+=over 4
+
+=item $conn->_check_open($txn, $action)
+
+Croaks unless the transaction is open and innermost, and this is the process
+that opened it.
+
+=back
+
+=cut
+
+sub _check_open {
+    my $self = shift;
+    my ($txn, $action) = @_;
+
+    my $where = $txn->opened_at;
+    confess "Cannot $action the transaction opened at $where from process $$; process $self->{+PID} opened it" unless $self->{+PID} == $$;
+    confess "Cannot $action the transaction opened at $where: it is already finished"                          unless $self->_is_open($txn);
+    confess "Cannot $action the transaction opened at $where: a transaction opened inside it is still open"    unless $txn->depth == @{$self->{+TXNS}};
+}
+
+=pod
+
+=over 4
+
+=item $conn->_unwind($txn)
+
+Rolls the transaction back, with every transaction open inside it, then drops
+them from the stack and the lookup table. An async query still pending is
+cancelled first, warning if that fails. Nothing is dropped when the database
+refuses the rollback.
+
+=back
+
+=cut
+
+sub _unwind {
+    my $self = shift;
+    my ($txn) = @_;
+
+    # A query left pending inside it cannot be collected any more. On PostgreSQL the cancel aborts the transaction.
+    if (my $busy = $self->{+BUSY}) {
+        local $@;
+        eval { $busy->{cancel}->(); 1 } or warn "Cancelling the async query pending in the transaction opened at " . $txn->opened_at . " failed: $@";
+    }
+
+    if ($txn->depth == 1) {
+        $self->_do('ROLLBACK');
+    }
+    else {
+        $self->_do('ROLLBACK TO SAVEPOINT ' . $txn->name);
+        $self->_do('RELEASE SAVEPOINT ' . $txn->name);
+    }
+
+    $self->_drop_levels($txn);
+}
+
+=pod
+
+=over 4
+
+=item $conn->_drop_levels($txn)
+
+Drops the transaction, and every transaction open inside it, from the stack
+and the lookup table, without SQL.
+
+=back
+
+=cut
+
+sub _drop_levels {
+    my $self = shift;
+    my ($txn) = @_;
+
+    my $txns   = $self->{+TXNS};
+    my $lookup = $self->lookup;
+    while (@$txns >= $txn->depth) {
+        pop @$txns;
+        $lookup->rollback_level;
+    }
+}
+
+=pod
+
+=over 4
+
+=item $conn->_abandon($txn)
+
+For a transaction whose outcome is unknown: drops it as C<_drop_levels> does,
+then empties every remaining transaction lookup level, so no row held from
+inside the transaction is canon. The outside level is kept.
+
+=back
+
+=cut
+
+sub _abandon {
+    my $self = shift;
+    my ($txn) = @_;
+    $self->_drop_levels($txn);
+    $self->lookup->clear_txn_levels;
+}
+
+sub DESTROY {
+    my $self = shift;
+    return if !$self->{+PID} || $self->{+PID} == $$;
+
+    # By now DBI has torn its handles down. Any still alive at exit were released before that.
+    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+
+    $self->release_inherited;
+}
+
+# A child that exits with the parent's async query still pending would otherwise free the handle and the
+# statement in any order during global destruction. DBD::Pg 3.21.2, freeing the statement after its handle,
+# reads freed memory (https://github.com/bucardo/dbdpg/issues/218) and can wait on the query, taking the
+# parent's result off the shared socket.
+END {
+    local ($?, $@, $!);
+    $_->release_inherited for grep { $_ } values %PENDING;
+}
 
 1;
 
@@ -1355,7 +1931,7 @@ __END__
 
 =head1 SOURCE
 
-The source code repository for DBIx::QuickORM can be found at
+The source code repository for DBIx-QuickORM can be found at
 L<https://github.com/exodist/DBIx-QuickORM>.
 
 =head1 MAINTAINERS

@@ -3,7 +3,7 @@ use blib;
 use Acme::Parataxis qw[:all];
 $|++;
 
-# Set threshold to 100 opcodes (very low for demo)
+# Set threshold to 100 maybe_yield() calls (very low for demo)
 Acme::Parataxis::set_preempt_threshold(100);
 Acme::Parataxis::run(
     sub {

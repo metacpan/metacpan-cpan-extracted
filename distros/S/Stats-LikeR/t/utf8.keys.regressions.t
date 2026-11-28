@@ -53,7 +53,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my $zhe   = "\x{436}"; # a name outside Latin-1
 my $bytes = "caf\xe9"; # Latin-1, stored as one byte per char

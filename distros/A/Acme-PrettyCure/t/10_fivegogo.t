@@ -6,14 +6,14 @@ use Test::More;
 use Acme::PrettyCure;
 
 my ( $nozomi, $rin, $urara, $komachi, $karen, $kurumi )
-    = Acme::PrettyCure->members('FiveGoGo');
+    = Acme::PrettyCure->girls('FiveGoGo');
 
-isa_ok $nozomi,  'Acme::PrettyCure::CureDream';
-isa_ok $rin,     'Acme::PrettyCure::CureRouge';
-isa_ok $urara,   'Acme::PrettyCure::CureLemonade';
-isa_ok $komachi, 'Acme::PrettyCure::CureMint';
-isa_ok $karen,   'Acme::PrettyCure::CureAqua';
-isa_ok $kurumi,  'Acme::PrettyCure::MilkyRose';
+isa_ok $nozomi,  'Acme::PrettyCure::Girl::CureDream';
+isa_ok $rin,     'Acme::PrettyCure::Girl::CureRouge';
+isa_ok $urara,   'Acme::PrettyCure::Girl::CureLemonade';
+isa_ok $komachi, 'Acme::PrettyCure::Girl::CureMint';
+isa_ok $karen,   'Acme::PrettyCure::Girl::CureAqua';
+isa_ok $kurumi,  'Acme::PrettyCure::Girl::MilkyRose';
 
 $kurumi->powerdown();
 

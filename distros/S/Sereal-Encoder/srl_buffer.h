@@ -11,13 +11,24 @@
  * usable in one place per compilation unit. Drop "static" when necessary.
  * For now, potentially smaller code wins. */
 
+/* Signed-safe maximum buffer size so ptrdiff_t pointer differences never wrap */
+#ifndef SRL_BUF_MAX_SIZE
+#   define SRL_BUF_MAX_SIZE ((~(size_t)0) >> 1)
+#endif
+
+/* Cap retained buffer size on reusable encoders so an occasional huge
+ * packet does not permanently pin multi-MB buffers. */
+#ifndef SRL_ENC_BUF_REUSE_MAX_SIZE
+#   define SRL_ENC_BUF_REUSE_MAX_SIZE (1024 * 1024)
+#endif
+
 /* buffer operations */
 #define BUF_POS_OFS(buf) (((buf)->pos) - ((buf)->start))
 #define BUF_SPACE(buf) (((buf)->end) - ((buf)->pos))
 #define BUF_SIZE(buf) (((buf)->end) - ((buf)->start))
 /* a negative BUF_SPACE() (pos past end) must not wrap to "plenty of room" */
 #define BUF_NEED_GROW(buf, minlen) (BUF_SPACE(buf) < 0 || (size_t)BUF_SPACE(buf) <= (minlen))
-#define BUF_NEED_GROW_TOTAL(buf, minlen) ((size_t)BUF_SIZE(buf) <= minlen)
+#define BUF_NEED_GROW_TOTAL(buf, minlen) (BUF_SIZE(buf) < 0 || (size_t)BUF_SIZE(buf) <= (minlen))
 #define BUF_NOT_DONE(buf) ((buf)->pos < (buf)->end)
 #define BUF_DONE(buf) ((buf)->pos >= (buf)->end)
 
@@ -101,10 +112,7 @@ srl_buf_swap_buffer(pTHX_ srl_buffer_t *buf1, srl_buffer_t *buf2)
     Copy(&tmp, buf2, 1, srl_buffer_t);
 }
 
-/* old_size + (new_size / 4) */
-#define OVERALLOC_FUNC(cur_size,req_size) (cur_size + (req_size >> 2))
-
-SRL_STATIC_INLINE void
+static SRL_NOINLINE SRL_UNUSED void
 srl_buf_grow_nocheck(pTHX_ srl_buffer_t *buf, const size_t minlen)
 {
     const size_t pos_ofs= BUF_POS_OFS(buf); /* have to store the offset of pos */
@@ -113,14 +121,26 @@ srl_buf_grow_nocheck(pTHX_ srl_buffer_t *buf, const size_t minlen)
     const size_t new_size = minlen;
 #else
     const size_t cur_size = BUF_SIZE(buf);
-    const size_t tmp_size = (minlen >> 2) > (size_t)~(size_t)0 - cur_size
-        ? minlen : OVERALLOC_FUNC(cur_size, minlen);
-    const size_t new_size = (minlen > tmp_size) ? minlen : tmp_size;
+    /* Grow 2x below 64 KiB to minimize early reallocs, then 1.5x above 64 KiB,
+     * clamping at SRL_ENC_BUF_REUSE_MAX_SIZE while demand fits so steady-state
+     * ~1 MiB packets do not overshoot into the oversized trim/steal cliff. */
+    const size_t grow_delta = (cur_size < 65536) ? cur_size : (cur_size >> 1);
+    size_t target_size = (grow_delta > SRL_BUF_MAX_SIZE - cur_size)
+        ? SRL_BUF_MAX_SIZE : (cur_size + grow_delta);
+    size_t new_size;
+    if (cur_size < (size_t)SRL_ENC_BUF_REUSE_MAX_SIZE
+            && minlen <= (size_t)SRL_ENC_BUF_REUSE_MAX_SIZE
+            && target_size > (size_t)SRL_ENC_BUF_REUSE_MAX_SIZE)
+        target_size = (size_t)SRL_ENC_BUF_REUSE_MAX_SIZE;
+    new_size = (minlen > target_size) ? minlen : target_size;
 #endif
 
     DEBUG_ASSERT_BUF_SANE(buf);
+    if (expect_false(minlen > SRL_BUF_MAX_SIZE))
+        croak("Sereal output buffer is too large");
     /* assert that Renew means GROWING the buffer */
-    assert(buf->start + new_size > buf->end);
+    assert(BUF_SIZE(buf) >= (ptrdiff_t)0);
+    assert(new_size > (size_t)BUF_SIZE(buf));
 
     Renew(buf->start, new_size, srl_buffer_char);
     if (buf->start == NULL)
@@ -143,10 +163,12 @@ srl_buf_grow_nocheck(pTHX_ srl_buffer_t *buf, const size_t minlen)
 #define BUF_SIZE_ASSERT(buf, minlen)                                    \
   STMT_START {                                                          \
     DEBUG_ASSERT_BUF_SANE(buf);                                         \
-    if (BUF_NEED_GROW(buf, minlen)) {                                   \
-      if ((size_t)(minlen) > (size_t)~(size_t)0 - (size_t)BUF_SIZE(buf)) \
-        croak("Sereal output buffer is too large");                    \
-      srl_buf_grow_nocheck(aTHX_ (buf), (BUF_SIZE(buf) + minlen));      \
+    if (expect_false(BUF_NEED_GROW(buf, minlen))) {                     \
+      const size_t pos_ofs_ = (size_t)BUF_POS_OFS(buf);                 \
+      const size_t minlen_ = (size_t)(minlen);                          \
+      if (minlen_ >= SRL_BUF_MAX_SIZE - pos_ofs_)                       \
+        croak("Sereal output buffer is too large");                     \
+      srl_buf_grow_nocheck(aTHX_ (buf), pos_ofs_ + minlen_ + 1);        \
     }                                                                   \
     DEBUG_ASSERT_BUF_SANE(buf);                                         \
   } STMT_END
@@ -154,8 +176,12 @@ srl_buf_grow_nocheck(pTHX_ srl_buffer_t *buf, const size_t minlen)
 #define BUF_SIZE_ASSERT_TOTAL(buf, minlen)                              \
   STMT_START {                                                          \
     DEBUG_ASSERT_BUF_SANE(buf);                                         \
-    if (BUF_NEED_GROW_TOTAL(buf, minlen))                               \
-      srl_buf_grow_nocheck(aTHX_ (buf), (minlen));                      \
+    if (expect_false(BUF_NEED_GROW_TOTAL(buf, minlen))) {               \
+      const size_t minlen_ = (size_t)(minlen);                          \
+      if (minlen_ >= SRL_BUF_MAX_SIZE)                                  \
+        croak("Sereal output buffer is too large");                     \
+      srl_buf_grow_nocheck(aTHX_ (buf), minlen_ + 1);                   \
+    }                                                                   \
     DEBUG_ASSERT_BUF_SANE(buf);                                         \
   } STMT_END
 
@@ -238,7 +264,7 @@ SRL_STATIC_INLINE void
 srl_buf_cat_varint_raw_nocheck(pTHX_ srl_buffer_t *buf, UV value) {
     DEBUG_ASSERT_BUF_SANE(buf);
     DEBUG_ASSERT_BUF_SPACE(buf, SRL_MAX_VARINT_LENGTH);
-    while (value >= 0x80) {                     /* while we are larger than 7 bits long */
+    while (expect_false(value >= 0x80)) {       /* while we are larger than 7 bits long */
         *buf->pos++ = (value & 0x7f) | 0x80;    /* write out the least significant 7 bits, set the high bit */
         value >>= 7;                            /* shift off the 7 least significant bits */
     }
@@ -274,7 +300,14 @@ SRL_STATIC_INLINE void
 srl_buf_cat_varint(pTHX_ srl_buffer_t *buf, const char tag, const UV value) {
     /* this implements "varint" from google protocol buffers */
     BUF_SIZE_ASSERT(buf, SRL_MAX_VARINT_LENGTH + 1); /* always allocate space for the tag, overalloc is harmless */
-    srl_buf_cat_varint_nocheck(aTHX_ buf, tag, value);
+    if (expect_true(tag))
+        *buf->pos++ = tag;
+    if (expect_true(value < 0x80)) {
+        *buf->pos++ = (U8)value;
+        DEBUG_ASSERT_BUF_SANE(buf);
+    } else {
+        srl_buf_cat_varint_raw_nocheck(aTHX_ buf, value);
+    }
 }
 
 SRL_STATIC_INLINE void

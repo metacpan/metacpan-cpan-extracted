@@ -1,16 +1,20 @@
 package CPAN::InGit::ArchiveTree;
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # ABSTRACT: An object managing a CPAN file structure in a Git Tree
 
 
 use Carp;
-use Scalar::Util 'refaddr', 'blessed';
+use Scalar::Util 'blessed';
 use POSIX 'strftime';
-use IO::Uncompress::Gunzip qw( gunzip $GunzipError );
+use Archive::Tar;
+use CPAN::Meta 2.150010;
+use IO::Compress::Gzip qw( gzip $GzipError );
+use CPAN::InGit::DistTree;
 use JSON::PP;
 use Time::Piece;
 use Log::Any '$log';
 use Moo;
+use version ();
 use v5.36;
 
 extends 'CPAN::InGit::MutableTree';
@@ -79,7 +83,9 @@ sub package_details_blob($self) {
 
 has package_details => ( is => 'rw', lazy => 1, builder => 1, clearer => 1 );
 sub _build_package_details($self) {
-   $self->parse_package_details($self->package_details_blob->content);
+   my $blob= $self->package_details_blob;
+   return $blob? $self->parse_package_details($blob->content)
+               : { by_module => {}, by_dist => {} };
 }
 
 
@@ -109,11 +115,13 @@ sub parse_package_details($self, $content) {
 
 
 sub write_package_details($self) {
+   my $content= $self->_format_package_details($self->package_details);
+   $self->set_path('modules/02packages.details.txt', \$content);
+}
+
+sub _format_package_details($self, $details) {
    my $url= $self->canonical_url // 'cpan_mirror_ingit.local';
-   # on initial creation, need to write an empty package_details without triggering
-   # lazy-build of package_details
-   my @mod_list= !$self->package_details_blob? ()
-               : values %{$self->package_details->{by_module}};
+   my @mod_list= values %{$details->{by_module}};
    my $line_count= @mod_list;
    my $date= strftime("%a, %d %b %Y %H:%M:%S GMT", gmtime);
    my $content= <<~END;
@@ -133,7 +141,33 @@ sub write_package_details($self) {
    for (@mod_list) {
       push @lines, sprintf("%s %s  %s\n", $_->[0], $_->[1] // 'undef', $_->[2]);
    }
-   $self->set_path('modules/02packages.details.txt', \join('', $content, @lines));
+   return join('', $content, @lines);
+}
+
+
+sub index_distribution($self, $author_path, $versions) {
+   $self->_index_distribution($self->package_details, $author_path, $versions);
+   $self->write_package_details;
+}
+
+sub _index_distribution($self, $details, $author_path, $versions) {
+   my ($by_module, $by_dist)= @$details{qw( by_module by_dist )};
+   my %changed= ($author_path => 1);
+   for my $row (@{delete($by_dist->{$author_path}) // []}) {
+      delete $by_module->{$row->[0]}
+         if ($by_module->{$row->[0]} // [])->[2] && $by_module->{$row->[0]}[2] eq $author_path;
+   }
+   for my $name (keys %$versions) {
+      $changed{$by_module->{$name}[2]}= 1 if $by_module->{$name};
+      my $row= [ $name, $versions->{$name}, $author_path ];
+      $by_module->{$name}= $row;
+      push @{$by_dist->{$author_path}}, $row;
+   }
+   for my $path (keys %changed) {
+      next unless $by_dist->{$path};
+      @{$by_dist->{$path}}= grep { ($by_module->{$_->[0]} // 0) == $_ } @{$by_dist->{$path}};
+      delete $by_dist->{$path} unless @{$by_dist->{$path}};
+   }
 }
 
 
@@ -169,17 +203,95 @@ sub get_module_dist($self, $mod_name) {
 }
 
 
+sub _parse_version($v) { defined $v? eval { version->parse($v) } : undef }
+
+# Normalize a list of trees or { name, by_module } into [ [ $name, \%by_module ], ... ]
+sub _source_indexes($self, $sources) {
+   $sources //= [ map { $self->parent->get_archive_tree($_) // () } @{ $self->default_import_sources // [] } ];
+   return [ map { blessed($_)? [ $_->name, $_->package_details->{by_module} ] : [ $_->{name}, $_->{by_module} ] } @$sources ];
+}
+
+# Returns ($index_row, $parsed_version, $source_name) of the best provider of a module
+sub _best_source_row($mod, $source_idx) {
+   my ($best, $best_ver, $best_source);
+   for (@$source_idx) {
+      my $candidate= $_->[1]{$mod} or next;
+      my $ver= _parse_version($candidate->[1]);
+      next if $best && (!defined $ver || (defined $best_ver && $ver <= $best_ver));
+      ($best, $best_ver, $best_source)= ($candidate, $ver, $_->[0]);
+   }
+   return ($best, $best_ver, $best_source);
+}
+
+sub find_module_source($self, $mod, %options) {
+   my ($row, undef, $source)= _best_source_row($mod, $self->_source_indexes($options{sources}));
+   return $row && { module => $mod, version => $row->[1], author_path => $row->[2], source => $source };
+}
+
+sub find_upgrades($self, %options) {
+   my $source_idx= $self->_source_indexes($options{sources});
+   my $parse= \&_parse_version;
+   my $by_dist= $self->package_details->{by_dist};
+   my @result;
+   for my $author_path ($options{dists}? (sort grep $by_dist->{$_}, @{ $options{dists} }) : sort keys %$by_dist) {
+      my (%pairs, @same, @missing);
+      for my $row (@{ $by_dist->{$author_path} }) {
+         my ($mod, $mod_ver)= @$row;
+         my ($best, $best_ver, $best_source)= _best_source_row($mod, $source_idx);
+         if (!$best) { push @missing, $mod }
+         elsif ($best->[2] eq $author_path) { push @same, $mod }
+         else {
+            my $pair= $pairs{$best->[2]} //= { source => $best_source, modules => {}, newer_module => 0 };
+            $pair->{modules}{$mod}= [ $mod_ver, $best->[1] ];
+            my $cur_ver= $parse->($mod_ver);
+            $pair->{newer_module}= 1 if defined $best_ver && (!defined $cur_ver || $best_ver > $cur_ver);
+         }
+      }
+      my ($dist, $version)= CPAN::InGit::DistTree->parse_release($author_path);
+      my $dist_ver= $parse->($version);
+      my @upgrades;
+      for my $to_path (sort keys %pairs) {
+         my $pair= $pairs{$to_path};
+         my ($to_dist, $to_version)= CPAN::InGit::DistTree->parse_release($to_path);
+         my $to_ver= $parse->($to_version);
+         my $same_name= defined $dist && defined $to_dist && $dist eq $to_dist;
+         my $newer= $same_name && defined $dist_ver && defined $to_ver? $to_ver > $dist_ver
+                  : $pair->{newer_module};
+         next unless $newer;
+         push @upgrades, {
+            author_path => $to_path, dist => $to_dist, version => $to_version,
+            source => $pair->{source}, kind => ($same_name? 'upgrade' : 'moved'),
+            modules => $pair->{modules},
+         };
+      }
+      next unless @upgrades;
+      push @result, {
+         author_path => $author_path, dist => $dist, version => $version,
+         upgrades => \@upgrades,
+         (@same?    ( left_behind   => [ sort @same ] ) : ()),
+         (@missing? ( not_in_source => [ sort @missing ] ) : ()),
+      };
+   }
+   return \@result;
+}
+
+
 sub meta_path_for_dist($self, $author_path) {
-   # replace archive extension with '.meta.json'
-   $author_path =~ s/\.(zip|tar\.gz|tgz|tar\.bz2|tbz2)\z//;
+   # Replace the archive extension with '.meta'.
+   my (undef, $ext)= CPAN::InGit::DistTree->parse_filename($author_path);
+   $author_path= substr($author_path, 0, -1 - length $ext) if defined $ext;
    return "authors/id/$author_path.meta";
 }
 
 
 sub import_dist($self, $peer, $author_path, %options) {
    my $dist_path= "authors/id/$author_path";
-   my $distfile_ent= $peer->get_path($dist_path)
-      or croak "Import source branch '".$peer->name."' does not contain $dist_path";
+   my $distfile_ent= $peer->get_path($dist_path);
+   if (!$distfile_ent && ($peer->dist_storage($author_path) // '') eq 'unpacked') {
+      my $bytes= $peer->get_distfile($author_path);
+      $distfile_ent= [ Git::Raw::Blob->create($self->git_repo, $$bytes), 0100644 ];
+   }
+   croak "Import source branch '".$peer->name."' does not contain $dist_path" unless $distfile_ent;
    $log->info("Importing $author_path from ".$peer->name." to ".$self->name);
    my $existing_ent= $self->get_path($dist_path);
    # If exists, must be same gitobj as before or this is an error
@@ -187,23 +299,147 @@ sub import_dist($self, $peer, $author_path, %options) {
       croak "$dist_path already exists with different content"
          unless $existing_ent->[0]->id eq $distfile_ent->[0]->id;
    }
-   $self->set_path($dist_path, $distfile_ent->[0], mode => $distfile_ent->[1]);
    my $modules_registered= $peer->package_details->{by_dist}{$author_path};
+   my %versions= map { $_->[0] => $_->[1] } @{ $modules_registered // [] };
+   # Inspection of the archive is advisory; an unreadable archive can still be copied.
+   my $dist= eval {
+      local $Archive::Tar::WARN= 0;
+      $peer->get_dist($author_path);
+   };
+   if ($dist) {
+      my @unindexed= sort grep !exists $versions{$_}, keys %{ $dist->provides };
+      $log->warn("Packages claimed by $author_path but missing from the index for this distribution in "
+         .$peer->name.': '.join(', ', @unindexed)) if @unindexed;
+   }
+   $self->set_path($dist_path, $distfile_ent->[0], mode => $distfile_ent->[1]);
    if ($modules_registered) {
-      $self->package_details->{by_dist}{$author_path}= [ @$modules_registered ];
-      $self->package_details->{by_module}{$_->[0]}= $_
-         for @$modules_registered;
-      $self->write_package_details;
+      $self->index_distribution($author_path, \%versions);
    }
    my $meta_path= $self->meta_path_for_dist($author_path);
    my $meta_ent= $peer->get_path($meta_path);
    if ($meta_ent) {
       $self->set_path($meta_path, $meta_ent->[0], mode => $meta_ent->[1]);
+   } elsif ($dist && $dist->meta_source ne 'synthesized') {
+      my $json= $dist->meta->as_string({ version => 2 });
+      $self->set_path($meta_path, \$json);
    } else {
-      # TODO: parse module for META.json and dependnecies
       $log->warn("No META for $author_path");
    }
    return $self;
+}
+
+
+sub dist_storage($self, $author_path) {
+   my $entry= $self->SUPER::get_path("authors/id/$author_path");
+   return 'archive' if $entry && $entry->[0]->is_blob;
+   return $self->_unpacked_dist_dir($author_path)? 'unpacked' : undef;
+}
+
+# Return the Git::Raw::Tree for a distribution stored as a directory, having the name of
+# a .tar.gz author path without the extension, and a metadata sidecar.
+sub _unpacked_dist_dir($self, $author_path) {
+   return undef unless $author_path =~ /\.tar\.gz\z/;
+   my $meta= $self->SUPER::get_path($self->meta_path_for_dist($author_path));
+   return undef unless $meta && $meta->[0]->is_blob;
+   my $dir= $self->SUPER::get_path('authors/id/'.substr($author_path, 0, -7));
+   return $dir && $dir->[0]->is_tree? $dir->[0] : undef;
+}
+
+
+sub get_dist($self, $author_path, %options) {
+   my ($name)= CPAN::InGit::DistTree->parse_filename($author_path)
+      or return undef;
+   my $repo= $self->parent;
+   my ($tree, $storage);
+   my $entry= $self->SUPER::get_path("authors/id/$author_path");
+   if ($entry && $entry->[0]->is_blob) {
+      my $blob= $entry->[0];
+      $storage= 'archive';
+      $tree= $repo->cached_dist_tree('blob/'.$blob->id, sub {
+         $log->debug("Unpacking $author_path into dist cache");
+         CPAN::InGit::DistTree->new_from_archive(
+            parent => $repo, filename => $author_path, data => \($blob->content)
+         )->tree;
+      });
+   } elsif ($tree= $self->_unpacked_dist_dir($author_path)) {
+      $storage= 'unpacked';
+   } else {
+      return undef;
+   }
+   return CPAN::InGit::DistTree->new(
+      parent => $repo, tree => $tree, name => $name,
+      author_path => $author_path, storage => $storage,
+   );
+}
+
+
+sub get_distfile($self, $author_path) {
+   my $entry= $self->SUPER::get_path("authors/id/$author_path");
+   return \$entry->[0]->content if $entry && $entry->[0]->is_blob;
+   my $tree= $self->_unpacked_dist_dir($author_path) // return undef;
+   my ($name)= $author_path =~ m{([^/]+)\.tar\.gz\z};
+   my $tar= Archive::Tar->new;
+   $self->parent->add_git_tree_to_tar($tar, $name, $tree);
+   my $raw= $tar->write;
+   gzip \$raw => \my $compressed, Time => 0 or croak "gzip failed: $GzipError";
+   return \$compressed;
+}
+
+
+sub localize_module($self, $package, %options) {
+   my @sources= ($self, @{ $options{sources} // $self->default_import_sources // [] });
+   for my $source (@sources) {
+      $source= $self->parent->get_archive_tree($source)
+         // croak "No such archive tree $source" unless ref $source;
+      my $path= $source->get_module_dist($package) // next;
+      my $bytes= $source->get_distfile($path) // next;
+      my $rows= $source->package_details->{by_dist}{$path};
+      return $self->add_local_dist($path, $bytes,
+         versions => { map { $_->[0] => $_->[1] } @$rows });
+   }
+   croak "No distribution found for $package in ".$self->name." or its import sources";
+}
+
+
+sub add_local_dist($self, $filename, $bytes, %options) {
+   my $dist= CPAN::InGit::DistTree->new_from_archive(
+      parent => $self->parent, filename => $filename, data => $bytes
+   );
+   # The files might get written to a working directory
+   $dist->check_symlinks;
+   my $name= $dist->name;
+   my $meta= $dist->meta->as_struct({ version => 2 });
+   my $provides= $meta->{provides}= { %{ $dist->provides } };
+   my $versions= $options{versions} // { map { $_ => $provides->{$_}{version} } keys %$provides };
+   for my $pkg (keys %$versions) {
+      croak "Invalid package index entry in $filename"
+         if $pkg !~ /\A\S+\z/ || (defined $versions->{$pkg} && $versions->{$pkg} !~ /\A\S+\z/);
+   }
+
+   my $author_path= "L/LO/LOCAL/$name.tar.gz";
+   my $root= "authors/id/L/LO/LOCAL/$name";
+   my $meta_path= $self->meta_path_for_dist($author_path);
+   $self->check_new_paths($root, "authors/id/$author_path", $meta_path);
+
+   for my $pkg (keys %$provides) {
+      if (!exists $versions->{$pkg}) {
+         delete $provides->{$pkg};
+      } else {
+         $provides->{$pkg}= { %{ $provides->{$pkg} } };
+         if (defined $versions->{$pkg}) {
+            $provides->{$pkg}{version}= $versions->{$pkg};
+         } else {
+            delete $provides->{$pkg}{version};
+         }
+      }
+   }
+   my $json= CPAN::Meta->new($meta)->as_string({ version => 2 });
+   $self->package_details; # Read the current index before adding any files.
+   $log->info("Unpacking $filename as $author_path");
+   $self->set_path($root, $dist->files);
+   $self->set_path($meta_path, \$json);
+   $self->index_distribution($author_path, $versions);
+   return $author_path;
 }
 
 
@@ -212,7 +448,11 @@ sub get_dist_meta($self, $author_path, %options) {
    my $meta_ent= $self->get_path($meta_path);
    return CPAN::Meta->load_string($meta_ent->[0]->content)
       if $meta_ent;
-   # TODO: process the tar file to generate the meta
+   my $dist= eval {
+      local $Archive::Tar::WARN= 0;
+      $self->get_dist($author_path);
+   };
+   return $dist? $dist->meta : undef;
 }
 
 
@@ -395,8 +635,8 @@ sub import_cpanfile_snapshot($self, $snapshot_spec, %options) {
       # Which source has this file?
       for my $source (@$sources) {
          $log->debugf("check %s for %s", $source->name, $author_path);
-         my $distfile_ent= $source->get_path("authors/id/$author_path")
-            or next;
+         next unless $source->get_path("authors/id/$author_path")
+            || $source->dist_storage($author_path);
          $self->import_dist($source, $author_path);
          $imported_dists{$author_path}= $source;
          # Update index with the modules provided by this distribution if it wasn't imported
@@ -404,12 +644,7 @@ sub import_cpanfile_snapshot($self, $snapshot_spec, %options) {
          if (!$source->package_details->{by_dist}{$author_path}) {
             # Fall back to the 'provides' from the cpanfile.snapshot
             if (ref $dist_info->{provides} eq 'HASH') {
-               my @mod_index= map [ $_, $dist_info->{provides}{$_}, $author_path ],
-                  keys %{$dist_info->{provides}};
-               $self->package_details->{by_dist}{$author_path}= \@mod_index;
-               $self->package_details->{by_module}{$_->[0]}= $_
-                  for @mod_index;
-               $self->write_package_details;
+               $self->index_distribution($author_path, $dist_info->{provides});
             } else {
                my $msg= "Snapshot lacks 'provides' for $dist_name, and not indexed in ".$source->name." either";
                $options{partial}? $log->notice($msg) : croak $msg;
@@ -456,7 +691,7 @@ upstream.  This class only contains methods to import distributions from other G
 
 Distributions in C<authors/id/X/XX/XXXXX> should be kept identical to the public CPAN copy.
 Local changes/patches to those files should be given a new distribution name under
-C<authors/id/local>.  The "provides" list (of modules) of a public CPAN distribution will be kept
+C<authors/id/L/LO/LOCAL>.  The "provides" list (of modules) of a public CPAN distribution will be kept
 the same as reported by public CPAN (for security, so that a dist without permission to index a
 module still can't claim that name) but the "provides" list of a local distribution will always
 take precedence in the indexing.
@@ -532,6 +767,13 @@ attribute L</package_details>.
 Write C<< modules/02packages.details.txt >> from the current value of attribute L</package_details>.
 This adds it to the pending changes to the tree, but does not commit it.
 
+=head2 index_distribution
+
+  $tree->index_distribution($author_path, \%package_versions);
+
+Make this distribution the provider of the supplied packages and versions. Replace
+its previous package list and write the updated index to the tree.
+
 =head2 has_module
 
   $bool= $atree->has_module($mod_name);
@@ -544,6 +786,69 @@ This adds it to the pending changes to the tree, but does not commit it.
 =head2 get_module_dist
 
   $ver= $atree->get_module_dist($mod_name);
+
+=head2 find_upgrades
+
+  my $list= $archive_tree->find_upgrades(sources => \@other_archive_trees);
+  # [
+  #   {
+  #     author_path => 'A/AU/AUTHOR/Example-1.00.tar.gz',
+  #     dist        => 'Example',
+  #     version     => '1.00',
+  #     upgrades    => [
+  #       { author_path => 'A/AU/AUTHOR/Example-1.02.tar.gz', dist => 'Example', version => '1.02',
+  #         source => 'www_cpan_org', kind => 'upgrade',
+  #         modules => { 'Example' => [ '1.00', '1.02' ] } },
+  #       { author_path => 'A/AU/AUTHOR/Example-Util-0.01.tar.gz', dist => 'Example-Util', version => '0.01',
+  #         source => 'www_cpan_org', kind => 'moved',
+  #         modules => { 'Example::Util' => [ '1.00', '1.01' ] } },
+  #     ],
+  #     left_behind   => [ 'Example::Old' ],
+  #     not_in_source => [ 'Example::Private' ],
+  #   },
+  #   ...
+  # ]
+
+Compare the index of this tree with the index of other trees (by default, the trees named in
+L</default_import_sources>) and return every distribution of this tree for which a newer
+distribution is available, sorted by author path.
+
+The comparison starts from the modules, because a module can move from one distribution to
+another.  Each module of this tree is looked up in the sources, taking the source with the
+highest version of it.  The modules are then grouped by the pair of (distribution here,
+distribution there), and each pair becomes an element of C<upgrades> if it is newer:
+
+=over
+
+=item C<< kind => 'upgrade' >>
+
+The other distribution has the same name and a higher release version.
+
+=item C<< kind => 'moved' >>
+
+The other distribution has a different name, and a higher version of at least one module.
+
+=back
+
+Each element of C<sources> is an ArchiveTree, or a hashref of
+C<< { name => $name, by_module => \%by_module } >> in the format of L</package_details>, for
+a caller that has its own snapshot of an index.  The option C<dists> (an arrayref of author
+paths) limits the comparison to those distributions of this tree.
+
+C<modules> has the version of each module here and there.  C<left_behind> lists the modules
+which the sources still attribute to the distribution of this tree; typically, modules that
+were removed from the newer release.  C<not_in_source> lists the modules that no source
+provides.  Both are omitted when empty.
+
+=head2 find_module_source
+
+  my $found= $archive_tree->find_module_source($module_name, sources => \@sources);
+  # { module => 'Example', version => '1.02', author_path => 'A/AU/AUTHOR/Example-1.02.tar.gz',
+  #   source => 'www_cpan_org' }
+
+Look up one module in the sources (as described for L</find_upgrades>, which uses this same
+selection) and return the one with the highest version of it, or C<undef> if no source
+provides it.  The first source wins a tie.
 
 =head2 meta_path_for_dist
 
@@ -559,12 +864,73 @@ This is just a simple replacement of file extension that accounts for some speci
 Fetch an C<$author_path> from another tree, and update the module index to assign ownership of
 the same modules as this dist had in the other tree.  The tree is written, but not committed.
 This can change ownership of modules to this dist from another dist that claimed them.
+Warn about packages the archive claims that the peer index does not register for
+this distribution.
+
+The C<.meta> file of the distribution is copied from the peer as well.  If the peer doesn't
+have one, it is written from the C<META.json> or C<META.yml> found inside the distribution.
+
+=head2 dist_storage
+
+  my $storage= $tree->dist_storage($author_path);
+
+Returns C<'archive'> if the distribution is stored in this tree as an archive file,
+C<'unpacked'> if it is stored as a directory of files (plus C<.meta> file) from which a
+C<.tar.gz> can be generated, or C<undef> if this tree does not contain the distribution.
+This never fetches anything from the upstream of a mirror.
+
+=head2 get_dist
+
+  my $dist= $tree->get_dist($author_path, %options);
+
+Return a L<CPAN::InGit::DistTree> for browsing, inspecting, or comparing the files of a
+distribution, or C<undef> if this tree does not contain the distribution.  An archive file is
+unpacked the first time it is requested and cached in L<CPAN::InGit/dist_cache_repo>.
+This dies if the archive can't be unpacked.
+
+Options:
+
+=over
+
+=item fetch
+
+For a L<MirrorTree|CPAN::InGit::MirrorTree> which lacks the distribution, download it
+from upstream and unpack it into the cache, without adding the archive to the mirror.
+
+=back
+
+=head2 get_distfile
+
+  my $bytes_ref= $tree->get_distfile($author_path);
+
+Return a scalar reference to the archive, or C<undef> if unavailable.
+For an unpacked distribution, generate the archive from its Git tree.
+Mirrors can fetch the archive without adding it to the tree.
+
+=head2 localize_module
+
+  my $author_path= $tree->localize_module($package, %options);
+
+Look up a package in this tree, then in the configured import sources (or the
+C<sources> option). Unpack its distribution under the LOCAL author and preserve
+the package names and versions registered by the source.
+
+=head2 add_local_dist
+
+  my $author_path= $tree->add_local_dist($filename, \$bytes, %options);
+
+Unpack a distribution under C<authors/id/L/LO/LOCAL>, write its metadata and
+register its packages in the index. Return the C<.tar.gz> author path that
+serves the unpacked distribution. Supply C<versions> as a hash of indexed
+packages and versions when importing from a known manifest.
 
 =head2 get_dist_meta
 
-  $prereqs= $archive_tree->get_dist_meta($author_path);
+  $meta= $archive_tree->get_dist_meta($author_path);
 
-Return the CPAN::Meta for the distribution, or C<undef> if unknown.
+Return the L<CPAN::Meta> for the distribution, or C<undef> if unknown.  This comes from
+the C<.meta> file stored next to the distribution, and otherwise from inspecting the
+contents of the distribution (see L<CPAN::InGit::DistTree/meta>).
 
 =head2 import_modules
 
@@ -607,7 +973,7 @@ complete package collection.
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

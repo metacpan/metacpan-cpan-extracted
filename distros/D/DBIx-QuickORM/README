@@ -1,1359 +1,1352 @@
 NAME
 
-    DBIx::QuickORM - Composable ORM builder.
+    DBIx::QuickORM - An ORM that quickly gives you what you need with
+    minimal boilerplate, and easily extends to more complex use cases.
+
+WHERE TO START
+
+    New to the ORM? Read DBIx::QuickORM::Manual::Quickstart: short examples
+    of everything most applications need. See DBIx::QuickORM::Manual for
+    additional resources.
 
 DESCRIPTION
 
-    DBIx::QuickORM allows you to define ORMs with reusable and composible
-    parts.
+    Connect and start working. DBIx::QuickORM scans the live database and
+    uses what it finds as the schema. There is no schema, table, or column
+    metadata to declare. Most of it is automatic. Insert, find, update,
+    delete, and query rows right away.
 
-    With this ORM builder you can specify:
+    Rows come back as DBIx::QuickORM::Row objects, but custom row classes
+    can be defined, or you can request plain hashrefs be returned if you do
+    not want the overhead of a full row object.
 
-    How to connect to one or more databases on one or more servers.
+    When the scan gets something wrong, or you need custom behavior, it is
+    easy to adjust: omit fields by default, give a field a data type for
+    inflation, add foreign keys the database does not declare, and so on.
+    See new (under "Constructor"), or the easy to use DSL
+    (DBIx::QuickORM::DSL), for details.
 
-    One or more schema structures.
+    Larger applications can declare the ORM and its row classes in their
+    own modules. See DBIx::QuickORM::ORM.
 
-    Custom row classes to use.
+    Supported databases: PostgreSQL, MySQL, MariaDB, SQLite, and DuckDB.
 
-    Plugins to use.
+    This distribution is still considered experimental and may change
+    significantly without warning.
 
-EARLY DEVELOPMENT NOTICE
+SYNOPSIS
 
-    It is important to note that if you use DBIx::QuickORM currently you
-    will be an early adopter. The userbase is still small, so a lot has not
-    been battle tested. Also with a small userbase I still feel free to try
-    a few things out and make breaking changes. This will change if enough
-    people indicate active use of this project. Once it has an active
-    userbase it will stabilize and breaking changes will require good
-    reason. Also with active users come bug reports that will help make the
-    project more robust.
-
- NOTES ON AI USE IN THIS PROJECT
-
-  HUMAN WRITTEN FROM THE START
-
-    This project was initially entirely human authored for ~2 years. Most
-    of the code is still human written.
-
-    Recently AI/LLM has been leveraged to find bugs and write some missing
-    documentation.
-
-    Some partially implemented features have also been completed with
-    AI/LLM assistance.
-
-  AI/LLM IS ALLOWED
-
-    I will not police what tools contributors use to write and submit their
-    contributions, this includes AI/LLM. I will however verify quality of
-    any and all submissions.
-
-    I expect all PRs, bug reports, and feature requests to be:
-
-    Reasonably sized
-
-      Nobody likes a wall of text or code that takes forever to read.
-
-    Human Reviewable
-
-      If a human (usually me) cannot read, digest, and understand the
-      review, it will not be merged. I may delegate this to other trusted
-      DBIx::QuickORM contributors who have a proven track record.
-
-    Understood by the one submitting them
-
-      For a PR you MUST understand what you are submitting, full stop.
-
-      For bug reports it is ok to report a bug that is affecting you, even
-      if you do not understand the bug. Usually bugs come from
-      misunderstanding, so this bullet point is largely about code
-      submissions.
-
-    Documentation must not be in "the uncanny valley"
-
-      AI Authored documentation is fine, as long as it can be read and
-      understood easily. A lot of AI documentation can look good on the
-      surface, but be utterly perplexing when a human reads it, which is
-      not acceptable.
-
-DOCUMENTATION
-
-    The best place to start is DBIx::QuickORM::Manual::QuickStart, which
-    walks you through connecting to a database and working with rows as
-    objects in just a few lines. Broader documentation - tutorials, guides,
-    recipes, and worked examples - lives in DBIx::QuickORM::Manual, the
-    documentation hub. For a brief index of every feature with links to
-    where each is documented, see DBIx::QuickORM::Manual::Features.
-
-    The DBIx::QuickORM module itself exports a DSL (a set of builder
-    functions) for defining ORMs, databases, servers, schemas, tables,
-    columns, and links. The rest of this document is the reference for
-    those DSL functions: what each one does and how they nest. It is
-    intentionally function-focused rather than an end-to-end guide - for
-    that, start with the manual.
-
-ORM BUILDER EXPORTS
-
-    You get all these when using DBIx::QuickORM.
-
-    Three of these exports (connect, index, and socket) have the same names
-    as Perl built-ins, so importing DBIx::QuickORM shadows those built-ins
-    in the importing package only (it is a lexical-scope import, not a
-    global change). Inside such a package, connect(...), index(...), and
-    socket(...) call the DSL builders below. If you need the Perl built-in
-    in that package, call it explicitly as CORE::connect(...),
-    CORE::index(...), or CORE::socket(...). As a convenience, a call to one
-    of these that has the exact argument shape of the built-in (for example
-    index($string, $substr)) croaks with a reminder to use CORE:: rather
-    than silently misrouting into the builder.
-
-    orm $NAME => sub { ... }
-
-    my $orm = orm($NAME)
-
-      Define or fetch an ORM.
-
-          orm myorm => sub {
-              db mydb => sub { ... };
-              schema myschema => sub { ... };
-          };
-      
-          my $orm = orm('myorm');
-
-      You can also compose using databases or schemas you defined
-      previously:
-
-          db mydb1 => sub { ... };
-          db mydb2 => sub { ... };
-      
-          schema myschema1 => sub { ... };
-          schema myschema2 => sub { ... };
-      
-          orm myorm1 => sub {
-              db 'mydb1';
-              schema 'myschema1';
-          };
-      
-          orm myorm2 => sub {
-              db 'mydb2';
-              schema 'myschema2';
-          };
-      
-          orm my_mix_a => sub {
-              db 'mydb1';
-              schema 'myschema2';
-          };
-      
-          orm my_mix_b => sub {
-              db 'mydb2';
-              schema 'myschema1';
-          };
-
-      Used at the top level. Can contain db, schema, handle_class,
-      autofill, plus alt, plugin, plugins, meta, and build_class.
-
-    alt $VARIANT => sub { ... }
-
-      Can be used to add variations to any builder:
-
-          orm my_orm => sub {
-              db mydb => sub {
-                  # ************************************
-                  alt mysql => sub {
-                      dialect 'MySQL';
-                  };
-      
-                  alt pgsql => sub {
-                      dialect 'PostgreSQL';
-                  };
-                  # ************************************
-              };
-      
-              schema my_schema => sub {
-                  table foo => sub {
-                      column x => sub {
-                          identity();
-      
-                          # ************************************
-                          alt mysql => sub {
-                              type \'BIGINT';
-                          };
-      
-                          alt pgsql => sub {
-                              type \'BIGSERIAL';
-                          };
-                          # ************************************
-                      };
-                  }
-              };
-          };
-
-      Variants can be fetched using the colon : in the name:
-
-          my $pg_orm    = orm('my_orm:pgsql');
-          my $mysql_orm = orm('my_orm:mysql');
-
-      This works in orm(), db(), schema(), table(), and row() builders. It
-      does cascade, so if you ask for the mysql variant of an ORM, it will
-      also give you the mysql variants of the database, schema, tables and
-      rows.
-
-      Can be nested under any builder. Can contain whatever the builder it
-      is nested under can contain.
-
-    db $NAME
-
-    db $NAME => sub { ... }
-
-    $db = db $NAME
-
-    $db = db $NAME => sub { ... }
-
-      Used to define a database.
-
-          db mydb => sub {
-              dialect 'MySQL';
-              host 'mysql.myapp.com';
-              port 1234;
-              user $MYSQL_USER;
-              pass $MYSQL_PASS;
-              db_name 'myapp_mysql';    # In mysql the db is named myapp_mysql
-          };
-
-      Can also be used to fetch a database by name:
-
-          my $db = db('mydb');
-
-      Can also be used to tell an ORM which database to use:
-
-          orm myorm => sub {
-              db 'mydb';
-              ...
-          };
-
-      Used at the top level, or nested under orm or server. Can contain
-      driver, dialect, connect, attributes, creds, dsn, host, port, socket,
-      user, pass, and db_name.
-
-    dialect '+DBIx::QuickORM::Dialect::PostgreSQL'
-
-    dialect 'PostgreSQL'
-
-    dialect 'MySQL'
-
-    dialect 'MySQL::MariaDB'
-
-    dialect 'MySQL::Percona'
-
-    dialect 'MySQL::Community'
-
-    dialect 'SQLite'
-
-      Specify what dialect of SQL should be used. This is important for
-      reading schema from an existing database, or writing new schema SQL.
-
-      DBIx::QuickORM::Dialect:: will be prefixed to the start of any string
-      provided unless it starts with a plus +, in which case the plus is
-      removed and the rest of the string is left unmodified.
-
-      The following are all supported by DBIx::QuickORM by default
-
-      PostgreSQL
-
-	For interacting with PostgreSQL databases.
-
-      MySQL
-
-	For interacting with generic MySQL databases. Selecting this will
-	auto-upgrade to MariaDB, Percona, or Community variants if it can
-	detect the variant. If it cannot detect the variant then the
-	generic will be used.
-
-	NOTE: Using the correct variant can produce better results. For
-	example MariaDB supports RETURNING on INSERTs, Percona and
-	Community variants do not, and thus need a second query to fetch
-	the data post-INSERT, and using last_insert_id to get
-	auto-generated primary keys. DBIx::QuickORM is aware of this and
-	will use returning when possible.
-
-      MySQL::MariaDB
-
-	For interacting with MariaDB databases.
-
-      MySQL::Percona
-
-	For interacting with MySQL as distributed by Percona.
-
-      MySQL::Community
-
-	For interacting with the Community Edition of MySQL.
-
-      SQLite
-
-	For interacting with SQLite databases.
-
-      DuckDB
-
-	For interacting with DuckDB databases. DuckDB is embedded (like
-	SQLite) and supports RETURNING on all DML, but does not support
-	savepoints, so nested transactions are unavailable.
-
-      Can be nested under db or server.
-
-    driver '+DBD::Pg'
-
-    driver 'Pg'
-
-    driver 'mysql'
-
-    driver 'MariaDB'
-
-    driver 'SQLite'
-
-      Usually you do not need to specify this as your dialect should
-      specify the correct one to use. However in cases like MySQL and
-      MariaDB they are more or less interchangeable and you may want to
-      override the default.
-
-      Specify what DBI driver should be used. DBD:: is prefixed to any
-      string you specify unless it starts with +, in which case the plus is
-      stripped and the rest of the module name is unmodified.
-
-      NOTE: DBIx::QuickORM can use either DBD::mysql or DBD::MariaDB to
-      connect to any of the MySQL variants. It will default to DBD::MariaDB
-      if it is installed and you have not requested DBD::mysql directly.
-
-      Can be nested under db or server.
-
-    attributes \%HASHREF
-
-    attributes(attr => val, ...)
-
-      Set the attributes of the database connection.
-
-      This can take a hashref or key-value pairs.
-
-      This will override all previous attributes, it does not merge.
-
-          db mydb => sub {
-              attributes { foo => 1 };
-          };
-
-      Or:
-
-          db mydb => sub {
-              attributes foo => 1;
-          };
-
-      Can be nested under db or server.
-
-    host $HOSTNAME
-
-    hostname $HOSTNAME
-
-      Provide a hostname or IP address for database connections
-
-          db mydb => sub {
-              host 'mydb.mydomain.com';
-          };
-
-      Can be nested under db or server.
-
-    port $PORT
-
-      Provide a port number for database connection.
-
-          db mydb => sub {
-              port 1234;
-          };
-
-      Can be nested under db or server.
-
-    socket $SOCKET_PATH
-
-      Provide a socket instead of a host+port
-
-          db mydb => sub {
-              socket '/path/to/db.socket';
-          };
-
-      Can be nested under db or server.
-
-    user $USERNAME
-
-    username $USERNAME
-
-      provide a database username
-
-          db mydb => sub {
-              user 'bob';
-          };
-
-      Can be nested under db or server.
-
-    pass $PASSWORD
-
-    password $PASSWORD
-
-      provide a database password
-
-          db mydb => sub {
-              pass 'hunter2'; # Do not store any real passwords in plaintext in code!!!!
-          };
-
-      Can be nested under db or server.
-
-    creds sub { return \%CREDS }
-
-      Allows you to provide a coderef that will return a hashref with all
-      the necessary database connection fields.
-
-      This is mainly useful if you credentials are in an encrypted YAML or
-      JSON file and you have a method to decrypt and read it returning it
-      as a hash.
-
-          db mydb => sub {
-              creds sub { ... };
-          };
-
-      Can be nested under db or server.
-
-    connect sub { ... }
-
-    connect \&connect
-
-      Instead of providing all the other fields, you may specify a coderef
-      that returns a DBI connection.
-
-      IMPORTANT: This function must always return a new DBI connection it
-      MUST NOT cache it!
-
-          sub mydb => sub {
-              connect sub { ... };
-          };
-
-      Can be nested under db or server.
-
-    dsn $DSN
-
-      Specify the DSN used to connect to the database. If not provided then
-      an attempt will be made to construct a DSN from other parameters, if
-      they are available.
-
-          db mydb => sub {
-              dsn "dbi:Pg:dbname=foo";
-          };
-
-      Can be nested under db or server.
-
-    server $NAME => sub { ... }
-
-      Used to define a server with multiple databases. This is a way to
-      avoid re-specifying credentials for each database you connect to.
-
-      You can use db('server_name.db_name') to fetch the database.
-
-      Basically this allows you to specify any database fields once in the
-      server, then define any number of databases that inherit them.
-
-      Example:
-
-          server pg => sub {
-              host 'pg.myapp.com';
-              user $USER;
-              pass $PASS;
-              attributes { work_well => 1 }
-      
-              db 'myapp';       # Points at the 'myapp' database on this db server
-              db 'otherapp';    # Points at the 'otherapp' database on this db server
-      
-              # You can also override any if a special db needs slight modifications.
-              db special => sub {
-                  attributes { work_well => 0, work_wrong => 1 };
-              };
-          };
-      
-          orm myapp => sub {
-              db 'pg.myapp';
-              ...;
-          };
-      
-          orm otherapp => sub {
-              db 'pg.otherapp';
-              ...;
-          };
-
-      Used at the top level. Can contain db plus the same connection
-      settings a db can contain (driver, dialect, connect, attributes,
-      creds, dsn, host, port, socket, user, pass).
-
-    schema $NAME => sub { ... }
-
-    $schema = schema($NAME)
-
-    $schema = schema($NAME => sub { ... })
-
-      Used to either fetch or define a schema.
-
-      When called with only 1 argument it will fetch the schema with the
-      given name.
-
-      When used inside an ORM builder it will set the schema for the ORM
-      (all ORMs have exactly one schema).
-
-      When called with 2 arguments it will define the schema using the
-      coderef as a builder.
-
-      When called in a non-void context it will return the compiled schema,
-      otherwise it adds it to the ORM class.
-
-          # Define the 'foo' schema:
-          schema foo => sub {
-              table a => sub { ... };
-              table b => sub { ... };
-          };
-      
-          # Fetch it:
-          my $foo = schema('foo');
-      
-          # Define and compile one:
-          my $bar = schema bar => sub { ... }
-      
-          # Use it in an orm:
-          orm my_orm => sub {
-              schema('foo');
-              db(...);
-          };
-
-      Used at the top level, or nested under orm. Can contain table, view,
-      tables, row_class, sql, and link.
-
-    table $NAME => sub { ... }
-
-    table $CLASS
-
-    table $CLASS => sub { ... }
-
-      Used to define a table, or load a table class.
-
-          schema my_schema => sub {
-              # Load an existing table
-              table 'My::Table::Foo';
-      
-              # Define a new table
-              table my_table => sub {
-                  column foo => sub { ... };
-                  primary_key('foo');
-              };
-      
-              # Load an existing table, but make some changes to it
-              table 'My::Table::Bar' => sub {
-                  # Override the row class used in the original
-                  row_class 'DBIx::QuickORM::Row';
-              };
-          };
-
-      This will assume you are loading a table class if the double colon ::
-      appears in the name. Otherwise it assumes you are defining a new
-      table. This means it is not possible to load top-level packages as
-      table classes, which is a feature, not a bug.
-
-      Can be nested under schema. Can contain column, columns, primary_key,
-      unique, index, db_name, row_class, sql, and link.
-
-    view $NAME => sub { ... }
-
-    view $CLASS
-
-    view $CLASS => sub { ... }
-
-      Used to define a view, or load a view class. Behaves exactly like
-      table above, but produces a view instead of a table.
-
-          schema my_schema => sub {
-              view active_users => sub {
-                  column id   => sub { ... };
-                  column name => sub { ... };
-              };
-          };
-
-      Can be nested under schema. Can contain the same things as table.
-
-    tables 'Table::Namespace'
-
-      Used to load all tables in the specified namespace:
-
-          schema my_schema => sub {
-              # Load My::Table::Foo, My::Table::Bar, etc.
-              tables 'My::Table';
-          };
-
-      Can be nested under schema.
-
-    row_class '+My::Row::Class'
-
-    row_class 'MyRowClass'
-
-      When fetching a row from a table, this is the class that each row
-      will be blessed into.
-
-      This can be provided as a default for a schema, or as a specific one
-      to use in a table. When using table classes this will set the base
-      class for the table as the table class itself will be the row class.
-
-      If the class name has a plus + it will be stripped off and the class
-      name will not be altered further. If there is no + then
-      DBIx::QuickORM::Row:: will be prefixed onto your string, and the
-      resulting class will be loaded.
-
-          schema my_schema => sub {
-              # Uses My::Row::Class as the default for rows in all tables that do not override it.
-              row_class '+My::Row::Class';
-      
-              table foo => sub {
-                  row_class 'Foo'; # Uses DBIx::QuickORM::Row::Foo as the row class for this table
-              };
-          };
-
-      In a table class:
-
-          package My::ORM::Table::Foo;
-          use DBIx::QuickORM type => 'table';
-      
-          table foo => sub {
-              # Sets the base class (@ISA) for this table class to 'My::Row::Class'
-              row_class '+My::Row::Class';
-          };
-
-      Can be nested under table or schema.
-
-    db_name $NAME
-
-      Sometimes you want the ORM to use one name for a table or database,
-      but the database server actually uses another. For example you may
-      want the ORM to use the name people for a table, but the database
-      actually uses the table name populace. You can use db_name to set the
-      in-database name.
-
-          table people => sub {
-              db_name 'populace';
-      
-              ...
-          };
-
-      This can also be used to have a different name for an entire database
-      in the orm from its actual name on the server:
-
-          db theapp => sub {    # Name in the orm
-              db_name 'myapp'    # Actual name on the server;
-          };
-
-      It works the same way for an individual column, letting the ORM use
-      one name for a column while the database uses another:
-
-          column people_id => sub {    # Name in the orm
-              db_name 'id';            # Actual column name in the table
-          };
-
-      Can be nested under table, db, or column.
-
-    column NAME => sub { ... }
-
-    column NAME => %SPECS
-
-      Define a column with the given name. By default the name is used both
-      as the name the ORM uses for the column and as the actual name of the
-      column in the database. To have the ORM use a different name from the
-      database column, set db_name inside the column.
-
-          column foo => sub {
-              type \'BIGINT'; # Specify a type in raw SQL (can also accept DBIx::QuickORM::Type::*)
-      
-              not_null(); # Column cannot be null
-      
-              # This column is an identity column, or is a primary key using
-              # auto-increment. OR similar
-              identity();
-      
-              ...
-          };
-
-      Another simple way to do everything above:
-
-          column foo => ('not_null', 'identity', \'BIGINT');
-
-      Can be nested under table. Can contain omit, nullable, not_null,
-      identity, affinity, type, sql, default, primary_key, unique, link,
-      and db_name.
-
-    omit
-
-      When set on a column, the column will be omitted from SELECTs by
-      default. When you fetch a row the column will not be fetched until
-      needed. This is useful if a table has a column that is usually huge
-      and rarely used.
-
-          column foo => sub {
-              omit;
-          };
-
-      In a non-void context it will return the string omit for use in a
-      column specification without a builder.
-
-          column bar => omit();
-
-      Can be nested under column.
-
-    volatile
-
-      Marks a column as volatile. A volatile column is one whose stored
-      value the database may set or change during a write, so the value the
-      caller sent cannot be trusted as the in-memory truth. Common sources
-      are generated columns, identity or sequence-backed columns,
-      server-side defaults, ON UPDATE clauses, and triggers.
-
-          column updated_at => sub {
-              affinity 'string';
-              volatile;
-          };
-
-      After a write QuickORM does not keep a stale in-memory value for a
-      volatile column the database owns. Instead of trusting the sent value
-      it lazily fetches the real stored value the next time the column is
-      read:
-
-      When you explicitly send a value for a non-omitted column on an
-      insert, that value is kept (a server default does not override a
-      value you provided).
-
-      When the database fills a column you did not send (a generated or
-      defaulted column), that column is dropped and lazily re-fetched on
-      the next read.
-
-      When a column is both volatile and omitted, its sent value is cleared
-      and lazily re-fetched on the next read.
-
-      When the write is an update, every volatile column is lazily
-      re-fetched, because an ON UPDATE clause or a trigger may have changed
-      it.
-
-      When you call auto_refresh (or insert_and_refresh), the whole row is
-      read back from the database immediately instead of lazily.
-
-      QuickORM auto-marks the columns it can detect as volatile during
-      introspection (generated, identity or sequence-backed,
-      server-default, and on-update columns, plus columns a trigger is seen
-      to set). Use this marker for anything auto-detection cannot see.
-
-      In a non-void context it returns the string volatile for use in a
-      column specification without a builder.
-
-          column updated_at => ('string', 'volatile');
-
-      Can be nested under column.
-
-    nullable()
-
-    nullable(1)
-
-    nullable(0)
-
-    not_null()
-
-    not_null(1)
-
-    not_null(0)
-
-      Toggle nullability for a column. nullable() defaults to setting the
-      column as nullable. not_null() defaults to setting the column as not
-      nullable.
-
-          column not_nullable => sub {
-              not_null();
-          };
-      
-          column is_nullable => sub {
-              nullable();
-          };
-
-      In a non-void context these will return a string, either nullable or
-      not_null. These can be used in column specifications that do not use
-      a builder.
-
-          column foo => nullable();
-          column bar => not_null();
-
-      Can be nested under column.
-
-    identity()
-
-    identity(1)
-
-    identity(0)
-
-      Used to designate a column as an identity column. This is mainly used
-      for generating schema SQL. In a sufficient version of PostgreSQL this
-      will generate an identity column. It will fallback to a column with a
-      sequence, or in MySQL/SQLite it will use auto-incrementing columns.
-
-      In a column builder it will set (default) or unset the identity
-      attribute of the column.
-
-          column foo => sub {
-              identity();
-          };
-
-      In a non-void context it will simply return identity by default or
-      when given a true value as an argument. It will return an empty list
-      if a false argument is provided.
-
-          column foo => identity();
-
-      Can be nested under column.
-
-    affinity('string')
-
-    affinity('numeric')
-
-    affinity('binary')
-
-    affinity('boolean')
-
-      When used inside a column builder it will set the columns affinity to
-      the one specified.
-
-          column foo => sub {
-              affinity 'string';
-          };
-
-      When used in a non-void context it will return the provided string.
-      This case is only useful for checking for typos as it will throw an
-      exception if you use an invalid affinity type.
-
-          column foo => affinity('string');
-
-      Can be nested under column.
-
-    type(\$sql)
-
-    type("+My::Custom::Type") # The + is stripped off
-
-    type("+My::Custom::Type", @CONSTRUCTION_ARGS)
-
-    type("MyType") # Short for "DBIx::QuickORM::Type::MyType"
-
-    type("MyType", @CONSTRUCTION_ARGS)
-
-    type(My::Type->new(...))
-
-      Used to specify the type for the column. You can provide custom SQL
-      in the form of a scalar referernce. You can also provide the class of
-      a type, if you prefix the class name with a plus + then it will strip
-      the + off and make no further modifications. If you provide a string
-      without a + it will attempt to load DBIx::QuickORM::Type::YOUR_STRING
-      and use that.
-
-      In a column builder this will directly apply the type to the column
-      being built.
-
-      In scalar context this will return the constructed type object.
-
-          column foo => sub {
-              type 'MyType';
-          };
-      
-          column foo => type('MyType');
-
-      Can be nested under column.
-
-    sql($sql)
-
-    sql(infix => $sql)
-
-    sql(prefix => $sql)
-
-    sql(postfix => $sql)
-
-      This is used when generating SQL to define the database.
-
-      This allows you to provide custom SQL to define a table/column, or
-      add SQL before (prefix) and after (postfix).
-
-      Infix will prevent the typical SQL from being generated, the infix
-      will be used instead.
-
-      If no *fix is specified then infix is assumed.
-
-      Can be nested under schema, table, or column.
-
-    default(\$sql)
-
-    default(sub { ... })
-
-    %key_val = default(\$sql)
-
-    %key_val = default(sub { ... })
-
-      When given a scalar reference it is treated as SQL to be used when
-      generating SQL to define the column.
-
-      When given a coderef it will be used as a default value generator for
-      the column whenever DBIx::QuickORM INSERTs a new row.
-
-      In void context it will apply the default to the column being
-      defined, or will throw an exception if no column is being built.
-
-          column foo => sub {
-              default \"NOW()"; # Used when generating SQL for the table
-              default sub { 123 }; # Used when inserting a new row
-          };
-
-      This can also be used without a codeblock:
-
-          column foo => default(\"NOW()"), default(sub { 123 });
-
-      In the above cases they return:
-
-          (sql_default => "NOW()")
-          (perl_default => sub { 123 })
-
-      Can be nested under column.
-
-    columns(@names)
-
-    columns(@names, \%attrs)
-
-    columns(@names, sub { ... })
-
-      Define multiple columns at a time. If any attrs hashref or sub
-      builder are specified they will be applied to all provided column
-      names.
-
-      Can be nested under table.
-
-    primary_key
-
-    primary_key(@COLUMNS)
-
-    primary_key(\%OPTIONS, @COLUMNS)
-
-      Used to define a primary key. When used under a table you must
-      provide a list of columns. When used under a column builder it
-      designates just that column as the primary key, no arguments would be
-      accepted.
-
-          table mytable => sub {
-              column a => sub { ... };
-              column b => sub { ... };
-      
-              primary_key('a', 'b');
-          };
-
-      Or to make a single column the primary key:
-
-          table mytable => sub {
-              column a => sub {
-                  ...
-                  primary_key();
-              };
-          };
-
-      Can be nested under table or column.
-
-      When the live database reports a different primary key than the one
-      you declare here, schema construction croaks rather than silently
-      picking one. Pass a leading options hashref with override => 1 to
-      declare that your key is intentional and should win over the
-      database's:
-
-          table mytable => sub {
-              column a => sub { ... };
-      
-              primary_key({override => 1}, 'a');
-          };
-
-      The options hashref works under a column builder too:
-
-          column a => sub {
-              ...
-              primary_key({override => 1});
-          };
-
-    no_volatile
-
-    no_volatile(1)
-
-    no_volatile(0)
-
-      Marks a whole table as volatile-free: an explicit assertion that none
-      of its columns are volatile (see volatile under column). Use it to
-      opt a table out of the conservative trigger handling and to silence
-      the per-table warning QuickORM emits when it finds a trigger whose
-      column effects it cannot resolve.
-
-          table events => sub {
-              no_volatile;
-              column id => sub { primary_key; affinity 'numeric' };
-              ...
-          };
-
-      The same assertion can be made for one or more tables from the quick
-      interface with no_volatile => [ 'events', ... ] (or no_volatile => 1
-      for every table). Can be nested under table.
-
-    unique
-
-    unique(@COLUMNS)
-
-      Used to define a unique constraint. When used under a table you must
-      provide a list of columns. When used under a column builder it
-      designates just that column as unique, no arguments would be
-      accepted.
-
-          table mytable => sub {
-              column a => sub { ... };
-              column b => sub { ... };
-      
-              unique('a', 'b');
-          };
-
-      Or to make a single column unique:
-
-          table mytable => sub {
-              column a => sub {
-                  ...
-                  unique();
-              };
-          };
-
-      Can be nested under table or column.
-
-    index $NAME => \@COLUMNS
-
-    index $NAME => \@COLUMNS, \%PARAMS
-
-    my $index = index(...)
-
-      Define an index on a table. Pass the index name, an arrayref of
-      columns, and an optional hashref of extra parameters.
-
-          table mytable => sub {
-              column a => sub { ... };
-              column b => sub { ... };
-      
-              index my_idx => ['a', 'b'];
-          };
-
-      In a non-void context it returns the index hashref instead of
-      attaching it to the table.
-
-      Can be nested under table.
-
-    link \@LOCAL => \@OTHER
-
-    link [$table => \@columns]
-
-      Define a foreign-key style link/relationship. The exact arguments
-      depend on context: under a schema you provide both the local and the
-      foreign side; under a column the local side is taken to be the
-      current column and you provide only the side being linked to.
-
-          # In a schema, linking two tables:
-          schema my_schema => sub {
-              ...
-              link ['foo', ['foo_id']] => ['bar', ['id']];
-          };
-      
-          # In a column, linking just this column:
-          table foo => sub {
-              column bar_id => sub {
-                  link ['bar', ['id']];
-              };
-          };
-
-      Can be nested under schema or column.
-
-    build_class $CLASS
-
-      Use this to override the class being built by a builder.
-
-          schema myschema => sub {
-              build_class 'DBIx::QuickORM::Schema::MySchemaSubclass';
-      
-              ...
-          };
-
-      Can be nested under any builder.
-
-    my $meta = meta
-
-      Get the current builder meta hashref
-
-          table mytable => sub {
-              my $meta = meta();
-      
-              # This is what db_name('foo') would do!
-              $meta->{name} = 'foo';
-          };
-
-      Can be nested under any builder.
-
-    plugin '+My::Plugin'
-
-    plugin 'MyPlugin'
-
-    plugin 'MyPlugin' => @CONSTRUCTION_ARGS
-
-    plugin 'MyPlugin' => \%CONSTRUCTION_ARGS
-
-    plugin My::Plugin->new()
-
-      Load a plugin and apply it to the current builder (or top level) and
-      all nested builders below it.
-
-      The + prefix can be used to specify a fully qualified plugin package
-      name. Without the plus + the namespace DBIx::QuickORM::Plugin:: will
-      be prefixed to the string.
-
-          plugin '+My::Plugin';    # Loads 'My::Plugin'
-          plugin 'MyPlugin';       # Loads 'DBIx::QuickORM::Plugin::MyPlugin
-
-      You can also provide an already blessed plugin:
-
-          plugin My::Plugin->new();
-
-      Or provide construction args:
-
-          plugin '+My::Plugin' => (foo => 1, bar => 2);
-          plugin '+MyPlugin'   => {foo => 1, bar => 2};
-
-      Can be used at the top level or nested under any builder.
-
-    $plugins = plugins()
-
-    plugins '+My::Plugin', 'MyPlugin' => \%ARGS, My::Plugin->new(...), ...
-
-      Load several plugins at once, if a plugin class is followed by a
-      hashref it is used as construction arguments.
-
-      Can also be used with no arguments to return an arrayref of all
-      active plugins for the current scope.
-
-      Can be used at the top level or nested under any builder.
-
-    handle_class '+My::Handle::Class'
-
-    handle_class 'MyHandleClass'
-
-      Set the default handle class for the ORM. Handles are the objects
-      returned when you query the ORM for rows.
-
-      If the class name has a plus + it will be stripped off and the class
-      name will not be altered further. If there is no + then
-      DBIx::QuickORM::Handle is assumed.
-
-          orm my_orm => sub {
-              handle_class '+My::Handle::Class';
-          };
-
-      Can be nested under orm.
-
-    autofill()
-
-    autofill($CLASS)
-
-    autofill(sub { ... })
-
-    autofill($CLASS, sub { ... })
-
-    autofill $CLASS
-
-    autofill sub { ... }
-
-    autofill $CLASS => sub { ... }
-
-      Used inside an orm() builder. This tells QuickORM to build an
-      DBIx::QuickORM::Schema object by asking the database what tables and
-      columns it has.
-
-          orm my_orm => sub {
-              db ...;
-      
-              autofill; # Autofill schema from the db itself
-          };
-
-      By default the DBIx::QuickORM::Schema::Autofill class is used to do
-      the autofill operation. You can provide an alternate class as the
-      first argument if you wish to use a custom one.
-
-      There are additional operations that can be done inside autofill,
-      just provide a subref and call them:
-
-          autofill sub {
-              autotype $TYPE;                         # Automatically use DBIx::QuickORM::Type::TYPE classes when applicable
-              autoskip table => qw/table1 table2/;    # Do not generate schema for the specified tables
-              autorow 'My::Row::Namespace';           # Automatically generate My::Row::Namespace::TABLE classes, also loading any that exist as .pm files
-              autoname TYPE => sub { ... };           # Custom names for tables, accessors, links, etc.
-              autohook HOOK => sub { ... };           # Run behavior at specific hook points
-          };
-
-      Can be nested under orm. Can contain autotype, autoskip, autorow,
-      autoname, and autohook.
-
-    autotype $TYPE_CLASS
-
-    autotype 'JSON'
-
-    autotype '+DBIx::QuickORM::Type::JSON'
-
-    autotype 'UUID'
-
-    autotype '+DBIx::QuickORM::Type::UUID'
-
-      Load custom DBIx::QuickORM::Type subclasses. If a column is found
-      with the right type then the type class will be used to
-      inflate/deflate the values automatically.
-
-      Can be nested under autofill.
-
-    autoskip table = qw/table1 table2 .../>
-
-    autoskip column = qw/col1 col2 .../>
-
-      Skip defining schema entries for the specified tables or columns.
-
-      Can be nested under autofill.
-
-    autorow 'My::App::Row'
-
-    autorow $ROW_BASE_CLASS
-
-      Generate My::App::Row::TABLE classes for each table autofilled. If
-      you write a My/App/Row/TABLE.pm file it will be loaded as well.
-
-      If you define a My::App::Row class it will be loaded and all table
-      rows will use it as a base class. If no such class is found the new
-      classes will use DBIx::QuickORM::Row as a base class.
-
-      Can be nested under autofill.
-
-    autoname link_accessor => sub { ... }
-
-    autoname field_accessor => sub { ... }
-
-    autoname table => sub { ... }
-
-    autoname link => sub { ... }
-
-      You can name the $row->FIELD accessor:
-
-          autoname field_accessor => sub {
-              my %params     = @_;
-              my $name       = $params{name};   # Name that would be used by default
-              my $field_name = $params{field};  # Usually the same as 'name'
-              my $table      = $params{table};  # The DBIx::QuickORM::Schema::Table object
-              my $column     = $params{column}; # The DBIx::QuickORM::Schema::Table::Column object
-      
-              return $new_name;
-          };
-
-      You can also name the $row->LINK accessor
-
-          autoname link_accessor => sub {
-              my %params = @_;
-              my $name         = $params{name};        # Name that would be used by default
-              my $link         = $params{link};        # DBIx::QuickORM::Link object
-              my $table        = $params{table};       # DBIx::QuickORM::Schema::Table object
-              my $linked_table = $params{linked_table} # Name of the table being linked to
-      
-              # If the foreign key points to a unique row, then the accessor will
-              # return a single row object:
-              return "obtain_" . $linked_table if $link->unique;
-      
-              # If the foreign key points to non-unique rows, then the accessor will
-              # return a DBIx::QuickORM::Query object:
-              return "select_" . $linked_table . "s";
-          };
-
-      You can also provide custom names for tables. When using the table in
-      the ORM you would use the name provided here, but under the hood the
-      ORM will use the correct table name in queries.
-
-          autoname table => sub {
-              my %params = @_;
-              my $name   = $params{name};     # The name of the table in the database
-              my $table  = $params{table};    # A hashref that will be blessed into the DBIx::QuickORM::Schema::Table once the name is set.
-      
-              return $new_name;
-          };
-
-      You can also set aliases for links before they are constructed:
-
-          autoname link => sub {
-              my %params       = @_;
-              my $in_table     = $params{in_table};
-              my $in_fields    = $params{in_fields};
-              my $fetch_table  = $params{fetch_table};
-              my $fetch_fields = $params{fetch_fields};
-      
-              return $alias;
-          };
-
-      These hooks also resolve relationship accessor name collisions. When
-      a table has two foreign keys to the same table (for example sender_id
-      and recipient_id both pointing at users), both relationships default
-      to the same accessor name; autofill croaks at schema-build time and
-      names the conflict. Use autoname link to give each relationship a
-      distinct alias, or autoname link_accessor to give each accessor a
-      distinct name; both hooks receive the link and its columns. A
-      relationship accessor that would clash with a column accessor croaks
-      the same way.
-
-      The croak is deliberate rather than auto-renaming: an automatic name
-      would be forward-incompatible, because adding a second foreign key
-      later would change the accessor an existing single foreign key
-      already produced.
-
-      Can be nested under autofill.
-
-    autohook HOOK = sub { my %params = @_; ... }>
-
-      See DBIx::QuickORM::Schema::Autofill for a list of hooks and their
-      params.
-
-      Can be nested under autofill.
-
-YOUR ORM PACKAGE EXPORTS
-
-    $orm_meta = orm()
-
-    $orm = orm($ORM_NAME)
-
-    $db = orm(db => $DB_NAME)
-
-    $schema = orm(schema => $SCHEMA_NAME)
-
-    $orm_variant = orm("${ORM_NAME}:${VARIANT}")
-
-    $db_variant = orm(db => "${DB_NAME}:${VARIANT}")
-
-    $schema_variant = orm(schema => "${SCHEMA_NAME}:${VARIANT}")
-
-      This function is the one-stop shop to access any ORM, schema, or
-      database instances you have defined.
-
- RENAMING THE EXPORT
-
-    You can rename the orm() function at import time by providing an
-    alternate name.
-
-        use My::ORM qw/renamed_orm/;
+        use DBIx::QuickORM;
     
-        my $orm = renamed_orm('my_orm');
+        my $orm = DBIx::QuickORM->new(
+            credentials => {
+                dsn  => $dsn,
+                user => $user,
+                pass => $pass,
+            },
+        );
+    
+        my $bob = $orm->insert(users => {name => 'Bob'});
+        my $row = $orm->find(users => $bob->field('id'));
+    
+        $bob->update({name => 'Robert'});
+    
+        my @roberts = $orm->handle('users')
+            ->where({name => 'Robert'})
+            ->all;
+    
+        $orm->txn(sub {
+            $orm->insert(users => {name => 'Ann'});
+            $orm->insert(users => {name => 'Cy'});
+        });
+    
+        $bob->delete;
+
+PUBLIC METHODS
+
+ Constructor
+
+    $orm = DBIx::QuickORM->new(%args)
+
+    $orm = DBIx::QuickORM->new(\%args)
+
+      Connects, scans the database into a map of its tables and fields
+      (DBIx::QuickORM::Map), and returns the ORM. Pass exactly one of dbh,
+      connect, or credentials. An unknown argument croaks.
+
+          my $orm = DBIx::QuickORM->new(
+              credentials => {
+                  dsn  => $dsn,
+                  user => $user,
+                  pass => $pass,
+              },
+              omit         => {users => ['prefs']},    # selected only when asked for
+              row_classes  => {posts => undef},        # posts come back as plain hashrefs
+              retain_cache => 1,                       # keep rows cached until clear_cache()
+          );
+
+      The connection argument, one of:
+
+      dbh => $dbh
+
+	A connected DBI handle with RaiseError and AutoCommit on. The ORM
+	takes it over and may change its attributes. Using it elsewhere is
+	unsupported.
+
+	With this form the ORM cannot open a second connection: using the
+	ORM from a forked child croaks, and so do aside and forked on its
+	handles (see "Running elsewhere" in DBIx::QuickORM::Handle).
+
+      connect => sub { ... }
+
+	A code reference that returns a new, uncached handle with
+	RaiseError and AutoCommit on each time it is called.
+
+      credentials => {dsn => $dsn, user => $user, pass => $pass, attrs =>
+      \%attrs}
+
+	Arguments for DBI->connect. dsn is required. user, pass, and attrs
+	are optional. Other keys croak. RaiseError and AutoCommit are
+	always turned on, and AutoCommit given false in attrs croaks.
+
+      The ORM manages transactions, so every form needs AutoCommit on. A
+      handle with AutoCommit off, or with a transaction already open,
+      croaks.
+
+      The remaining arguments adjust the map. The database is scanned into
+      a DBIx::QuickORM::Map unless db_map is given. These arguments then
+      change it, in this order. Each type or row class they name is loaded
+      during new.
+
+      Naming a table or field not in the map croaks, as does an argument of
+      the wrong type.
+
+      db_map => $map
+
+	A DBIx::QuickORM::Map, or a hashref of map data, used instead of a
+	scan. It is deep-copied, so the original is never changed. The
+	arguments below adjust the copy.
+
+      autotype => \@types
+
+      autotype => undef
+
+      append_autotype => \@types
+
+	The types tried, in order, on each field when the map is built. The
+	first that matches becomes the field's orm_type. Default: UUID,
+	JSON, then DateTime (DBIx::QuickORM::Type::UUID,
+	DBIx::QuickORM::Type::JSON, DBIx::QuickORM::Type::DateTime).
+
+	autotype => undef or [] turns this off. append_autotype adds to the
+	autotype list, or to the default. With a db_map, the map keeps its
+	types unless either is given. Then every field is typed again.
+
+	A type matches through its base_types or matches (see
+	DBIx::QuickORM::Role::Type).
+
+	Type names work the same everywhere: a bare name such as JSON means
+	DBIx::QuickORM::Type::JSON, and a leading + marks a full class
+	name, such as +My::Type. The map holds the full name.
+
+	Array fields are never typed automatically: those whose db_type
+	ends in [] or [N] (PostgreSQL arrays, DuckDB lists and fixed-size
+	arrays). Use types to give one a type.
+
+      types => {table => {field => $type_or_undef}}
+
+      types => {table => {field => {class => $type_or_undef, format =>
+      \&code, generate => $mode}}}
+
+	Sets a field's type. Undef removes it.
+
+	The hashref form also sets field hints: format and generate (see
+	"Field hints" in DBIx::QuickORM::Role::Type). Without class it
+	keeps the field's type.
+
+	Either form replaces the field's hints with the ones given (none
+	for the plain form). type_options then fills in the rest. Other
+	keys croak, and so does a hint on a field left without a type.
+
+      type_options => {$type => {format => \&code, generate => $mode}}
+
+	Field hints for every field of a type, such as {UUID => {format =>
+	sub { uc $_[0] }}}. A field's own hints in types win, each hint
+	separately.
+
+      fks => {table => {other_table => [{field => other_field}, ...]}}
+
+	Foreign keys to add to the scanned ones. A key identical to one the
+	table already has is ignored. A key over the same fields that maps
+	them differently croaks.
+
+      omit => {table => \@fields}
+
+      default_fields => {table => \@fields}
+
+	Set which fields a table's queries select by default (the table's
+	default_fields).
+
+	omit selects every field but the ones listed. default_fields
+	selects the ones listed plus the primary key. A table named in
+	neither selects every field, unless a given db_map sets its default
+	fields.
+
+	Croaks when both name the same table, when omit names a primary key
+	field, or when no field is left.
+
+      row_classes => {table => $class_or_undef}
+
+	The row class for one table's rows. Undef means hashrefs.
+
+	Every row class named anywhere is loaded unless it already has a
+	new method. One that cannot be loaded croaks.
+
+      row_namespace => $namespace
+
+	Gives each table a row class under $namespace, named from the
+	table: user_posts gets ${namespace}::UserPosts.
+
+	A table with an entry in row_classes (or in a given db_map) keeps
+	it.
+
+	A table whose class is not loaded and has no module keeps the
+	default row class. A module that fails to load croaks with its
+	error.
+
+	A class found this way must do DBIx::QuickORM::Role::Row. One that
+	does not croaks, naming the table and the class.
+
+	A table name that gives no valid class name (it must start with a
+	letter or _ and hold only word characters) warns and keeps the
+	default row class.
+
+      row_class_name => sub { my ($table) = @_; return $name }
+
+	Replaces how row_namespace names a table's class. It gets the table
+	name and returns the part after the namespace, such as 'Person' for
+	people.
+
+	Returning undef keeps the default row class for that table, without
+	a warning. Returning an invalid name (one holding ::, say) warns
+	and keeps the default.
+
+      row_class, sql_builder, where_builders, and like_aggregates are
+      described under "ATTRIBUTES". retain_cache, enforce_canon, isolation,
+      time_zone (or tz), and datetime_parsers are described under
+      "Settings". A setting of the wrong type croaks.
+
+      A subclass constructor can pass caller => [caller] so errors from new
+      name its own caller's line. It is not kept on the object.
+
+ Settings
+
+    $conn = $orm->connection
+
+      The current DBIx::QuickORM::Connection.
+
+      In a forked child, the ORM drops the inherited handle without closing
+      the parent's session. It then opens a new Connection from the
+      connector, keeping the map and settings.
+
+      That croaks when the ORM was given a dbh, and when a second
+      connection cannot reach the same data (an in-memory SQLite database,
+      or DuckDB).
+
+    $map = $orm->db_map
+
+      The DBIx::QuickORM::Map built when the ORM was constructed.
+
+    $bool = $orm->retain_cache
+
+      Whether canonical copies stay in the row cache outside a transaction.
+      Default 0.
+
+      With 0 they are held weakly and freed once nothing else uses them.
+      With 1 they stay until clear_cache.
+
+    $bool = $orm->enforce_canon
+
+      Whether update_row and delete_row refuse row data that is not
+      canonical. Default 1.
+
+      Outside a transaction, they croak when given row data that is not the
+      canonical copy. Inside one, the check is on by default whatever this
+      says. Each call can override it.
+
+    $orm->set_enforce_canon($bool)
+
+      Change enforce_canon on the current Connection, for every write after
+      the call.
+
+    $level = $orm->isolation
+
+      The default isolation level for outermost transactions. Undef means
+      'read committed'. Takes the levels txn takes (see txn under
+      "Transactions").
+
+    $tz = $orm->time_zone
+
+      The session time zone, UTC unless given. MySQL and MariaDB get UTC as
+      +00:00. SQLite has no session time zone. new also accepts it as tz.
+      Giving both croaks.
+
+    \@parsers = $orm->datetime_parsers
+
+      Parsers for date and time text that neither the database's own parser
+      nor DateTime::Format::ISO8601 reads, tried in order. Empty unless
+      given.
+
+          use DateTime::Format::Strptime;
+      
+          my $orm = DBIx::QuickORM->new(
+              credentials => {
+                  dsn  => $dsn,
+                  user => $user,
+                  pass => $pass,
+              },
+              datetime_parsers => [
+                  DateTime::Format::Strptime->new(pattern => '%d/%m/%Y %H:%M'),
+                  # epoch seconds
+                  sub { $_[0] =~ m/^\d+\z/ ? DateTime->from_epoch(epoch => $_[0]) : undef },
+              ],
+          );
+
+      Each is a class or object with parse_datetime, or a code reference
+      taking the text. new loads each class, and croaks when one cannot be
+      loaded or has no parse_datetime.
+
+      A parser says no by returning undef or dying. The first DateTime
+      returned wins. Returning anything else croaks.
+
+    $orm->set_datetime_parsers(\@parsers)
+
+      Replace datetime_parsers on the current Connection, checked as new
+      checks it, for values read after the call.
+
+      A DateTime field read before the call keeps the parsers it was read
+      with, even while still unparsed.
+
+    Only enforce_canon and datetime_parsers have setters. The other
+    settings are fixed when the ORM is built. Build a new ORM to change
+    them. A forked child's new Connection keeps the changed values.
+
+ The row cache
+
+    The ORM caches one canonical copy of each row's data, by primary key. A
+    row is canonical when its data is that copy. That does not mean it
+    matches the database right now.
+
+    $bool = $orm->is_canon($table, $row_or_data)
+
+      True when the row data (or a row object's row_data) is the canonical
+      copy for its primary key.
+
+      False when it is not, or when the row cache has no copy for that key.
+      Croaks when the primary key cannot be determined.
+
+      So a row missing part of its key (a new row from vivify, say) croaks
+      here, while the row's own is_canon answers false.
+
+    $orm->clear_cache
+
+    $orm->clear_cache($table)
+
+    $orm->clear_cache($table => $pk)
+
+      Forgets canonical copies: all of them, one table's, or one row's.
+      They are read from the database again when next looked up.
+
+          my $user = $orm->find(users => $id);
+          my $held = $orm->is_canon(users => $user);    # true: $user's data is the canonical copy
+      
+          $orm->clear_cache(users => $id);              # or clear_cache('users'), or clear_cache()
+          my $still = $orm->is_canon(users => $user);   # false
+          $user->refresh;                               # canonical again
+
+      $pk takes the forms find takes (see DBIx::QuickORM::Handle), and its
+      values are deflated (turned into database form) the same way.
+
+      A typed key matches in any form: a DateTime or the database's text, a
+      UUID in upper case or as 16 bytes.
+
+      Inside a transaction, it clears the current transaction or savepoint
+      level, and the cache from before the outermost transaction. A
+      savepoint rollback restores what the enclosing level held.
+      "Transactions" says what ending the outermost transaction does.
+
+      A handle that already ran keeps its rows. Call its clear to query
+      again.
+
+ CRUD operations
+
+        # a row object
+        my $ann = $orm->insert(
+            users => {
+                name  => 'Ann',
+                prefs => {theme => 'dark'},
+            },
+        );
+    
+        # row data: a hashref
+        my $ben = $orm->insert(
+            users => {name => 'Ben'},
+            data  => 1,
+        );
+    
+        $orm->insert(users => {name => 'Cy'});    # void: nothing read back
+    
+        # an arrayref of rows, or with count => 1, how many went in
+        my $rows = $orm->insert_many(users => [{name => 'Di'}, {name => 'Ed'}]);
+        my $n    = $orm->insert_many(
+            users => [{name => 'Flo'}],
+            count => 1,
+        );
+    
+        $orm->update_row(users => $ann, {name => 'Anne'});    # updates the row object given
+    
+        my $fresh = $orm->update_row(
+            users => $ben,
+            {email => 'ben@example.com'},
+            cas => ['email'],
+        );
+    
+        my $again = $orm->refresh_row(users => {id => $ben->{id}});    # a row object, from the cache
+        my $gone  = $orm->delete_row(users => $fresh);                 # 1
+    
+        # rows have the same operations as methods
+        $ann->update({email => 'ann@example.com'});    # $orm->update_row(users => $ann, {...})
+        $ann->refresh;                                 # $orm->refresh_row(users => $ann, cache => 0)
+        $ann->delete;                                  # $orm->delete_row(users => $ann)
+
+    The CRUD operations work on row data: plain hashrefs where a missing
+    key means the field was not fetched and an undef value means NULL.
+    Wherever row data is expected, a row object works too, and its row_data
+    is used.
+
+    A row object given to update_row or refresh_row must also have
+    set_row_data, which takes the new row data. One without it, or an
+    aggregate row, croaks before anything is sent.
+
+    Each CRUD operation croaks on an argument it does not know.
+
+    The CRUD operations that return rows (insert, insert_many, update_row,
+    and refresh_row) share one rule:
+
+      * In void context they do the work and return nothing.
+
+      * Given a row object, update_row and refresh_row return that same
+      object, now holding the new row data (it takes the new data in void
+      context too).
+
+      * data => 1 returns the row data instead of a row. A given row object
+      still takes the new data. A handle's data_only does the same for the
+      rows it returns.
+
+      * Otherwise they return a new row object. The class is the table's
+      row_class in the map when set (even to undef), else the ORM's
+      row_class. When that class is undef (as with row_class => undef to
+      new), they return the row data.
+
+      * insert_many returns an arrayref of these, never a list.
+
+      * When no row matched, update_row and refresh_row return undef. A row
+      object given keeps its row data, but a refresh_row that finds no row
+      marks it deleted (see was_deleted in DBIx::QuickORM::Role::Row).
+
+    For row class authors: the object is built with $class->new(row_data =>
+    \%data, orm => $orm, table => $table), or blessed from those directly
+    when the class's fast_bless is true.
+
+    Writes replace the canonical copy for that primary key. A read keeps
+    the canonical copy when every fetched value matches it, adding any new
+    fields. Otherwise the read replaces it.
+
+    A row written through RETURNING comes back with the table's default
+    fields. Without RETURNING (MySQL always, MariaDB for updates) it holds
+    only the primary key.
+
+    Values sent are never copied into the returned row data (except with
+    insert's as_given): defaults, triggers, and generated columns can
+    change them.
+
+    Every CRUD operation takes raw. Without it, every value sent (inserted
+    values, changes, compare-and-swap values, and primary key values) is
+    deflated, turned from a Perl value into database form, by its field's
+    type:
+
+      * A reference on a typed field is deflated.
+
+      * A reference on a field without a type croaks.
+
+      * A plain value on a typed field is deflated when the type's
+      is_inflated says it is inflated. A plain value can be ambiguous (is
+      123 JSON, or already encoded?). Wrap it in raw() or inflated() to say
+      which.
+
+      * Anything else is sent as given.
+
+    raw => 1 says every value is already in database form and skips
+    deflation. It is also how to send a reference to a field without a type
+    (a PostgreSQL array, say).
+
+    raw covers only the values you gave. Values the ORM generates, such as
+    a primary key from its type, are deflated as above whatever raw says.
+
+    To mark one value instead of all, wrap it in a marker from
+    DBIx::QuickORM::Value. A marker overrides both the default and raw:
+
+        use DBIx::QuickORM::Value qw/raw inflated sql/;
+    
+        my $dee = $orm->insert(
+            users => {
+                name    => 'Dee',
+                prefs   => raw('{"theme":"dark"}'),    # already JSON text: sent as is
+                created => sql('now()'),               # literal SQL
+            },
+        );
+    
+        # raw => 1 for every value, but deflate this one
+        my $eli = $orm->insert(
+            users => {
+                name  => 'Eli',
+                prefs => inflated({theme => 'light'}),
+            },
+            raw => 1,
+        );
+
+    raw() sends one value as given, and inflated() deflates one even under
+    raw => 1. binary() binds bytes, and sql() is literal SQL.
+    DBIx::QuickORM::Manual::Values covers each marker, deflation, and
+    inflation on read.
+
+    The single-row CRUD operations reuse prepared statements (DBI's
+    prepare_cached). Behind a pooler in transaction mode, such as
+    PgBouncer, turn off server-side prepares (DBD::Pg's pg_server_prepare).
+
+    $row = $orm->insert($table => \%fields, raw => $bool)
+
+    \%data = $orm->insert($table => \%fields, data => 1, raw => $bool)
+
+    $row = $orm->insert($table => \%fields, as_given => 1, raw => $bool)
+
+      Inserts one row and returns it. At least one field is required.
+
+      The new primary key comes from RETURNING, from the given values, or
+      from the database's last insert id for a single-field key.
+
+      A typed primary key field left out can get its value from its type (a
+      version 7 UUID for a UUID field). The ORM skips this when the
+      database fills the column and can return it with RETURNING. On MySQL
+      it always generates. The field's generate hint changes this (see
+      "Field hints" in DBIx::QuickORM::Role::Type).
+
+      A field passed as undef is sent as NULL and is not generated.
+
+      Generated values are sent like your own, and as_given includes them.
+      insert_many generates them the same way for each row.
+
+      In void context it only inserts. It sends no RETURNING, caches no
+      canonical copy, builds no row, and skips the checks below.
+
+      Without RETURNING (MySQL), unless in void context:
+
+	* A table without a primary key croaks.
+
+	* A compound key not given in full croaks before anything is sent.
+
+	* A single-field key not given (or given as sql()) is read from the
+	last insert id after the insert. When the database generated none
+	(a key that is not auto-increment gives 0), the insert croaks with
+	the row already in the table.
+
+      as_given => 1 returns a copy of the fields as sent, in database form,
+      plus the new primary key, instead of reading the row back. Fields
+      sent as sql() are left out.
+
+      The copy is not canonical, so update and delete on it croak while
+      enforce_canon is on. Refresh it first. A row object fetches a field
+      the copy lacks when it is read.
+
+      On a table without a primary key it returns the copy even without
+      RETURNING, but nothing can be written or fetched through it.
+
+    \@rows = $orm->insert_many($table => \@rows, raw => $bool)
+
+    \@data = $orm->insert_many($table => \@rows, data => 1, raw => $bool)
+
+    $count = $orm->insert_many($table => \@rows, count => 1, raw => $bool)
+
+      Inserts many rows and returns an arrayref of the new rows. Every row
+      must have the same fields, at least one.
+
+      On a table with a primary key, the new rows become canonical. Copies
+      already in the row cache stay.
+
+      count => 1 returns how many rows were inserted instead. It works on
+      every database, never reads rows back, and cannot be combined with
+      data => 1.
+
+      In void context it only inserts: nothing is read back or made
+      canonical.
+
+      An empty \@rows sends nothing and returns an empty arrayref (0 with
+      count).
+
+      The rows go in multi-row INSERT statements, each holding as many rows
+      as the database's bind limit allows. When it takes more than one
+      statement, they run in one transaction, so either every row is
+      inserted or none is.
+
+      Inside an open transaction it always takes a savepoint, even for one
+      statement: a failure rolls back only these rows and leaves the open
+      transaction usable. On DuckDB, which has no savepoints, the open
+      transaction is used as it is.
+
+      The returned rows come in the order the database gives them, with the
+      table's default fields.
+
+      Without RETURNING (MySQL) each row holds only its primary key, so
+      every row must carry its whole primary key. A row without it, or a
+      table without a primary key, croaks before anything is sent. Use
+      count or void context.
+
+    $row = $orm->update_row($table, $row_or_data, \%changes, %opts)
+
+    \%data = $orm->update_row($table, $row_or_data, \%changes, data => 1,
+    %opts)
+
+      Updates the row with the row data's primary key and returns it, or
+      undef when no row matched. At least one change is required. A row
+      object given follows the rule in "CRUD operations".
+
+      Options:
+
+      enforce_canon => $bool
+
+	When true, croaks unless the row data is canonical (see is_canon).
+	Undef or absent means true inside a transaction, otherwise the
+	ORM's enforce_canon.
+
+	0 skips that check, but cas and auto_cas still apply. It also skips
+	the row state checks: a row not in the database (vivified, or
+	deleted) is still updated by its key, where the row's own update
+	croaks. Not recommended.
+
+      cas => \@fields
+
+	Compare-and-swap: update only while these fields still hold the row
+	data's values (undef matches NULL). Otherwise return undef and
+	change nothing. Each field must be in the row data, or it croaks.
+
+	It compares with =, so it does not suit floats, PostgreSQL json, or
+	MySQL JSON.
+
+      auto_cas => $bool
+
+	Compare-and-swap on every field present in both the row data and
+	the changes.
+
+    $count = $orm->delete_row($table, $row_or_data, enforce_canon => $bool,
+    raw => $bool)
+
+      Deletes the row with the row data's primary key and returns how many
+      rows were deleted (0 or 1). The ORM stops holding it and marks the
+      row data deleted (see was_deleted in DBIx::QuickORM::Role::Row).
+
+      A delete that matches no row also marks it deleted (it is not in the
+      database) and returns 0.
+
+      enforce_canon is as for update_row, including what 0 bypasses.
+
+    $row = $orm->refresh_row($table, $row_or_data, cache => $bool, db =>
+    $bool, fields => \@fields, raw => $bool)
+
+    \%data = $orm->refresh_row($table, $row_or_data, data => 1, %opts)
+
+      The canonical row for a primary key, or undef when there is none. It
+      takes row data, a row, or a primary key in any form (a value, an
+      arrayref, or a hashref).
+
+      A row object given follows the rule in "CRUD operations".
+
+      It reads fields plus the primary key, or the table's default fields.
+
+      By default it returns the canonical copy when that has every field
+      asked for, and reads the database otherwise. cache => 0 always reads
+      the database. db => 0 only looks in the cache, returning the
+      canonical copy as it is, or undef. Both 0 croaks.
+
+ Finding by primary key
+
+        my $user = $orm->find(users => $id);
+        my $data = $orm->find(users => $id, data => 1);    # row data
+        my $none = $orm->find(users => -1);                # undef
+
+    Reads one row by primary key, like refresh_row. It never writes to the
+    database.
+
+    $row = $orm->find($table, $pk, %opts)
+
+    \%data = $orm->find($table, $pk, data => 1, %opts)
+
+      The row with primary key $pk, or undef. $pk takes any key form (see
+      find in DBIx::QuickORM::Handle). The options are refresh_row's.
+
+      A row object passed in gives its key. It may also show the state the
+      read found, such as new values or that the row is gone.
+
+ Finding or inserting
+
+        my $gil = $orm->find_or_insert(
+            users => {
+                name  => 'Gil',
+                email => 'gil@example.com',
+            },
+            by => ['email'],
+        );
+        my $same = $orm->find_or_insert(
+            users => {email => 'gil@example.com'},
+            by    => ['email'],
+        );
+
+    $row = $orm->find_or_insert($table => \%fields, by => \@fields, raw =>
+    $bool)
+
+    \%data = $orm->find_or_insert($table => \%fields, data => 1, %opts)
+
+      Returns the row whose by fields hold the given values, inserting it
+      from \%fields when there is none. It follows the CRUD operations'
+      return rule.
+
+      by defaults to the primary key. A table without one needs by. Every
+      by field must be in \%fields. Croaks when more than one row matches,
+      or for a field the table does not have, whether or not the row
+      exists.
+
+      An undef by value croaks: NULL does not identify a row, since a
+      unique key allows many.
+
+      The insert runs in a savepoint, or in a transaction when none is
+      open, so a failed insert leaves an open transaction usable. When the
+      insert fails (say another process inserted the row first), it looks
+      the row up again and returns it. If it still finds none, it rethrows
+      the insert's error.
+
+      This recovery needs a unique key on the by fields. Without one, two
+      racing calls can both insert.
+
+      Recovery works at the default 'read committed'. Inside a transaction
+      at 'repeatable read' or 'serializable' (when chosen, or the MySQL
+      family's server default under 'server'), the second lookup reads the
+      transaction's snapshot. A row another session committed after this
+      transaction started stays invisible, so the insert's error is
+      rethrown.
+
+      raw => 1 also covers the by values used to look the row up. They must
+      then be in exact database form, or the lookup misses and the insert
+      fails on a duplicate key.
+
+      On DuckDB, which has no savepoints, an insert inside an open
+      transaction runs without one, and a failed insert leaves that
+      transaction unusable.
+
+      A table handle has it too: $h->find_or_insert(\%fields, %opts) (see
+      DBIx::QuickORM::Handle).
+
+ Rows not in the database
+
+    A row can exist in memory before it is inserted. Change it with modify,
+    then write it with its insert.
+
+    $row = $orm->vivify($table => \%fields)
+
+      A new row that is not in the database yet. Nothing is written until
+      you call its insert. Until then, modify changes it (see
+      DBIx::QuickORM::Role::Row).
+
+      The fields are checked and deflated as insert does, into a new
+      hashref. An empty hashref is fine. Fill it in with modify. The row is
+      built as the CRUD operations build rows, so with no row class it is
+      the row data.
+
+ Following foreign keys
+
+        my $post = $orm->insert(
+            posts => {
+                user_id => $id,
+                title   => 'Hi',
+            },
+        );
+    
+        my $author = $orm->follow_fk(posts => $post, 'users')->only;
+        my @posts  = $orm->follow_fk(users => $author, 'posts')->order_by('id')->all;
+    
+        # the same, as a row method: no table needed
+        my $writer = $post->follow_fk('users')->only;
+
+    $h = $orm->follow_fk($table, $row_or_data, $other_table, link =>
+    \%link)
+
+    $h = $orm->follow_fk($table, $row_or_data, $other_table, via => \%via)
+
+      A table handle (DBIx::QuickORM::Handle) on $other_table for the rows
+      linked to this row by a foreign key: the row it points to, or the
+      rows that point to it.
+
+      The handle's where holds the linked fields' values from the row,
+      qualified as other_table.field, so the handle can be joined to other
+      tables. Narrow the handle with and, since where would replace the
+      link.
+
+      link is {our_field => their_field, ...}, as foreign keys are written
+      in the map, and gives the direction. On a self-referencing employees
+      table, {manager_id => 'id'} follows to an employee's manager and {id
+      => 'manager_id'} to their reports. It must match a foreign key of
+      $table to $other_table, or one of $other_table to $table reversed.
+      Without it there must be exactly one such key.
+
+      via takes the same mapping for a key the map does not know, such as
+      one the database never declared: via => {editor_id => 'id'}. No
+      foreign key need exist, but both tables must be in the map and every
+      field it names must exist. To declare the key for every call instead,
+      give fks to new.
+
+      Croaks on a link that matches no key, on more than one key without a
+      link, on a key to a table not in the map, on a via field that does
+      not exist, and when given both link and via.
+
+      The handle expects one row (single, see DBIx::QuickORM::Iterator)
+      when the fields it looks up are the other table's primary key or a
+      unique key. Otherwise it expects many (multi), whatever the data.
+
+      Linked fields missing from the row data are fetched first, with one
+      refresh_row. It croaks if the row is gone. A NULL linked value refers
+      to nothing, so the handle matches no rows.
+
+ Inserting linked rows
+
+        my $post = $orm->insert_fk(users => $alice, 'posts', {title => 'One'});
+        my $posts = $orm->insert_many_fk(users => $alice, 'posts', {title => 'A'}, {title => 'B'});
+    
+        # the same, as row methods
+        my $draft = $alice->insert_fk('posts', {title => 'Draft'});
+
+    Inserts rows into $other_table that point at this row, filling their
+    foreign key fields from it. Only that direction: a key of $table to
+    $other_table cannot be followed this way, since the new row would have
+    to be written back into this one.
+
+    $row = $orm->insert_fk($table, $row_or_data, $other_table, %opts,
+    \%fields)
+
+    \@rows = $orm->insert_many_fk($table, $row_or_data, $other_table,
+    %opts, @fields)
+
+      insert_fk inserts exactly one row and returns it, as insert does.
+      insert_many_fk inserts any number, as insert_many does: an arrayref
+      of rows, the count with count => 1, nothing in void context.
+
+      After $other_table, a string is an option name taking the next
+      argument as its value, and every other hashref is a row's fields:
+
+          $alice->insert_fk('posts', link => {id => 'user_id'}, {title => 'Linked'});
+
+      link chooses the key when more than one of $other_table points at
+      $table, written {our_field => their_field} as follow_fk takes it. via
+      gives a mapping with no key behind it, as for follow_fk. The new
+      rows' right-hand fields are filled from this row's left-hand fields.
+      The other options are those of insert (raw, data, as_given) or
+      insert_many (raw, data, count).
+
+      Croaks, before anything is inserted, when the fields set a link
+      field, when the row's linked value is NULL, when the row is not in
+      the database, and on a link that points from $table. A linked field
+      missing from the row data is fetched first, with one refresh_row. The
+      linked values are sent as they are in the row data, so a hashref must
+      hold them in database form, as row data does.
+
+ Handles
+
+        my @bobs = $orm->handle('users')
+            ->where({name => 'Bob'})
+            ->order_by('id')
+            ->all;
+        my @rows = $orm->handle(\['SELECT id, name FROM users WHERE id > ?', 10])->all;
+
+    $h = $orm->handle($table)
+
+    $h = $orm->handle(\$sql)
+
+    $h = $orm->handle(\[$sql, @binds])
+
+    $h = $orm->handle($source)
+
+      A DBIx::QuickORM::Handle over a table, an SQL query, or a source
+      object (DBIx::QuickORM::Role::Source).
+
+      An SQL query runs as written, and its binds are not deflated. Its
+      rows belong to no table: they are never canonical and cannot be
+      written through the ORM.
+
+ Transactions
+
+    DBIx::QuickORM::Txn shows the block and object forms. Nesting gives
+    savepoints. isolation sets the level and retry replays a block:
+
+        $orm->txn(sub {
+            $orm->insert(users => {name => 'Outer'});
+            eval {
+                $orm->txn(sub {
+                    $orm->insert(users => {name => 'Inner'});
+                    die "undo only the inner work\n";
+                });
+            };
+        });    # Outer is committed, Inner was rolled back with its savepoint
+    
+        my $count = $orm->txn(
+            sub { $orm->handle('users')->count },    # the block's return value
+            isolation => 'serializable',
+            retry     => 3,
+        );
+
+    $txn = $orm->txn
+
+    $txn = $orm->txn(isolation => $level)
+
+    @result = $orm->txn(sub { my $txn = shift; ... })
+
+    @result = $orm->txn(sub { ... }, retry => $n, isolation => $level)
+
+      Opens a transaction, or a savepoint inside the open one, as a
+      DBIx::QuickORM::Txn. Given a block, runs it with the transaction and
+      returns what the block returns.
+
+      Without a block, commit or roll back through the returned object.
+      Only the innermost open transaction can be committed or rolled back.
+      One that goes out of scope unfinished is rolled back with a warning.
+
+      With a block, a normal return commits, unless the block already
+      committed or rolled back the transaction. An exception rolls back and
+      is rethrown.
+
+      retry => $n runs the block of an outermost transaction again, up to
+      $n more times, while the exception is a database error whose
+      retriable is true (a deadlock, a serialization failure, or a lock
+      timeout). See DBIx::QuickORM::Exception::DB. The block must be safe
+      to run again. retry croaks without a block, and on a nested
+      transaction, which cannot be replayed alone.
+
+      An outermost transaction opens at the ORM's isolation, or 'read
+      committed' by default. It states that level when it opens, so a
+      changed server or session default cannot alter it.
+
+      'server' is the exception: it sends a plain BEGIN and uses the
+      database's own default.
+
+      isolation => $level opens an outermost transaction at another level:
+      'read committed', 'repeatable read', 'serializable', 'read
+      uncommitted', or 'server', in any case. Each retry begins at the same
+      level.
+
+      isolation croaks on a nested transaction and for any other value.
+
+      The ORM's isolation setting takes the same levels, and new croaks for
+      any other. It is undef unless given, and is stored in lower case.
+
+      SQLite and DuckDB cannot set a level. There the default is 'server',
+      and any other level croaks when the transaction opens. PostgreSQL
+      runs 'read uncommitted' as 'read committed'. "ISOLATION" in
+      DBIx::QuickORM::Manual::Transactions has the details.
+
+      Savepoints need a database that has them, so nesting croaks on
+      DuckDB.
+
+      Inside a transaction, update_row and delete_row check that row data
+      is canonical by default, whatever enforce_canon says. Canonical
+      copies are held strongly.
+
+      Inside a transaction, rows read before it are not canonical until
+      read again. A rollback restores the row cache and row state from
+      before. A commit keeps what the transaction read. After a rollback,
+      refresh a row object you still hold. See
+      DBIx::QuickORM::Manual::Transactions for the details.
+
+ Loading classes
+
+    $bool = DBIx::QuickORM->load_class($what, $class)
+
+    $bool = DBIx::QuickORM->load_class($what, $class, $missing_ok)
+
+      Loads a class from its module file and returns true. Croaks "$what
+      could not be loaded" with the error when it cannot.
+
+      With $missing_ok, a missing module file returns false instead. An
+      error inside the file still croaks.
+
+    $class = $orm->require_type($type)
+
+    $class = $orm->require_type($type, $context)
+
+      Returns the full class name for a type name (JSON, or +My::Type for a
+      class outside DBIx::QuickORM::Type), loading it unless it already has
+      deflate.
+
+      Croaks when it cannot be loaded. $context, when given, says in that
+      error what asked for the type.
+
+    $orm->load_row_class($class)
+
+      Loads a row class unless it already has a new. Croaks when the name
+      is not a valid package name or the class cannot be loaded.
+
+ATTRIBUTES
+
+    Read-only accessors. Each returns the constructor argument of the same
+    name, or its default. connector, sql_builder, and where_builders hold
+    what new built from it.
+
+    $class = $orm->row_class
+
+      The default row class, DBIx::QuickORM::Row unless given. Undef means
+      plain hashrefs.
+
+    \%classes = $orm->row_classes
+
+    $namespace = $orm->row_namespace
+
+    $code = $orm->row_class_name
+
+    \%omit = $orm->omit
+
+    \%fields = $orm->default_fields
+
+    \%types = $orm->types
+
+    \%options = $orm->type_options
+
+    \@types = $orm->autotype
+
+    \@types = $orm->append_autotype
+
+    \%fks = $orm->fks
+
+      The arguments as given to new, or undef. See new for what each does.
+      db_map holds the result. autotype is undef unless given, even though
+      a default list applies.
+
+    $builder = $orm->sql_builder
+
+      The SQL builder that handles use. Default:
+      DBIx::QuickORM::SQLBuilder::SQLAbstract.
+
+      new takes an object composing DBIx::QuickORM::Role::SQLBuilder, or
+      the name of a class that does. A class is loaded unless it has new,
+      then built with no arguments. Anything else croaks.
+
+    \@builders = $orm->where_builders
+
+      The where builders that render a handle's where. The first that can
+      build it wins (see DBIx::QuickORM::Role::WhereBuilder).
+
+      Default: DBIx::QuickORM::WhereBuilder::RawSQL,
+      DBIx::QuickORM::WhereBuilder::Simple, then
+      DBIx::QuickORM::WhereBuilder::SQLAbstract.
+
+      new takes a non-empty arrayref of classes or objects composing the
+      role. A class is loaded unless it has build_where. Anything else
+      croaks. A handle can use its own list through its where_builders.
+
+    $code = $orm->connector
+
+      The code reference the ORM calls to open a database handle, built
+      from the connection argument.
+
+    \@names = $orm->like_aggregates
+
+      Extra aggregate functions whose result keeps the field's type and
+      foreign keys, like the built-in min and max. Undef unless given.
+
+      A computed column [$func, $field] using one of them gets the field's
+      type and foreign keys (see "Computed columns" in
+      DBIx::QuickORM::Handle). Names are matched case-insensitively.
+
+PRIVATE METHODS
+
+    $out = $orm->_primitive($method, \@class, $table, $row_or_data, @args)
+
+      Runs the Connection's CRUD operation and returns its result by the
+      rule the CRUD operations share. In void context it returns nothing.
+      Given a row object for update_row or refresh_row, it returns that row
+      after set_row_data (which runs in void context too). With data => 1
+      it returns the row data. Otherwise it returns a new row built by _row
+      with @class.
+
+      An undef result is undef, and the row is left alone. Handles pass
+      their row_class as @class.
+
+      An arrayref result (insert_many) comes back as an arrayref, of rows
+      or of row data. A plain result (insert_many's count) comes back as it
+      is.
+
+      Croaks before running the CRUD operation when a row object given to
+      update_row or refresh_row cannot take new data: it has no
+      set_row_data, or it is an aggregate row.
+
+    $out = $orm->_find_or_insert(\@frame, \@class, $table, \%fields, %opts)
+
+      find_or_insert, building the row with @class as _row does and
+      reporting its errors at @frame. Handles pass their row_class as
+      @class.
+
+    $out = $orm->_find(\@class, $table, $pk, %opts)
+
+      find: _primitive running refresh_row on the key, with a row object
+      given as the key replaced by its row data. Handles pass their
+      row_class as @class.
+
+    $row = $orm->_row($table, \%data)
+
+    $row = $orm->_row($table, \%data, $class)
+
+      The row data, or a row object over it when the table has a row class.
+      Undef for undef. A given $class (even undef) replaces the table's.
+      Handles pass their row_class this way. Built by _row_builder.
+
+    $build = $orm->_row_builder($table)
+
+    $build = $orm->_row_builder($table, $class)
+
+      What turns row data into rows of the table, resolved once for a whole
+      result set: a code reference taking the row data and returning the
+      row object, or undef when rows are hashrefs (no row class). $class is
+      as for _row.
+
+      Every place that builds table rows uses it. When the class's
+      fast_bless is true the row is blessed directly, otherwise built with
+      new. The ORM asks each class for fast_bless once and remembers the
+      answer.
+
+    $class = $orm->_row_class($table)
+
+      The table's row class: its row_class in the map when set (even to
+      undef), otherwise the ORM's, which is also the class for an undef
+      table.
+
+    $orm->_check_args
+
+      Turns tz into time_zone, then croaks naming the first argument in
+      %SHAPES whose shape is wrong. The Connection checks datetime_parsers.
+
+    _croak_at(\@frame, $message)
+
+      Dies with the message at the frame's file and line, worded as croak
+      words it. @frame is a caller frame that a public method captured, so
+      an error found deeper, reached through a handle or a row, reports the
+      user's line.
+
+    _rethrow_at(\@frame, $what, $error)
+
+      Rethrows an error caught at a public entry, with the frame's file and
+      line appended: (from $what at FILE line N). The error keeps its own
+      location, so a bug report still shows where it was thrown. Exception
+      objects are rethrown unchanged, and so is a message that already ends
+      at the frame's line.
+
+      Use it where one public call reaches many errors in other modules,
+      such as new. _croak_at suits a chain with a few known errors.
+
+    $h = $orm->_follow_fk(\@frame, $table, $row_or_data, $other_table,
+    %params)
+
+      follow_fk, reporting its errors at @frame: the caller frame of the
+      public follow_fk (the ORM's or a row's).
+
+    $out = $orm->_insert_fk(\@frame, $method, $table, $row_or_data,
+    $other_table, @args)
+
+      insert_fk ($method insert) or insert_many_fk (insert_many), reporting
+      its errors at @frame: the caller frame of the public method (the
+      ORM's or a row's).
+
+    \%link = $orm->_link_for(\@frame, $map, $table, $other, {link =>
+    \%link, via => \%via}, $insert_method)
+
+      The link a call's link or via option gives: _via_link for via,
+      otherwise _fk_link with link (undef when absent) and $insert_method.
+      Croaks when both are given.
+
+    \%link = $orm->_via_link(\@frame, $map, $table, $other, \%via)
+
+      %via, {our_field => their_field}, as the link, with no foreign key
+      behind it. Croaks unless both tables are in the map, %via is a
+      non-empty hashref, and every field it names is a field of its table.
+
+    \%link = $orm->_fk_link(\@frame, $map, $table, $other, \%given)
+
+    \%link = $orm->_fk_link(\@frame, $map, $table, $other, \%given,
+    $insert_method)
+
+      The link to follow, {our_field => their_field}, from the foreign keys
+      of $table to $other and those of $other to $table turned around: the
+      one matching %given, or the only one when %given is undef. Croaks
+      otherwise, and when $other is not in the map, reporting at @frame.
+
+      With $insert_method (the calling method's name, for messages), only
+      the keys of $other to $table count, and a %given matching a key of
+      $table to $other croaks, naming the direction.
+
+    $source = $orm->_table_source($table)
+
+      The table's DBIx::QuickORM::Source::Table, built on first use and
+      then kept: sources are immutable, so every handle over the table
+      shares it. Croaks as the source's new does, keeping nothing.
+
+    $h = $orm->_fk_handle($other, {$their_field => $value, ...})
+
+      A handle on the rows of $other whose fields hold these values, each
+      field qualified as other.field in the where. An undef value refers to
+      nothing: its condition is sql('IS NULL AND 1 = 0'), which is never
+      true. The handle is single when the fields are exactly the primary
+      key or a unique key of $other, otherwise multi. Croaks when $other is
+      not in the map.
+
+    $bool = $orm->_can_connect
+
+      True unless the ORM was given a dbh: whether the connector can open
+      another connection.
+
+    $code = $orm->_build_connector
+
+      Turns the one connection argument into the connector, removing it
+      from the object, and sets _can_connect.
+
+    $builder = $orm->_build_sql_builder
+
+      The sql_builder argument as an object, the default when none was
+      given.
+
+    \@builders = $orm->_where_builders($what, \@builders)
+
+      A copy of the list, each class loaded unless it has build_where.
+      Croaks, naming $what, for a list of the wrong shape (as new checks
+      it) or a builder not composing DBIx::QuickORM::Role::WhereBuilder.
+
+    $conn = $orm->_connect(%args)
+
+      A new Connection with these arguments and a handle from the
+      connector.
+
+    $new = $orm->_connect_like($conn)
+
+      A new Connection from the connector with the map and settings of the
+      given one: for a forked child's reconnect, and for queries run on a
+      second connection.
+
+    $map = $orm->_copy_map($db_map)
+
+      A copy of a given map as a DBIx::QuickORM::Map, or undef for undef.
+
+    $orm->_setup_map($map, $given)
+
+      Adjusts the Connection's map in place by the arguments, in the order
+      new lists them, through the methods below. $given is true when the
+      map came from db_map rather than a scan.
+
+    $orm->_autotype($map, $given)
+
+      Sets each field's orm_type from the autotype list, as new describes.
+      A given map keeps its types, which are only loaded, when new got
+      neither autotype nor append_autotype.
+
+    $orm->_apply_types($map)
+
+      Applies types, loading each type it names. A named field gets the
+      type in place of any autotype, or none for undef. Its format and
+      generate hints become the ones given (none for the plain form).
+
+      Then type_options fills each hint a field of that type lacks. format
+      and generate fall back separately. Each type it names is loaded. A
+      field left with a hint but no type croaks.
+
+    $orm->_apply_fks($map)
+
+      Applies fks: adds each link to the table's foreign keys, through
+      _add_fk.
+
+    $orm->_apply_default_fields($map)
+
+      Applies omit and default_fields, setting each named table's default
+      fields, with the croaks new lists.
+
+    $orm->_apply_row_classes($map)
+
+      Applies row_classes, then row_namespace to each table left without a
+      row class (through _namespace_class, and a class found there must do
+      DBIx::QuickORM::Role::Row), then loads every row class the map names
+      and the ORM's row_class, unless the class already has a new.
+
+    $class = $orm->_namespace_class($namespace, $table)
+
+      The table's row class under row_namespace: the namespace and the part
+      row_class_name gives for the table, or by default each _-separated
+      part of the name with its first letter upper-cased, joined.
+
+      Undef when the part is undef. Warns and returns undef when the part
+      is not an identifier.
+
+    $orm->_apply_key_types($map)
+
+      Records each table's pk_types (see DBIx::QuickORM::Map) when a
+      primary key field has a type. Croaks when such a type has no
+      canonical_key_value, and when a field whose type can generate values
+      has generate => 'prefer_orm' on a column the database refuses values
+      for.
+
+    $orm->_apply_passthrough($map)
+
+      Sets passthrough on each typed field whose type's inflate_is_identity
+      is true for that field, and removes it from every other field.
+
+    \%arg = $orm->_table_arg($map, $name, $want, \&check)
+
+      The named argument, or an empty hash when it was not given. Croaks
+      unless it is a hashref whose values pass check ($want describes the
+      shape), or when it names a table not in the map.
+
+    $orm->_check_fields($map, $name, $table, @fields)
+
+      Croaks for the first field not in the table.
+
+    $class = $orm->_type_class($type)
+
+      The full class name for a type name.
+
+    $orm->_require_map_types($map)
+
+      Loads every type a given map names.
+
+    [$class, \%base_types, $has_matches] = $orm->_load_type($arg, $type)
+
+      Loads an autotype for _autotype: its class, its base_types as a set,
+      and whether it has matches. Croaks naming the argument when the type
+      cannot be loaded, or has neither.
+
+    $orm->_add_fk($map, $table, $other, \%link)
+
+      Adds a foreign key from the table to the other one, unless the table
+      already has the same link. Croaks when it has a link on the same
+      fields that points at different fields of the other table.
+
+    $orm->_set_default_fields($map, $arg, $table, @fields)
+
+      Sets the table's default fields to @fields, sorted and without
+      duplicates. Croaks naming the argument when @fields is empty.
 
 SOURCE
 
-    The source code repository for DBIx::QuickORM can be found at
-    https://https://github.com/exodist/DBIx-QuickORM.
+    The source code repository for DBIx-QuickORM can be found at
+    https://github.com/exodist/DBIx-QuickORM.
 
 MAINTAINERS
 

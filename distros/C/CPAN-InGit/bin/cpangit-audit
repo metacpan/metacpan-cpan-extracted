@@ -1,0 +1,344 @@
+#! /usr/bin/env perl
+# PODNAME: cpangit-audit
+our $VERSION = '0.007'; # VERSION
+# ABSTRACT: list the distributions of a branch which are outdated or affected by CVEs
+
+use v5.36;
+use FindBin;
+BEGIN { push @INC, "$FindBin::RealBin/../lib" if -f "$FindBin::RealBin/../dist.ini" }
+use CPAN::InGit;
+use CPAN::InGit::DistTree;
+use Getopt::Long;
+use Pod::Usage;
+use JSON::PP;
+use POSIX 'strftime';
+use Log::Any::Adapter 'Stderr', log_level => 'warning';
+
+
+my $log_level= Log::Any::Adapter::Util::numeric_level('warning');
+my $quiet= 0;
+my $format;
+GetOptions(
+   'git-dir=s'           => \(my $git_dir= $ENV{GIT_DIR} // '.'),
+   'branch=s'            => \my $branch_name,
+   'source=s'            => \my @source_names,
+   'format=s'            => \$format,
+   'json'                => sub { $format= 'json' },
+   'cve-only'            => \my $cve_only,
+   'outdated-only'       => \my $outdated_only,
+   'assert-have-src-ver' => \my $assert_have_src_ver,
+   'assert-no-cve'       => \my $assert_no_cve,
+   'cve-file=s'          => \my $cve_file,
+   'refresh'             => \my $refresh,
+   'fetch!'              => \(my $fetch= 1),
+   'cve!'                => \(my $use_cve= 1),
+   'verbose|v'           => sub { ++$log_level },
+   'quiet|q'             => sub { --$log_level if $log_level; ++$quiet },
+   'help'                => sub { pod2usage(1) },
+) && !@ARGV or pod2usage(2);
+# The assertions are a yes-or-no question, so they don't write the report unless asked
+$format //= ($assert_have_src_ver || $assert_no_cve)? 'none' : 'text';
+$format =~ /\A(?:text|json|none)\z/ or pod2usage("Unknown format '$format'");
+$use_cve || !($assert_no_cve || $cve_only) or pod2usage("--no-cve conflicts with --assert-no-cve and --cve-only");
+$fetch || !$refresh or pod2usage("--no-fetch conflicts with --refresh");
+!($cve_only && $outdated_only) or pod2usage("--cve-only conflicts with --outdated-only");
+
+Log::Any::Adapter->set('Stderr', log_level => $log_level);
+
+sub age($epoch) {
+   my $sec= time - $epoch;
+   return $sec < 90? 'just now' : $sec < 5400? sprintf('%dm ago', $sec/60)
+        : $sec < 48*3600? sprintf('%dh ago', $sec/3600) : sprintf('%dd ago', $sec/86400);
+}
+
+my @failed;
+my $ok= eval {
+   my $git_repo= Git::Raw::Repository->discover($git_dir);
+   my $cpan_repo= CPAN::InGit->new(git_repo => $git_repo);
+
+   my $get_tree= sub ($name) {
+      my $tree= $cpan_repo->get_archive_tree($name)
+         or die "Branch '$name' is not a 'PAN (no /cpan_ingit.json file)\n";
+      $tree->autofetch(0) if !$fetch && $tree->can('autofetch');
+      $tree;
+   };
+   $branch_name //= $cpan_repo->workdir_branch_name
+      // die "Must specify --branch=X for bare git repo\n";
+   my $tree= $get_tree->($branch_name);
+   @source_names= @{ $tree->default_import_sources // [] } unless @source_names;
+   @source_names or die "Branch '$branch_name' has no import sources; specify --source\n";
+   my @sources= map $get_tree->($_), @source_names;
+
+   my $advisories;
+   if ($use_cve) {
+      $advisories= $cpan_repo->load_advisories(
+         (defined $cve_file? ( path => $cve_file ) : ()),
+         refresh => (!$fetch? 0 : $refresh? 1 : undef),
+      );
+      printf STDERR "CVE list: %s (fetched %s)\n", $advisories->source_path, age($advisories->fetched)
+         unless $quiet;
+   }
+   my $advisories_of= sub ($author_path) {
+      [ $advisories? $advisories->affecting_path($author_path) : () ]
+   };
+
+   my %entries= map +( $_->{author_path} => $_ ), @{ $tree->find_upgrades(sources => \@sources) };
+   my $by_dist= $tree->package_details->{by_dist};
+   my ($outdated, $affected)= (scalar keys %entries, 0);
+   for my $author_path (keys %$by_dist) {
+      my $found= $advisories_of->($author_path);
+      my $entry= $entries{$author_path};
+      if (@$found) {
+         ++$affected;
+         unless ($entry) {
+            my ($dist, $version)= CPAN::InGit::DistTree->parse_release($author_path);
+            $entry= $entries{$author_path}= {
+               author_path => $author_path, dist => $dist, version => $version, upgrades => [] };
+         }
+      }
+      next unless $entry;
+      $entry->{advisories}= $found;
+      for (@{ $entry->{upgrades} }) {
+         $_->{advisories}= $advisories_of->($_->{author_path});
+         $_->{diff_args}= [ $author_path, $_->{author_path} ];
+      }
+   }
+   my @dists= map $entries{$_}, sort keys %entries;
+
+   # The assertions apply to the whole branch, regardless of what is listed
+   for (@dists) {
+      my $ids= join ' ', map $_->{ids}[0] // '(unnamed advisory)', @{ $_->{advisories} };
+      push @failed, { assertion => 'no-cve', author_path => $_->{author_path},
+                      message => "$_->{author_path} is affected by $ids" }
+         if $assert_no_cve && length $ids;
+      next unless $assert_have_src_ver;
+      for my $up (@{ $_->{upgrades} }) {
+         push @failed, { assertion => 'have-src-ver', author_path => $_->{author_path},
+                         message => "$_->{author_path} is behind $up->{author_path} of '$up->{source}'" };
+      }
+   }
+
+   @dists= grep @{ $_->{advisories} }, @dists if $cve_only;
+   @dists= grep @{ $_->{upgrades} }, @dists if $outdated_only;
+
+   binmode STDOUT, ':raw';
+   if ($format eq 'none') {
+   }
+   elsif ($format eq 'json') {
+      print JSON::PP->new->utf8->canonical->pretty->encode({
+         branch   => $branch_name,
+         sources  => \@source_names,
+         cve_list => !$advisories? undef : {
+            path    => $advisories->source_path,
+            fetched => strftime('%Y-%m-%dT%H:%M:%SZ', gmtime $advisories->fetched),
+            url     => $cpan_repo->cve_feed_url,
+         },
+         dists    => \@dists,
+         summary  => { dists => scalar keys %$by_dist, outdated => $outdated, affected => $affected },
+         failed_assertions => \@failed,
+      });
+   }
+   else {
+      my $label= sub ($d) { defined $d->{dist}? "$d->{dist}-$d->{version}" : $d->{author_path} };
+      my $ids= sub ($d) { join ' ', map $_->{ids}[0] // '(unnamed advisory)', @{ $d->{advisories} } };
+      my $out= '';
+      for my $d (@dists) {
+         my $cur_ids= $ids->($d);
+         if (!@{ $d->{upgrades} }) {
+            $out .= sprintf "%s  (no newer version)  CVE: %s\n", $label->($d), $cur_ids;
+         }
+         for my $up (@{ $d->{upgrades} }) {
+            $out .= sprintf "%s -> %s  (%s)", $label->($d), $label->($up), $up->{source};
+            $out .= "  moved: ".join(' ', sort keys %{ $up->{modules} }) if $up->{kind} eq 'moved';
+            if ($advisories) {
+               my $new_ids= $ids->($up);
+               $out .= "  CVE: $cur_ids" if length $cur_ids;
+               $out .= !length $new_ids? (length $cur_ids? "  [fixed by upgrade]" : '')
+                     : $new_ids eq $cur_ids? "  [not fixed by upgrade]"
+                     : "  [newer version has: $new_ids]";
+            }
+            $out .= "\n";
+         }
+         $out .= "   left behind: @{ $d->{left_behind} }\n" if $d->{left_behind};
+         $out .= "   not in source: @{ $d->{not_in_source} }\n" if $d->{not_in_source};
+      }
+      $out .= sprintf "%d distributions in '%s': %d outdated, %s\n", scalar keys %$by_dist, $branch_name,
+         $outdated, ($advisories? "$affected affected by CVEs" : "CVEs not checked");
+      utf8::encode($out);
+      print $out;
+   }
+   1;
+};
+unless ($ok) {
+   print STDERR $@ =~ /\n\z/? $@ : "$@\n";
+   exit 2;
+}
+print STDERR "Assertion failed (--assert-$_->{assertion}): $_->{message}\n" for @failed;
+exit(@failed? 1 : 0);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpangit-audit - list the distributions of a branch which are outdated or affected by CVEs
+
+=head1 NAME
+
+cpangit-audit - list the distributions of a branch which are outdated or affected by CVEs
+
+=head1 USAGE
+
+  cpangit-audit [OPTIONS]
+
+This compares the index of your branch with the index of each of its import sources, and
+with the CPAN Security Advisory list (the same one the web interface uses).  It lists every
+distribution of the branch for which a newer distribution is available, and every
+distribution of the branch which is affected by a security advisory, whether or not there is
+a newer one.  For each, it says which advisories affect the version you have, and which
+affect the version you could upgrade to.
+
+A module can move from one distribution to another, so the comparison is made one module at
+a time and then grouped by the pair of (distribution you have, distribution that now provides
+the module).  A distribution of your branch can therefore be listed with more than one newer
+distribution.  Each pair can be given to C<cpangit-diff> for review.
+
+The exit status is 0 unless you request one of the C<--assert-*> checks.
+
+=head1 OPTIONS
+
+=over
+
+=item --git-dir=PATH
+
+Path to the Git repository of L<CPAN::InGit>.  The default is GIT_DIR from the
+environment, or any git repo above "."
+
+=item --branch=BRANCH_NAME
+
+The branch to audit.  The default is the checked-out branch.
+
+=item --source=BRANCH_NAME
+
+A branch to search for newer versions.  May be given more than once.  The default is the
+import sources of C<--branch>.
+
+=item --format=text|json|none
+
+=item --json
+
+The default is C<text>, one line for each pair of distributions, unless one of the
+C<--assert-*> options is given, in which case the default is C<none> and nothing is written
+to STDOUT.  Give C<--format> along with an assertion to get both.  C<--json> is the same as
+C<--format=json>, which writes one object:
+
+  {
+    "branch": "my_app",
+    "sources": [ "www_cpan_org" ],
+    "cve_list": { "path": "...", "fetched": "2026-11-27T10:00:00Z", "url": "..." },
+    "dists": [
+      {
+        "author_path": "A/AU/AUTHOR/Example-1.00.tar.gz",
+        "dist": "Example", "version": "1.00",
+        "advisories": [
+          { "ids": [ "CVE-2025-1234", "CPANSA-Example-2025-1234" ], "affected_versions": [ "<1.02" ],
+            "title": "...", "severity": "high", "reported": "2025-01-02", "description": "..." }
+        ],
+        "upgrades": [
+          {
+            "author_path": "A/AU/AUTHOR/Example-1.02.tar.gz",
+            "dist": "Example", "version": "1.02",
+            "source": "www_cpan_org",
+            "kind": "upgrade",
+            "modules": { "Example": [ "1.00", "1.02" ] },
+            "advisories": [],
+            "diff_args": [ "A/AU/AUTHOR/Example-1.00.tar.gz", "A/AU/AUTHOR/Example-1.02.tar.gz" ]
+          }
+        ],
+        "left_behind": [ "Example::Old" ],
+        "not_in_source": [ "Example::Private" ]
+      }
+    ],
+    "summary": { "dists": 120, "outdated": 1, "affected": 1 },
+    "failed_assertions": []
+  }
+
+C<kind> is C<upgrade> for a newer release of the same distribution, and C<moved> when the
+modules are now provided by a distribution with a different name.  C<modules> has the
+version of each module in the branch and in the source.  C<left_behind> are modules the
+source still attributes to the distribution you have (usually because the newer release
+removed them), and C<not_in_source> are modules no source provides.  C<diff_args> are the
+arguments for C<cpangit-diff>.  C<summary.dists> counts every distribution of the branch.
+
+=item --cve-only
+
+Only list the distributions which are affected by an advisory.
+
+=item --outdated-only
+
+Only list the distributions for which a newer distribution is available.
+
+=item --assert-have-src-ver
+
+Exit with status 1 if a newer distribution is available for any distribution of the branch.
+The list of distributions is not written unless you also give C<--format>.
+
+=item --assert-no-cve
+
+Exit with status 1 if any distribution of the branch is affected by an advisory.  Advisories
+which only affect the newer distribution do not count.  The list of distributions is not
+written unless you also give C<--format>.
+
+=item --cve-file=PATH
+
+The file in which to keep the CVE list.  The default is C<cpan-ingit-cpansa.json> inside the
+Git directory.  The list is downloaded to this file if it doesn't exist or is more than 12
+hours old, and the file is otherwise used as it is.  The path and age of the file are
+announced on STDERR.
+
+=item --refresh
+
+Ask the server for a newer CVE list regardless of the age of the file.
+
+=item --no-fetch
+
+Never use the network.  Use the CVE list file as it is (failing if there is none) and don't
+let a mirror branch refresh its index.
+
+=item --no-cve
+
+Don't look up advisories at all.
+
+=item -v, --verbose
+
+=item -q, --quiet
+
+Show more or fewer log messages (on STDERR).  C<--quiet> also omits the announcement of the
+CVE list file.
+
+=back
+
+=head1 EXIT STATUS
+
+0 if the audit was made, 1 if an C<--assert-*> check failed, and 2 for any error.  Each
+failed check is described by a line on STDERR, and in C<failed_assertions> of the JSON.
+
+=head1 VERSION
+
+version 0.007
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Michael Conrad, and IntelliTree Solutions.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

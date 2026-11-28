@@ -9,7 +9,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my $HAVE_LEAKTRACE;
 BEGIN {

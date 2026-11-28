@@ -46,6 +46,8 @@
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
+            "MIME::Base64" : "0",
             "Test::More" : "1.302162",
             "Test::Pod" : "1.52",
             "lib" : "0"
@@ -62,6 +64,6 @@
          "web" : "https://gitlab.com/deguest/JSON-Schema-Validate"
       }
    },
-   "version" : "v0.9.1",
+   "version" : "v0.9.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

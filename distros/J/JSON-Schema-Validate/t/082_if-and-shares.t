@@ -45,10 +45,7 @@ sub _dump_errors
     return "Errors:\n" . $json->encode( \@h );
 }
 
-# -------------------------------------------------------------------------
 # 1. if/then regression: 'if' must NOT leak 'required' errors
-# -------------------------------------------------------------------------
-
 my $schema_if_then =
 {
     '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
@@ -101,10 +98,7 @@ _check(
     1,
 );
 
-# -------------------------------------------------------------------------
 # 2. shares: oneOf(simple total, classes) + conditional voting logic
-# -------------------------------------------------------------------------
-
 my $shares_def =
 {
     type  => 'object',

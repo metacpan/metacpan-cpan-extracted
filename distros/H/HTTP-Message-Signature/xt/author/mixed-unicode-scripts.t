@@ -14,7 +14,9 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01-base.t',
+    't/01-public_keys.t',
     't/02-test-data.t',
+    't/web_bot_auth_architecture_v1.json',
     't/web_bot_auth_architecture_v2.json'
 );
 

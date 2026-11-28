@@ -611,6 +611,8 @@ static int fiber_capacity = 0;
 /** @brief Slots currently handed out, whether the fiber is live or still waiting for its jobs to drain. Capped by
  *  max_fibers, which is what makes "the table is full" a policy decision rather than a property of the array. */
 static int fiber_used = 0;
+/** @brief Fibers currently started, maintained incrementally so the scheduler never scans the whole table on idle ticks. */
+static int live_fiber_count = 0;
 /** @brief Array of active fiber structures (fiber_capacity entries) */
 static para_fiber_t ** fibers = NULL;
 /** @brief LIFO of free fiber slot indexes (O(1) allocation), fiber_capacity entries */
@@ -636,6 +638,74 @@ static int para_fiber_exit_in_flight = 0;
 #define MAX_JOBS 1024
 /** @brief Fixed-size array for background tasks */
 static job_t job_slots[MAX_JOBS];
+
+/** @brief One bit per reclaimable job slot. A set bit means JOB_FREE; bits are kept under queue_lock. Scanning 16 words
+ *  finds the same lowest free slot as the old linear scan without walking 1024 job structs on every submission. */
+#define JOB_BITS_PER_WORD 64
+#define JOB_WORD_COUNT ((MAX_JOBS + JOB_BITS_PER_WORD - 1) / JOB_BITS_PER_WORD)
+static uint64_t free_job_mask[JOB_WORD_COUNT];
+/** @brief One bit per submitted-but-unclaimed job, maintained under queue_lock. Workers claim the lowest set bit so
+ *  claim order matches the old linear scan. */
+static uint64_t pending_job_mask[JOB_WORD_COUNT];
+/** @brief One bit per armed TASK_SLEEP job (JOB_NEW or JOB_BUSY), maintained under queue_lock so cancellation only
+ *  visits sleeps instead of scanning all 1024 slots. */
+static uint64_t sleep_job_mask[JOB_WORD_COUNT];
+/** @brief Number of armed short TASK_SLEEP jobs (input <= 8 ms), maintained under queue_lock. The scheduler uses it
+ *  to stretch its sub-tick poll window only when a sleep is actually in flight; CPU jobs keep the short fixed budget. */
+static volatile int short_sleep_jobs = 0;
+
+/** @brief True for the sleep arms that use the Windows high-resolution sub-tick spin in worker_thread(). */
+static int is_short_sleep_job(job_t * job) {
+    return job->type == TASK_SLEEP && job->input.i > 0 && job->input.i <= 8;
+}
+
+/** @brief Count trailing zero bits without a compiler intrinsic, so MSVC and every C99 compiler get the same result. */
+static int para_ctz64(uint64_t x) {
+    int n = 0;
+    if (!(x & 0xffffffffULL)) { n += 32; x >>= 32; }
+    if (!(x & 0xffffULL))     { n += 16; x >>= 16; }
+    if (!(x & 0xffULL))       { n +=  8; x >>=  8; }
+    if (!(x & 0xfULL))        { n +=  4; x >>=  4; }
+    if (!(x & 0x3ULL))        { n +=  2; x >>=  2; }
+    if (!(x & 0x1ULL))        { n +=  1; }
+    return n;
+}
+
+/** @brief Claims the lowest free job slot, or -1 when the table is full. Caller holds queue_lock. */
+static int take_free_job_slot(void) {
+    for (int w = 0; w < JOB_WORD_COUNT; w++) {
+        uint64_t bits = free_job_mask[w];
+        if (!bits)
+            continue;
+        int bit = para_ctz64(bits);
+        int idx = w * JOB_BITS_PER_WORD + bit;
+        if (idx >= MAX_JOBS)    /* unused high bits in a partial last word */
+            return -1;
+        free_job_mask[w] &= ~(1ULL << bit);
+        return idx;
+    }
+    return -1;
+}
+
+/** @brief Jobs submitted but not yet claimed by a worker (JOB_NEW), maintained under queue_lock. */
+static int pending_job_count = 0;
+
+/** @brief Claims the lowest submitted-but-unclaimed job, or -1 when none are pending. Caller holds queue_lock and
+ *  still owns the status/pending_job_count updates, matching the old scan's side effects exactly. */
+static int take_pending_job_slot(void) {
+    for (int w = 0; w < JOB_WORD_COUNT; w++) {
+        uint64_t bits = pending_job_mask[w];
+        if (!bits)
+            continue;
+        int bit = para_ctz64(bits);
+        int idx = w * JOB_BITS_PER_WORD + bit;
+        if (idx >= MAX_JOBS)    /* unused high bits in a partial last word */
+            return -1;
+        pending_job_mask[w] &= ~(1ULL << bit);
+        return idx;
+    }
+    return -1;
+}
 /** @brief Mutex protecting access to the job queue */
 static para_mutex_t queue_lock;
 
@@ -975,25 +1045,24 @@ void * worker_thread(void * arg) {
     pthread_sigmask(SIG_BLOCK, &block_set, NULL);
 #endif
 
+    int found_idx = -1;    /* carried from one job to the next so completion publication and the next claim share a lock window */
     while (threads_keep_running) {
-        int found_idx = -1;
-
-        LOCK(queue_lock);
-        while (threads_keep_running) {
-            for (int i = 0; i < MAX_JOBS; i++) {
-                if (job_slots[i].status == JOB_NEW) {
-                    job_slots[i].status = JOB_BUSY;
-                    found_idx = i;
-                    break;
+        if (found_idx == -1) {
+            LOCK(queue_lock);
+            while (threads_keep_running) {
+                found_idx = take_pending_job_slot();
+                if (found_idx != -1) {
+                    job_slots[found_idx].status = JOB_BUSY;
+                    pending_job_count--;
                 }
+                if (found_idx != -1 || !threads_keep_running)
+                    break;
+                PARA_COND_WAIT(queue_cond, queue_lock);
             }
-            if (found_idx != -1 || !threads_keep_running)
-                break;
-            PARA_COND_WAIT(queue_cond, queue_lock);
+            if (found_idx != -1)
+                busy_thread_count++;    /* busy from claim until the job is marked done, all under queue_lock */
+            UNLOCK(queue_lock);
         }
-        if (found_idx != -1)
-            busy_thread_count++;    /* busy from claim until the job is marked done, all under queue_lock */
-        UNLOCK(queue_lock);
 
         if (found_idx != -1 && threads_keep_running) {
             job_t * job = &job_slots[found_idx];
@@ -1002,40 +1071,76 @@ void * worker_thread(void * arg) {
             if (job->type == TASK_SLEEP) {
                 int ms = (int)job->input.i;
                 int recalled = 0;
-                LOCK(queue_lock);
-                if (ms > 0 && !job->recall && threads_keep_running) {
-                    /* Timed condition-variable wait instead of quantized polling: the OS sleeps for (almost) the whole
-                     * remainder in one call, so a 1000 ms arm costs ~1000 ms on any platform (the old 4 ms quantum
-                     * inflated Windows sleeps ~4x through the ~15.6 ms system timer tick). The wait releases
-                     * queue_lock, so notifying threads (submit/recall/shutdown) are never blocked by a sleeping worker.
-                     * Recall and shutdown wakes are observed by re-checking the predicate; the deadline is fixed, so
-                     * spurious or broadcast wakeups just re-wait to it. */
 #ifdef _WIN32
-                    /* Absolute deadline as ms since boot; unsigned subtraction is wrap-safe. */
-                    DWORD deadline = GetTickCount() + (DWORD)ms;
-                    while (!job->recall && threads_keep_running) {
-                        DWORD remaining = deadline - GetTickCount();
-                        if ((int)remaining <= 0)
-                            break;
-                        PARA_COND_TIMEDWAIT(queue_cond, queue_lock, remaining);
+                /* Sub-tick sleeps would be rounded up to a ~15.6 ms timer tick by SleepConditionVariableCS. For
+                 * short arms only, yield-spin against a high-resolution counter instead; the spin is bounded by the
+                 * requested duration and briefly takes queue_lock to observe recall/shutdown, so cancellation stays
+                 * prompt and the worker never blocks a submitter while spinning. */
+                if (ms > 0 && ms <= 8) {
+                    LOCK(queue_lock);
+                    recalled = job->recall || !threads_keep_running;
+                    UNLOCK(queue_lock);
+                    if (!recalled) {
+                        LARGE_INTEGER freq, start, now;
+                        QueryPerformanceFrequency(&freq);
+                        QueryPerformanceCounter(&start);
+                        int checks = 0;
+                        while (freq.QuadPart > 0) {
+                            QueryPerformanceCounter(&now);
+                            if ((now.QuadPart - start.QuadPart) * 1000 >= ms * freq.QuadPart)
+                                break;
+                            if ((++checks & 31) == 0) {
+                                LOCK(queue_lock);
+                                recalled = job->recall || !threads_keep_running;
+                                UNLOCK(queue_lock);
+                                if (recalled)
+                                    break;
+                            }
+                            SwitchToThread();
+                        }
+                        LOCK(queue_lock);
+                        recalled = recalled || job->recall || !threads_keep_running;
+                        UNLOCK(queue_lock);
                     }
-#else
-                    struct timespec deadline;
-                    clock_gettime(CLOCK_REALTIME, &deadline);
-                    deadline.tv_sec += ms / 1000;
-                    deadline.tv_nsec += (long)(ms % 1000) * 1000000L;
-                    if (deadline.tv_nsec >= 1000000000L) {
-                        deadline.tv_sec++;
-                        deadline.tv_nsec -= 1000000000L;
-                    }
-                    while (!job->recall && threads_keep_running &&
-                           PARA_COND_TIMEDWAIT(queue_cond, queue_lock, &deadline)) {
-                        /* woken (recall, spurious, or shutdown); re-check and re-wait to the same deadline */
-                    }
-#endif
                 }
-                recalled = job->recall;
-                UNLOCK(queue_lock);
+                else
+#endif
+                {
+                    LOCK(queue_lock);
+                    if (ms > 0 && !job->recall && threads_keep_running) {
+                        /* Timed condition-variable wait instead of quantized polling: the OS sleeps for (almost) the whole
+                         * remainder in one call, so a 1000 ms arm costs ~1000 ms on any platform (the old 4 ms quantum
+                         * inflated Windows sleeps ~4x through the ~15.6 ms system timer tick). The wait releases
+                         * queue_lock, so notifying threads (submit/recall/shutdown) are never blocked by a sleeping worker.
+                         * Recall and shutdown wakes are observed by re-checking the predicate; the deadline is fixed, so
+                         * spurious or broadcast wakeups just re-wait to it. */
+#ifdef _WIN32
+                        /* Absolute deadline as ms since boot; unsigned subtraction is wrap-safe. */
+                        DWORD deadline = GetTickCount() + (DWORD)ms;
+                        while (!job->recall && threads_keep_running) {
+                            DWORD remaining = deadline - GetTickCount();
+                            if ((int)remaining <= 0)
+                                break;
+                            PARA_COND_TIMEDWAIT(queue_cond, queue_lock, remaining);
+                        }
+#else
+                        struct timespec deadline;
+                        clock_gettime(CLOCK_REALTIME, &deadline);
+                        deadline.tv_sec += ms / 1000;
+                        deadline.tv_nsec += (long)(ms % 1000) * 1000000L;
+                        if (deadline.tv_nsec >= 1000000000L) {
+                            deadline.tv_sec++;
+                            deadline.tv_nsec -= 1000000000L;
+                        }
+                        while (!job->recall && threads_keep_running &&
+                               PARA_COND_TIMEDWAIT(queue_cond, queue_lock, &deadline)) {
+                            /* woken (recall, spurious, or shutdown); re-check and re-wait to the same deadline */
+                        }
+#endif
+                    }
+                    recalled = job->recall;
+                    UNLOCK(queue_lock);
+                }
                 /* output.i = -1 signals an early recall (interrupted or shutdown); otherwise the full duration elapses. */
                 job->output.i = (recalled || !threads_keep_running) ? -1 : ms;
             }
@@ -1103,13 +1208,31 @@ void * worker_thread(void * arg) {
             busy_thread_count--;
             done_queue[done_tail] = found_idx;
             done_tail = (done_tail + 1) % (MAX_JOBS + 1);
+
+            /* Claim the next job before releasing the lock used to publish this one. The wake policy is unchanged:
+             * submitters still broadcast, and a worker with no next job waits on queue_cond exactly as before. */
+            int next_idx = -1;
+            while (threads_keep_running) {
+                next_idx = take_pending_job_slot();
+                if (next_idx != -1) {
+                    job_slots[next_idx].status = JOB_BUSY;
+                    pending_job_count--;
+                    busy_thread_count++;
+                    break;
+                }
+                if (!threads_keep_running)
+                    break;
+                PARA_COND_WAIT(queue_cond, queue_lock);
+            }
             UNLOCK(queue_lock);
+            found_idx = next_idx;
         }
         else {
             if (found_idx != -1) { /* claimed, but shutting down before it ran: keep the busy count honest */
                 LOCK(queue_lock);
                 busy_thread_count--;
                 UNLOCK(queue_lock);
+                found_idx = -1;
             }
 #ifdef _WIN32
             Sleep(1);
@@ -1117,6 +1240,11 @@ void * worker_thread(void * arg) {
             usleep(1000);
 #endif
         }
+    }
+    if (found_idx != -1) {    /* shutdown between carrying a claimed job and running it */
+        LOCK(queue_lock);
+        busy_thread_count--;
+        UNLOCK(queue_lock);
     }
     return 0;
 }
@@ -1139,6 +1267,14 @@ DLLEXPORT void init_threads() {
 #endif
     for (int i = 0; i < MAX_JOBS; i++)
         job_slots[i].status = JOB_FREE;
+    for (int w = 0; w < JOB_WORD_COUNT; w++) {
+        free_job_mask[w] = ~0ULL;
+        pending_job_mask[w] = 0;
+        sleep_job_mask[w] = 0;
+    }
+    short_sleep_jobs = 0;
+    if (MAX_JOBS % JOB_BITS_PER_WORD)
+        free_job_mask[JOB_WORD_COUNT - 1] = (1ULL << (MAX_JOBS % JOB_BITS_PER_WORD)) - 1;
 
     if (max_thread_pool_size == 0) {
         max_thread_pool_size = get_cpu_count();
@@ -1168,12 +1304,7 @@ DLLEXPORT int submit_c_job(int type, int64_t arg, int timeout_ms) {
     int idx = -1;
     LOCK(queue_lock);
 
-    for (int i = 0; i < MAX_JOBS; i++) {
-        if (job_slots[i].status == JOB_FREE) {
-            idx = i;
-            break;
-        }
-    }
+    idx = take_free_job_slot();
     if (idx != -1) {
         job_slots[idx].fiber_id = current_fiber_id;
         job_slots[idx].type = type;
@@ -1181,6 +1312,13 @@ DLLEXPORT int submit_c_job(int type, int64_t arg, int timeout_ms) {
         job_slots[idx].timeout_ms = timeout_ms;
         job_slots[idx].status = JOB_NEW;
         job_slots[idx].recall = 0;
+        pending_job_mask[idx >> 6] |= 1ULL << (idx & 63);
+        if (type == TASK_SLEEP) {
+            sleep_job_mask[idx >> 6] |= 1ULL << (idx & 63);
+            if (is_short_sleep_job(&job_slots[idx]))
+                short_sleep_jobs++;
+        }
+        pending_job_count++;
         outstanding_jobs++;
         if (current_fiber_id >= 0 && current_fiber_id < fiber_capacity)
             job_refcount[current_fiber_id]++;
@@ -1191,13 +1329,9 @@ DLLEXPORT int submit_c_job(int type, int64_t arg, int timeout_ms) {
          * nothing, and queued behind sleeps lasting hundreds of milliseconds. A 10 ms await_sleep submitted while
          * both seeded workers held a 400 ms and a 600 ms sleep woke at 400 ms instead of 10 ms. Pending work with
          * no idle worker to claim it is exactly the case that needs a worker, so now that is what is measured. */
-        int pending_count = 0;
-        for (int i = 0; i < MAX_JOBS; i++)
-            if (job_slots[i].status == JOB_NEW)
-                pending_count++;
         int idle_count = current_thread_count - busy_thread_count;
-        if (pending_count > idle_count)
-            _spawn_workers(pending_count - idle_count); /* stops at max_thread_pool_size / MAX_THREADS */
+        if (pending_job_count > idle_count)
+            _spawn_workers(pending_job_count - idle_count); /* stops at max_thread_pool_size / MAX_THREADS */
 
         /* Broadcast (not signal): a single wakeup may be swallowed by a worker parked in its timed sleep wait
          * (which only re-checks its absolute deadline and continues), leaving idle workers with no wakeup and
@@ -1235,6 +1369,8 @@ DLLEXPORT int check_for_completion() {
  * @return int Number of outstanding jobs.
  */
 DLLEXPORT int get_outstanding_jobs() { return outstanding_jobs; }
+/** @brief Number of armed short sleeps currently in flight; read by the scheduler to size its poll window. */
+DLLEXPORT int get_short_sleep_jobs() { return short_sleep_jobs; }
 
 /**
  * @brief Recalls (abandons early) every armed TASK_SLEEP job owned by the given fiber.
@@ -1252,15 +1388,23 @@ DLLEXPORT int recall_sleep_jobs_for_fiber(int fid) {
         return 0;
     int count = 0;
     LOCK(queue_lock);
-    for (int i = 0; i < MAX_JOBS; i++) {
-        if (job_slots[i].fiber_id != fid)
-            continue;
-        if (job_slots[i].type != TASK_SLEEP)
-            continue;
-        if (job_slots[i].status != JOB_NEW && job_slots[i].status != JOB_BUSY)
-            continue;
-        job_slots[i].recall = 1;
-        count++;
+    for (int w = 0; w < JOB_WORD_COUNT; w++) {
+        uint64_t bits = sleep_job_mask[w];
+        while (bits) {
+            int bit = para_ctz64(bits);
+            int i = w * JOB_BITS_PER_WORD + bit;
+            bits &= bits - 1;
+            if (i >= MAX_JOBS)      /* unused high bits in a partial last word */
+                continue;
+            if (job_slots[i].fiber_id != fid)
+                continue;
+            if (job_slots[i].type != TASK_SLEEP)
+                continue;
+            if (job_slots[i].status != JOB_NEW && job_slots[i].status != JOB_BUSY)
+                continue;
+            job_slots[i].recall = 1;
+            count++;
+        }
     }
     if (count > 0)
         PARA_COND_BROADCAST(queue_cond); /* Wake the armed worker(s) immediately instead of waiting for the next job signal */
@@ -1313,7 +1457,11 @@ DLLEXPORT void free_job_slot(int idx) {
         return;
     int owner = job_slots[idx].fiber_id;
     LOCK(queue_lock);
+    if (is_short_sleep_job(&job_slots[idx]))
+        short_sleep_jobs--;
     job_slots[idx].status = JOB_FREE;
+    free_job_mask[idx >> 6] |= 1ULL << (idx & 63);
+    sleep_job_mask[idx >> 6] &= ~(1ULL << (idx & 63));
     outstanding_jobs--;
     UNLOCK(queue_lock);
 
@@ -2113,7 +2261,8 @@ static void para_diag_pads(pTHX_ const char * tag, PERL_SI * si) {
  * @param to The fiber being resumed.
  */
 static void _activate_current_depths(pTHX_ para_fiber_t * from, para_fiber_t * to) {
-    para_diag_swapno++;
+    if (para_diag_enabled())
+        para_diag_swapno++;
     if (!from || !to || from == to)
         return;
     para_pad_save_context(aTHX_ from);
@@ -2714,7 +2863,10 @@ DLLEXPORT SV * coro_yield(SV * ret_val) {
  */
 PARA_HIDDEN void para_entry_point(para_fiber_t * c) {
     dTHX;
-    c->started = 1;
+    if (!c->started) {
+        c->started = 1;
+        live_fiber_count++;
+    }
     ENTER;
     SAVETMPS;
     dSP;
@@ -3427,7 +3579,7 @@ DLLEXPORT SV * spawn_fiber(SV * user_code, SV * class) {
         own_stash = gv_stashpv("Acme::Parataxis", GV_ADD);
     HV * stash = strEQ(cls, "Acme::Parataxis") ? own_stash : gv_stashpv(cls, GV_ADD);
     AV * obj = newAV();
-    av_extend(obj, 8); /* pre-size to fit every F_* slot in one allocation */
+    av_extend(obj, 18); /* pre-size through F_QUEUED so park/queue flags never grow the fiber array */
     SV * objrv = newRV_noinc((SV *)obj);
     sv_bless(objrv, stash);
     av_store(obj, 0, SvREFCNT_inc(user_code)); /* F_CODE */
@@ -3447,28 +3599,62 @@ DLLEXPORT SV * spawn_fiber(SV * user_code, SV * class) {
 /**
  * @brief Reclaims all completed background jobs in a single call.
  *
- * Returns an arrayref of [fiber_id, result] pairs for every finished job, freeing the job slots as it goes.
- *
- * @return SV* Arrayref of completed jobs (may be empty).
+ * Appends fiber_id, result pairs to the supplied array, freeing the job slots as it goes. A flat array avoids one AV,
+ * reference and two SV allocations per finished job; only the scheduler consumes this internal buffer.
  */
 DLLEXPORT void drain_jobs(SV * out_ref) {
     dTHX;
     if (!out_ref || !SvROK(out_ref) || SvTYPE(SvRV(out_ref)) != SVt_PVAV)
         return;
+    if (!threads_initialized)
+        init_threads();
     AV * out = (AV *)SvRV(out_ref);
     av_clear(out);
-    while (1) {
-        int job_idx = check_for_completion();
-        if (job_idx == -1)
-            break;
-        AV * pair = newAV();
-        av_push(pair, newSViv(get_job_coro_id(job_idx)));
-        SV * res = get_job_result(job_idx);
-        /* get_job_result returns a mortal parked on the caller's tmps stack; copy it so the pair owns its own SV
-         * instead of double-decrementing the mortal when both the pair and FREETMPS release it. */
-        av_push(pair, (res && res != &PL_sv_undef) ? newSVsv(res) : &PL_sv_undef);
-        av_push(out, newRV_noinc((SV *)pair));
-        free_job_slot(job_idx);
+
+    /* The old loop took queue_lock three times per finished job: once to pop the completion ring, once to read the
+     * result, and once to free the slot. Copy the immutable done state out under a single lock acquisition, release
+     * the slots, then build the Perl result pairs outside the lock. A job's output is published before the worker
+     * marks it JOB_DONE and pushes it, so the lock in this pop gives us a happens-before for those writes. */
+    int owners[MAX_JOBS + 1];
+    int values[MAX_JOBS + 1];
+    int has_result[MAX_JOBS + 1];
+    int count = 0;
+
+    LOCK(queue_lock);
+    while (done_head != done_tail) {
+        int job_idx = done_queue[done_head];
+        done_head = (done_head + 1) % (MAX_JOBS + 1);
+        if (job_idx < 0 || job_idx >= MAX_JOBS)
+            continue;
+        job_t * job = &job_slots[job_idx];
+        owners[count] = job->fiber_id;
+        has_result[count] = (job->type == TASK_SLEEP || job->type == TASK_GET_CPU ||
+                            job->type == TASK_READ || job->type == TASK_WRITE);
+        values[count] = has_result[count] ? job->output.i : 0;
+        if (is_short_sleep_job(job))
+            short_sleep_jobs--;
+        job->status = JOB_FREE;
+        free_job_mask[job_idx >> 6] |= 1ULL << (job_idx & 63);
+        sleep_job_mask[job_idx >> 6] &= ~(1ULL << (job_idx & 63));
+        outstanding_jobs--;
+        count++;
+    }
+    UNLOCK(queue_lock);
+
+    for (int i = 0; i < count; i++) {
+        av_push(out, newSViv(owners[i]));
+        av_push(out, has_result[i] ? newSViv(values[i]) : &PL_sv_undef);
+
+        /* Same deferred slot release as free_job_slot(): a destroyed fiber's id cannot be reused until every job
+         * it submitted has been reclaimed here. job_refcount/_release_slot are main-thread only. */
+        int owner = owners[i];
+        if (owner >= 0 && owner < fiber_capacity && job_refcount && job_refcount[owner] > 0) {
+            job_refcount[owner]--;
+            if (job_refcount[owner] == 0 && fiber_destroyed[owner]) {
+                fiber_destroyed[owner] = 0;
+                _release_slot(owner);
+            }
+        }
     }
 }
 
@@ -3544,13 +3730,30 @@ DLLEXPORT SV * get_fiber_by_id(int fiber_id) {
     return sv_2mortal(self_ref);
 }
 
+/**
+ * @brief Returns flat (fiber object, fid) pairs for all live fibers in one call.
+ *
+ * Used by the scheduler's startup/teardown snapshot, which used to call get_fiber_by_id() once per slot in the
+ * whole fiber table. The returned array owns one strong reference to each live wrapper; the caller releases it by
+ * dropping the array.
+ */
+DLLEXPORT SV * snapshot_live_fibers(void) {
+    dTHX;
+    AV * out = newAV();
+    for (int fid = 0; fid < fiber_capacity; fid++) {
+        para_fiber_t * c = fibers[fid];
+        if (!c || !c->self_ref || c->self_ref == &PL_sv_undef)
+            continue;
+        SvREFCNT_inc(c->self_ref);
+        av_push(out, c->self_ref);
+        av_push(out, newSViv(fid));
+    }
+    return sv_2mortal(newRV_noinc((SV *)out));
+}
+
 /** @brief Returns the number of currently live (non-destroyed) fibers. */
 DLLEXPORT int get_live_fiber_count(void) {
-    int count = 0;
-    for (int i = 0; i < fiber_capacity; i++)
-        if (fibers[i] && fibers[i]->started)
-            count++;
-    return count;
+    return live_fiber_count;
 }
 
 /** @brief Returns the number of allocated slots in the fiber table, i.e. the exclusive upper bound on a fiber id.
@@ -3767,6 +3970,11 @@ DLLEXPORT void destroy_coro(int fiber_id) {
         return;
 #endif
 
+    if (c->started) {
+        c->started = 0;
+        if (live_fiber_count > 0)
+            live_fiber_count--;
+    }
     fibers[fiber_id] = NULL;
     if (job_refcount[fiber_id] > 0) {
         /* Keep the id out of the free list until every in-flight job it submitted has been reclaimed, so no newer

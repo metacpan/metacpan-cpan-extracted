@@ -59,7 +59,7 @@ use Test::More;
 use Test::Exception;
 use File::Temp 'tempfile';
 use File::Spec;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # write_table announces every write on file descriptor 1 directly, which the
 # documentation notes a `local *STDOUT` cannot intercept, so redirect the

@@ -4,7 +4,7 @@ package Ekorn::Pipeline::Pipes;
 
 use Ekorn::Pipeline qw();
 
-our $VERSION = 'v0.4.5';
+our $VERSION = 'v0.5.0';
 
 # Return what a run of the stages gives, the invocant its one value, as
 # a pipeline of them called with it gives it, in either context: what

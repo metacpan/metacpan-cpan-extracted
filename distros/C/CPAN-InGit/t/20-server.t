@@ -2,8 +2,11 @@ BEGIN { $ENV{MOJO_NO_TLS}= 1; }
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Test2AndUtils;
+use Archive::Tar;
 use File::Temp;
 use Git::Raw;
+use IO::Compress::Gzip qw(gzip $GzipError);
+use IO::Compress::Zip qw(zip $ZipError);
 use Test::Mojo;
 use Mojo::Server::PSGI;
 use Time::Piece;
@@ -180,6 +183,211 @@ subtest all_branches => sub {
    $mtree->commit('Update package index');
    $t->get_ok('/test/modules/?filter=AAAAAAAAA')->status_is(200)
       ->json_is('/modules/0/version', '1.02');
+};
+
+subtest source_versions => sub {
+   my $older= CPAN::InGit::MutableTree->new(parent => $cpan_repo);
+   my $newer= CPAN::InGit::MutableTree->new(parent => $cpan_repo);
+   my $pinned= CPAN::InGit::MutableTree->new(parent => $cpan_repo);
+   my $release= 'A/AU/AUTHOR/Example-2.00.tar.gz';
+   $older->set_path('cpan_ingit.json', \'{}');
+   my $old_index= <<'END';
+Last-Updated: Wed, 19 Nov 2025 23:29:01 GMT
+
+Example 1.90 A/AU/AUTHOR/Example-1.90.tar.gz
+Uncached 3.10 A/AU/AUTHOR/Uncached-3.10.tar.gz
+END
+   $older->set_path('modules/02packages.details.txt', \$old_index);
+   $older->commit('Older source', create_branch => 'source/older');
+
+   # A stale mirror index still supplies source versions without contacting its upstream.
+   $newer->set_path('cpan_ingit.json', \q{{"upstream_url":"http://127.0.0.1:1/","autofetch":1,"package_details_max_age":1,"canonical_url":"https://example.test/source/"}});
+   my $new_index= <<"END";
+Last-Updated: Thu, 20 Nov 2025 11:00:00 GMT
+
+Example 2.00 $release
+Same 1.000 A/AU/AUTHOR/Same-1.00.tar.gz
+Uncached 3.00 A/AU/AUTHOR/Uncached-3.00.tar.gz
+Unpacked 2.00 L/LO/LOCAL/Unpacked-2.00.tar.gz
+END
+   $newer->set_path('modules/02packages.details.txt', \$new_index);
+   my $tar= Archive::Tar->new;
+   $tar->add_data('Example-2.00/ChangeLog', "<changes>example</changes>\n");
+   $tar->add_data('Example-2.00/lib/Example.pm', "package Example;\n");
+   $tar->add_data('Example-2.00/lib/with # space.txt', "notes\n");
+   $tar->add_data('Example-2.00/empty/', '', {type => Archive::Tar::Constant::DIR});
+   my $raw= $tar->write;
+   gzip \$raw => \my $archive or die $GzipError;
+   $newer->set_path("authors/id/$release", \$archive);
+   zip \"\0\x01" => \my $zip, Name => 'data/test.bin' or die $ZipError;
+   $newer->set_path('authors/id/A/AU/AUTHOR/Example-2.00.zip', \$zip);
+   $newer->set_path('authors/id/L/LO/LOCAL/Unpacked-2.00.meta', \'{}');
+   $newer->set_path('authors/id/L/LO/LOCAL/Unpacked-2.00/ChangeLog.md', \"Unpacked changes\n");
+   $newer->commit('Newer source', create_branch => 'source/newer');
+
+   $pinned->set_path('cpan_ingit.json', \q{{"default_import_sources":["source/older","source/newer","missing"]}});
+   my $pinned_index= <<'END';
+Last-Updated: Wed, 19 Nov 2025 23:29:01 GMT
+
+Example 1.00 A/AU/AUTHOR/Example-1.00.tar.gz
+Missing 1.00 L/LO/LOCAL/Missing-1.00.tar.gz
+Same 1.00 A/AU/AUTHOR/Same-1.00.tar.gz
+Uncached 4.00 A/AU/AUTHOR/Uncached-4.00.tar.gz
+Unpacked 1.00 L/LO/LOCAL/Unpacked-1.00.tar.gz
+END
+   $pinned->set_path('modules/02packages.details.txt', \$pinned_index);
+   my $old_tar= Archive::Tar->new;
+   $old_tar->add_data('Example-1.00/ChangeLog', "first release\n");
+   $old_tar->add_data('Example-1.00/lib/Example.pm', "package Example;\nour \$VERSION= 1;\n");
+   $old_tar->add_data('Example-1.00/META.json', JSON::PP->new->encode({
+      'meta-spec' => { version => 2 }, name => 'Example', version => '1.00', abstract => 'Example',
+      author => ['A'], license => ['perl_5'], dynamic_config => 0, generated_by => 'test',
+      release_status => 'stable',
+      prereqs => { runtime => { requires => { 'Foo' => '1' } } },
+   }));
+   my $old_raw= $old_tar->write;
+   gzip \$old_raw => \my $old_archive or die $GzipError;
+   my $pinned_release= 'A/AU/AUTHOR/Example-1.00.tar.gz';
+   $pinned->set_path("authors/id/$pinned_release", \$old_archive);
+   $pinned->commit('Pinned branch', create_branch => 'pinned');
+
+   my $t= Test::Mojo->new('Mojolicious');
+   CPAN::InGit::Server->mount($t->app->routes->any('/pan'), $cpan_repo, app => $t->app, module_index_max_rows => 3);
+   $t->get_ok('/pan/pinned/')->status_is(200)->text_is('thead th:nth-child(3)', 'Src. Ver.')
+      ->text_is('.source-branch a[href="/pan/~branch/source~newer/"]', 'source/newer')
+      ->element_exists('.source-branch a[href="/pan/~branch/source~older/"]')
+      ->text_like('.source-branch a[href="/pan/~branch/source~newer/"] + .source-index-updated',
+         qr/20 Nov 2025 11:00:00 GMT/)
+      ->text_is('tbody tr:nth-child(1) .source-version a[target="_blank"][rel="noopener"]', '2.00')
+      ->text_like('tbody tr:nth-child(2) .source-version', qr/\A\s*\z/)
+      ->text_like('tbody tr:nth-child(3) .source-version', qr/\A\s*1\.000\s*\z/)
+      ->element_count_is('tbody tr:nth-child(3) .source-version a', 0);
+   my $review= Mojo::URL->new($t->tx->res->dom->at('.source-version a')->attr('href'));
+   is($review->path->to_string, "/pan/~branch/pinned/authors/id/$pinned_release/~diff",
+      'review link is a diff from the pinned distribution');
+   is($review->query->to_hash, { to => $release, to_source => 'source/newer' },
+      'review link compares with the distribution of the source');
+
+   # Upgrade review, in each format
+   $t->get_ok($review)->status_is(200)->content_type_like(qr{^text/html})
+      ->text_is('#from-dist', $pinned_release)->text_is('#to-dist', $release)
+      ->element_exists(qq{#to-dist[href="/pan/~branch/pinned/authors/id/$release/?source=source%2Fnewer"]})
+      ->text_like('.note', qr/Example-2\.00 has no usable META/)
+      ->text_is('#prereq-changes tbody tr td:nth-child(3)', 'Foo')
+      ->text_is('#changes-added', "<changes>example</changes>\n")
+      ->element_count_is('#files-changed tbody tr', 4)
+      ->text_like('pre.patch .del', qr/^-our \$VERSION= 1;$/);
+   $t->get_ok($review->clone->query({ as => 'json' }))->status_is(200)
+      ->json_is('/from/name', 'Example-1.00')->json_is('/from/meta_source', 'META.json')
+      ->json_is('/to/name', 'Example-2.00')->json_is('/to/meta_source', 'synthesized')
+      ->json_is('/prereqs', { runtime => { requires => { Foo => [ '1', undef ] } } })
+      ->json_is('/changes/path', 'ChangeLog')->json_is('/changes/added', "<changes>example</changes>\n")
+      ->json_is('/stats', { files => 4, additions => 2, deletions => 3 });
+   is( { map +($_->{path} => [ $_->{status}, $_->{skipped} ]), $t->tx->res->json->{files}->@* },
+      {
+         'ChangeLog'               => [ 'modified', 'changes' ],
+         'META.json'               => [ 'deleted', 'generated' ],
+         'lib/Example.pm'          => [ 'modified', undef ],
+         'lib/with # space.txt'    => [ 'added', undef ],
+      },
+      'files of the comparison' );
+   $t->get_ok($review->clone->query({ as => 'text' }))->status_is(200)->content_type_like(qr{^text/plain})
+      ->content_like(qr/^From: +\Q$pinned_release\E \(version 1\.00\)$/m)
+      ->content_like(qr/^- runtime requires Foo 1$/m)
+      ->content_like(qr/^M lib\/Example\.pm  \+0 -1$/m)
+      ->content_like(qr/^D META\.json  \+0 -1  \[patch omitted: generated\]$/m)
+      ->content_like(qr/^-our \$VERSION= 1;$/m);
+   $t->get_ok($review->clone->query({ as => 'text', patch => 0 }))->status_is(200)
+      ->content_unlike(qr/^== Patches ==$/m);
+   $t->get_ok($review->clone->query({ as => 'json', path => 'lib/Example.pm' }))->status_is(200)
+      ->json_is('/stats/files', 1)->json_is('/files/0/path', 'lib/Example.pm');
+   $t->get_ok($review->clone->query({ to => undef }))->status_is(400);
+   $t->get_ok($review->clone->query({ to => '../x.tar.gz' }))->status_is(400);
+   $t->get_ok($review->clone->query({ to_source => 'test' }))->status_is(404);
+   $t->get_ok($review->clone->query({ to => 'L/LO/LOCAL/Missing-9.tar.gz', as => 'json' }))->status_is(404);
+
+   # Special views of a distribution
+   my $source_archive= "/pan/~branch/source~newer/authors/id/$release";
+   $t->get_ok("$source_archive/~changes")->status_is(200)->content_type_like(qr{^text/plain})
+      ->header_is('X-Content-Type-Options', 'nosniff')->content_is("<changes>example</changes>\n");
+   $t->get_ok("/pan/~branch/pinned/authors/id/$release/~changes?source=source/newer")
+      ->status_is(200)->content_is("<changes>example</changes>\n");
+   $t->get_ok("$source_archive/~meta")->status_is(200)
+      ->header_is('X-CPAN-InGit-Meta-Source', 'synthesized')->json_is('/name', 'Example');
+   $t->get_ok("/pan/~branch/pinned/authors/id/$pinned_release/~meta")->status_is(200)
+      ->header_is('X-CPAN-InGit-Meta-Source', 'META.json')->json_is('/prereqs/runtime/requires/Foo', '1');
+   $t->get_ok("$source_archive/~unknown")->status_is(404);
+   $t->get_ok($source_archive)->status_is(200)->header_like('Content-Disposition', qr/^attachment/)
+      ->content_is($archive);
+
+   # Browsing the files of a distribution, which are found without the wrapper directory
+   {
+      no warnings 'redefine';
+      local *CPAN::InGit::DistTree::_read_tar= sub { die 'Unexpected archive re-extraction' };
+      $t->get_ok("$source_archive/lib/Example.pm")->status_is(200)->content_is("package Example;\n");
+      $t->get_ok("$source_archive/")->status_is(200);
+   }
+   is( [ $t->tx->res->dom->find('li a')->map('text')->each ], [ 'ChangeLog', 'lib/' ], 'root of distribution' );
+   is( [ $t->tx->res->dom->find('.dist-views a')->map('text')->each ], [ 'Change log', 'Metadata', 'Download' ],
+      'views of distribution' );
+   $t->get_ok("$source_archive/lib/")->status_is(200)
+      ->element_exists(qq{a[href="$source_archive/"]})
+      ->element_exists(qq{a[href="$source_archive/lib/with%20%23%20space.txt"]});
+   $t->get_ok("$source_archive/lib/with%20%23%20space.txt")->status_is(200)->content_is("notes\n");
+   $t->get_ok("$source_archive/missing.txt")->status_is(404);
+   $t->get_ok("$source_archive/Example-2.00/lib/Example.pm")->status_is(404);
+   my $zip_path= '/pan/~branch/source~newer/authors/id/A/AU/AUTHOR/Example-2.00.zip';
+   $t->get_ok("$zip_path/")->status_is(200)->text_is('li a', 'test.bin');
+   $t->get_ok("$zip_path/test.bin")->status_is(200)->header_is('Content-Disposition', 'attachment')
+      ->content_type_is('application/octet-stream')->content_is("\0\x01");
+
+   # Distributions which aren't available
+   $t->get_ok('/pan/pinned/modules/?after=Same')->status_is(200)
+      ->json_is('/modules/0/source_version', '3.10')->json_is('/modules/1/source_version', '2.00');
+   my ($uncached, $unpacked)= $t->tx->res->json->{modules}->@*;
+   # The branch is ahead of its sources, which is not an upgrade (same rule as cpangit-audit)
+   is($uncached->{review_url}, undef, 'no review link when the source is older');
+   $t->get_ok('/pan/pinned/authors/id/A/AU/AUTHOR/Uncached-4.00.tar.gz/~diff?to=A/AU/AUTHOR/Uncached-3.10.tar.gz&to_source=source/older')
+      ->status_is(302)
+      ->header_is(Location => 'https://metacpan.org/release/AUTHOR/Uncached-3.10/changes');
+   $t->get_ok('/pan/pinned/authors/id/A/AU/AUTHOR/Uncached-3.10.tar.gz/~changes?source=source/older')
+      ->status_is(302)->header_is(Location => 'https://metacpan.org/release/AUTHOR/Uncached-3.10/changes');
+   $t->get_ok('/pan/pinned/authors/id/A/AU/AUTHOR/Uncached-3.10.tar.gz/lib/Uncached.pm')
+      ->status_is(302)->header_is(Location => 'https://metacpan.org/release/AUTHOR/Uncached-3.10/source/lib/Uncached.pm');
+   is(Mojo::URL->new($unpacked->{review_url})->query->to_hash,
+      { to => 'L/LO/LOCAL/Unpacked-2.00.tar.gz', to_source => 'source/newer' }, 'review link of a LOCAL distribution');
+   $t->get_ok($unpacked->{review_url})->status_is(404);
+
+   # A distribution stored unpacked in an import source
+   my $unpacked_url= Mojo::URL->new('/pan/~branch/pinned/authors/id/L/LO/LOCAL/Unpacked-2.00.tar.gz/')
+      ->query(source => 'source/newer');
+   $t->get_ok($unpacked_url)->status_is(200)->text_is('li a', 'ChangeLog.md');
+   my $child= Mojo::URL->new($t->tx->res->dom->at('li a')->attr('href'));
+   is($child->query->param('source'), 'source/newer', 'file links retain the selected source');
+   $t->get_ok($child)->status_is(200)->content_is("Unpacked changes\n");
+   $t->get_ok('/pan/~branch/source~newer/authors/id/L/LO/LOCAL/Unpacked-2.00.tar.gz/~changes')
+      ->status_is(200)->content_is("Unpacked changes\n");
+   $t->get_ok('/pan/~branch/pinned/authors/id/L/LO/LOCAL/Unpacked-2.00.tar.gz/')->status_is(404);
+
+   # The cache follows the content of the archive
+   $new_index =~ s/Example 2\.00/Example 2.01/;
+   $newer->set_path('modules/02packages.details.txt', \$new_index);
+   $tar->add_data('Example-2.00/Changes', "Replacement changes\n");
+   $raw= $tar->write;
+   gzip \$raw => \my $replacement or die $GzipError;
+   $newer->set_path("authors/id/$release", \$replacement);
+   $newer->commit('Update source index');
+   $t->get_ok('/pan/pinned/modules/?filter=Example')->status_is(200)
+      ->json_is('/modules/0/source_version', '2.01');
+   $t->get_ok("$source_archive/~changes")->status_is(200)->content_is("Replacement changes\n");
+
+   my $fixed= Test::Mojo->new('Mojolicious');
+   CPAN::InGit::Server->mount($fixed->app->routes->any('/mirror'), $cpan_repo,
+      archive_tree => $cpan_repo->get_archive_tree('pinned'));
+   $fixed->get_ok('/mirror/')->status_is(200)
+      ->element_exists('.source-branch a[href="https://example.test/source/"]');
+   $fixed->get_ok($fixed->tx->res->dom->at('.source-version a')->attr('href'))->status_is(200)
+      ->text_is('#to-dist', $release);
 };
 
 subtest module_pagination => sub {

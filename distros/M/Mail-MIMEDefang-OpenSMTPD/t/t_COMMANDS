@@ -1,0 +1,30 @@
+i8uSrz16
+S<noreply@ewm-email.com>
+=_ ewm-email.com%20[213.32.148.122]
+=cert_issuer 
+=cert_subject 
+=cipher TLS_AES_256_GCM_SHA384
+=cipher_bits 256
+=daemon_name MTA
+=daemon_port 25
+=i 29C6RMnT1360932
+=if_addr 192.168.20.172
+=if_name server1.raptoremailsecurity.com
+=j server1.raptoremailsecurity.com
+=mail_addr noreply@ewm-email.com
+=mail_host ewm-email.com.
+=mail_mailer esmtp
+=tls_version TLSv1.3
+=verify NOT
+=client_port 21266
+=load_avg 0
+=mail_host ewm-email.com.
+=mail_addr noreply@ewm-email.com
+Q29C6RMnT1360932
+Hewm-email.com
+I213.32.148.122
+Eewm-email.com
+R<roderickb@brewisengineering.co.uk> esmtp [62.30.8.112] roderickb@brewisengineering.co.uk
+UEworks%20Manager%20-%20New%20Features
+X<202212100627.ck5oo7dsgidvj@ewm-email.com>
+F

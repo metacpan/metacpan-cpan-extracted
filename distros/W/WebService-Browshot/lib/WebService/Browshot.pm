@@ -6,6 +6,7 @@ use warnings;
 
 use LWP::UserAgent;
 use JSON;
+use URI;
 use URI::Encode qw(uri_encode);
 use File::Basename;
 use File::Path qw(make_path);
@@ -18,7 +19,7 @@ IO::Socket::SSL::set_ctx_defaults(
      verify_mode => 0,
 );
 
-our $VERSION = '1.32.0';
+our $VERSION = '2.0.0';
 
 =head1 NAME
 
@@ -35,13 +36,21 @@ WebService::Browshot - Perl extension for Browshot (L<https://browshot.com/>), a
 
 =head1 DESCRIPTION
 
-Browshot (L<http://www.browshot.com/>) is a web service to easily make screenshots of web pages in any screen size, as any device: iPhone, iPad, Android, Nook, PC, etc. Browshot has full Flash, JavaScript, CSS, & HTML5 support.
+Browshot (L<http://www.browshot.com/>) is a web service to easily make screenshots of web pages in any screen size, as any device: iPhone, iPad, Android, Nook, PC, etc. Browshot supports JavaScript, CSS, and HTML5.
 
 The latest API version is detailed at L<http://browshot.com/api/documentation>. WebService::Browshot follows the API documentation very closely: the function names are similar to the URLs used (screenshot/create becomes C<screenshot_create()>, instance/list becomes C<instance_list()>, etc.), the request arguments are exactly the same, etc.
 
-The library version matches closely the API version it handles: WebService::Browshot 1.0.0 is the first release for the API 1.0, WebService::Browshot 1.1.1 is the second release for the API 1.1, etc.
+The library supports Browshot API v1 and v2. Calls with legacy instance,
+screen, details, hook, or hosting arguments use v1. Instance lookup and
+C<screenshot_host()> also use v1. Other calls prefer v2 where supported.
+V2 captures accept C<browser>, C<country>, C<screen_width>, C<screen_height>,
+C<mobile>, or a named C<device>. C<instance_id> is optional.
 
-WebService::Browshot can handle most the API updates within the same major version, e.g. WebService::Browshot 1.0.0 should be compatible with the API 1.1 or 1.2.
+Pass C<api_version =E<gt> 1> or C<api_version =E<gt> 2> to select the response
+format for a call. This option is consumed by the library. An explicit C<base>
+pins the version for calls without an override. In automatic mode, a request
+supported by both versions can use v1 if the server reports that the v2 route
+is unavailable.
 
 The source code is available on github at L<https://github.com/juliensobrier/browshot-perl>.
 
@@ -50,7 +59,7 @@ The source code is available on github at L<https://github.com/juliensobrier/bro
 
 =head2 new()
 
-  my $browshot = WebService::Browshot->new(key => 'my_key', base => 'http://api.browshot.com/api/v1/', debug => 1]);
+  my $browshot = WebService::Browshot->new(key => 'my_key', debug => 1);
 
 Create a new WebService::Browshot object. You must pass your API key (go to you Dashboard to find your API key).
 
@@ -64,7 +73,9 @@ Required.  API key.
 
 =item base
 
- Optional. Base URL for all API requests. You should use the default base provided by the library. Be careful if you decide to use HTTP instead of HTTPS as your API key could be sniffed and your account could be used without your consent.
+Optional. Pin all requests to a specific base URL, for example
+C<https://api.browshot.com/api/v1/> for the v1 response format. By default the
+library selects a version for each request. Use HTTPS to protect your API key.
 
 =item debug
 
@@ -92,7 +103,8 @@ sub new {
 
   	my $browshot = {	
 		_key	=> $args{key}	|| '',
-		_base	=> $args{base}	|| 'https://api.browshot.com/api/v1/',
+		_base	=> $args{base}	|| 'https://api.browshot.com/api/v2/',
+		_auto_api => ! $args{base},
 		_debug	=> $args{debug}	|| 0,
 
 		_retry	=> 2,
@@ -107,7 +119,7 @@ sub new {
 
 =head2 api_version()
 
-Return the API version handled by the library. Note that this library can usually handle new arguments in requests without requiring an update.
+Return the newest API version supported by the library. This is independent of the version selected for a particular request.
 
 =cut
 
@@ -148,8 +160,7 @@ Required. URL of the website to create a screenshot of.
 sub simple {
 	my ($self, %args) = @_;
 
-	my $url	= $self->make_url(action => 'simple', parameters => { %args });
-	my $res = $self->{_ua}->get($url);
+	my $res = $self->_request('get', action => 'simple', parameters => { %args });
 
 	# $self->info($res->message);
 	# $self->info($res->request->as_string);
@@ -193,8 +204,7 @@ sub simple_file {
 		return (400, '');
 	}
 
-	my $url	= $self->make_url(action => 'simple', parameters => { %args });
-	my $res = $self->{_ua}->get($url);
+	my $res = $self->_request('get', action => 'simple', parameters => { %args });
 
 	my $content = $res->decoded_content;
 
@@ -221,7 +231,7 @@ Return the list of instances as a hash reference. See L<http://browshot.com/api/
 sub instance_list {
 	my ($self, %args) = @_;
 	
-	return $self->return_reply(action => 'instance/list');
+	return $self->return_reply(action => 'instance/list', parameters => { %args });
 }
 
 =head2 instance_info()
@@ -246,7 +256,7 @@ sub instance_info  {
 	my ($self, %args) 	= @_;
 	my $id							= $args{id}	|| $self->error("Missing id in instance_info");
 
-	return $self->return_reply(action => 'instance/info', parameters => { id => $id });
+	return $self->return_reply(action => 'instance/info', parameters => { %args, id => $id });
 }
 
 =head2 browser_list()
@@ -258,7 +268,7 @@ Return the list of browsers as a hash reference. See L<http://browshot.com/api/d
 sub browser_list {
 	my ($self, %args) = @_;
 	
-	return $self->return_reply(action => 'browser/list');
+	return $self->return_reply(action => 'browser/list', parameters => { %args });
 }
 
 =head2 browser_info()
@@ -273,7 +283,7 @@ Arguments:
 
 =item id
 
-Required. Browser ID
+Browser ID. Alternatively pass C<browser =E<gt> 'chrome'> or C<'firefox'> to use the v2 browser catalog.
 
 =back
 
@@ -281,9 +291,8 @@ Required. Browser ID
 
 sub browser_info  {
 	my ($self, %args) 	= @_;
-	my $id				= $args{id}	|| $self->error("Missing id in browser_info");
-
-	return $self->return_reply(action => 'browser/info', parameters => { id => $id });
+	$self->error("Missing id or browser in browser_info") if (! defined $args{id} && ! defined $args{browser});
+	return $self->return_reply(action => 'browser/info', parameters => { %args });
 }
 
 
@@ -306,17 +315,17 @@ Use C<pdf =E<gt> 1> to generate a PDF (1 additional credit), or
 C<video =E<gt> 1> to record WebM, MP4, or animated GIF with
 C<video_format =E<gt> 'webm'>, C<'mp4'>, or C<'gif'>. WebM is the default.
 C<video_duration> is 1-30 seconds (default 15); video adds 1 credit per started
-5 seconds of requested duration, for every format. PDF and video require a paid
-Chrome-based instance. Wait for C<status> to be C<finished> before downloading.
+5 seconds of requested duration, for every format. PDF and video require
+Chrome. With v1, use a paid Chrome instance. Wait for C<status> to be
+C<finished> before downloading.
 
-C<device_scale =E<gt> 2> enables retina screenshots and C<hide_ads =E<gt> 1>
-enables ad blocking, without an additional charge. Retina cannot be combined
-with video. For additional countries, select the appropriate C<instance_id>
-from C<instance_list()>; do not relocate an instance with a country override.
-For example, instance 373 is Chrome in France and 377 is Chrome in India.
+C<device_scale =E<gt> 2> or C<3> enables retina screenshots and
+C<hide_ads =E<gt> 1> enables ad blocking without an additional charge. Video
+requires 1x resolution. Use C<country> for direct v2 captures, or select a
+country-specific C<instance_id> from C<instance_list()> for v1.
 
   my $screenshot = $browshot->screenshot_create(
-    url => 'https://example.org/', instance_id => 373,
+    url => 'https://example.org/', browser => 'chrome', country => 'fr',
     pdf => 1, pdf_format => 'a4', device_scale => 2, hide_ads => 1,
   );
 
@@ -363,7 +372,11 @@ sub screenshot_create {
 
   $browshot->screenshot_info(id => 568978)
 
-Get information about a screenshot requested previously. See L<http://browshot.com/api/documentation#screenshot_info> for the response format.
+Get information about an existing screenshot. By default this uses v2 for
+IDs created by either API version. Pass C<api_version =E<gt> 1> if you need
+legacy response fields such as C<instance_id>.
+
+  $browshot->screenshot_info(id => 568978, api_version => 1)
 
 Arguments:
 
@@ -492,26 +505,24 @@ Optional. Maximum height of the thumbnail.
 sub screenshot_thumbnail {
 	my ($self, %args) 	= @_;
 
-	if (exists($args{url}) && $args{url} =~ /image\/(\d+)\?/i && ! exists($args{id})) {
-		# get ID from url
-		$args{id} = $1;
-
-		if ($args{url}  =~ /&width=(\d+)\?/i && ! exists($args{width})) {
-				$args{width} = $1;
+	if (! exists $args{id} && defined $args{url}) {
+		my $uri = URI->new($args{url});
+		my $path = $uri->path || '';
+		my ($path_id) = $path =~ m{/image/(\d+)/?$}i;
+		if (defined($path_id) || $path =~ m{/screenshot/thumbnail/?$}i) {
+			my %query = $uri->query_form;
+			$args{id} = defined($path_id) ? $path_id : $query{id};
+			foreach my $name (qw(width height scale zoom ratio format quality shot left right top bottom)) {
+				$args{$name} = $query{$name} if (! exists $args{$name} && exists $query{$name});
+			}
 		}
-		if ($args{url}  =~ /&height=(\d+)\?/i && ! exists($args{height})) {
-				$args{height} = $1;
-		}
-		
 	}
-	elsif(! exists($args{id}) ) {
+	if (! defined $args{id}) {
 		$self->error("Missing id and url in screenshot_thumbnail");
 		return '';
 	}
-
-
-	my $url	= $self->make_url(action => 'screenshot/thumbnail', parameters => { %args });
-	my $res =  $self->{_ua}->get($url);
+	delete $args{url};
+	my $res = $self->_request('get', action => 'screenshot/thumbnail', parameters => { %args });
 
 	if ($res->is_success) {
 		return $res->decoded_content; # raw image file content
@@ -802,7 +813,9 @@ Required. One or more URLs.
 
 =item instances
 
-Required. One or more instance_id.
+Optional. One or more instance IDs for a v1 request. For v2, use the direct
+capture options or pass C<profiles> as an array of capture settings. The
+reply is keyed by screenshot ID.
 
 =back
 
@@ -833,7 +846,7 @@ Required. Path to the text file which contains the list of URLs.
 
 =item instance_id
 
-Required. instance_id to use for all screenshots.
+Optional. Instance ID to use for all screenshots in a v1 request.
 
 =back
 
@@ -842,7 +855,6 @@ Required. instance_id to use for all screenshots.
 sub batch_create {
 	my ($self, %args) 	= @_;
 	my $file		= $args{file}		|| $self->error("Missing file in batch_create");
-	my $instance_id		= $args{instance_id}	|| $self->error("Missing instance_id in batch_create");
 
 	delete $args{file};
 	return $self->return_post_reply(action => 'batch/create', parameters => { %args }, file => $file);
@@ -890,11 +902,11 @@ Required. Domain to crawl.
 
 =item url
 
-Required. URl to start with.
+Optional. URL to start with. The server defaults to the domain root.
 
 =item instance_id
 
-Required. instance_id to use for all screenshots.
+Optional. Instance ID to use for all screenshots in a v1 request.
 
 =back
 
@@ -903,8 +915,6 @@ Required. instance_id to use for all screenshots.
 sub crawl_create {
 	my ($self, %args) = @_;
 	my $domain				= $args{domain}			|| $self->error("Missing domain in crawl_create");
-	my $url						= $args{url}				|| $self->error("Missing url in crawl_create");
-	my $instance_id		= $args{instance_id}	|| $self->error("Missing instance_id in crawl_create");
 
 	return $self->return_reply(action => 'crawl/create', parameters => { %args });
 }
@@ -947,14 +957,66 @@ sub account_info {
 }
 
 
+=head2 device_list()
+
+Return the named device catalog for v2 captures.
+
+=cut
+
+sub device_list {
+	my ($self, %args) = @_;
+	return $self->return_reply(action => 'device/list', parameters => { %args });
+}
+
+=head2 app_list(), app_info()
+
+List account apps, or get one app by ID.
+
+  my $apps = $browshot->app_list();
+  my $app = $browshot->app_info(id => 42);
+
+=cut
+
+sub app_list {
+	my ($self, %args) = @_;
+	return $self->return_reply(action => 'app/list', parameters => { %args });
+}
+
+sub app_info {
+	my ($self, %args) = @_;
+	return $self->return_reply(action => 'app/info', parameters => { %args });
+}
+
+=head2 app_create(), app_update(), app_delete(), app_test(), app_run()
+
+Manage and run v2 webhook and S3 apps. Pass C<config> as a hash reference and
+C<apps> to C<app_run()> as an array of app slugs or configuration IDs.
+
+  my $app = $browshot->app_create(
+    type => 'webhook', app_id => 'notify', name => 'Notifications',
+    config => { url => 'https://example.org/events' },
+  );
+  $browshot->app_test(id => $app->{id});
+  $browshot->app_run(screenshot_id => 12345, apps => ['notify']);
+
+For a new capture, pass C<apps =E<gt> ['notify', 'archive']>. To override S3
+filenames, pass a hash reference such as
+C<apps =E<gt> { archive =E<gt> 'captures/{id}.png' }>.
+
+=cut
+
+sub app_create { return shift->_app_post('app/create', @_); }
+sub app_update { return shift->_app_post('app/update', @_); }
+sub app_delete { return shift->_app_post('app/delete', @_); }
+sub app_test { return shift->_app_post('app/test', @_); }
+sub app_run { return shift->_app_post('app/run', @_); }
+
 # Private methods
 
 sub return_binary {
 	my ($self, %args) 	= @_;
-	my $url	= $self->make_url(%args);
 	my $res;
-
-	eval { $res = $self->{_ua}->get($url); };
+	eval { $res = $self->_request('get', %args); };
 	return $self->error("Cannot retrieve $args{action}") if ($@ || ! defined($res));
 	return $self->error("Server sent back an error: " . $res->code) if (! $res->is_success);
 	return $self->error("Unexpected content type in $args{action}") if (($res->header('Content-Type') || '') !~ $args{content_type});
@@ -989,68 +1051,50 @@ sub save_binary {
 sub return_string {
 	my ($self, %args) 	= @_;
 
-	my $url	= $self->make_url(%args);
-	
 	my $res;
 	my $try = 0;
 
 	do {
 		$self->info("Try $try");
 		eval {
-			$res = $self->{_ua}->get($url);
+			$res = $self->_request('get', %args);
 		};
 		$self->error($@) if ($@);
 		$try++;
 	}
 	until($try < $self->{_retry} && defined $@);
+	return $self->error("Cannot retrieve $args{action}") if (! defined $res);
 
 	if (! $res->is_success) {
 		$self->error("Server sent back an error: " . $res->code);
 	}
   
-	return $res->decoded_content;
+	return $args{json_response} ? $res->decoded_content(charset => 'none') : $res->decoded_content;
 }
 
 sub return_post_string {
 	my ($self, %args) 	= @_;
-	my $file 		= $args{'file'} || '';
-
-	delete $args{'file'};
-	my $url	= $self->make_url(%args);
-	
-	my $res;
-	my $try = 0;
-
-	do {
-		$self->info("Try $try");
-		eval {
-			$res = $self->{_ua}->post(
-			  $url,
-			  Content_Type => 'form-data',
-			  Content => [
-			    file => [$file],
-			  ]
-			);
-		};
-		$self->error($res->request->as_string) if ($@);
-		$self->error($@) if ($@);
-		$try++;
-	}
-	until($try < $self->{_retry} && defined $@);
+	my @body = exists $args{json}
+		? (Content_Type => 'application/json', Content => encode_json($args{json}))
+		: (Content_Type => 'form-data', Content => [file => [$args{file} || '']]);
+	my $res = eval { $self->_request('post', %args, body => \@body); };
+	return $self->error("Cannot retrieve $args{action}") if ($@ || ! defined $res);
 
 	if (! $res->is_success) {
 		$self->error("Server sent back an error: " . $res->code);
-		$self->info($res->request->as_string);
-		$self->info($res->as_string);
+		if (! exists $args{json}) {
+			$self->info($res->request->as_string) if ($res->request);
+			$self->info($res->as_string);
+		}
 	}
   
-	return $res->decoded_content;
+	return $res->decoded_content(charset => 'none');
 }
 
 sub return_reply {
 	my ($self, %args) 	= @_;
 
-	my $content = $self->return_string(%args);
+	my $content = $self->return_string(%args, json_response => 1);
 
 	my $info;
 	eval {
@@ -1081,30 +1125,89 @@ sub return_post_reply {
 	return $info;
 }
 
+sub _app_post {
+	my ($self, $action, %body) = @_;
+	my %parameters;
+	$parameters{api_version} = delete $body{api_version} if (exists $body{api_version});
+	foreach my $field (qw(id screenshot_id)) {
+		$body{$field} = 0 + $body{$field} if (defined $body{$field} && $body{$field} =~ /^\d+$/);
+	}
+	if (defined $body{isActive} && ! ref($body{isActive}) && $body{isActive} =~ /^[01]$/) {
+		$body{isActive} = $body{isActive} ? JSON::true : JSON::false;
+	}
+	if (ref($body{apps}) eq 'ARRAY') {
+		$body{apps} = [map { "$_" } @{$body{apps}}];
+	}
+	return $self->return_post_reply(action => $action, parameters => \%parameters, json => \%body);
+}
+
+sub _version_for {
+	my ($self, $action, $parameters) = @_;
+	return $parameters->{api_version} if (defined $parameters->{api_version} && $parameters->{api_version} =~ /^[12]$/);
+	return undef if (! $self->{_auto_api});
+	return 1 if ($action =~ m{^(?:instance/|screenshot/host$)});
+	return 1 if grep {
+		defined $parameters->{$_} && /^(?:
+			instance_id|instance_ids|instances|screen|details|ids|hook|hook_.+|
+			hosting|hosting_.+|device_name|device_touch|device_mobile|device_landscape|user_agent
+		)$/x && (ref($parameters->{$_}) ne 'ARRAY' || @{$parameters->{$_}})
+	} keys %$parameters;
+	if ($action eq 'browser/info' && defined $parameters->{id}) {
+		return 1 if ($parameters->{id} !~ /^(?:40|42)$/);
+	}
+	return 2;
+}
+
+sub _request {
+	my ($self, $method, %args) = @_;
+	my $parameters = $args{parameters} || {};
+	my $action = $args{action};
+	my $version = $self->_version_for($action, $parameters);
+	my @body = @{$args{body} || []};
+	my $response = $self->{_ua}->$method($self->make_url(%args), @body);
+	if ($self->{_auto_api} && ! defined $parameters->{api_version} && $version == 2 &&
+	    $action !~ m{^(?:app/|device/)} &&
+	    ! grep { defined $parameters->{$_} && /^(?:browser|country|mobile|device|profiles|apps(?:\[.*\])?)$/ } keys %$parameters) {
+		# The v2 router returns this exact response before dispatch when v2 is
+		# unavailable. Ordinary resource errors cannot trigger another request.
+		if (defined $response && $response->code == 404 && ($response->header('Content-Type') || '') =~ m{^application/json(?:;|$)}i) {
+			my $error = eval { decode_json($response->content) };
+			if (ref($error) eq 'HASH' && ($error->{error} || '') eq 'NOT_FOUND' &&
+			    ($error->{message} || '') eq 'Page not found' && exists $error->{success} && ! $error->{success}) {
+				return $self->{_ua}->$method($self->make_url(%args, parameters => { %$parameters, api_version => 1 }), @body);
+			}
+		}
+	}
+	return $response;
+}
+
 sub make_url {
-	my ($self, %args) 	= @_;
-	my $action		= $args{action}		|| '';
-	my $parameters		= $args{parameters}	|| { };
+	my ($self, %args) = @_;
+	my $action = $args{action} || '';
+	my %parameters = %{$args{parameters} || {}};
+	my $version = $self->_version_for($action, \%parameters);
+	delete $parameters{api_version};
+	my $base = $self->{_base};
+	$base =~ s{/api/v[12]/?$}{/api/v$version/} if (defined $version);
+	my $url = $base . "$action?key=" . uri_encode($self->{_key}, 1);
 
-	my $url = $self->{_base} . "$action?key=" . uri_encode($self->{_key}, 1);
-
-
-	if (exists $parameters->{urls}) {
-	  foreach my $uri (@{ $parameters->{urls} }) {
-	    $url .= '&url=' . uri_encode($uri, 1);
-	  }
-	  delete  $parameters->{urls};
-	}
-
-	if (exists $parameters->{instances}) {
-	  foreach my $instance_id (@{ $parameters->{instances} }) {
-	    $url .= '&instance_id=' . uri_encode($instance_id, 1);
-	  }
-	  delete  $parameters->{instances};
-	}
-
-	foreach my $key (keys %$parameters) {
-	  $url .= '&' . uri_encode($key) . '=' . uri_encode($parameters->{$key}, 1) if (defined $parameters->{$key});
+	foreach my $name (sort keys %parameters) {
+		my $value = $parameters{$name};
+		next if (! defined $value);
+		my $key = $name eq 'urls' ? 'url' : $name eq 'instances' ? 'instance_id' : $name;
+		if ($key eq 'profiles' && ref($value) eq 'ARRAY') {
+			$value = JSON->new->encode($value);
+		}
+		if ($key eq 'apps' && ref($value) eq 'HASH') {
+			foreach my $app (sort keys %$value) {
+				$url .= '&' . uri_encode("apps[$app]", 1) . '=' . uri_encode($value->{$app}, 1) if (defined $value->{$app});
+			}
+			next;
+		}
+		my @values = ref($value) eq 'ARRAY' && $key =~ /^(?:url|instance_id|apps)$/ ? @$value : ($value);
+		foreach my $item (@values) {
+			$url .= '&' . uri_encode($key, 1) . '=' . uri_encode($item, 1) if (defined $item);
+		}
 	}
 
 	$self->info($url);
@@ -1143,6 +1246,11 @@ sub generic_error {
 =head1 CHANGES
 
 =over 4
+
+=item 2.0.0
+
+Select API v1 or v2 per request. Add direct capture options, device lookup,
+and app management. Allow v2 screenshot lookup with existing IDs.
 
 =item 1.32.0
 

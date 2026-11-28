@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.81 {
+package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.82 {
 
-  use 5.022;
+  use 5.024;
   use Moose;
   use Path::Tiny qw( path );
   use Scalar::Util qw( refaddr );
@@ -127,7 +127,7 @@ Dist::Zilla::Plugin::Author::Plicease::Cleaner - Clean things up
 
 =head1 VERSION
 
-version 2.81
+version 2.82
 
 =head1 SYNOPSIS
 

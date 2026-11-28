@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::Author::Plicease 2.81 {
+package Dist::Zilla::Plugin::Author::Plicease 2.82 {
 
   use strict;
   use warnings;
-  use 5.022;
+  use 5.024;
   use Path::Tiny ();
   use File::ShareDir::Dist ();
   use File::Which ();
@@ -56,7 +56,7 @@ Dist::Zilla::Plugin::Author::Plicease - Dist::Zilla plugins used by Plicease
 
 =head1 VERSION
 
-version 2.81
+version 2.82
 
 =head1 DESCRIPTION
 

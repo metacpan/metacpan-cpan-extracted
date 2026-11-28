@@ -1,0 +1,19 @@
+Changelog
+filter-mimedefang.pl
+lib/Mail/MIMEDefang/OpenSMTPD.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.MD
+t/data.t
+t/data/gtube.eml
+t/data/msg.eml
+t/filter.t
+t/headers.t
+t/lib/SmtpdHarness.pm
+t/protocol.t
+t/sender.t
+t/t_COMMANDS
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

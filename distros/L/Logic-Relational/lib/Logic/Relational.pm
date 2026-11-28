@@ -9,11 +9,11 @@ Logic::Relational - A pure-Perl relational logic system.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -84,6 +84,13 @@ our $VERSION = '0.03';
 		say "An ancestor of George is: " . $sol->value($ancestor);
 	}
 
+	# Declarative JSON-Datalog query
+	my $res = Family->query_data({
+		goals  => [{ pred => 'ancestor', args => ['$who', 'George'] }],
+		select => ['$who'],
+	});
+	# $res->{results} = [ { who => 'Edward' }, { who => 'Fran' }, ... ]
+
 =head1 DESCRIPTION
 
 C<Logic::Relational> provides a relational logic engine in pure Perl, offering logical variables, structural unification, facts, rules, and backtracking depth-first search. 
@@ -138,6 +145,50 @@ To execute a query on a logic database, use the name of the logic database with 
 	# Option E: Extract tuples of multiple variables (deduplicated by default)
 	query Family::parent(fresh my $p, fresh my $c) -> my $q_pairs;
 	my @pairs = $q_pairs->all_tuples([$p, $c]);
+
+=head2 JSON-Datalog Queries & Schema Introspection
+
+In addition to iterator-based queries, C<Logic::Relational> provides a data-driven, in-process JSON query interface (via C<query_data> and C<query_json>) and schema auto-reflection (via C<describe>). This interface is designed for external callers (such as web APIs) to be able to issue queries without writing Perl code.
+
+	# 1. Schema Introspection: Discover declared relations, arities, and docstrings
+	my $schema = Family->describe(include_stdlib => 0);
+
+	# 2. In-Process Conjunctive Query with Projection
+	my $res = Family->query_data({
+		goals => [
+			{ pred => 'parent', args => ['Alice', '$child'] },
+			{ pred => 'parent', args => ['$child', '$grandchild'] },
+		],
+		select   => ['$grandchild'],
+		distinct => 1,
+	});
+
+	if ($res->{ok}) {
+		for my $row (@{ $res->{results} }) {
+			say "Found grandchild: " . $row->{grandchild};
+		}
+	}
+
+	# 3. Raw JSON String Query (e.g. from a REST client)
+	my $json_res = Family->query_json(
+		q|{"goals":[{"pred":"parent","args":["Alice","$c"]}],"select":["$c"]}|
+	);
+
+Capabilities include:
+
+=over 4
+
+=item * B<Automatic Goal Reordering:> The planner prioritizes ground and positive goals before unground or negated goals for performance and soundness.
+
+=item * B<Negation-as-Failure Safety:> Unground variables in negated goals are detected at planning time (C<UNSAFE_NEGATION>), preventing unsound floundering.
+
+=item * B<Execution Budgets:> Hard guardrails prevent runaway recursion via resolution step limits (C<max_steps>) and wall-clock timeouts (C<timeout_ms>).
+
+=item * B<Set Semantics & Pagination:> Deduplication enabled by default (C<distinct =E<gt> 1>), with result row bounds (C<limit>) and pagination flags (C<truncated>).
+
+=back
+
+For the complete specification, see L<Logic::Relational::Manual::JSONDatalog>.
 
 =head2 Unification
 
@@ -680,6 +731,12 @@ C<ttl_mode => 'absolute'> (default): Wall-clock time keeps ticking while saved o
 C<ttl_mode => 'relative'> (or C<pause_ttl => 1>): Game/simulation time pauses while saved on disk. When reloaded, expiring facts resume with their exact C<remaining_ttl> relative to the moment of loading.
 	
 =head1 SEE ALSO
+
+L<Logic::Relational::Manual::JSONDatalog> - JSON-Datalog query interface
+
+L<Logic::Relational::Syntax> - Declarative syntax layer
+
+L<Logic::Relational::Program> - Program container and snapshot persistence
 
 L<AI::Prolog>
 

@@ -1,5 +1,14 @@
 Revision history for Music-NWC2MusicXML
 
+0.003.1	Fri Nov 27 09:50:06 PM EST 2026
+	[ Bug Fixes ]
+	- Parser: the Triplet token was ignored when computing durations, so
+	  triplet notes, chords and rests lasted their full written value and
+	  bars containing them were too long.  They now last two thirds of it.
+	- MusicXML: triplets printed as plain notes.  <time-modification> and
+	  <tuplet> elements are now emitted.
+	- bin/nwc2musicxml still reported version 0.002.3.
+
 0.003.0	Mon Nov  9 08:17:51 PM EST 2026
 	[ Bug Fixes ]
 	- MusicXML: a whole rest standing alone in a bar was emitted as a

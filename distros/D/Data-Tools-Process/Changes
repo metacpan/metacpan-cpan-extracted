@@ -1,6 +1,17 @@
 
 Revision history for Perl extension Data::Tools::Process
 
+1.61 2026.11.27
+
+   - Data::Tools::Process added path_gone( $path ) and cwd_gone(), check if
+     a path or the current directory was removed (or is no longer
+     accessible on a network file system)
+   - Data::Tools::Process::ForkPool fpool_wait_all( $pool, $timeout ) got
+     optional timeout in seconds: waits up to it for all processes of the
+     pool to exit, returns as soon as the pool is empty
+   - path_gone() and cwd_gone() tests in t/, fpool_wait_all() timeout tests
+     in tt/
+
 1.60 (pending)
 
    - first Data-Tools-Process release: Data::Tools::Process,

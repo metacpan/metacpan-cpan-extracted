@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use Test::More;
 use Test::Exception;
 use Test::LeakTrace;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # skew() and kurtosis() accumulate the third and fourth central moments in one
 # pass (Welford/Terriberry) instead of centering the sample in a second pass

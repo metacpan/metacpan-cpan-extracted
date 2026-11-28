@@ -1,6 +1,7 @@
-use 5.022;
+use 5.024;
 use Test2::V0 -no_srand => 1;
 use Test::DZil;
+use Dist::Zilla::Plugin::Author::Plicease;
 use File::Spec;
 use Path::Tiny qw( path tempdir );
 use experimental qw( signatures );
@@ -155,6 +156,19 @@ subtest 'perl version' => sub {
       my $pm = $mint->child('lib/Foo/Bar.pm')->slurp_utf8;
       note $pm;
       like $pm, $re, 'module content';
+
+      my $style = $mint->child('docs/PERLSTYLE.md');
+      if($version >= 5.042)
+      {
+        ok -f $style, 'has docs/PERLSTYLE.md';
+        is $style->slurp_utf8,
+           Dist::Zilla::Plugin::Author::Plicease->dist_dir->child('docs/PERLSTYLE.md')->slurp_utf8,
+           'docs/PERLSTYLE.md matches share copy';
+      }
+      else
+      {
+        ok !-e $style, 'no docs/PERLSTYLE.md';
+      }
     };
   }
 

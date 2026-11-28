@@ -1,10 +1,31 @@
 Revision history for HTTP-libsfparse:
 
+v0.0.5    2026-11-27 15:01:35+00:00 Europe/London
+  [Bug Fixes]
+  - Reverted broken workaround for 32-bit system. Use Math::Int64 instead.
+
+  [Tests]
+  - Changed tests to use JSON instead of JSON::PP, and explicitly require B.
+
+v0.0.4    2026-11-27 12:30:09+00:00 Europe/London
+  [Bug Fixes]
+  - Added missing prerequsite to Makefile.PL.
+
+  - Updated workaround for 32-bit systems to save longer numbers as strings.
+
+  [Documentation]
+  - Added missing timestamp to Changes for v0.0.3.
+
+  - Added missing documentation.
+
+  - Fixed typo in Changes.
+
+v0.0.3    2026-11-26 10:36:39+00:00 Europe/London
   [Incompatible Changes]
   - HTTP::StructuredField parse_dictionary and params changed to return Hash::Ordered objects, instead of hash references.
 
   [Bug Fixes]
-  - Fixd workaround for 32-bit systems.
+  - Fixed workaround for 32-bit systems.
 
   [Documentation]
   - Removed incorrect VERSION from the POD.

@@ -33,7 +33,7 @@ my @warnings = warnings {
     test => {
       $ENV{NO_TODO} ? () : ( todo_tests => [
         # various edge cases that are difficult to accomodate
-        { file => 'integers.json', group_description => 'int64 range checks', test_description => 'beyond lower boundary' },
+        Mojo::JSON::JSON_XS ? () : { file => 'integers.json', group_description => 'int64 range checks', test_description => 'beyond lower boundary' },
       ] ),
     },
   );

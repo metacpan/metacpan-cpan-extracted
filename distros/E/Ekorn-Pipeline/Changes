@@ -2,6 +2,34 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.5.0 2026-11-27
+
+    Stages that hold values back say where what they give came from.
+
+    So the stages after them get each value's own original (roadmap
+    2026-0060). What take_last and batch give result_original
+    changes, so it's a v0.5.0.
+
+    result_original promises the original of the value a result is
+    made from, but after a stage that holds values back, such as
+    take_last or batch, the stages after it saw the original of the
+    value the run had got to last. Stages written before this don't
+    change.
+
+    - A stage may say holds => 1 among its parts, by name. In its step,
+      as it keeps a value, kept_origin returns the value's origin,
+      whose gives marks what the stage made from it, so the stages
+      after it get that value's original, in a flush too (roadmap
+      2026-0060).
+    - kept_origin is exported by Ekorn::Pipeline::Context, and by
+      Tooling's :context.
+    - take_last's value has its own original, where it had none.
+    - A batch has no original, where one filled by a value had that
+      value's.
+    - Two new messages: "Expected stage #%s, made with gather, to hold
+      values back in its step, not in a pipeline", and "Expected
+      kept_origin in the step of a stage that holds values back".
+
 v0.4.5 2026-11-26
 
     A fix to the tests: they pass without Text::CSV.

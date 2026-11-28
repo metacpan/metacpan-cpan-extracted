@@ -155,6 +155,7 @@ t/epi_2x2.R.statsmodels.t
 t/epi_2x2.t
 t/eta_squared.R.R
 t/eta_squared.R.t
+t/exports.t
 t/fillna.t
 t/filter.R.pandas.R
 t/filter.R.pandas.py
@@ -170,6 +171,8 @@ t/fisher_test.rxc.R
 t/fisher_test.rxc.exact.py
 t/fisher_test.t
 t/fisher_test.window.R.scipy.t
+t/format.ties.R.R
+t/format.ties.R.t
 t/formula.parser.R.R
 t/formula.parser.R.t
 t/formula.utf8_names.t

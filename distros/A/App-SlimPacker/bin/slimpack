@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use File::Find;
 use File::Temp qw(tempdir);
+use File::Spec ();
 use Getopt::Long ();
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -136,7 +137,7 @@ sub cmd_pack {
     _load_slimpacker;
 
     # 1. trace (slurp from STDOUT)
-    my $trace = $fp->trace(args => [$script, @args]);
+    my $trace = _trace([$script, @args]);
     my @modules = grep { length } split /\r?\n/, $trace;
 
     # 2. drop core and --exclude modules (both match the "Foo::Bar" form)
@@ -229,7 +230,7 @@ sub _bundle_unpacklisted {
 sub cmd_trace {
     my (@args) = @_;
 
-    my $fp = _load_fatpacker;
+    _load_fatpacker;   # dies if App::FatPacker (and so its Trace) is missing
 
     my @use;
     my ($file, $to_stderr);
@@ -250,7 +251,40 @@ sub cmd_trace {
         unlink $file or die "Couldn't remove old trace file: $!";
     }
     my $arg = $to_stderr ? '>&STDERR' : ">>${file}";
-    $fp->trace(use => \@use, args => [$script, @args], output => $arg);
+    _trace([$script, @args], output => $arg, use => \@use);
+}
+
+# App::FatPacker->trace with the exit status checked. FatPacker's own trace
+# drops it, so a script that failed to compile gave a partial module list
+# and pack went on to write an incomplete bundle that exited 0. The trace
+# only compiles the script (with --lib on @INC, as the bundle has it), so
+# any failure means it does not compile.
+# With output (a Trace target such as '>&STDERR') the list goes there;
+# without, it is returned.
+sub _trace {
+    my ($args, %opt) = @_;
+    my ($script) = @$args;
+    die "slimpack: missing boot script\n" unless defined $script && length $script;
+    die "slimpack: Cannot read $script: $!\n" unless open my $probe, '<', $script;
+    local $ENV{PERL5OPT} = join ' ', ($ENV{PERL5OPT} || ()),
+        '-MApp::FatPacker::Trace=' . join ',', $opt{output} || '>&STDOUT', @{ $opt{use} || [] };
+    # the bundle resolves modules from --lib, so the trace must see it too
+    my $cmd  = join ' ', map { _shell_quote($_) }
+        $^X, '-I' . File::Spec->rel2abs($O{lib}), @$args;
+    my $list = '';
+    if ($opt{output}) { system $cmd } else { $list = `$cmd` }
+    die "slimpack: $script does not compile (see above), nothing was written\n" if $?;
+    return $list;
+}
+
+sub _shell_quote {
+    my ($s) = @_;
+    if ($^O eq 'MSWin32') {
+        $s =~ s/"/\\"/g;
+        return qq{"$s"};
+    }
+    $s =~ s/'/'\\''/g;
+    return "'$s'";
 }
 
 # --------------------------------------------------------- packlists ----

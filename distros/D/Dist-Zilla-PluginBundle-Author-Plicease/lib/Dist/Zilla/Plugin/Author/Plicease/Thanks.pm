@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::Author::Plicease::Thanks 2.81 {
+package Dist::Zilla::Plugin::Author::Plicease::Thanks 2.82 {
 
-  use 5.022;
+  use 5.024;
   use Moose;
   use experimental qw( postderef );
 
@@ -116,7 +116,7 @@ Dist::Zilla::Plugin::Author::Plicease::Thanks - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.81
+version 2.82
 
 =head1 SYNOPSIS
 

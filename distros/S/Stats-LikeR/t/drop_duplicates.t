@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 use Scalar::Util 'looks_like_number';
 use Test::Exception; # dies_ok / throws_ok
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::LeakTrace 'no_leaks_ok';
 
 # AoA -- all columns (default), keep => first

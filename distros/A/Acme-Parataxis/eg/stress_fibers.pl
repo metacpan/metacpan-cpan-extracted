@@ -6,7 +6,7 @@ use Time::HiRes     qw[time];
 # Stress Test 1: High Fiber Count & Rapid Lifecycle
 # This tests the scheduler's ability to handle many short-lived fibers.
 async {
-    my $total_fibers = 1000;    # We increased MAX_FIBERS in the C code to 1024
+    my $total_fibers = 1000;    # Fits the default 1024-entry table; max_fibers defaults to 65536
     my $iterations   = 5;
     say "Starting Stress Test: $total_fibers fibers, $iterations iterations...";
     my $start_time = time();

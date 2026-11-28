@@ -74,7 +74,7 @@
 
     <div id="footer" class="pad8 ui-widget-header ui-corner-all ui-helper-clearfix">
         <span id="status-line"></span>
-        %= link_to 'Tables'   => '/tables',      class=>'button'
+        %= link_to 'Tables'   => '/',      class=>'button'
     </div>
 </body>
 

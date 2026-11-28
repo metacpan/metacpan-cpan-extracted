@@ -20,20 +20,22 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Exporter' => '5.57',
+        'Hash::Ordered' => '0.009',
+        'Math::Int64'   => '0',
+        'Ref::Util'     => '0.200',
+        'Sub::Util'     => '1.40',
         'XSLoader' => '0',
     },
     TEST_REQUIRES => {
         'Test2::V0'    => '0',
         'Digest::MD5'  => 0,
         'MIME::Base64' => 0,
-
-        # t/13-httpwg-suite.t reads the conformance suite's JSON. Core since
-        # perl 5.14; the test skips itself if it is missing.
-        'JSON::PP' => '2.27103',
+        'JSON'         => '0',
+        'B'            => 0,
     },
 
     XS     => { 'libsfparse.xs' => 'libsfparse.c' },
-    OBJECT => 'libsfparse$(OBJ_EXT) src/sfparse$(OBJ_EXT)',
+    OBJECT => 'libsfparse$(OBJ_EXT) src/sfparse$(OBJ_EXT) perl_math_int64$(OBJ_EXT)',
     INC    => '-I. -Isrc',
 
     clean => { FILES => 'src/sfparse$(OBJ_EXT) HTTP-libsfparse-*' },
@@ -58,7 +60,7 @@ WriteMakefile(
 
 sub MY::postamble {
     return <<'MAKE_FRAG';
-src/sfparse$(OBJ_EXT) : src/sfparse.c src/sfparse.h
+src/sfparse$(OBJ_EXT) : src/sfparse.c src/sfparse.h perl_math_int64.c perl_math_int64.h
 	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) -o $@ src/sfparse.c
 MAKE_FRAG
 }

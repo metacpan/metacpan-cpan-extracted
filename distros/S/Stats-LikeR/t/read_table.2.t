@@ -3,7 +3,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use feature 'say';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use File::Temp qw(tempfile);
 use Test::More;
 

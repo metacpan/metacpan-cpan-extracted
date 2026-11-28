@@ -14,6 +14,7 @@ use lib 'lib', '../lib';
 use Test::More;
 use POSIX qw( WNOHANG );
 use File::Temp qw( tempdir );
+use Cwd;
 use Data::Tools;
 use Data::Tools::Process;
 
@@ -108,6 +109,28 @@ for ( 1 .. 50 )
   select( undef, undef, undef, 0.1 );
   }
 is( $reaped, $child, 'pidfile_kill_and_remove() signalled the process in the pidfile' );
+
+##############################################################################
+# path_gone() / cwd_gone()
+##############################################################################
+
+ok( ! path_gone( $TMP ),            'path_gone() is false for existing directory' );
+ok( ! path_gone( $marker ),         'path_gone() is false for existing file' );
+ok(   path_gone( "$TMP/no-such" ),  'path_gone() is true for missing path' );
+ok( ! cwd_gone(),                   'cwd_gone() is false for existing current directory' );
+
+my $START_DIR = Cwd::getcwd();
+my $GONE_DIR  = "$TMP/gone";
+mkdir( $GONE_DIR ) or die "mkdir $GONE_DIR: $!\n";
+chdir( $GONE_DIR ) or die "chdir $GONE_DIR: $!\n";
+SKIP:
+  {
+  skip( 'cannot remove the current directory on this system', 2 ) unless rmdir( $GONE_DIR );
+  ok( cwd_gone(),       'cwd_gone() is true for removed current directory' );
+  ok( path_gone( '.' ), 'path_gone( "." ) is true for removed current directory' );
+  }
+chdir( $START_DIR ) or die "chdir $START_DIR: $!\n";
+ok( ! cwd_gone(), 'cwd_gone() is false after leaving the removed directory' );
 
 ##############################################################################
 # daemonize() is not exercised here -- it detaches the process and closes all

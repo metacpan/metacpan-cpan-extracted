@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use FindBin;
 use Cwd ();
+use Config ();
 use File::Temp qw(tempdir);
 use File::Path qw(mkpath);
 
@@ -75,9 +76,13 @@ my ($td, $out, $rc);
     is `"$^X" "$td/bundled"`, "hi\n", 'bundle script runs standalone';
 
     # -- trace subcommand (module list to stderr)
-    ($out, $rc) = run('trace', '--to-stderr', "$td/bin/myapp");
+    #    trace has no --lib: the fixture's lib must be on @INC to compile
+    {
+        local $ENV{PERL5LIB} = join($Config::Config{path_sep}, "$td/lib", ($ENV{PERL5LIB} // ()));
+        ($out, $rc) = run('trace', '--to-stderr', "$td/bin/myapp");
+    }
     is $rc, 0, 'trace subcommand exits 0';
-    like $out, qr/App\/MyMod\.pm/, 'trace lists the bundled module';
+    like $out, qr{^App/MyMod\.pm$}m, 'trace lists the bundled module';
 
     # -- packlists-for subcommand
     #    FatPacker's packlists_containing requires each target module, then maps
@@ -109,6 +114,18 @@ my ($td, $out, $rc);
     # -- tree subcommand (no packlists → empty fatlib, still 0)
     ($out, $rc) = run('tree');
     is $rc, 0, 'tree exits 0';
+
+    # -- a script that does not compile must fail the build, not pack a
+    #    partial module list into a bundle that exits 0
+    write_fixture("$td/bin/broken", "use lib 'lib';\nuse App::MyMod;\nuse No::Such::Module::Here;\n");
+    write_fixture("$td/previous", "previous build\n");
+    ($out, $rc) = run('-o', "$td/previous", '--lib', "$td/lib", "$td/bin/broken");
+    isnt $rc, 0, 'pack of a script that does not compile exits nonzero';
+    like $out, qr/broken does not compile/, 'pack says the script does not compile';
+    is do { open my $fh, '<', "$td/previous" or die; local $/; <$fh> }, "previous build\n",
+        'pack leaves an existing output file alone';
+    ($out, $rc) = run('trace', '--to-stderr', "$td/bin/broken");
+    isnt $rc, 0, 'trace of a script that does not compile exits nonzero';
 
     # -- unknown word is not a subcommand → treated as the boot script, pack fails
     ($out, $rc) = run('frobnicate');

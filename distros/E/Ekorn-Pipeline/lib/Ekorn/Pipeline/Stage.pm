@@ -12,7 +12,7 @@ use Ekorn::Pipeline::Errors qw(croakf);
 use namespace::clean;
 
 # Croak at the line that called Ekorn::Pipeline.
-our $VERSION = 'v0.4.5';
+our $VERSION = 'v0.5.0';
 
 our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 

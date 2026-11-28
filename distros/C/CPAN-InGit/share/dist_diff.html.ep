@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= $report->{from}{name} %> → <%= $report->{to}{name} %></title>
+  <style>
+    body { font: 1rem/1.5 system-ui, sans-serif; max-width: 80rem; margin: 2rem auto; padding: 0 1rem; color: #172331; }
+    h1 { margin-bottom: .5rem; font-size: 1.5rem; } h2 { margin-top: 2rem; font-size: 1.2rem; }
+    a { color: #165ca2; }
+    .note { color: #8a4b00; }
+    .table-scroll { overflow-x: auto; }
+    table { border-collapse: collapse; text-align: left; }
+    th, td { border-bottom: 1px solid #d9e0e6; padding: .25rem .75rem; }
+    th { background: #eef2f6; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .add { color: #116329; } .del { color: #b3261e; }
+    pre { background: #f6f8fa; border: 1px solid #d9e0e6; padding: .75rem; overflow-x: auto; font-size: .85rem; line-height: 1.35; }
+    pre.patch span { display: block; }
+    pre.patch .add { background: #e6ffec; } pre.patch .del { background: #ffebe9; }
+    pre.patch .hunk { color: #5b6b7b; background: #eef2f6; }
+    details { margin: .5rem 0; } summary { cursor: pointer; font-family: ui-monospace, monospace; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1><a id="from-dist" href="<%= $from_url %>"><%= $report->{from}{author_path} // $report->{from}{name} %></a>
+      → <a id="to-dist" href="<%= $to_url %>"><%= $report->{to}{author_path} // $report->{to}{name} %></a></h1>
+    <p>Also available as <a href="<%= $text_url %>">plain text</a> or <a href="<%= $json_url %>">JSON</a>.</p>
+% for my $side (qw( from to )) {
+%   if ($report->{$side}{meta_source} eq 'synthesized') {
+    <p class="note"><%= $report->{$side}{name} %> has no usable META file, so its prereqs are unknown.</p>
+%   }
+% }
+
+    <h2>Prereq changes</h2>
+% my $prereqs= $report->{prereqs};
+% if (%$prereqs) {
+    <div class="table-scroll">
+    <table id="prereq-changes">
+      <thead><tr><th scope="col">Phase</th><th scope="col">Relationship</th><th scope="col">Module</th>
+        <th scope="col"><%= $report->{from}{name} %></th><th scope="col"><%= $report->{to}{name} %></th></tr></thead>
+      <tbody>
+%   for my $phase (sort keys %$prereqs) {
+%     for my $type (sort keys %{ $prereqs->{$phase} }) {
+%       for my $mod (sort keys %{ $prereqs->{$phase}{$type} }) {
+%         my ($old, $new)= @{ $prereqs->{$phase}{$type}{$mod} };
+        <tr><td><%= $phase %></td><td><%= $type %></td><td><%= $mod %></td>
+          <td class="<%= defined $new? '' : 'del' %>"><%= $old // '' %></td>
+          <td class="<%= defined $old? '' : 'add' %>"><%= $new // '' %></td></tr>
+%       }
+%     }
+%   }
+      </tbody>
+    </table>
+    </div>
+% } else {
+    <p id="prereq-changes">No changes to the declared prereqs.</p>
+% }
+
+    <h2>Change log</h2>
+% if (my $changes= $report->{changes}) {
+    <p>Lines added to <code><%= $changes->{path} %></code>:</p>
+    <pre id="changes-added"><%= $changes->{added} %></pre>
+% } else {
+    <p id="changes-added">No changes to a change log.</p>
+% }
+
+    <h2>Files changed: <%= $report->{stats}{files} %>
+      (<span class="add">+<%= $report->{stats}{additions} %></span>
+       <span class="del">−<%= $report->{stats}{deletions} %></span>)</h2>
+% if (@{ $report->{files} }) {
+    <div class="table-scroll">
+    <table id="files-changed">
+      <thead><tr><th scope="col">Status</th><th scope="col">File</th><th scope="col">+</th><th scope="col">−</th><th scope="col">Note</th></tr></thead>
+      <tbody>
+%   for my $file (@{ $report->{files} }) {
+        <tr><td><%= $file->{status} %></td>
+          <td><%= defined $file->{old_path}? "$file->{old_path} → " : '' %><%= $file->{path} %></td>
+          <td class="num add"><%= $file->{additions} %></td><td class="num del"><%= $file->{deletions} %></td>
+          <td><%= !$file->{skipped}? '' : $file->{skipped} eq 'changes'? 'shown above' : "patch omitted: $file->{skipped}" %><%= $file->{hidden_version_hunks}? "version-only hunks hidden: $file->{hidden_version_hunks}" : '' %></td></tr>
+%   }
+      </tbody>
+    </table>
+    </div>
+% }
+
+% for my $file (grep defined $_->{patch}, @{ $report->{files} }) {
+    <details open>
+      <summary><%= $file->{path} %></summary>
+      <pre class="patch"><% for my $line (split /^/m, $file->{patch}) { %><span class="<%= $line =~ /\A\+(?!\+\+ )/? 'add' : $line =~ /\A-(?!-- )/? 'del' : $line =~ /\A@@/? 'hunk' : '' %>"><%= $line %></span><% } %></pre>
+    </details>
+% }
+  </main>
+</body>
+</html>

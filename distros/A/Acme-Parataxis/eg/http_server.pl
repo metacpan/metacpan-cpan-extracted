@@ -111,7 +111,7 @@ sub accept_loop ($listener) {
 }
 
 # One raw HTTP request over a non-blocking socket; retire when the peer
-# closes (Connection: close), and return (status_code, full_response).
+# closes (Connection: close), and return the HTTP status code.
 sub http_request ( $port, $method, $path, $body = '' ) {
     my $sock = IO::Socket::INET->new( PeerHost => '127.0.0.1', PeerPort => $port, Proto => 'tcp', Blocking => 0 ) or return 0;
     $sock->autoflush(1);

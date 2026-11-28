@@ -23,7 +23,7 @@
 # and are held to 1e-13.
 require 5.010; use strict; use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my (@tm, @st, @gr);
 for my $i (0 .. 599) {

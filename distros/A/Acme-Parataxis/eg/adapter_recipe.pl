@@ -13,7 +13,9 @@ use v5.40;
 use blib;
 $|++;
 use Acme::Parataxis qw[:all];
-use Time::HiRes     ();
+use Config;
+use Time::HiRes ();
+my $PIPES_WATCHABLE = $^O ne 'MSWin32';
 
 # The yardstick.
 #
@@ -55,6 +57,8 @@ sub stall_pipe {
 
 sub drop_pipe {
     my ($reader) = @_;
+    my $buf = q{};
+    1 while sysread( $reader, $buf, 4096 );    # let the child finish before closing
     close $reader;
     return;
 }
@@ -110,8 +114,9 @@ Acme::Parataxis::run(
         say '  Three rows, one tick each -- and that single tick is the heartbeat\'s already-pending timer coming due';
         say '  after the work returned, not progress made during it. The pipe read and the select parked the OS thread';
         say '  outright. The arithmetic never reached a park site at all, so it did not even have a pending timer to';
-        say '  come due until it was finished. Different mechanisms, same result: 26 to 301 ms in which nothing else';
-        say '  in the program ran. Only the first of the three is something Compat can fix.';
+        say '  come due until it was finished. Different mechanisms, same result: every millisecond printed above';
+        say '  was a millisecond in which nothing else in the program ran. Only the first of the three is';
+        say '  something Compat can fix.';
         say '';
 
         # Section 2: what one install buys, and what it does not.
@@ -123,7 +128,7 @@ Acme::Parataxis::run(
         $reader = stall_pipe(300);
         measure(
             'sysread, in code compiled after it',
-            '<- cooperative, no other change',
+            $PIPES_WATCHABLE ? '<- cooperative, no other change' : '<- Win32 pipes are not watchable',
             sub {
                 my $buf = q{};
                 sysread( $reader, $buf, 5 );
@@ -158,15 +163,15 @@ Acme::Parataxis::run(
         # One thing to get right, and it is the easiest mistake to make here: await_read returns a BOOLEAN. It is
         # 1 when the handle is ready and -1 when the wait gave up -- a short timeout, or a descriptor the platform's
         # select() cannot watch at all. It is not a byte count, and feeding it to sysread as one is not a rounding
-        # error, it reads a single byte per readiness check: measured here, draining 512KB that way took 235ms
-        # against 1ms for 64KB reads. The length you want is yours to pass. The read's own return value is then the
-        # only honest source of "how many arrived", because readiness promises only that *something* is there.
+        # error, it reads a single byte per readiness check. The length you want is yours to pass. The read's own
+        # return value is then the only honest source of "how many arrived", because readiness promises only that
+        # *something* is there.
         say 'Wrapping the pre-install read yourself: the general adapter.';
         say '';
         $reader = stall_pipe(300);
         measure(
             'await_read, then the old read',
-            '<- same old function, wait moved',
+            $PIPES_WATCHABLE ? '<- same old function, wait moved' : '<- Win32 pipes are not watchable',
             sub {
                 my $ready = await_read( $reader, 5000 );
                 return unless $ready > 0;
@@ -186,6 +191,13 @@ Acme::Parataxis::run(
         say '  all". If you treat -1 as a length, or as success, a timeout silently becomes a one-byte read.';
         say '';
 
+        if ( !$PIPES_WATCHABLE ) {
+            say '  On Win32 this child-pipe shape cannot be watched by select(), so await_read returns -1';
+            say '  immediately and the two pipe rows above show the fallback rather than a cooperative read.';
+            say '  A socket is the watchable shape there.';
+            say '';
+        }
+
         # Section 4: the two cases with no in-process answer.
         say 'The two cases nothing here fixes.';
         say '';
@@ -199,26 +211,31 @@ Acme::Parataxis::run(
         say '  unfair, it makes it invisible: a fiber grinding through arithmetic is not running alongside its';
         say '  siblings, it is standing on all of their toes at once.';
         say '';
-        say '  The fix for both is to get the work off this OS thread, and this distribution deliberately has no';
-        say '  public "run this coderef on a worker thread" call -- that would drag threads.pm and a perl_clone';
-        say '  caveat into every install. The background-interpreter machinery ships separately for it:';
+        say '  The fix for both is to get the work off this OS thread. This distribution ships';
+        say '  Acme::Parataxis::Blocking, so the machinery needs no second install:';
         say '';
         say '      use Acme::Parataxis::Blocking qw[spawn_blocking];';
         say '      my $f = spawn_blocking( sub { heavy_parse($blob) } );';
         say '      my $parsed = $f->await;';
-        my $have_blocking = eval { require Acme::Parataxis::Blocking; 1 }                      ? 1 : 0;
-        my $have_ithreads = eval { require threads;                   threads->can('create') } ? 1 : 0;
-        $have_ithreads = 0 if $^O eq 'MSWin32';    # perl_clone does not work there
+        my $have_blocking = eval { require Acme::Parataxis::Blocking; 1 }                        ? 1 : 0;
+        my $have_ithreads = ( defined $Config{useithreads} && $Config{useithreads} eq 'define' ) ? 1 : 0;
         say '';
-        say '  On this machine it is not available:';
-        printf "    Acme::Parataxis::Blocking installed: %s\n",   ( $have_blocking ? 'yes' : 'no' );
-        printf "    an ithreads perl for it to clone:      %s\n", ( $have_ithreads ? 'yes' : 'no' );
-        say '';
-        say '  So the only move left in-process is to make the loop itself yield: maybe_yield() between chunks, or';
-        say '  await_sleep(0), at a granularity fine enough that whatever is queued behind it gets a turn. That';
-        say '  trades throughput for fairness -- the right trade in a server, the wrong one in a batch job. Make it';
-        say '  deliberately, per call site, rather than discovering it as a p99 that moved.';
-        say '';
+
+        if ( $have_blocking && $have_ithreads ) {
+            say '  It is available here; the bundled module can clone an interpreter for this closure.';
+            say '';
+        }
+        else {
+            say '  On this machine the thread form is not available:';
+            printf "    Acme::Parataxis::Blocking installed: %s\n",   ( $have_blocking ? 'yes' : 'no' );
+            printf "    an ithreads perl for it to clone:      %s\n", ( $have_ithreads ? 'yes' : 'no' );
+            say '';
+            say '  The in-process fallback is to make the loop itself yield: maybe_yield() between chunks, or';
+            say '  await_sleep(0), at a granularity fine enough that whatever is queued behind it gets a turn.';
+            say '  That trades throughput for fairness -- the right trade in a server, the wrong one in a batch';
+            say '  job. Make it deliberately, per call site, rather than discovering it as a p99 that moved.';
+            say '';
+        }
         say 'In order:';
         say '  1. Blocking in sleep/read/sysread? Install Compat above the code. Change nothing else.';
         say '  2. Blocking on a handle you know about? Wait for it, then make the call non-blocking.';

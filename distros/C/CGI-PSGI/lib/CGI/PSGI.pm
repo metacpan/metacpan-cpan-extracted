@@ -2,7 +2,7 @@ package CGI::PSGI;
 
 use strict;
 use 5.008_001;
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use base qw(CGI);
 
@@ -31,9 +31,22 @@ sub env {
     $_[0]->{psgi_env};
 }
 
+# CGI.pm expects read() on STDIN semantics: the full $len bytes unless EOF or
+# an error. psgi.input->read may return fewer (like sysread), so keep reading
+# until $len, EOF (0) or an error (undef). Returns the number of bytes read,
+# or the 0/undef of the first read if nothing was read.
 sub read_from_client {
     my($self, $buff, $len, $offset) = @_;
-    $self->{psgi_env}{'psgi.input'}->read($$buff, $len, $offset);
+    my $input = $self->{psgi_env}{'psgi.input'};
+    $offset ||= 0;
+
+    my $total = 0;
+    while ($total < $len) {
+        my $read = $input->read($$buff, $len - $total, $offset + $total);
+        return $total || $read unless $read;
+        $total += $read;
+    }
+    return $total;
 }
 
 # copied from CGI.pm. Deprecated: no CGI.pm since (at least) 4.04 calls it,
@@ -135,14 +148,24 @@ sub psgi_header {
     my($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p) =
         @{$result}[0 .. $#$order];
 
-    # extra headers: positional ones given as name=value, and leftover named
-    # ones, where -x_foo => 'bar' becomes X-foo: bar
+    # extra headers: positional ones given as name=value or as a ready-made
+    # "Name: value" line (which CGI.pm 5.02 sends as it is), and leftover
+    # named ones, where -x_foo => 'bar' becomes X-foo: bar
     my @other_headers;
-    for my $line (@{$result}[@$order .. $#$result]) {
-        next unless defined $line;
+    my @lines = grep defined, @{$result}[@$order .. $#$result];
+    # check the whole lines first, so a newline anywhere in one dies
+    # rather than the line being skipped
+    _check_header_values(@lines);
+    for my $line (@lines) {
         # Don't use \s because of perl bug 21951
-        next unless my($name, $value) = $line =~ /([^ \r\n\t=]+)=\"?(.+?)\"?$/s;
-        push @other_headers, ucfirst(lc $name), $value;
+        if (my($name, $value) = $line =~ /([^ \r\n\t=]+)=\"?(.+?)\"?$/s) {
+            push @other_headers, ucfirst(lc $name), $value;
+        } elsif (($name, $value) = $line =~ /^([!#\$%&'*+.^_`|~0-9A-Za-z-]+):[ \t]*(.*?)[ \t]*$/s) {
+            # CGI.pm ucfirsts the whole line
+            push @other_headers, ucfirst($name), $value;
+        }
+        # anything else (no colon, or not a valid header name) can't be
+        # made a header, and is skipped
     }
     for my $name (sort keys %{ $leftover || {} }) {
         next unless defined $leftover->{$name};
@@ -366,6 +389,10 @@ requires.
 
 If your application doesn't use C<< $cgi->header >>, you can ignore this
 method and generate the status code and headers arrayref another way.
+
+As in CGI.pm, extra positional arguments after the P3P one are extra
+headers, given as C<name=value> or as a C<Name: value> line. A line that
+is neither (no colon, or an invalid header name) is skipped.
 
 =head2 psgi_redirect
 

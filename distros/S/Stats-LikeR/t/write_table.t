@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir tempfile);
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::Exception;
 use Test::LeakTrace 'no_leaks_ok';
 

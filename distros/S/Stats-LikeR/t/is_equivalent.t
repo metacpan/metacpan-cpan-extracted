@@ -3,7 +3,7 @@
 require 5.010;
 use warnings FATAL => 'all';
 use utf8;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::Exception; # throws_ok / dies_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';

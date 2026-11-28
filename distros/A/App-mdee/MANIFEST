@@ -20,6 +20,7 @@ images/manual.png
 lib/App/Greple/md.pm
 lib/App/Greple/md/Blocks.pm
 lib/App/Greple/md/Image.pm
+lib/App/Greple/md/Mermaid.pm
 lib/App/Greple/md/widen.pm
 lib/App/mdee.pm
 minil.toml
@@ -52,6 +53,7 @@ t/16_highlight.t
 t/17_table_br.t
 t/18_intact.t
 t/19_image.t
+t/20_mermaid.t
 t/Util.pm
 t/demo.md
 t/table_br.md

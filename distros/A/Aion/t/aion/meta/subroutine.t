@@ -40,6 +40,28 @@ local ($::_g0 = do {$subroutine->stringify}, $::_e0 = "my_subroutine(Int => Int)
 # 
 # Сверяет свою (ожидаемую) сигнатуру с объявленной у функции в модуле и выбрасывает исключение, если сигнатуры не совпадают.
 # 
+# Но вторая сигнатура может иметь суженные типы.
+# 
+::done_testing; }; subtest 'compare ($subroutine)' => sub { 
+use Aion::Types;
+use Aion::Meta::Subroutine;
+
+my $x1 = Aion::Meta::Subroutine->new(pkg => 'ExCompare', subname => 'x1', signature => [Num() => Any]);
+my $x2 = Aion::Meta::Subroutine->new(pkg => 'ExCompare', subname => 'x2', signature => [Int() => Str]);
+
+local ($::_g0 = do {Int <= Num}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Int <= Num # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Str <= Any}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Str <= Any # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+$x1->compare($x2);
+eval {$x2->compare($x1);}; local ($::_g0 = $@, $::_e0 = 'Signature mismatch: x2(Int => Str) of ExCompare <=> x1(Num => Any) of ExCompare'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '$x2->compare($x1); # @-> Signature mismatch: x2(Int => Str) of ExCompare <=> x1(Num => Any) of ExCompare' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+
+my $x3 = Aion::Meta::Subroutine->new(pkg => 'ExCompare', subname => 'x3', signature => [Str() => Any]);
+
+local ($::_g0 = do {Str <= Num}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Str <= Num # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+eval {$x1->compare($x3);}; local ($::_g0 = $@, $::_e0 = 'Signature mismatch: x1(Num => Any) of ExCompare <=> x3(Str => Any) of ExCompare'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '$x1->compare($x3); # @-> Signature mismatch: x1(Num => Any) of ExCompare <=> x3(Str => Any) of ExCompare' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+
+# 
 # ## stringify ()
 # 
 # Строковое описание функции.

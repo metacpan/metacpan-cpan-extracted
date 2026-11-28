@@ -1,5 +1,12 @@
 Revision history for Perl extension Aion
 
+2.6 2026-11-27T18:15:03Z
+
+    - types `Uni` and `Bin` redefined: `Uni` is a string with the utf8 flag or with chars < 128, `Bin` is a string without the utf8 flag
+    - fixed export of Aion main functions (`has`, `with`, `have`, `havelock`, etc.) when the package does not see them via `UNIVERSAL::can`
+    - `Aion::Meta::Subroutine->compare` accepts narrowed types in the second signature (`Int` instead of `Num`) and reports signature mismatch
+
+
 2.5 2026-11-24T08:03:50Z
 
     - fix bug with req without isa and has with isa

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Music::NWC2MusicXML — convert NoteWorthy Composer scores to MusicXML</title>
+<meta name="description" content="Music::NWC2MusicXML converts NoteWorthy Composer 2 .nwc score files to MusicXML, so they open in MuseScore, Finale, Sibelius and Dorico. NoteWorthy Composer does not have to be installed.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Music::NWC2MusicXML">
+<meta property="og:title" content="Music::NWC2MusicXML — convert NoteWorthy Composer scores to MusicXML">
+<meta property="og:description" content="Music::NWC2MusicXML converts NoteWorthy Composer 2 .nwc score files to MusicXML, so they open in MuseScore, Finale, Sibelius and Dorico. NoteWorthy Composer does not have to be installed.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "SoftwareApplication",
+	"name": "Music::NWC2MusicXML",
+	"description": "Converts NoteWorthy Composer 2 .nwc score files to MusicXML, without NoteWorthy Composer being installed.",
+	"applicationCategory": "MultimediaApplication",
+	"operatingSystem": "Linux, macOS, Windows",
+	"programmingLanguage": "Perl",
+	"softwareVersion": "0.003.1",
+	"license": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
+	"url": "https://nwc2musicxml.nigelhorne.com/",
+	"sameAs": [
+		"https://metacpan.org/pod/Music::NWC2MusicXML",
+		"https://github.com/nigelhorne/NWC2MusicXML",
+		"https://nigelhorne.github.io/nwc2musicxml/coverage/"
+	],
+	"author": { "@type": "Person", "name": "Nigel Horne" },
+	"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Music::NWC2MusicXML</span>
+			<span class="brand-tag">NoteWorthy Composer scores to MusicXML</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html" class="current" aria-current="page">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="commands.html">Commands</a>
+			<a href="api.html">Perl API</a>
+			<a href="formats.html">What converts</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Convert NoteWorthy Composer scores to MusicXML</h1>
+	<p class="lead">
+		Music::NWC2MusicXML reads a NoteWorthy Composer 2 <code>.nwc</code> file,
+		still compressed in its binary container, and writes a MusicXML file that
+		MuseScore, Finale, Sibelius and Dorico can open. NoteWorthy Composer
+		itself does not have to be installed.
+	</p>
+
+	<ul class="facts">
+		<li>Perl 5.36+</li>
+		<li>GPL-2</li>
+		<li>NWC 2.x</li>
+		<li>MusicXML 4.0</li>
+		<li>No NWC licence needed</li>
+	</ul>
+
+<pre><code>cpanm Music::NWC2MusicXML
+
+nwc2musicxml Pilgrim.nwc
+<span class="comment"># writes Pilgrim.musicxml beside it</span>
+</code></pre>
+
+	<p>
+		The work is done in three stages that each stand on their own: the binary
+		container is decompressed back to the text format NoteWorthy Composer
+		uses, that text is parsed into a score of staves and events, and the score
+		is written out as MusicXML 4.0. Every stage can be called directly, and a
+		failure is reported with the code of the stage it came from rather than as
+		one anonymous error.
+	</p>
+
+	<ul class="cards">
+		<li class="card">
+			<h3>The container, not an export</h3>
+			<p>The NWC 2.x file is checked against its magic signature and inflated with zlib, so nothing has to be exported by hand and the converting machine needs no NoteWorthy Composer copy.</p>
+		</li>
+		<li class="card">
+			<h3>Exact durations</h3>
+			<p>Rhythm is held as a rational in quarter-note units, and <code>&lt;divisions&gt;</code> is the least common multiple across every staff, so triplets, double dots and dotted triplets do not drift.</p>
+		</li>
+		<li class="card">
+			<h3>Notation, not appearance</h3>
+			<p>Clefs, key and time signatures, tempo, dynamics, hairpins, fermatas, slurs, ties, grace notes, articulations, lyrics and barline styles come out as MusicXML elements.</p>
+		</li>
+		<li class="card">
+			<h3>Dynamics that still sound</h3>
+			<p>A staff's NWC <code>DynVel</code> velocities become <code>&lt;sound dynamics="…"/&gt;</code>, so a playback engine can still tell <em>mp</em> from <em>mf</em>.</p>
+		</li>
+		<li class="card">
+			<h3>Folders, not just files</h3>
+			<p>A directory argument collects the <code>.nwc</code> files in it; <code>--recursive</code> walks the tree and keeps its shape under <code>--output-dir</code>. One unreadable file does not abandon the rest.</p>
+		</li>
+		<li class="card">
+			<h3>Diagnostics with codes</h3>
+			<p><code>error_no_input</code>, <code>error_decode</code>, <code>error_parse</code>, <code>error_generate</code> and the rest are catalogue entries, so a script can act on them and <code>--warnings</code> can collect them in a file.</p>
+		</li>
+	</ul>
+
+	<h2>How a file is converted</h2>
+	<ol>
+		<li><strong>Decode.</strong> <code>Music::NWC2MusicXML::NWC-&gt;read</code> verifies the magic signature, inflates the zlib payload and returns the pipe-delimited NWCTXT text the file was built from.</li>
+		<li><strong>Parse.</strong> <code>Music::NWC2MusicXML::Parser-&gt;parse</code> walks the <code>|RecordType|Field:Value</code> records and builds a <code>Score</code> of <code>Staff</code> and <code>Event</code> objects, each event carrying its own duration and data.</li>
+		<li><strong>Annotate.</strong> Slurs, ties, fermatas, wedges and bar-scoped accidentals are resolved across the whole event stream before measures are grouped, because each of them spans more than one note.</li>
+		<li><strong>Generate.</strong> <code>Music::NWC2MusicXML::MusicXML-&gt;generate</code> writes the part list, measures, attributes, directions and notations, and hands back the document as a UTF-8 string.</li>
+		<li><strong>Report.</strong> The diagnostics object counts what went wrong; the command line turns that into an exit status, so a shell script can tell a warning from a failure.</li>
+	</ol>
+
+<pre><code><span class="comment"># one file</span>
+nwc2musicxml Pilgrim.nwc
+
+<span class="comment"># a folder tree, keeping its shape</span>
+nwc2musicxml --recursive --output-dir musicxml scores/
+
+<span class="comment"># the same thing from Perl</span>
+my $converter = Music::NWC2MusicXML-&gt;new;
+my $out = $converter-&gt;convert(input =&gt; 'Pilgrim.nwc', overwrite =&gt; 1);
+</code></pre>
+
+	<h2>What it does not do</h2>
+	<p>
+		A staff's
+		simultaneous voices are all written to voice 1, the page is fixed to A4,
+		and the lyric and flow-control paths have not been validated against a
+		golden score. <a href="limitations.html">The whole list is here</a>.
+	</p>
+
+	<h2>Where to go next</h2>
+	<ul>
+		<li><a href="install.html">Install</a> — from CPAN or from a checkout, and what has to be present first.</li>
+		<li><a href="quickstart.html">Quick start</a> — one file to MuseScore, then a whole folder.</li>
+		<li><a href="commands.html">Commands</a> — the options, the exit codes and what counts as input.</li>
+		<li><a href="api.html">Perl API</a> — <code>convert</code>, <code>batch_convert</code> and the three stages underneath.</li>
+		<li><a href="formats.html">What converts</a> — every NWC construct that has a MusicXML destination.</li>
+	</ul>
+
+	<div class="pager">
+		<span></span>
+		<a href="install.html">Install →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Music::NWC2MusicXML 0.003.1 — Copyright 2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/pod/Music::NWC2MusicXML">MetaCPAN</a> ·
+			<a href="https://metacpan.org/pod/nwc2musicxml">nwc2musicxml</a> ·
+			<a href="https://github.com/nigelhorne/NWC2MusicXML">Source</a> ·
+			<a href="https://nigelhorne.github.io/nwc2musicxml/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

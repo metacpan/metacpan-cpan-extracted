@@ -66,6 +66,7 @@ t/31-csv-without-text-csv.t
 t/32-context.t
 t/33-source-original.t
 t/34-versions.t
+t/35-where-values-came-from.t
 xt/agreement.t
 xt/dbix-squirrel-links.t
 xt/examples.t

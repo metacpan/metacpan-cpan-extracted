@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limits — Music::NWC2MusicXML</title>
+<meta name="description" content="What Music::NWC2MusicXML does not convert yet: multiple voices on one staff, custom page sizes, and lyrics and flow control that are not yet validated.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="limitations.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Music::NWC2MusicXML">
+<meta property="og:title" content="Limits — Music::NWC2MusicXML">
+<meta property="og:description" content="What Music::NWC2MusicXML does not convert yet: multiple voices on one staff, custom page sizes, and lyrics and flow control that are not yet validated.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Music::NWC2MusicXML</span>
+			<span class="brand-tag">NoteWorthy Composer scores to MusicXML</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="commands.html">Commands</a>
+			<a href="api.html">Perl API</a>
+			<a href="formats.html">What converts</a>
+			<a href="limitations.html" class="current" aria-current="page">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Limits</h1>
+	<p class="lead">
+		What the conversion cannot do yet, and what it leaves behind on purpose.
+		Everything here is a known gap rather than a surprise, and the first three
+		are the ones most likely to be noticed.
+	</p>
+
+	<h2>More than one voice on a staff</h2>
+	<p>
+		Every event is written to voice 1. A staff that holds two independent
+		melodic lines — the usual way of notating a passage that needs
+		different rhythms at once — comes out as one line, in time order. Split
+		such a staff into two staves in NoteWorthy Composer before converting if
+		the voices have to survive.
+	</p>
+
+	<h2>Page size</h2>
+	<p>
+		The page is A4, 210 by 297 mm. NWC's own <code>PgSetup</code> width and
+		height fields are not read, so a score set up for US Letter is laid out on
+		A4. The margins <em>are</em> read, and each side separately.
+	</p>
+
+	<h2>Not yet validated</h2>
+	<p>
+		Two paths have code and no evidence: lyrics, which are emitted with their
+		syllabic types, and flow control — coda, segno, D.C., D.S., Fine. Neither
+		has been checked against a golden score containing the corresponding NWC
+		records, so treat their output as untested rather than as supported.
+		Warnings from those paths are worth reporting, and a small
+		<code>.nwc</code> file that exercises them is the most useful bug report
+		of all.
+	</p>
+
+	<h2>On purpose</h2>
+	<p>
+		Graphical layout is not reconstructed: absolute positions, staff spacing,
+		per-element font sizes and page breaks all go. The conversion keeps the
+		order of importance it was built around — notes and rhythm, then voices,
+		measures, articulations, dynamics, lyrics, structural markings, instrument
+		information, and only then layout. A notation program will lay the score
+		out its own way, which is usually better than a copy of another program's
+		pagination.
+	</p>
+
+	<h2>Operationally</h2>
+	<ul>
+		<li><strong>Batch conversion is sequential.</strong> One file at a time, in the order given; there is no parallel mode. A large library converts at the speed of one core.</li>
+		<li><strong>No schema validation inside.</strong> The generated document is not checked against the MusicXML DTD or XSD. <code>--validate</code> is a different thing: it checks the score's own consistency — pitches, ties, slurs, measure durations, empty staves. For schema conformance, use <code>xmllint</code> with the MusicXML XSD, or import the file into a notation program.</li>
+		<li><strong>Only the NWC 2.x container.</strong> The file is checked against its magic signature and inflated with zlib before anything else happens, so something that is not an NWC 2.x score is refused as invalid input rather than half-converted into a plausible-looking file.</li>
+		<li><strong>NoteWorthy Composer is not involved.</strong> That is the point of the tool, but it also means the converter cannot fall back on NoteWorthy Composer for a record it does not recognise; such a record becomes an unsupported event and a warning.</li>
+	</ul>
+
+	<h2>Reporting a score that goes wrong</h2>
+	<p>
+		Bugs go to the
+		<a href="https://rt.cpan.org/Public/Dist/Display.html?Name=Music-NWC2MusicXML">CPAN request tracker</a>
+		or the <a href="https://github.com/nigelhorne/NWC2MusicXML/issues">GitHub issues</a>.
+		Include the diagnostics code and, if you can, the smallest
+		<code>.nwc</code> file that shows the problem — a trimmed score is far
+		easier to act on than a whole movement, and much easier than a
+		description of one.
+	</p>
+<pre><code>nwc2musicxml --debug Pilgrim.nwc 2&gt; debug.txt
+</code></pre>
+
+	<div class="pager">
+		<a href="formats.html">← What converts</a>
+		<a href="changelog.html">Changes →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Music::NWC2MusicXML 0.003.1 — Copyright 2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/pod/Music::NWC2MusicXML">MetaCPAN</a> ·
+			<a href="https://metacpan.org/pod/nwc2musicxml">nwc2musicxml</a> ·
+			<a href="https://github.com/nigelhorne/NWC2MusicXML">Source</a> ·
+			<a href="https://nigelhorne.github.io/nwc2musicxml/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

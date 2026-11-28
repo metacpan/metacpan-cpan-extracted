@@ -3,6 +3,8 @@ use 5.20.0;
 use strict;
 use warnings;
 use Getopt::Long;
+use Socket qw(AF_INET AF_INET6 AF_UNIX inet_pton inet_ntop sockaddr_family
+              unpack_sockaddr_in unpack_sockaddr_in6);
 use Pod::Usage;
 use FindBin;
 use lib -d "$FindBin::Bin/../lib/Mail/DKIM2" ? "$FindBin::Bin/../lib" : ();   # running from a checkout
@@ -89,6 +91,8 @@ GetOptions(\%opts,
     'max-recipe-literals=i',
     'wrap-single-part',
     'no-envelope-check',
+    'authserv-id=s',
+    'internal-hosts=s@',
     'help|h',
 ) or pod2usage(2);
 
@@ -106,22 +110,32 @@ warn "dkim2-milter: --allow-null-body-recipe is deprecated and does nothing: "
 $opts{socket}    //= 'unix:/var/run/dkim2-milter.sock';
 $opts{algorithm} //= 'rsa-sha256';
 $opts{mode}      //= 'both';
+$opts{'authserv-id'} //= 'localhost';
+die "--authserv-id must be a hostname-like token\n"
+    unless $opts{'authserv-id'} =~ /\A[A-Za-z0-9][A-Za-z0-9.\-]*\z/;
 
 unless ($opts{mode} =~ /^(inbound|outbound|both)$/) {
     die "Invalid --mode: must be inbound, outbound, or both\n";
 }
+
+die "--internal-hosts needs --mode both\n"
+    if $opts{'internal-hosts'} && $opts{mode} ne 'both';
 
 if ($opts{'wrap-single-part'}) {
     die "--wrap-single-part needs --mode inbound\n" unless $opts{mode} eq 'inbound';
     die "--wrap-single-part needs --snapshot-dir\n" unless $opts{'snapshot-dir'};
 }
 
-my $do_verify = $opts{mode} eq 'inbound' || $opts{mode} eq 'both';
 my $do_sign   = $opts{mode} eq 'outbound' || $opts{mode} eq 'both';
-# -09 section 14.4: the envelope must match the top signature. Only where the
-# transaction is the one the message arrived in: in --mode both it is the
-# outgoing one.
-my $check_envelope = $opts{mode} eq 'inbound' && !$opts{'no-envelope-check'};
+# -09 section 14.4: the envelope must match the top signature. Only in an
+# inbound transaction: that is the one the message arrived in.
+my $check_envelope = !$opts{'no-envelope-check'};
+
+# --mode both: which clients send mail out through this host. Loopback (and
+# a unix-socket client) always; --internal-hosts adds networks. A client
+# that authenticated (SMTP AUTH) is outbound wherever it is.
+my @internal_nets = map { _parse_cidr($_) } '127.0.0.0/8', '::1/128',
+    map { split /[\s,]+/ } @{ $opts{'internal-hosts'} || [] };
 
 # Determine if signing is possible
 my $can_sign_single = $opts{domain} && $opts{selector} && $opts{keyfile};
@@ -258,6 +272,7 @@ $milter->setconn($opts{socket});
 
 # Insert, change and delete headers; replace the body (--wrap-single-part).
 $milter->register('dkim2-milter', {
+    connect => \&cb_connect,
     envfrom => \&cb_envfrom,
     envrcpt => \&cb_envrcpt,
     header  => \&cb_header,
@@ -272,11 +287,45 @@ $milter->main();
 
 # --- Milter callbacks ---
 
+# The client's address, kept for the whole connection: see cb_envfrom.
+sub cb_connect {
+    my ($ctx, $host, $sockaddr) = @_;
+    $ctx->setpriv({ client => _client_addr($sockaddr) });
+    return SMFIS_CONTINUE;
+}
+
 sub cb_envfrom {
     my ($ctx, $from) = @_;
     $from =~ s/^<//;
     $from =~ s/>$//;
+    my $client = ($ctx->getpriv // {})->{client};
+    # Inbound or outbound, decided once per transaction. --mode both goes by
+    # where the message comes from, as OpenDKIM does: a client that
+    # authenticated, or one on loopback or --internal-hosts (Postfix gives
+    # non_smtpd_milters 127.0.0.1), is sending mail out; anything else is
+    # mail arriving. Mail from outside is never signed, whatever From it has.
+    my $inbound;
+    if ($opts{mode} eq 'both') {
+        # Sendmail::PMilter makes no IPv6 sockaddr without Socket6: then the
+        # address from the "_" macro ("host [addr]").
+        if (!defined $client && defined(my $u = $ctx->getsymval('_'))) {
+            # The name comes from DNS: take only the bracketed address at
+            # the end.
+            ($client) = $u =~ /\[(?:IPv6:)?([0-9A-Fa-f:.]+)\]\s*\z/;
+        }
+        my $auth = $ctx->getsymval('{auth_authen}');
+        my $why = defined $auth && length $auth ? 'authenticated'
+                : _is_internal($client)         ? "internal client $client"
+                : undef;
+        $inbound = !$why;
+        warn "dkim2-milter: from=$from " . ($why ? "outbound: $why"
+            : 'inbound: client ' . ($client // 'unknown')) . "\n";
+    } else {
+        $inbound = $opts{mode} eq 'inbound';
+    }
     $ctx->setpriv({
+        client    => $client,
+        inbound   => $inbound,
         env_from  => $from,
         env_rcpt  => [],
         headers   => [],
@@ -310,7 +359,7 @@ sub cb_header {
 sub cb_eoh {
     my ($ctx) = @_;
     my $priv = $ctx->getpriv;
-    $priv->{verify} = _start_verify($priv) if $do_verify;
+    $priv->{verify} = _start_verify($priv) if $priv->{inbound};
     return SMFIS_CONTINUE;
 }
 
@@ -328,6 +377,9 @@ sub cb_eom {
     my ($ctx) = @_;
     my $priv = $ctx->getpriv;
     my $EOL = "\015\012";
+    # Each transaction is inbound (verify) or outbound (sign), never both:
+    # see cb_envfrom.
+    my $inbound = $priv->{inbound};
 
     # Reconstruct the full message
     my $message = join('', @{$priv->{raw_hdrs}}) . $EOL . $priv->{body};
@@ -344,24 +396,24 @@ sub cb_eom {
     # not sign such a message, and an inbound milter on an internal hop
     # (--no-envelope-check: it cannot see the envelope the message arrived
     # in) hands it on rather than replace it with a better one of its own.
-    # The edge milter, and --mode both, believe none: there the message is
-    # arriving from outside.
+    # The edge milter believes none: there the message is arriving from
+    # outside.
     my ($arrival_bad) = grep { !/\A(?:pass|none)\z/ }
                         map { /\A([a-z]{1,20})\z/ ? $1 : 'permerror' }
                         _strip_header($ctx, $priv, \$message, 'X-DKIM2-Arrival');
-    undef $arrival_bad if $do_verify && ($do_sign || $check_envelope);
+    undef $arrival_bad if $inbound && $check_envelope;
 
     # X-DKIM2-Exploded: a list manager on this host (Mailman, Sympa) marks each
     # distribution copy, asking the signer for the -08 "exploded" flag. Only
     # a signing milter acts on it, and it never leaves: removed before signing.
-    $priv->{exploded} = _strip_exploded_header($ctx, $priv, \$message) if $do_sign;
+    $priv->{exploded} = _strip_exploded_header($ctx, $priv, \$message) if !$inbound;
     # A List-Id says the same without being asked: a list sent this copy,
     # and a list sends copies to more than one address. That covers a list
     # manager that adds no hint (stock Mailman). The Signer drops the flag
     # from a first signature (-09 section 12.5), so an unsigned post the
     # list originates as i=1 is unaffected.
     $priv->{exploded} ||= 1
-        if $do_sign && substr($message, 0, index($message, "\r\n\r\n") + 2) =~ /^List-Id[ \t]*:/mi;
+        if !$inbound && substr($message, 0, index($message, "\r\n\r\n") + 2) =~ /^List-Id[ \t]*:/mi;
 
     # Extract message-id for logging
     my $msgid = '';
@@ -373,14 +425,16 @@ sub cb_eom {
         }
     }
 
-    warn "dkim2-milter: processing $msgid from=$priv->{env_from} mode=$opts{mode}\n";
+    warn "dkim2-milter: processing $msgid from=$priv->{env_from} mode=$opts{mode}"
+       . ($opts{mode} eq 'both' ? ($inbound ? ' inbound' : ' outbound') : '') . "\n";
+
 
     # Verification result, shared between the verify and sign blocks.
     # 'none' means no DKIM2-Signature headers were present.
     my $verify_result = 'none';
 
     # --- Inbound: verify and cache snapshot ---
-    if ($do_verify) {
+    if ($inbound) {
         # Started at the end of the headers; should no eoh have come, here.
         $verify_result = _finish_verify($priv->{verify} // do {
             my $state = _start_verify($priv);
@@ -395,13 +449,13 @@ sub cb_eom {
         my ($arrival_word) = $result =~ /\A([a-z]+)/;
         $arrival_word = $arrival_bad // $arrival_word // 'permerror';
         my $vouched = $arrival_word =~ /\A(?:pass|none)\z/;
-        $ctx->insheader('X-DKIM2-Arrival', $arrival_word, 0) unless $do_sign;
+        $ctx->insheader('X-DKIM2-Arrival', $arrival_word, 0);
 
         # Build the A-R and X-DKIM2-Info headers we're about to add.
         # Authentication-Results is not in the spec exclusion list so it
         # is included in the header hash.  The MI must be computed over
         # a synthetic message that already contains these headers.
-        my $ar_value = "localhost; dkim2=" . _ar_result($result);
+        my $ar_value = "$opts{'authserv-id'}; dkim2=" . _ar_result($result);
         my $info_value = _dkim2_info("verify=" . _ar_result($result));
         my $ar_raw = "Authentication-Results: $ar_value$EOL";
         # _dkim2_info() folds with bare LF (the milter wire form); the
@@ -515,7 +569,7 @@ sub cb_eom {
     }
 
     # --- Outbound: compute MI diff if needed, then sign ---
-    if ($do_sign) {
+    if (!$inbound) {
         # No key for this sender: this message is not ours to sign, so it
         # leaves exactly as it came -- no Message-Instance (unsigned, a
         # receiver reports it as permerror), no X-DKIM2-Info, no snapshot.
@@ -543,8 +597,7 @@ sub cb_eom {
         }
 
         # If there are upstream DKIM2-Signature headers the chain must have
-        # verified before we extend it.  In mode=both the verify block already
-        # ran. In mode=outbound a snapshot of this message is the proof: the
+        # verified before we extend it. A snapshot of this message is the proof: the
         # inbound milter took it only of a message whose chain verified (or
         # that had none), so the signatures are not checked again, only the
         # instances (below). With no snapshot the Gate verifies it all now.
@@ -582,15 +635,16 @@ sub cb_eom {
         my $mi_header;
         my %mi_info;
         my $arrival_verdict;
-        if ($snapshot_store) {
+        {
             # Fail closed: an exception computing the instance means no
             # Message-Instance and no signature.
             # The snapshot is the one the inbound milter named on this very
             # message (X-DKIM2-Snapshot, stripped above); one token or none.
-            # In --mode both the message came from outside in this same
-            # transaction, so a token on it is not one we gave it.
+            # With no
+            # snapshot store (an originating host) there is no snapshot: a
+            # message with no instance gets m=1 from itself.
             my $snap;
-            if (!$do_verify && @snapshot_tokens == 1 && $snapshot_tokens[0] =~ /^[0-9a-f]{32}\z/) {
+            if ($snapshot_store && @snapshot_tokens == 1 && $snapshot_tokens[0] =~ /^[0-9a-f]{32}\z/) {
                 $snap = $snapshot_store->fetch(_snapshot_key($snapshot_tokens[0]));
                 $mi_info{snapf} = $snapshot_store->rel_path_for_mi(_snapshot_key($snapshot_tokens[0]))
                     if defined $snap;
@@ -624,13 +678,10 @@ sub cb_eom {
         my $gate_sd = $sign_config->{domain};
         # Fail closed: an exception anywhere in the gate (a crafted message
         # must never take the callback down with it) is a logged refusal.
-        # The inbound verdict (mode both) still describes the message only if
-        # this hop added and removed nothing.
         my $gate = eval {
             Mail::DKIM2::Gate->check($sign_msg,
                 (defined $gate_sd ? (SigningDomain => $gate_sd) : ()),
-                ($do_verify && $sign_msg eq $message ? (VerifyResult => $verify_result)
-                 : defined $arrival_verdict ? (VerifyResult => $arrival_verdict) : ()),
+                (defined $arrival_verdict ? (VerifyResult => $arrival_verdict) : ()),
                 _gate_pubkey_cb());
         };
         unless ($gate) {
@@ -781,6 +832,51 @@ sub cb_close {
     return SMFIS_CONTINUE;
 }
 
+# --- Where a client is ---
+
+# The text form of a connect callback's packed address; 'unix' for a
+# unix-socket client; undef when there is none.
+sub _client_addr {
+    my ($pack) = @_;
+    return undef unless defined $pack && length $pack;
+    my $fam = eval { sockaddr_family($pack) } // return undef;
+    return 'unix' if $fam == AF_UNIX;
+    my $addr = eval {
+        $fam == AF_INET  ? inet_ntop(AF_INET,  (unpack_sockaddr_in($pack))[1])  :
+        $fam == AF_INET6 ? inet_ntop(AF_INET6, (unpack_sockaddr_in6($pack))[1]) : undef;
+    };
+    return $addr;
+}
+
+# [ address bits, prefix length ] of an address or CIDR network.
+sub _parse_cidr {
+    my ($cidr) = @_;
+    my ($addr, $len) = split m{/}, $cidr, 2;
+    my $bin = inet_pton($addr =~ /:/ ? AF_INET6 : AF_INET, $addr)
+        or die "--internal-hosts: not an IP address or network: $cidr\n";
+    my $max = 8 * length $bin;
+    $len //= $max;
+    die "--internal-hosts: bad prefix length: $cidr\n"
+        unless $len =~ /\A\d{1,3}\z/ && $len <= $max;
+    return [ unpack('B*', $bin), $len ];
+}
+
+# True for a unix-socket client and for an address in @internal_nets. An
+# IPv4-mapped IPv6 address counts as the IPv4 one.
+sub _is_internal {
+    my ($client) = @_;
+    return 0 unless defined $client;
+    return 1 if $client eq 'unix';
+    $client =~ s/\A::ffff:(\d+\.\d+\.\d+\.\d+)\z/$1/i;
+    my $bin = inet_pton($client =~ /:/ ? AF_INET6 : AF_INET, $client) // return 0;
+    my $bits = unpack('B*', $bin);
+    for my $net (@internal_nets) {
+        next unless length $net->[0] == length $bits;
+        return 1 if substr($bits, 0, $net->[1]) eq substr($net->[0], 0, $net->[1]);
+    }
+    return 0;
+}
+
 # --- Signing config lookup ---
 
 # Returns { domain, selector, key, algorithm } or undef.
@@ -885,7 +981,7 @@ sub _start_verify {
         # not a broken chain.
         my @arrived = map { $_->[1] } grep { lc $_->[0] eq 'x-dkim2-arrival' } @{$priv->{headers}};
         $verifier->allow_unsigned_mi(1)
-            if $opts{mode} eq 'inbound' && !$check_envelope
+            if !$check_envelope
             && @arrived && !grep { !/\A\s*(?:pass|none)\s*\z/ } @arrived;
         $state->{verifier} = $verifier;
         $verifier->PRINT(join('', grep { !/\AX-DKIM2-Snapshot[ \t]*:/i } @$raw_hdrs)
@@ -1095,7 +1191,11 @@ dkim2-milter - Standalone DKIM2 milter for Postfix
 =head1 SYNOPSIS
 
     # Verify only (no signing)
-    dkim2-milter --socket unix:/var/run/dkim2.sock
+    dkim2-milter --mode inbound --socket unix:/var/run/dkim2.sock
+
+    # An originating host: sign the mail this host sends
+    dkim2-milter --mode outbound --socket inet:8893@127.0.0.1 \
+        --keydir /etc/dkim2/keys
 
     # Sign for a single domain
     dkim2-milter --socket unix:/var/run/dkim2.sock \
@@ -1107,7 +1207,7 @@ dkim2-milter - Standalone DKIM2 milter for Postfix
     dkim2-milter --socket unix:/var/run/dkim2.sock \
         --keydir /etc/dkim2/keys
 
-    # With message snapshots for diff-based Message-Instance
+    # A list host: snapshots for diff-based Message-Instance (both milters)
     dkim2-milter --socket unix:/var/run/dkim2.sock \
         --keydir /etc/dkim2/keys \
         --snapshot-dir /var/spool/dkim2/snapshots
@@ -1123,7 +1223,8 @@ A standalone milter daemon that provides DKIM2 signature verification and
 signing for Postfix (or any milter-compatible MTA).  Uses L<Sendmail::PMilter>
 for the milter protocol.
 
-Verification is enabled by default for all inbound messages.
+What it does is set by C<--mode>: C<inbound> verifies, C<outbound> signs,
+and the default C<both> does each where it applies (see L</OPTIONS>).
 
 Signing can be configured in two ways:
 
@@ -1243,6 +1344,50 @@ the changes.
 Milter socket specification.  Default: C<unix:/var/run/dkim2-milter.sock>.
 Examples: C<unix:/path/to/sock>, C<inet:8891@localhost>.
 
+=item B<--mode>, B<-m> I<inbound|outbound|both>
+
+What this milter does.  Default: C<both>.
+
+C<inbound> verifies each message and adds C<Authentication-Results> and
+C<X-DKIM2-Info> with the verdict (and, with C<--snapshot-dir>, keeps the
+arrival snapshot).  Put it on mail arriving from outside (Postfix
+C<smtpd_milters> on port 25).  It needs no key.
+
+C<outbound> signs each message it holds a key for: it adds the
+Message-Instance this hop needs (C<m=1> on a message that has none; with
+C<--snapshot-dir>, a diff against the inbound milter's snapshot for a
+message a list or forwarder changed) and a C<DKIM2-Signature>.  Put it on
+mail leaving this host: C<non_smtpd_milters> for locally generated mail,
+and the C<smtpd_milters> of a submission port.  An originating host needs
+nothing more than C<--mode outbound> and its key(s).
+
+C<both> does both on one socket, deciding each transaction by where the
+message comes from, as OpenDKIM does.  It is B<outbound> when the client
+authenticated (SMTP AUTH: Postfix's C<{auth_authen}> macro, sent by
+default), is on loopback (C<127.0.0.0/8>, C<::1>: Postfix gives
+C<non_smtpd_milters> C<127.0.0.1>) or a unix socket, or is in
+C<--internal-hosts>.  Anything else is B<inbound>, including a client the
+MTA gave no address for.  So mail from the Internet is verified and never
+signed, whatever From it carries, and one C<both> milter can sit on both
+C<smtpd_milters> and C<non_smtpd_milters>.  With C<--snapshot-dir> that
+covers a list host too: a post from outside is stamped and snapshotted, and
+the list manager's copy, re-injected over loopback, is diffed against the
+snapshot and signed.  Each transaction is one or the other, never both.
+
+=item B<--internal-hosts> I<NET>[,I<NET>...]
+
+C<--mode both> only.  Repeatable.  Further addresses or CIDR networks (IPv4
+or IPv6) whose clients send mail out through this host, as loopback does:
+mail from them is signed, not verified.  For example
+C<--internal-hosts 192.0.2.0/24,2001:db8::/32>.  Not needed for clients that
+use SMTP AUTH.
+
+=item B<--authserv-id> I<ID>
+
+The authserv-id (RFC 8601) in the C<Authentication-Results> this milter
+adds: this host's name, as your MTA and delivery agent expect it.
+Default: C<localhost>.
+
 =item B<--domain>, B<-d> I<DOMAIN>
 
 Signing domain (single-domain mode).  Requires C<--selector> and C<--keyfile>.
@@ -1281,8 +1426,11 @@ In keydir mode, the algorithm is auto-detected from each key file.
 
 =item B<--snapshot-dir> I<PATH>
 
-Directory for message snapshots.  Enables diff-based Message-Instance
-computation.  On inbound, a message gets a snapshot only when its chain
+Directory for message snapshots, shared by an inbound and an outbound
+milter.  A list host or forwarder needs it: it lets the outbound milter
+describe what changed since the message arrived (diff-based
+Message-Instance).  An originating host does not: without it the outbound
+milter stamps C<m=1> from the message itself.  On inbound, a message gets a snapshot only when its chain
 verified (C<pass>) or it had none (C<none>), and the milter stamps its own
 C<m=1> or the top Message-Instance matches the content; the snapshot is
 stored under a random token, which is added to the message as
@@ -1365,13 +1513,13 @@ C<X-DKIM2-Info: action=wrap-single-part;>.
 
 =item B<--no-envelope-check>
 
-Inbound mode checks the SMTP envelope against the top DKIM2-Signature (-09
+An inbound transaction checks the SMTP envelope against the top DKIM2-Signature (-09
 section 14.4): MAIL FROM must equal its C<mf=> and every RCPT TO must be in
 its C<rt=>, or the result is C<fail>. Turn that off for a milter on an
 internal hop, after an earlier one has checked the envelope the message
 arrived with and the MTA may have rewritten it since (the wrap milter behind
-port 25, say). The other modes never check: there the transaction is the
-outgoing one.
+port 25, say). An outbound transaction never checks: it is the outgoing
+one.
 
 =item B<--max-recipe-literals> I<N>
 
@@ -1384,14 +1532,6 @@ declared unrecoverable rather than carried in the header.
 Path to a JSON file with DNS key records (for testing without real DNS).
 Format: C<< { "domain": { "selector._domainkey": [["txt", "v=DKIM1; ..."]] } } >>.
 
-=item B<--verify>, B<--no-verify>
-
-Enable or disable verification.  Default: enabled.
-
-=item B<--sign>, B<--no-sign>
-
-Enable or disable signing.  Default: enabled if signing config is available.
-
 =item B<--help>, B<-h>
 
 Show this help message.
@@ -1400,16 +1540,29 @@ Show this help message.
 
 =head1 POSTFIX CONFIGURATION
 
-Add to C<main.cf>:
+An originating host (it sends its own mail and receives none through
+this milter) runs one C<--mode outbound> milter:
 
-    # For inbound verification
-    smtpd_milters = unix:/var/run/dkim2-milter.sock
+    dkim2-milter --mode outbound --socket inet:8893@127.0.0.1 \
+        --keydir /etc/dkim2/keys
 
-    # For outbound signing (locally-generated mail)
-    non_smtpd_milters = unix:/var/run/dkim2-milter.sock
+and adds to C<main.cf>:
 
-    # Milter default action if the milter is unavailable
+    # Sign locally generated mail (sendmail(1), cron, the web app)
+    non_smtpd_milters = inet:127.0.0.1:8893
+    # ... and mail submitted over SMTP, if this host takes any
+    # (or set it per service in master.cf, e.g. on the submission port)
+    smtpd_milters = inet:127.0.0.1:8893
     milter_default_action = accept
+
+A host that also receives mail from the Internet can run one
+C<--mode both> milter on C<smtpd_milters> and C<non_smtpd_milters>: it
+verifies mail from outside and signs mail from loopback, authenticated
+clients and C<--internal-hosts> (see C<--mode>).  Or it runs a
+C<--mode inbound> milter on port 25 and a C<--mode outbound> milter on
+outgoing mail, as mail.dkim2.com does; C<deploy/examples/> in the interop
+repository has the systemd units and the Postfix fragments for both, and
+for a mailing list host.
 
 =head1 DEPENDENCIES
 

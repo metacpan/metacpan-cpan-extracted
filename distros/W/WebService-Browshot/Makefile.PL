@@ -5,6 +5,7 @@ WriteMakefile(
     NAME              => 'WebService::Browshot',
     VERSION_FROM      => 'lib/WebService/Browshot.pm', # finds $VERSION
     PREREQ_PM         => {
+        URI                => 0,
 		URI::Encode		    => 0,
 		JSON			        => 0,
 		LWP::UserAgent		=> 0,

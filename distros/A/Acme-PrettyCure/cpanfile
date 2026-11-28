@@ -1,0 +1,31 @@
+requires 'perl' => '5.010001';
+requires 'Moo';
+requires 'Time::Piece';
+requires 'UNIVERSAL::require';
+requires 'List::MoreUtils';
+requires 'Math::Random::MT';
+requires 'Imager';
+requires 'Furl';
+requires 'Cache::LRU';
+requires 'Net::DNS::Lite';
+
+on 'configure' => sub {
+    requires 'Module::Build::Tiny';
+};
+
+on 'test' => sub {
+    requires 'Test::More' => '0.98';
+    requires 'Test::Requires' => 0;
+    requires 'Test::Exception';
+    # t/Utils.pm is on Test2; the tests move to Test2::V0 in phase 2 (#6)
+    requires 'Test2::V0';
+};
+
+on 'develop' => sub {
+    # v3.2.0: manage_changes in minil.toml (the change log is CHANGELOG.md)
+    requires 'Minilla', 'v3.2.0';
+    requires 'Pod::Markdown::Github';
+    requires 'Test::Perl::Critic';
+    # The version checked to format `use feature 'class'` (class, field, method, ADJUST) (#6)
+    requires 'Perl::Tidy', '20260826';
+};

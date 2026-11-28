@@ -1,0 +1,249 @@
+#! /usr/bin/env perl
+# PODNAME: cpangit-diff
+our $VERSION = '0.007'; # VERSION
+# ABSTRACT: compare two CPAN distributions, for reviewing an upgrade
+
+use v5.36;
+use FindBin;
+BEGIN { push @INC, "$FindBin::RealBin/../lib" if -f "$FindBin::RealBin/../dist.ini" }
+use CPAN::InGit;
+use CPAN::InGit::DistTree;
+use Getopt::Long;
+use Pod::Usage;
+use JSON::PP;
+use Log::Any::Adapter 'Stderr', log_level => 'warning';
+
+
+my $format= 'text';
+my $log_level= Log::Any::Adapter::Util::numeric_level('warning');
+GetOptions(
+   'git-dir=s'         => \(my $git_dir= $ENV{GIT_DIR} // '.'),
+   'branch=s'          => \my $branch_name,
+   'to-branch=s'       => \my $to_branch_name,
+   'format=s'          => \$format,
+   'json'              => sub { $format= 'json' },
+   'stat'              => \my $stat,
+   'path=s'            => \my @paths,
+   'include-generated!'=> \my $include_generated,
+   'hide-version-diff!'=> \my $hide_version_diff,
+   'full'              => \my $full,
+   'context=i'         => \my $context,
+   'max-patch-size=i'  => \my $max_patch_size,
+   'fetch!'            => \(my $fetch= 1),
+   'verbose|v'         => sub { ++$log_level },
+   'quiet|q'           => sub { --$log_level if $log_level },
+   'help'              => sub { pod2usage(1) },
+) && (@ARGV == 1 || @ARGV == 2) or pod2usage(2);
+$format eq 'text' || $format eq 'json' or pod2usage("Unknown format '$format'");
+
+Log::Any::Adapter->set('Stderr', log_level => $log_level);
+
+my $module_name= qr/\A\w+(?:::\w+)*\z/;
+
+{ # scope to help run destructors in the right order
+   my $git_repo= Git::Raw::Repository->discover($git_dir);
+   my $cpan_repo= CPAN::InGit->new(git_repo => $git_repo);
+
+   my $get_tree= sub ($name) {
+      my $tree= $cpan_repo->get_archive_tree($name)
+         or die "Branch '$name' is not a 'PAN (no /cpan_ingit.json file)\n";
+      # This tool only reads.  Don't let a mirror refresh its index or add files to itself.
+      $tree->autofetch(0) if $tree->can('autofetch');
+      $tree;
+   };
+
+   # Find a dist by archive file, author path, or module name, in the first tree that has it
+   my $find_dist= sub ($spec, @trees) {
+      if ($spec !~ $module_name && -f $spec) {
+         open my $fh, '<:raw', $spec or die "open($spec): $!\n";
+         my $bytes= do { local $/; <$fh> };
+         return CPAN::InGit::DistTree->new_from_archive(
+            parent => $cpan_repo, filename => $spec, data => \$bytes, storage => 'file');
+      }
+      my @tried;
+      for my $tree (@trees) {
+         my $author_path= $spec =~ $module_name? $tree->get_module_dist($spec) : $spec;
+         push @tried, $tree->name;
+         next unless defined $author_path;
+         my $dist= $tree->get_dist($author_path, fetch => $fetch);
+         return $dist if $dist;
+      }
+      die "Can't find distribution '$spec' in ".join(' or ', map "branch '$_'", @tried)."\n";
+   };
+
+   my $from_tree;
+   if (length $branch_name || length $cpan_repo->workdir_branch_name) {
+      $from_tree= $get_tree->($branch_name // $cpan_repo->workdir_branch_name);
+   }
+   # the trees are optional if both dists are files
+   my $need_tree= sub {
+      $from_tree // die "Must specify --branch=X for bare git repo\n";
+   };
+   my @source_trees= !$from_tree? ()
+      : map { eval { $get_tree->($_) } // () } @{ $from_tree->default_import_sources // [] };
+
+   my ($from, $to);
+   if (@ARGV == 1) {
+      my $mod= $ARGV[0];
+      $mod =~ $module_name or pod2usage("Expected a module name, or two distributions");
+      my $from_path= $need_tree->()->get_module_dist($mod)
+         // die "Module '$mod' is not provided by branch '".$from_tree->name."'\n";
+      $from= $find_dist->($from_path, $from_tree);
+      my @candidates= length $to_branch_name? ($get_tree->($to_branch_name)) : @source_trees;
+      @candidates or die "Branch '".$from_tree->name."' has no import sources; specify --to-branch\n";
+      my ($to_tree)= grep { ($_->get_module_dist($mod) // $from_path) ne $from_path } @candidates;
+      $to_tree or die "Module '$mod' comes from the same distribution ($from_path) in "
+         .join(' and ', map "'".$_->name."'", @candidates)."\n";
+      $to= $find_dist->($mod, $to_tree);
+   } else {
+      $from= $find_dist->($ARGV[0], (-f $ARGV[0] && $ARGV[0] !~ $module_name? () : ($need_tree->(), @source_trees)));
+      $to=   $find_dist->($ARGV[1], (-f $ARGV[1] && $ARGV[1] !~ $module_name? ()
+                           : length $to_branch_name? $get_tree->($to_branch_name)
+                           : ($need_tree->(), @source_trees)));
+   }
+
+   my $report= $from->compare($to,
+      paths => \@paths,
+      patch => !$stat,
+      include_generated => $include_generated // $full,
+      hide_version_diff => $hide_version_diff // !$full,
+      (defined $context? ( context_lines => $context ) : ()),
+      (defined $max_patch_size? ( max_patch_size => $max_patch_size ) : $full? ( max_patch_size => 0 ) : ()),
+   );
+   binmode STDOUT, ':raw';
+   my $out= $format eq 'json'? JSON::PP->new->utf8->canonical->pretty->encode($report)
+          : CPAN::InGit::DistTree->format_comparison($report, patch => !$stat);
+   utf8::encode($out) if $format ne 'json';
+   print $out;
+}
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpangit-diff - compare two CPAN distributions, for reviewing an upgrade
+
+=head1 NAME
+
+cpangit-diff - compare two CPAN distributions, for reviewing an upgrade
+
+=head1 USAGE
+
+  cpangit-diff [OPTIONS] MODULE::NAME
+  cpangit-diff [OPTIONS] FROM_DIST TO_DIST
+
+The first form compares the distribution that provides a module in your branch with the
+distribution that provides it in one of the branch's import sources; in other words, it
+shows what you would get by upgrading that module.
+
+The second form compares any two distributions.  Each can be given as an author path like
+C<A/AU/AUTHOR/Example-1.02.tar.gz>, as the name of a module (meaning the distribution that
+provides that module), or as the path of an archive file on disk.
+
+The output starts with the changes to the declared prereqs, then the lines added to the
+change log, then a one-line summary of each changed file, and then a unified diff of each
+changed file.  Files that are generated or binary are listed in the summary but have no
+diff.  The output is meant to be equally useful to a person and to an automated reviewer.
+
+=head1 OPTIONS
+
+=over
+
+=item --git-dir=PATH
+
+Path to the Git repository of L<CPAN::InGit>.  The default is GIT_DIR from the
+environment, or any git repo above "."
+
+=item --branch=BRANCH_NAME
+
+The branch in which to find FROM_DIST.  The default is the checked-out branch.
+
+=item --to-branch=BRANCH_NAME
+
+The branch in which to find TO_DIST.  The default is to look in C<--branch> and then in
+each of its import sources.  With a single MODULE::NAME argument, the default is the first
+import source that provides the module from a different distribution than C<--branch>.
+
+=item --format=text|json
+
+=item --json
+
+C<--json> is the same as C<--format=json>.  The default is C<text>.  C<json> writes the complete structure described in
+L<CPAN::InGit::DistTree/compare>.
+
+=item --stat
+
+Omit the diffs of the files, leaving the prereqs, change log, and summary of files.
+
+=item --full
+
+Show the diff of every file, complete.  This is the same as C<--include-generated>
+C<--no-hide-version-diff> C<--max-patch-size=0>.  Any of those given explicitly (such as
+C<--hide-version-diff> or C<--max-patch-size=50000>) takes precedence.  Binary files still
+have no diff.
+
+=item --path=PATH
+
+Only compare files matching this path (or git pathspec) within the distributions.  May be
+given more than once.  This also enables the diffs of generated files.
+
+=item --include-generated
+
+Include the diffs of generated files: C<META.json>, C<META.yml>, C<MANIFEST>, C<SIGNATURE>,
+C<ppport.h>, and everything under C<inc/>.
+
+=item --no-hide-version-diff
+
+Show every change.  By default, a change of a single line which mentions "version" and only
+replaces the version number of FROM_DIST with the version number of TO_DIST is left out of
+the diffs, because every module of a distribution usually has one or two of them.  The
+summary of files says where they were left out.
+
+=item --context=N
+
+Number of unchanged lines to show around each change.  Default 3.
+
+=item --max-patch-size=BYTES
+
+Omit the diff of any file whose diff is larger than this.  Default 200000; 0 for no limit.
+
+=item --no-fetch
+
+Never download a distribution.  By default, a distribution listed by a mirror branch but not
+yet stored in it is downloaded from the mirror's upstream.  It is kept in a cache, and is not
+added to the mirror branch.
+
+=item -v, --verbose
+
+=item -q, --quiet
+
+Show more or fewer log messages (on STDERR)
+
+=back
+
+=head1 EXIT STATUS
+
+0 if the comparison was made (whether or not there were differences), and nonzero if a
+distribution could not be found or read.
+
+=head1 VERSION
+
+version 0.007
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Michael Conrad, and IntelliTree Solutions.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

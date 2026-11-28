@@ -69,6 +69,43 @@ is($joined, $lines, 'the rest of the text is not changed');
     is(length $head[0], length $head[1], '3line: the rule is as wide as the header');
 }
 
+# keep.table: what is joined by GS, kept in one pane
+{
+    my $units = sub {
+	my $cfg = shift;
+	my $out = $strip->(run("'-Mmd::config($cfg,intact=table)' $md")->stdout);
+	my($table) = grep { /[$US$GS]/ } split /\n/, $out;
+	[ map { [ split /$GS/ ] } split /$US/, $table ];
+    };
+    my $none = $units->("$cfg,keep.table=none");
+    ok(!(grep { @$_ > 1 } @$none), 'none: no group');
+    like($none->[0][0], qr/^ key/, 'none: the header alone');
+
+    my $row = $units->("$cfg,keep.table=row");
+    like($row->[0][0], qr/^ key/, 'row: the header alone');
+    is(scalar @{$row->[0]}, 1, 'row: the header is not a group');
+    like($row->[1][0], qr/^\x{2500}+\x{253C}/, 'row: the rule alone');
+    like($row->[2][0], qr/k1/, 'row: the first row');
+    ok(@{$row->[2]} > 1, 'row: a wrapped row is a group');
+
+    my $head = $units->("$cfg,keep.table=head");
+    is_deeply($head, $units->($cfg), 'head is the default');
+    is(scalar @$head, 4, 'head: the header with the first row, and the other rows');
+
+    my $all = $units->("$cfg,keep.table=all");
+    is(scalar @$all, 1, 'all: the table is one group');
+
+    my $r = run("'-Mmd::config($cfg,intact=table,keep.table=header)' $md");
+    isnt($r->status, 0, 'an unknown value dies');
+
+    # 3line: the rule below goes with the last row only with head
+    my $row3 = $units->("$cfg,table_style=3line,keep.table=row");
+    like($row3->[-1][0], qr/^\x{2500}+$/, '3line row: the rule below alone');
+    my $head3 = $units->("$cfg,table_style=3line,keep.table=head");
+    like($head3->[-1][-1], qr/^\x{2500}+$/, '3line head: the rule below with the last row');
+    ok(@{$head3->[-1]} > 1, '3line head: the last row is a group');
+}
+
 # a table of one row is a group with no US, and is not folded as text
 {
     my $dir = tempdir(CLEANUP => 1);

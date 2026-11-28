@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 # PODNAME: cpangit-add
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # ABSTRACT: import CPAN packages to local CPAN trees
 
 use v5.36;
@@ -17,10 +17,12 @@ my $log_level= Log::Any::Adapter::Util::numeric_level('info');
 GetOptions(
    'git-dir=s'  => \(my $git_dir= $ENV{GIT_DIR} // '.'),
    'branch=s'   => \my $branch_name,
+   'local'      => \my $local,
    'verbose|v'  => sub { ++$log_level },
    'quiet|q'    => sub { --$log_level if $log_level },
    'help'       => sub { pod2usage(1) },
 ) && @ARGV or pod2usage(2);
+pod2usage(2) if $local && @ARGV != 1;
 
 Log::Any::Adapter->set('Stdout', log_level => $log_level);
 
@@ -29,11 +31,20 @@ my $prereq_types=  [qw( requires )];
 my $requirements;
 my $cpan_snapshot;
 
-while (@ARGV) {
+sub slurp {
+   my $name= shift;
+   open my $fh, '<:raw', $name or die "open($name): $!";
+   local $/;
+   my $bytes= <$fh> // die "read($name): $!";
+   close $fh or die "close($name): $!";
+   $bytes;
+}
+
+while (!$local && @ARGV) {
    if ($ARGV[0] =~ m,/, or $ARGV[0] eq 'cpanfile' or $ARGV[0] eq 'cpanfile.snapshot') {
       my $path= shift;
       # load content
-      my $content= do { open my $fh, '<', $path or die "open($path): $!"; local $/; <$fh> };
+      my $content= slurp($path);
       # detect format
       if ($path =~ /cpanfile\.snapshot\z/ or $content =~ /^# carton snapshot/) {
          my $snap= CPAN::InGit->_parse_cpanfile_snapshot($content);
@@ -88,16 +99,27 @@ while (@ARGV) {
          .($ent? '' : ' (no /cpan_ingit.json file)');
    }
 
-   my %imported_dists;
-   %imported_dists= %{ $atree->import_cpanfile_snapshot($cpan_snapshot) }
-      if $cpan_snapshot;
-   %imported_dists= ( %imported_dists, %{ $atree->import_modules($requirements) } )
-      if $requirements;
-   # If this is not the working branch, also need to commit it
-   unless ($atree->use_workdir) {
-      # TODO: smarter choice of commit title
-      my $title= "Imported modules";
-      $atree->commit("$title\n\nImported modules:\n".join('', map "  - $_\n", sort keys %imported_dists))
+   if ($local) {
+      my ($name)= @ARGV;
+      my $path;
+      if ($name =~ /\A\w+(?:::\w+)*\z/ && !-f $name) {
+         $path= $atree->localize_module($name);
+      } else {
+         $path= $atree->add_local_dist($name, \slurp($name));
+      }
+      $atree->commit("Import $path for local changes") unless $atree->use_workdir;
+   } else {
+      my %imported_dists;
+      %imported_dists= %{ $atree->import_cpanfile_snapshot($cpan_snapshot) }
+         if $cpan_snapshot;
+      %imported_dists= ( %imported_dists, %{ $atree->import_modules($requirements) } )
+         if $requirements;
+      # If this is not the working branch, also need to commit it
+      unless ($atree->use_workdir) {
+         # TODO: smarter choice of commit title
+         my $title= "Imported modules";
+         $atree->commit("$title\n\nImported modules:\n".join('', map "  - $_\n", sort keys %imported_dists))
+      }
    }
 }
 exit 0;
@@ -114,18 +136,21 @@ cpangit-add - import CPAN packages to local CPAN trees
 
 =head1 NAME
 
-  cpangit-add
+cpangit-add - import CPAN distributions into local archive branches
 
 =head1 USAGE
 
   cpangit-add [OPTIONS] [MODULE::NAME [VERSION]] ...
-  cpangit-add [OPTIONS] ./PATH/TO/CPANFILE
+  cpangit-add [OPTIONS] PATH/TO/CPANFILE
+  cpangit-add [OPTIONS] --local PATH_OR_MODULE_NAME
 
-Add one or more modules, and their dependencies, to a mirror branch.  This will add the files
-to the index, and you can then review and commit them.
+The first two forms add one or more modules, and their dependencies, to a
+mirror branch.  If the branch is the working branch, this will add the files
+to the index for you to review and commit.  Otherwise the files are added in
+an automatic commit on that branch.
 
-A name with "/" or "\\" in it will be treated as a cpanfile.  A name without will be treated as
-the name of a perl module to fetch from upstream.
+When '--local' is used, locate a distribution archive, unpack it under
+author L/LO/LOCAL, and update the package index to use this dist.
 
 =head1 OPTIONS
 
@@ -133,19 +158,28 @@ the name of a perl module to fetch from upstream.
 
 =item --git-dir=PATH
 
-Path to the Git repository of L<CPAN::InGit>.  The default is GIT_DIR from the environment,
-or any git repo above "."
+Path to the Git repository of L<CPAN::InGit>.  The default is GIT_DIR from
+the environment, or any git repo above "."
 
 =item --branch=BRANCH_NAME
 
-Branch name to commit the changes to.  If this is the checked-out branch, the index will be
-updated but no commit will be generated.
+Branch name to commit the changes to.  If this is the checked-out branch, the
+index will be updated but no commit will be generated.
+
+=item --local
+
+Unpack one distribution into C<authors/id/L/LO/LOCAL/> for local patching.
+Only one argument is permitted, and in addition to a module name, it may be
+a file path of a distribution archive.  For module names, the distribution
+will be resolved by the usual means, possibly using a distribution that was
+already indexed in this branch under a different author.  The action fails
+if the local-author distribution directory already exists.
 
 =back
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

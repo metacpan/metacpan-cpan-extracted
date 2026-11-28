@@ -1,0 +1,71 @@
+{
+   "abstract" : "helpers for the MIMEDefang OpenSMTPD filter",
+   "author" : [
+      "The McGrail Foundation"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mail-MIMEDefang-OpenSMTPD",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Path" : "0",
+            "Getopt::Std" : "0",
+            "IO::Select" : "0",
+            "IO::Socket::UNIX" : "0",
+            "Mail::MIMEDefang" : "v3.7.1",
+            "Mail::MIMEDefang::Utils" : "0",
+            "OpenSMTPd::Filter" : "0",
+            "Socket" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Temp" : "0",
+            "IPC::Open3" : "0",
+            "Symbol" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/The-McGrail-Foundation/MIMEDefang-smtpd-filter/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/The-McGrail-Foundation/MIMEDefang-smtpd-filter.git",
+         "web" : "https://github.com/The-McGrail-Foundation/MIMEDefang-smtpd-filter"
+      }
+   },
+   "version" : "1.1",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

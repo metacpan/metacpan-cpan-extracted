@@ -52,6 +52,14 @@ t/081_unique-keys.t
 t/082_if-and-shares.t
 t/083_defs_refs.t
 t/084_is_valid.t
+t/085_composed-annotations.t
+t/086_boolean-recursion.t
+t/087_scalar-content-and-patterns.t
+t/088_ref-siblings.t
+t/089_resources-and-values.t
+t/090_compile-js-values.t
+t/091_decimal-numbers.t
+t/092_resource-aliases-and-prefix-items.t
 t/900_pod.t
 t/910_coverage.t
 t/920_manifest.t

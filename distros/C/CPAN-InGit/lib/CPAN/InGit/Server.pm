@@ -1,5 +1,5 @@
 package CPAN::InGit::Server;
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # ABSTRACT: A Mojolicious::Controller that serves the ArchiveTrees from a git repo
 
 
@@ -8,13 +8,15 @@ use Scalar::Util 'refaddr', 'blessed';
 use JSON::PP;
 use Time::Piece;
 use Log::Any '$log';
-use Archive::Tar;
 use IO::Compress::Gzip qw( gzip $GzipError );
 use CPAN::InGit;
+use CPAN::InGit::DistTree;
 use File::ShareDir ();
 use Mojo::File 'path';
+use Mojo::Util 'url_escape';
 use Mojolicious::Static;
 use Mojo::Base 'Mojolicious::Controller';
+use version ();
 use v5.36;
 
 
@@ -36,28 +38,30 @@ sub _tree_object($class, $repo, $tree_name, $branch_head_only=0) {
 }
 
 sub archive_tree($c) {
-   $c->stash->{archive_tree} //= do {
-      my $tree_name= $c->tree_name;
-      my $cache= $c->tree_cache;
-      my $object= $c->_tree_object($c->cpan_repo, $tree_name, $c->branch_head_only);
-      my $current_tree= $object && eval { $c->cpan_repo->lookup_tree($object) };
-      my $atree= $cache->{$tree_name};
-      if ($atree && (!$current_tree || $atree->tree->id ne $current_tree->id)) {
-         delete $cache->{$tree_name};
-         $atree= undef;
+   $c->stash->{archive_tree} //= $c->_archive_tree_for($c->tree_name);
+}
+
+sub _archive_tree_for($c, $tree_name) {
+   return undef unless defined $tree_name;
+   my $cache= $c->tree_cache;
+   my $object= $c->_tree_object($c->cpan_repo, $tree_name, $c->branch_head_only);
+   my $current_tree= $object && eval { $c->cpan_repo->lookup_tree($object) };
+   my $atree= $cache->{$tree_name};
+   if ($atree && (!$current_tree || $atree->tree->id ne $current_tree->id)) {
+      delete $cache->{$tree_name};
+      $atree= undef;
+   }
+   if (!$atree && $current_tree) {
+      $atree= $c->cpan_repo->get_archive_tree($object);
+      if ($atree) {
+         # reconstruct actual name for ArchiveTree->name attribute
+         (my $name= $tree_name) =~ s{^~[^/]+/}{};
+         $name =~ tr{~}{/};
+         $atree->name($name);
+         $cache->{$tree_name}= $atree;
       }
-      if (!$atree && $current_tree) {
-         $atree= $c->cpan_repo->get_archive_tree($object);
-         if ($atree) {
-            # reconstruct actual name for ArchiveTree->name attribute
-            (my $name= $tree_name) =~ s{^~[^/]+/}{};
-            $name =~ tr{~}{/};
-            $atree->name($name);
-            $cache->{$tree_name}= $atree;
-         }
-      }
-      $atree;
-   };
+   }
+   return $atree;
 }
 
 sub tree_name($c) {
@@ -103,13 +107,15 @@ sub _new_cache {
 sub mount($class, $base_route, $cpan_repo, %options) {
    my $atree= $options{archive_tree};
    my $app= delete $options{app};
-   # Ensure there is a cache if serving all branches
+   # Single-tree mounts also cache any configured import source branches.
    $options{branch_cache} //= $class->_new_cache
-      unless defined $atree;
+      unless defined $options{tree_cache};
    # This function could be called multiple times to mount various repos at different paths,
    # so each instance needs a different route namespace.
    # The route_ns is added as a stash attribute and used by actions when generating URLs.
    my $route_ns= 'cpan_ingit_'.++$base_route->root->{_cpan_ingit_mount_count};
+   # Create or open the cache of unpacked distributions before workers fork
+   $cpan_repo->dist_cache_repo;
    my $configured_route= $base_route->to(
       namespace => '',
       controller => $class,
@@ -197,13 +203,12 @@ sub serve_repo_index($c) {
    my @branches;
    my $index_branches= $c->index_branches // 0;
    if ($index_branches) {
-      my $route_ns= $c->stash('cpan_ingit_route_ns');
       for my $branch (sort { $a->shorthand cmp $b->shorthand } $c->cpan_repo->git_repo->branches('local')) {
          my $tree= $branch->peel('tree');
          next unless $tree->entry_bypath('cpan_ingit.json')
             && $tree->entry_bypath('modules/02packages.details.txt');
          my $name= $branch->shorthand;
-         push @branches, { name => $name, url => $c->url_for("$route_ns.index", tree_name => '~branch/'.($name =~ tr{/}{~}r))->path->trailing_slash(1) };
+         push @branches, { name => $name, url => $c->_branch_index_url($name) };
       }
    }
    $c->render(inline => $c->_share_dir->child('repo_index.html.ep')->slurp('UTF-8'), handler => 'ep', format => 'html',
@@ -211,26 +216,83 @@ sub serve_repo_index($c) {
 }
 
 
-sub _module_index($c) {
-   my $atree= $c->archive_tree;
-   my $blob= $atree->package_details_blob;
-   return undef unless $blob;
-   my $index= $atree->{_server_module_index};
+sub _branch_selector($c, $name) { '~branch/'.($name =~ tr{/}{~}r) }
+
+sub _branch_index_url($c, $name) {
+   my $route_ns= $c->stash('cpan_ingit_route_ns');
+   return $c->url_for("$route_ns.index", tree_name => $c->_branch_selector($name))->path->trailing_slash(1);
+}
+
+sub _module_index($c, $atree, $as_source=0) {
+   # Source comparisons use the Git index snapshot and do not trigger mirror autofetch.
+   my $blob;
+   if ($as_source) {
+      my $entry= $atree->tree->entry_bypath('modules/02packages.details.txt');
+      $blob= $entry->object if $entry;
+   } else {
+      $blob= $atree->package_details_blob;
+   }
+   return undef unless $blob && $blob->is_blob;
+   my $cache_key= $as_source? '_server_source_index' : '_server_module_index';
+   my $index= $atree->{$cache_key};
    unless ($index && $index->{blob_id} eq $blob->id) {
       my ($headers, $body)= split /\r?\n\r?\n/, $blob->content, 2;
-      my ($updated)= $headers =~ /^Last-Updated:\s*([^\r\n]*)/m;
+      my ($updated)= ($headers // '') =~ /^Last-Updated:[ \t]*([^\r\n]*)/m;
       my @rows;
       for my $line (split /\r?\n/, $body // '') {
          next unless $line =~ /^(\S+)\s+(\S+)\s+(\S+)\s*$/;
          push @rows, { name => $1, version => $2, path => $3, text => $line };
       }
-      @rows= sort { $a->{name} cmp $b->{name} } @rows;
-      $index= $atree->{_server_module_index}= { blob_id => $blob->id, updated => $updated, rows => \@rows };
+      $index= $atree->{$cache_key}= { blob_id => $blob->id, updated => $updated };
+      if ($as_source) {
+         # in the format of ArchiveTree->package_details
+         $index->{by_module}= { map +( $_->{name} => [ $_->{name}, ($_->{version} eq 'undef'? undef : $_->{version}), $_->{path} ] ), @rows };
+      } else {
+         $index->{rows}= [ sort { $a->{name} cmp $b->{name} } @rows ];
+      }
    }
    return $index;
 }
 
-sub _module_page($c, $index) {
+sub _import_sources($c) {
+   my %seen;
+   my @sources;
+   for my $name (@{ $c->archive_tree->default_import_sources // [] }) {
+      next if $seen{$name}++;
+      my $tree= $c->_archive_tree_for($c->_branch_selector($name)) // next;
+      push @sources, { name => $name, tree => $tree };
+   }
+   return \@sources;
+}
+
+# Add source_version to each row whose module is provided by an import source, and review_url
+# where ArchiveTree->find_upgrades says the source has a newer distribution for that module.
+# The sources are snapshots of the committed indexes, so nothing is fetched.
+sub _with_source_versions($c, $rows, $sources, $authors_url) {
+   my $atree= $c->archive_tree;
+   my @snapshots= map +{ name => $_->{name}, by_module => $_->{index}{by_module} }, grep $_->{index}, @$sources;
+   my %seen;
+   my $upgrades= $atree->find_upgrades(sources => \@snapshots, dists => [ grep !$seen{$_}++, map $_->{path}, @$rows ]);
+   my %review;  # { $author_path }{ $module } => upgrade
+   for my $dist (@$upgrades) {
+      for my $up (@{ $dist->{upgrades} }) {
+         $review{$dist->{author_path}}{$_}= $up for keys %{ $up->{modules} };
+      }
+   }
+   return map {
+      my $row= $_;
+      if (my $found= $atree->find_module_source($row->{name}, sources => \@snapshots)) {
+         $row= { %$row, source_version => $found->{version} // 'undef' };
+         if (my $up= $review{$row->{path}}{$row->{name}}) {
+            my $url= _author_url($authors_url, "$row->{path}/~diff");
+            $row->{review_url}= $url->query(to => $up->{author_path}, to_source => $up->{source})->to_string;
+         }
+      }
+      $row;
+   } @$rows;
+}
+
+sub _module_page($c, $index, $sources) {
    my $filter= $c->param('filter') // '';
    my $needle= lc $filter;
    my @matches= grep index(lc $_->{text}, $needle) >= 0, $index->{rows}->@*;
@@ -245,6 +307,12 @@ sub _module_page($c, $index) {
       $end= $start+$max if $end > $start+$max;
    }
    my @rows= @matches[$start .. $end-1];
+   if (@$sources) {
+      $_->{index}= $c->_module_index($_->{tree}, 1) for @$sources;
+      my $route_ns= $c->stash('cpan_ingit_route_ns');
+      my $authors= $c->url_for("$route_ns.authors", author_path => '');
+      @rows= $c->_with_source_versions(\@rows, $sources, $authors);
+   }
    return {
       modules => \@rows,
       filter => $filter,
@@ -259,14 +327,14 @@ sub serve_module_list($c) {
    return undef unless $c->check_tree_exists;
    return $c->render(status => 400, json => { error => 'Supply only one of after and before' })
       if defined $c->param('after') && defined $c->param('before');
-   my $index= $c->_module_index
+   my $index= $c->_module_index($c->archive_tree)
       or return $c->render(status => 404, json => { error => 'No package index in this tree' });
-   $c->render(json => $c->_module_page($index));
+   $c->render(json => $c->_module_page($index, $c->_import_sources));
 }
 
 sub serve_index($c) {
    return undef unless $c->check_tree_exists;
-   my $index= $c->_module_index
+   my $index= $c->_module_index($c->archive_tree)
       or return $c->render(status => 404, text => 'No package index in this tree');
    my $atree= $c->archive_tree;
    my $origin= $atree->branch;
@@ -276,14 +344,198 @@ sub serve_index($c) {
    my $commit= !$origin? undef
       : $origin->isa('Git::Raw::Commit')? $origin : $origin->peel('commit');
    my $route_ns= $c->stash('cpan_ingit_route_ns');
+   my $sources= $c->_import_sources;
+   my $module_page= $c->_module_page($index, $sources);
+   for my $source (@$sources) {
+      my $url= $c->tree_name? $c->_branch_index_url($source->{name}) : $source->{tree}->canonical_url;
+      $source->{url}= $url if defined $url && "$url" =~ m{\A(?:/(?!/)|https?://)}i;
+   }
    $c->render(inline => $c->_share_dir->child('archive_tree_index.html.ep')->slurp('UTF-8'), handler => 'ep', format => 'html',
-      module_page => $c->_module_page($index), index_updated => $index->{updated},
+      module_page => $module_page, index_updated => $index->{updated}, sources => $sources,
+      show_source_versions => !!@{ $atree->default_import_sources // [] },
       commit_date => $commit? gmtime($commit->time)->strftime('%a, %d %b %Y %H:%M:%S GMT') : undef,
       tree_label => $atree->name,
       json_url => $c->url_for("$route_ns.modules")->path->trailing_slash(1),
       script_url => $c->url_for("$route_ns.assets", asset => 'archive_tree_index.js'),
       cve_script_url => $c->url_for("$route_ns.assets", asset => 'cpan_cves.js'),
       authors_url => $c->url_for("$route_ns.authors", author_path => ''));
+}
+
+sub _author_url($base, $path) {
+   my $url= $base->clone;
+   push $url->path->parts->@*, split m{/}, $path;
+   $url->path->trailing_slash($path =~ m{/\z}? 1 : 0);
+   return $url;
+}
+
+# Split an author path at an archive filename followed by a slash.  Return the archive path
+# and the path within the distribution (which may be empty)
+sub _split_dist_member_path($path) {
+   my @parts= split m{/}, $path, -1;
+   for my $i (0 .. $#parts-1) {
+      next unless CPAN::InGit::DistTree->parse_filename($parts[$i]);
+      return (join('/', @parts[0..$i]), join('/', @parts[$i+1..$#parts]));
+   }
+   return;
+}
+
+sub _is_unsafe_path($path) {
+   return $path =~ m{[\\:\x00-\x1f\x7f]} || !!grep { $_ eq '.' || $_ eq '..' } split m{/}, $path;
+}
+
+# Returns (author, release_name) if the author path is a release which should exist on public CPAN
+sub _public_release($archive) {
+   my ($author, $file)= $archive =~ m{\A[A-Z]/[A-Z]{2}/([A-Z][A-Z0-9]*)/([^/]+)\z}
+      or return;
+   my ($release)= CPAN::InGit::DistTree->parse_filename($file);
+   return defined $release && $author ne 'LOCAL'? ($author, $release) : ();
+}
+
+sub _metacpan_url($archive, $suffix='') {
+   my ($author, $release)= _public_release($archive) or return undef;
+   return 'https://metacpan.org/release/'.url_escape($author).'/'.url_escape($release).$suffix;
+}
+
+# Find a distribution in the current tree, or if $source_name is given, in that import source.
+# A public release is identical everywhere, so it may come from any tree that has it.
+sub _find_dist($c, $archive, $source_name=undef) {
+   my @trees= ($c->archive_tree);
+   if (defined $source_name) {
+      my $sources= $c->_import_sources;
+      my ($source)= grep $_->{name} eq $source_name, @$sources
+         or return undef;
+      @trees= _public_release($archive)? ($source->{tree}, @trees, map $_->{tree}, @$sources)
+            : ($source->{tree});
+   }
+   my %seen;
+   for my $tree (@trees) {
+      next if $seen{refaddr($tree)}++;
+      my $dist= eval {
+         local $Archive::Tar::WARN= 0;
+         # A mirror may download the dist into the cache, but only if it is allowed to fetch
+         $tree->get_dist($archive, fetch => ($tree->can('autofetch') && $tree->autofetch));
+      };
+      $c->log->warn("Could not read $archive in ".$tree->name.": $@") if $@;
+      return $dist if $dist;
+   }
+   return undef;
+}
+
+sub _render_dist_bytes($c, $bytes) {
+   $c->res->headers->header('X-Content-Type-Options' => 'nosniff');
+   if (index($bytes, "\0") >= 0) {
+      $c->res->headers->content_disposition('attachment');
+      $c->res->headers->content_type('application/octet-stream');
+      return $c->render(data => $bytes);
+   }
+   return $c->render(data => $bytes, format => 'txt');
+}
+
+
+sub serve_dist_member($c, $archive, $member) {
+   $member =~ s{/\z}{};
+   return $c->reply->not_found if _is_unsafe_path("$archive/$member");
+   my $source= $c->param('source');
+   return $c->reply->not_found
+      if defined $source && !grep $_->{name} eq $source, @{ $c->_import_sources };
+   return $c->serve_dist_diff($archive) if $member eq '~diff';
+
+   my $dist= $c->_find_dist($archive, $source);
+   if ($dist && $member eq '~changes') {
+      my ($name, $blob)= $dist->changes_file;
+      return $c->_render_dist_bytes($blob->content) if $blob;
+   }
+   elsif ($dist && $member eq '~meta') {
+      $c->res->headers->header('X-CPAN-InGit-Meta-Source' => $dist->meta_source);
+      return $c->render(json => $dist->meta->as_struct({ version => 2 }));
+   }
+   elsif ($dist && $member !~ /\A~/) {
+      my $ent= $dist->get_path($member);
+      return $c->_render_dist_directory($dist, $member, $source)
+         if $ent && $ent->[0]->is_tree;
+      # for a symlink, this shows the path it links to
+      return $c->_render_dist_bytes($ent->[0]->content)
+         if $ent;
+   }
+
+   if ($member eq '~changes' || (!$dist && $member !~ /\A~/)) {
+      my $path= join '/', map url_escape($_), split m{/}, $member;
+      my $url= _metacpan_url($archive, $member eq '~changes'? '/changes'
+                                     : '/source'.(length($path)? "/$path" : ''));
+      return $c->redirect_to($url) if $url;
+   }
+   return $c->render(status => 404, text => 'No such path in distribution');
+}
+
+sub _render_dist_directory($c, $dist, $member, $source) {
+   my $route_ns= $c->stash('cpan_ingit_route_ns');
+   my $plain_base= $c->url_for("$route_ns.authors", author_path => '');
+   my $base= $plain_base->clone;
+   $base->query(source => $source) if defined $source;
+   my $archive= $dist->author_path;
+   my $prefix= length($member)? "$archive/$member" : $archive;
+   my $entries= $dist->list_dir($member);
+   my @links= map {
+      my $name= $entries->{$_}[0]->is_tree? "$_/" : $_;
+      { name => $name, url => _author_url($base, "$prefix/$name") }
+   } sort keys %$entries;
+   my $parent= length($member)? _author_url($base, $prefix =~ s{[^/]+\z}{}r) : undef;
+   my @views;
+   if (!length $member) {
+      push @views, { name => 'Change log', url => _author_url($base, "$archive/~changes") }
+         if $dist->changes_file || _public_release($archive);
+      push @views, { name => 'Metadata', url => _author_url($base, "$archive/~meta") };
+      push @views, { name => 'Download', url => _author_url($plain_base, $archive) }
+         unless $dist->storage eq 'upstream';
+   }
+   $c->render(inline => $c->_share_dir->child('dist_directory.html.ep')->slurp('UTF-8'),
+      handler => 'ep', format => 'html', title => $prefix, links => \@links, parent => $parent,
+      views => \@views);
+}
+
+
+sub serve_dist_diff($c, $archive) {
+   my $to= $c->param('to');
+   return $c->render(status => 400, text => "Parameter 'to' must be the author path of a distribution")
+      unless defined $to && !_is_unsafe_path($to) && CPAN::InGit::DistTree->parse_filename($to);
+   my ($source, $to_source)= map $c->param($_), qw( source to_source );
+   return $c->reply->not_found
+      if defined $to_source && !grep $_->{name} eq $to_source, @{ $c->_import_sources };
+   my $from_dist= $c->_find_dist($archive, $source);
+   my $to_dist= $c->_find_dist($to, $to_source);
+   unless ($from_dist && $to_dist) {
+      my $as= $c->param('as') // 'html';
+      my $url= $as eq 'html'? _metacpan_url($to, '/changes') : undef;
+      return $c->redirect_to($url) if $url;
+      return $c->render(status => 404, text => 'Distribution not available: '.($from_dist? $to : $archive));
+   }
+   my $want_patch= ($c->param('patch') // 1)? 1 : 0;
+   my $report= $from_dist->compare($to_dist,
+      paths => [ grep length, @{ $c->every_param('path') } ],
+      patch => $want_patch,
+      hide_version_diff => ($c->param('hide_version_diff') // 1)? 1 : 0,
+   );
+   my $as= $c->param('as') // 'html';
+   return $c->render(json => $report) if $as eq 'json';
+   if ($as eq 'text') {
+      $c->res->headers->header('X-Content-Type-Options' => 'nosniff');
+      return $c->render(format => 'txt',
+         data => Mojo::Util::encode('UTF-8', CPAN::InGit::DistTree->format_comparison($report, patch => $want_patch)));
+   }
+   my $route_ns= $c->stash('cpan_ingit_route_ns');
+   my $base= $c->url_for("$route_ns.authors", author_path => '');
+   my $browse= sub ($path, $src) {
+      my $url= _author_url($base, "$path/");
+      $url->query(source => $src) if defined $src;
+      $url;
+   };
+   my $self_url= $c->req->url->clone;
+   $c->render(inline => $c->_share_dir->child('dist_diff.html.ep')->slurp('UTF-8'),
+      handler => 'ep', format => 'html', report => $report,
+      from_url => $browse->($archive, $source), to_url => $browse->($to, $to_source),
+      text_url => $self_url->clone->query({ as => 'text' }),
+      json_url => $self_url->clone->query({ as => 'json' }),
+   );
 }
 
 
@@ -308,9 +560,15 @@ sub serve_package_details($c) {
 
 sub serve_author_file($c) {
    return undef unless $c->check_tree_exists;
-   my $path= 'authors/id/'.$c->stash->{author_path};
+   my $author_path= $c->stash->{author_path};
    # cpanm adds extra '/' when the path name doesn't match the expected A/AU/AUTHOR format
-   $path =~ s,//+,/,g;
+   $author_path =~ s,//+,/,g;
+   my $dist_path= $author_path;
+   $dist_path .= '/' if $c->req->url->path->trailing_slash && $dist_path !~ m{/\z};
+   if (my @dist= _split_dist_member_path($dist_path)) {
+      return $c->serve_dist_member(@dist);
+   }
+   my $path= "authors/id/$author_path";
    my ($basename)= ($path =~ m,([^/]+)\z,);
    # Does the exact file exist?
    my $ent= $c->archive_tree->get_path($path);
@@ -323,21 +581,17 @@ sub serve_author_file($c) {
          $c->render(status => 403, text => 'not a file');
       }
    }
+   elsif (($c->archive_tree->dist_storage($author_path) // '') eq 'unpacked') {
+      my $archive= $c->archive_tree->get_distfile($author_path);
+      $c->res->headers->content_type('application/gzip');
+      $c->res->headers->content_disposition(qq{attachment; filename="$basename"});
+      $c->render(data => $$archive);
+   }
    elsif ($path =~ /(.*?)\.gz\z/
       && ($ent= $c->archive_tree->get_path($1)) && $ent->[0]->is_blob
    ) {
       $c->log->debug("Path $1 is ".$ent->[0]->id.', will gzip it');
       $c->render_gzipped($ent->[0]->content, $basename);
-   }
-   elsif ($path =~ /(.*?)\.tar\.gz\z/
-      # Don't auto-tar trees that don't look like distributions
-      && ($ent= $c->archive_tree->get_path("$1.meta")) && $ent->[0]->is_blob
-      && ($ent= $c->archive_tree->get_path($1)) && $ent->[0]->is_tree
-   ) {
-      $c->log->debug("Path $1 is ".$ent->[0]->id.', will tar+gzip it');
-      my $tar= Archive::Tar->new;
-      $c->cpan_repo->add_git_tree_to_tar($tar, substr($basename, 0, -7), $ent->[0]);
-      $c->render_gzipped($tar->write, $basename);
    }
    else {
       $c->render(status => 404, text => 'No such path in branch');
@@ -426,7 +680,13 @@ and a package index are listed only when C<index_branches> is enabled in the sta
 =head2 serve_index
 
 Serve an HTML index for a CPAN tree, including its commit date, package index date,
-and the first 5000 matching modules.
+and the first 5000 matching modules.  When import sources are configured, show
+the newest version of each module in their committed package indexes, and where a
+source has a newer distribution for the module (as decided by
+L<CPAN::InGit::ArchiveTree/find_upgrades>, the same rule C<cpangit-audit> uses) link
+the version to a L<comparison|/serve_dist_diff> of the two distributions.
+In single-tree mounts, source branches
+with a canonical web URL link to that URL.
 
 =head2 serve_module_list
 
@@ -436,10 +696,61 @@ C<after> and C<before> are exclusive module-name boundaries; supply at most one.
 Rows are sorted by module name, with at most 500 returned per request.
 
 The response contains C<modules> (objects with C<name>, C<version>, C<path>, and
-C<text>), the applied C<filter>, the Git C<tree> ID, and C<next_after> and
+C<text>, plus C<source_version> and C<review_url> where applicable),
+the applied C<filter>, the Git C<tree> ID, and C<next_after> and
 C<previous_before> cursors (null at either end).  C<complete> is true only when
 this response includes every row matching the filter, including rows outside
 the requested boundary.  A client may then narrow that filter locally.
+
+=head2 serve_dist_member
+
+Serve a path within a distribution; a directory listing, a file, or one of the special
+names C<~changes>, C<~meta>, or C<~diff>.  If the distribution is a public CPAN release
+which can't be found (or has no change log), this redirects to the equivalent page of
+metacpan.org.
+
+=head2 serve_dist_diff
+
+Compare the distribution named by the URL with another distribution, for reviewing an
+upgrade (or downgrade, or local patch).  Query parameters:
+
+=over
+
+=item to
+
+Required.  The author path of the distribution to compare with.
+
+=item source
+
+Optional name of an import source in which to look for the distribution of the URL.
+
+=item to_source
+
+Optional name of an import source in which to look for the C<to> distribution.
+
+=item path
+
+Optional, and may be repeated.  Limit the file comparison to these paths.
+
+=item patch
+
+Set to C<0> to omit the patches from the response.
+
+=item hide_version_diff
+
+Set to C<0> to show the hunks which only change the version number.
+See L<CPAN::InGit::DistTree/compare>.
+
+=item as
+
+C<json> returns the structure described in L<CPAN::InGit::DistTree/compare>.
+C<text> returns the plain-text rendering of L<CPAN::InGit::DistTree/format_comparison>.
+The default is an HTML page.
+
+=back
+
+If either distribution can't be found, this redirects to the change log of the C<to>
+distribution on metacpan.org when that is a public release, and otherwise returns 404.
 
 =head2 check_tree_exists
 
@@ -455,6 +766,8 @@ Serve C<< modules/02packages.details.txt[.gz] >>.
 Serve all files under C<< authors/id/... >>.  (All files in that path of the git branch are considered public)
 This performs automatic creation of .tar.gz files if a directory and matching .meta file exist,
 allowing distributions to be unpacked within the git repo, but served as .tar.gz files.
+A trailing slash after an archive filename browses its contents, and a path after the slash
+is handled by L</serve_dist_member>.
 
 =head2 render_gzipped
 
@@ -482,6 +795,24 @@ Summary:
   /authors/id/D/DP/DPARIS/Crypt-DES-2.07.meta       # extracted metadata
   /authors/id/L/LO/LOCAL/Crypt-DES-2.07_01/...      # untarred customized dist
   /authors/id/L/LO/LOCAL/Crypt-DES-2.07_01.meta     # untarred customized dist's metadata
+
+=head2 Distribution Contents
+
+A path that continues beyond the file name of a distribution archive refers to the contents
+of that distribution.  The files of the distribution are found directly beneath the archive
+name (the customary wrapper directory of the archive is not part of the path) and names
+beginning with C<~> are special views of the distribution:
+
+  /authors/id/D/DP/DPARIS/Crypt-DES-2.07.tar.gz/            # directory listing
+  /authors/id/D/DP/DPARIS/Crypt-DES-2.07.tar.gz/lib/        # directory listing
+  /authors/id/D/DP/DPARIS/Crypt-DES-2.07.tar.gz/DES.pm      # one file
+  /authors/id/D/DP/DPARIS/Crypt-DES-2.07.tar.gz/~changes    # the change log, whatever its name
+  /authors/id/D/DP/DPARIS/Crypt-DES-2.07.tar.gz/~meta       # CPAN Meta (version 2) as JSON
+  /authors/id/D/DP/DPARIS/Crypt-DES-2.07.tar.gz/~diff?to=D/DP/DPARIS/Crypt-DES-2.08.tar.gz
+
+All of these accept a query parameter C<source> naming one of the tree's
+C<default_import_sources>, to look for the distribution in that tree instead.  See
+L</serve_dist_diff> for the parameters of C<~diff>.
 
 =head2 mount
 
@@ -513,6 +844,9 @@ as:
 The route's root serves a repository index; C<index_branches> enables
 branch links on that page and defaults to false.
 
+Browsing and comparing the contents of distributions unpacks each archive once
+into L<CPAN::InGit/dist_cache_repo>.
+
 Files in C<share/public> are served verbatim under C<~static/> within the mount,
 using Mojo's static file handler.
 
@@ -527,7 +861,7 @@ URLs are more convenient.
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

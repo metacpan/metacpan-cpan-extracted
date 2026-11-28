@@ -16,7 +16,7 @@ use Cwd;
 use POSIX;
 use Data::Tools;
 
-our $VERSION = '1.60';
+our $VERSION = '1.61';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -27,6 +27,9 @@ our @EXPORT = qw(
                   pidfile_kill_and_remove
                   pidfile_create
                   pidfile_remove
+
+                  cwd_gone
+                  path_gone
                 );
 
 ##############################################################################
@@ -189,6 +192,28 @@ sub pidfile_remove
   return undef;
 }
 
+##############################################################################
+
+# path_gone( $path )
+# returns:
+#    * 1 if $path cannot be stat()-ed (missing, ESTALE etc. on network fs)
+#    * 1 if $path is unlinked (link count 0, e.g. removed current directory)
+#    * false otherwise
+
+sub path_gone
+{
+  my $path = shift;
+
+  my @st = stat( $path );
+  return 1 unless @st;       # ENOENT, ESTALE etc. on network fs
+  return $st[3] == 0;        # unlinked
+}
+
+sub cwd_gone
+{
+  return path_gone( '.' );
+}
+
 
 ##############################################################################
 
@@ -238,6 +263,14 @@ sub pidfile_remove
 
   # just remove the pid file
   pidfile_remove( '/var/run/myapp.pid' );
+
+  # --------------------------------------------------------------------------
+
+  # check if the current directory was removed under the process
+  die "current directory is gone" if cwd_gone();
+
+  # the same for any path
+  print "log dir is gone\n" if path_gone( '/var/log/myapp' );
 
   # --------------------------------------------------------------------------
 
@@ -352,6 +385,24 @@ Returns:
 =head2 pidfile_remove( $pid_file_name )
 
 Removes $pid_file_name. Returns undef.
+
+=head2 path_gone( $path )
+
+Checks if $path is gone. Returns true if $path cannot be stat()-ed (it does
+not exist, or the stat fails with ESTALE or similar on a network file
+system), or if its link count is 0 (it was unlinked). Returns false if
+$path is still there.
+
+Note that a link count of 0 can only be seen through something still
+holding the removed entry, like the current directory ('.') of a process
+whose directory was removed. A removed path given by name just fails stat().
+
+=head2 cwd_gone()
+
+The same as path_gone( '.' ): returns true if the current working directory
+of the process was removed (or is no longer accessible on a network file
+system), false otherwise. Useful for long running processes and daemons
+started with daemonize_here(), whose directory may be removed under them.
 
 =head1 REQUIRED MODULES
 

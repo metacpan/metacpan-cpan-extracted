@@ -1,12 +1,11 @@
 ##----------------------------------------------------------------------------
-## JSON Schema Validator - ~/lib/m
-## Version v0.9.1
+## JSON Schema Validator - ~/lib/JSON/Schema/Validate.pm
+## Version v0.9.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/07
-## Modified 2026/08/20
+## Modified 2026/11/28
 ## All rights reserved
-## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.##
@@ -23,7 +22,7 @@ BEGIN
     use Scalar::Util qw( blessed looks_like_number reftype refaddr );
     use List::Util qw( first any all );
     use Encode ();
-    our $VERSION = 'v0.9.1';
+    our $VERSION = 'v0.9.2';
 };
 
 use v5.16.0;
@@ -34,9 +33,9 @@ sub new
 {
     my $class  = shift( @_ );
     my $schema = shift( @_ );
-    if( defined( $schema ) && ( !ref( $schema ) || ref( $schema ) ne 'HASH' ) )
+    if( defined( $schema ) && ref( $schema ) ne 'HASH' && !JSON::is_bool( $schema ) )
     {
-        die( "You provided a value (", overload::StrVal( $schema ), "), but it is not an hash reference. You must create a new $class object like this: $class->new( \$schema, \%opts );" );
+        die( "You provided a value (", overload::StrVal( $schema ), "), but it is not a hash reference or a JSON boolean. You must create a new $class object like this: $class->new( \$schema, \%opts );" );
     }
 
     my $self =
@@ -44,7 +43,7 @@ sub new
         comment_handler     => undef,
         # boolean
         compile_on          => 0,
-        # { schema, anchors, id_index, base }
+        # { schema, resource_index, base, fn_index }
         compiled            => undef,
         # boolean; when 0, failures don’t invalidate; when 1, they do
         content_assert      => 0,
@@ -162,9 +161,10 @@ sub compile_js
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
+    $opts    = {%$opts};
 
-    my $schema = $self->{schema}
-        or die( "No schema loaded; cannot compile to JavaScript" );
+    my $schema = $self->{schema};
+    die( "No schema loaded; cannot compile to JavaScript" ) unless( defined( $schema ) );
 
     # Public JS API name, e.g. "validateIncorporation"
     my $name = exists( $opts->{name} ) && defined( $opts->{name} ) && length( $opts->{name} )
@@ -180,6 +180,9 @@ sub compile_js
     my @funcs;         # accumulated JS validator functions
 
     my $root_ptr = '#';
+    my $index = { resources => {}, nodes => {} };
+    $opts->{_resource_base} = _index_schema_202012( $schema, '', '#', $index, 1 );
+    $opts->{_resource_index} = $index;
 
     # Pass $opts down so we can see ecma => ... inside the compiler.
     my $root_fn  = $self->_compile_js_node( $schema, $root_ptr, \%seen, \@funcs, \$counter, $schema, $opts );
@@ -227,6 +230,26 @@ sub compile_js
     function _jsv_hasOwn(obj, prop)
     {
         return Object.prototype.hasOwnProperty.call(obj, prop);
+    }
+
+    function _jsv_equal(a, b)
+    {
+        if(a === b) return true;
+        if(a === null || b === null || typeof a !== 'object' || typeof b !== 'object') return false;
+        if(Array.isArray(a) !== Array.isArray(b)) return false;
+        var keys = Object.keys(a);
+        if(keys.length !== Object.keys(b).length) return false;
+        for(var i = 0; i < keys.length; i++)
+        {
+            var key = keys[i];
+            if(!_jsv_hasOwn(b, key) || !_jsv_equal(a[key], b[key])) return false;
+        }
+        return true;
+    }
+
+    function _jsv_strlen(s)
+    {
+        return s.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, 'x').length;
     }
 
 JS_RUNTIME
@@ -838,40 +861,42 @@ sub validate
 
     my $ctx =
     {
-        root            => $self->{compiled},
-        instance_root   => $data,
-        resolver        => $self->{resolver},
-        formats         => $self->{formats},
-        errors          => $self->{errors},
-        max_errors      => ( ( defined( $opts->{max_errors} ) && $opts->{max_errors} =~ /^\d+$/ ) ? $opts->{max_errors} : $self->{max_errors} ),
-        error_count     => 0,
+        root                => $self->{compiled},
+        resource_index      => _copy_resource_index( $self->{compiled}->{resource_index} ),
+        external_fn_index   => {},
+        instance_root       => $data,
+        resolver            => $self->{resolver},
+        formats             => $self->{formats},
+        errors              => $self->{errors},
+        max_errors          => ( ( defined( $opts->{max_errors} ) && $opts->{max_errors} =~ /^\d+$/ ) ? $opts->{max_errors} : $self->{max_errors} ),
+        error_count         => 0,
 
         # paths / recursion
-        ptr_stack       => ['#'],
-        id_stack        => [ $self->{compiled}->{base} ],
-        dyn_stack       => [ {} ],                     # dynamicAnchor scope frames
-        visited         => {},                         # "schema_ptr|inst_addr" => 1
+        ptr_stack           => ['#'],
+        id_stack            => [ $self->{compiled}->{base} ],
+        dyn_stack           => [ {} ],  # dynamicAnchor scope frames
+        visited             => {},      # "resource|schema_ptr|inst_addr" => 1
 
         # annotation (for unevaluated*)
-        ann_mode        => 1,
-        compile_on      => ( defined( $opts->{compile_on} ) ? ( $opts->{compile_on} ? 1 : 0 ) : ( $self->{compile_on} ? 1 : 0 ) ),
+        ann_mode            => 1,
+        compile_on          => ( defined( $opts->{compile_on} ) ? ( $opts->{compile_on} ? 1 : 0 ) : ( $self->{compile_on} ? 1 : 0 ) ),
 
         # trace
-        trace_on        => ( defined( $opts->{trace_on} ) ? ( $opts->{trace_on} ? 1 : 0 ) : ( $self->{trace_on} ? 1 : 0 ) ),
-        trace_sample    => $self->{trace_sample} || 0,
-        trace_limit     => ( defined( $opts->{trace_limit} ) && $opts->{trace_limit} =~ /^\d+$/ ) ? $opts->{trace_limit} : ( $self->{trace_limit} || 0 ),
-        trace           => [],
+        trace_on            => ( defined( $opts->{trace_on} ) ? ( $opts->{trace_on} ? 1 : 0 ) : ( $self->{trace_on} ? 1 : 0 ) ),
+        trace_sample        => $self->{trace_sample} || 0,
+        trace_limit         => ( defined( $opts->{trace_limit} ) && $opts->{trace_limit} =~ /^\d+$/ ) ? $opts->{trace_limit} : ( $self->{trace_limit} || 0 ),
+        trace               => [],
 
         # content assertion & helpers
-        content_assert   => ( defined( $opts->{content_assert} ) ? ( $opts->{content_assert} ? 1 : 0 ) : ( $self->{content_assert} ? 1 : 0 ) ),
-        media_validators => $self->{media_validators},
-        content_decoders => $self->{content_decoders},
+        content_assert      => ( defined( $opts->{content_assert} ) ? ( $opts->{content_assert} ? 1 : 0 ) : ( $self->{content_assert} ? 1 : 0 ) ),
+        media_validators    => $self->{media_validators},
+        content_decoders    => $self->{content_decoders},
 
-        comment_handler  => $self->{comment_handler},
+        comment_handler     => $self->{comment_handler},
 
         # extensions
-        unique_keys      => $self->{unique_keys},
-        extensions       => $self->{extensions},
+        unique_keys         => $self->{unique_keys},
+        extensions          => $self->{extensions},
     };
 
     # Guarantee at least one trace entry when trace is enabled
@@ -903,131 +928,115 @@ sub validate
 sub _apply_dynamic_ref
 {
     my( $ctx, $schema_ptr, $ref, $inst ) = @_;
-
-    if( $ref =~ /\#(.+)\z/ )
-    {
-        my $name = $1;
-        for( my $i = $#{ $ctx->{dyn_stack} }; $i >= 0; $i-- )
-        {
-            my $frame = $ctx->{dyn_stack}->[$i];
-            if( my $node = $frame->{ $name } )
-            {
-                my $sp = _ptr_of_node( $ctx->{root}, $node );
-                return( _v( $ctx, $sp, $node, $inst ) );
-            }
-        }
-    }
-
-    return( _apply_ref( $ctx, $schema_ptr, $ref, $inst ) );
+    return( _apply_ref( $ctx, $schema_ptr, $ref, $inst, '$dynamicRef' ) );
 }
 
 # $ref and $dynamicRef
 sub _apply_ref
 {
-    my( $ctx, $schema_ptr, $ref, $inst ) = @_;
+    my( $ctx, $schema_ptr, $ref, $inst, $keyword ) = @_;
+    $keyword ||= '$ref';
+    my $abs = _resolve_uri( $ctx->{id_stack}->[-1], $ref );
+    my( $uri, $fragment ) = split( /#/, $abs, 2 );
+    $uri = '' unless( defined( $uri ) );
+    my $index = $ctx->{resource_index};
 
-    my $base = $ctx->{id_stack}->[-1];
-    my $abs  = _resolve_uri( $base, $ref );
-
-    # Direct absolute ID/anchor hit
-    if( my $node = $ctx->{root}->{id_index}->{ $abs } )
-    {
-        my $sp = _ptr_of_node( $ctx->{root}, $node );
-        return( _v( $ctx, $sp, $node, $inst ) );
-    }
-
-    # Local fragment
-    if( $ref =~ /^\#/ )
-    {
-        # 1) Try anchors (e.g. "#foo" / "#MyAnchor")
-        if( my $n = $ctx->{root}->{anchors}->{ $ref } )
-        {
-            return( _v( $ctx, $ref, $n, $inst ) );
-        }
-        if( $ref =~ /^\#([A-Za-z0-9._-]+)\z/ )
-        {
-            my $cand = $base . '#' . $1;
-            if( my $node = $ctx->{root}->{id_index}->{ $cand } )
-            {
-                my $sp = _ptr_of_node( $ctx->{root}, $node );
-                return( _v( $ctx, $sp, $node, $inst ) );
-            }
-        }
-        # 2) If it’s a JSON Pointer ( "#/..." ), use _jsv_resolve_internal_ref
-        if( $ref =~ m{\A\#/(?:[^~/]|~[01])} )
-        {
-            # or pulled from id_index; same one used in compile_js
-            my $root_schema = $ctx->{root}->{schema} or return( _err_res( $ctx, $schema_ptr, "missing schema", '$ref' ) );
-
-            my $node = _jsv_resolve_internal_ref( $root_schema, $ref );
-            if( $node )
-            {
-                return( _v( $ctx, $ref, $node, $inst ) );
-            }
-
-            return _err_res(
-                $ctx,
-                $schema_ptr,
-                "unresolved JSON Pointer fragment in \$ref: $abs",
-                '$ref'
-            );
-        }
-        # 3) If not a JSON Pointer and not an anchor, fall through to external resolver / error
-    }
-
-    # External resolver hook
-    if( $ctx->{resolver} )
+    # Resolve external resources once per validation, without retaining resolver answers across calls.
+    if( !exists( $index->{resources}->{ $uri } ) && $ctx->{resolver} )
     {
         local $@;
         my $ext = eval{ $ctx->{resolver}->( $abs ) };
-        return( _err_res( $ctx, $schema_ptr, "resolver failed for \$ref: $abs", '$ref' ) ) unless( $ext && ref( $ext ) );
-
-        my $ext_base = _normalize_uri( ( ref( $ext ) eq 'HASH' && $ext->{'$id'} ) ? $ext->{'$id'} : $abs );
-
-        my( $frag ) = ( $abs =~ /(\#.*)\z/ );
-        my ( $anchors, $ids ) = ( {}, {} );
-        _index_schema_202012( $ext, $ext_base, '#', $anchors, $ids );
-
-        push( @{$ctx->{id_stack}}, $ext_base );
-
-        # If the abs URI included a JSON Pointer fragment, honor it here
-        my $target_ptr = '#';
-        if( defined( $frag ) && length( $frag ) )
+        return( _err_res( $ctx, $schema_ptr, "resolver failed for $keyword: $abs", $keyword ) )
+            unless( ref( $ext ) eq 'HASH' || JSON::is_bool( $ext ) );
+        $ext = eval{ _clone( $ext ) };
+        return( _err_res( $ctx, $schema_ptr, "invalid schema resource for $keyword: $abs", $keyword ) ) if( $@ );
+        # A retrieval URI may identify an already indexed canonical resource. Reuse it only if the schema is identical.
+        my $canonical = $uri;
+        if( ref( $ext ) eq 'HASH' && defined( $ext->{'$id'} ) && !ref( $ext->{'$id'} ) && length( $ext->{'$id'} ) )
         {
-            if( $frag =~ m{\A\#/(?:[^~/]|~[01])} )
-            {
-                # JSON Pointer fragment
-                if( my $node = $anchors->{ $frag } )
-                {
-                    my $r = _v( $ctx, $frag, $node, $inst );
-                    pop( @{$ctx->{id_stack}} );
-                    return( $r );
-                }
-                else
-                {
-                    pop( @{$ctx->{id_stack}} );
-                    return( _err_res( $ctx, $schema_ptr, "unresolved JSON Pointer fragment in \$ref: $abs", '$ref' ) );
-                }
-            }
-            elsif( $frag =~ /\A\#([A-Za-z0-9._-]+)\z/ )
-            {
-                my $cand = $ext_base . '#' . $1;
-                if( my $node = $ids->{ $cand } )
-                {
-                    my $sp = _ptr_of_node( { anchors => $anchors }, $node ) || '#';
-                    my $r  = _v( $ctx, $sp, $node, $inst );
-                    pop( @{$ctx->{id_stack}} );
-                    return( $r );
-                }
-            }
+            $canonical = _resolve_uri( $uri, $ext->{'$id'} );
+            $canonical =~ s/#$//;
         }
-
-        my $r = _v( $ctx, '#', $ext, $inst );
-        pop( @{$ctx->{id_stack}} );
-        return( $r );
+        if( my $existing = $index->{resources}->{ $canonical } )
+        {
+            return( _err_res( $ctx, $schema_ptr, "conflicting schema resource for $keyword: $abs", $keyword ) )
+                unless( _canon( $existing->{schema} ) eq _canon( $ext ) );
+            $index->{resources}->{ $uri } = $existing;
+        }
+        else
+        {
+            my $staged = _copy_resource_index( $index );
+            my $base = eval{ _index_schema_202012( $ext, $uri, '#', $staged, 1 ) };
+            return( _err_res( $ctx, $schema_ptr, "invalid schema resource for $keyword: $abs", $keyword ) ) if( $@ );
+            # The retrieval URI cannot also identify a different embedded resource in the returned document.
+            return( _err_res( $ctx, $schema_ptr, "conflicting schema resource for $keyword: $abs", $keyword ) )
+                if( $uri ne $base && exists( $staged->{resources}->{ $uri } ) );
+            $staged->{resources}->{ $uri } = $staged->{resources}->{ $base };
+            %$index = %$staged;
+        }
     }
+    my $resource = $index->{resources}->{ $uri };
+    return( _err_res( $ctx, $schema_ptr, "unresolved $keyword: $ref (abs: $abs)", $keyword ) ) unless( $resource );
+    my( $node, $ptr );
+    $fragment = '' unless( defined( $fragment ) );
+    # URI fragments are UTF-8 percent-encoded JSON Pointers or plain-name anchors.
+    my $decoded = eval{ _decode_fragment( $fragment ) };
+    return( _err_res( $ctx, $schema_ptr, "invalid fragment in $keyword: $abs", $keyword ) ) unless( defined( $decoded ) );
+    $fragment = $decoded;
+    if( $fragment eq '' )
+    {
+        ( $node, $ptr ) = @$resource{qw( schema pointer )};
+    }
+    elsif( $fragment =~ m{^/} )
+    {
+        $node = _jsv_resolve_internal_ref( $resource->{schema}, '#' . $fragment );
+        $ptr = $resource->{pointer} . $fragment;
+    }
+    else
+    {
+        my $entry = $resource->{anchors}->{ $fragment };
+        if( $entry )
+        {
+            # Only a dynamic anchor at the statically resolved target enables dynamic scope lookup.
+            if( $keyword eq '$dynamicRef' && $entry->{dynamic} )
+            {
+                for my $scope ( @{$ctx->{id_stack}} )
+                {
+                    my $candidate = $index->{resources}->{ $scope }->{anchors}->{ $fragment };
+                    next unless( $candidate && $candidate->{dynamic} );
+                    $entry = $candidate;
+                    last;
+                }
+            }
+            ( $node, $ptr ) = @$entry{qw( schema pointer )};
+        }
+    }
+    unless( ref( $node ) eq 'HASH' || JSON::is_bool( $node ) )
+    {
+        my $msg = $fragment =~ m{^/} ? "unresolved JSON Pointer fragment in $keyword: $abs" : "unresolved $keyword: $ref (abs: $abs)";
+        return( _err_res( $ctx, $schema_ptr, $msg, $keyword ) );
+    }
+    # Explicit pointers may address legacy schema containers outside standard vocabulary locations.
+    my $base = $resource->{base};
+    if( ref( $node ) eq 'HASH' && !exists( $index->{nodes}->{ refaddr( $node ) } ) )
+    {
+        my $staged = _copy_resource_index( $index );
+        eval{ _index_schema_202012( $node, $base, $ptr, $staged, 0 ) };
+        return( _err_res( $ctx, $schema_ptr, "invalid schema resource for $keyword: $abs", $keyword ) ) if( $@ );
+        %$index = %$staged;
+    }
+    # Hash schemas carry their own indexed scope; boolean schemas cannot contain references.
+    return( _v( $ctx, $ptr, $node, $inst ) );
+}
 
-    return( _err_res( $ctx, $schema_ptr, "unresolved \$ref: $ref (abs: $abs)", '$ref' ) );
+sub _builtin_json_media
+{
+    my( $text, $params ) = @_;
+    local $@;
+    eval{ _decode_json_content( $text ) };
+    return( 0, 'invalid JSON', undef ) if( $@ );
+    # Leave the original payload available for contentSchema, including JSON scalars and null.
+    return( 1, undef );
 }
 
 sub _canon
@@ -1109,7 +1118,11 @@ sub _compile_js_node
                 $target_schema =~ /^#\//
             )
             {
-                last if( $followed{ $target_schema }++ );
+                if( $followed{ $target_schema }++ )
+                {
+                    $target_schema = undef;
+                    last;
+                }
                 $target_ptr    = $target_schema;
                 $target_schema = _jsv_resolve_internal_ref( $root, $target_ptr );
             }
@@ -1122,7 +1135,7 @@ sub _compile_js_node
             my $fn = "jsv_node_${id}";
             $seen->{ $sp } = $fn;
             push( @$funcs, <<JS_RUNTIME );
-// $sp (unresolved pointer-alias $S)
+// Schema node (unresolved pointer alias)
 function $fn(inst, path, ctx)
 {
 }
@@ -1130,7 +1143,7 @@ JS_RUNTIME
             return( $fn );
         }
 
-        unless( ref( $target_schema ) eq 'HASH' )
+        unless( ref( $target_schema ) eq 'HASH' || JSON::is_bool( $target_schema ) )
         {
             die(
                 "Internal error: pointer-alias '$S' at '$sp' did not resolve to an object schema " .
@@ -1145,123 +1158,54 @@ JS_RUNTIME
         return( $base_fn );
     }
 
-    # NOTE: $ref
-    # 0) $ref handling (internal refs only)
-    if( ref( $S ) eq 'HASH' &&
-        exists( $S->{'$ref'} ) )
-    {
-        my $ref = $S->{'$ref'};
-
-        # Only support internal refs ("#/...") in JS
-        if( defined( $ref ) && $ref =~ /^#/ )
-        {
-            my $target_ptr = $ref;
-
-            # If we already compiled that pointer, just alias and return it
-            if( exists( $seen->{ $target_ptr } ) )
-            {
-                $seen->{ $sp } = $seen->{ $target_ptr };
-                return( $seen->{ $target_ptr } );
-            }
-
-            # Otherwise, resolve pointer against the root schema
-            my $target_schema = _jsv_resolve_internal_ref( $root, $target_ptr );
-
-
-            # Support "pointer alias" schemas such as:
-            # definitions => { address => "#/definitions/jp_address" }
-            # Keep resolving until we reach a real schema hash.
-            if( defined( $target_schema ) && !ref( $target_schema ) )
-            {
-                my %followed;
-                while(
-                    defined( $target_schema ) &&
-                    !ref( $target_schema ) &&
-                    $target_schema =~ /^#\//
-                )
-                {
-                    last if( $followed{ $target_schema }++ );
-                    $target_ptr    = $target_schema;
-                    $target_schema = _jsv_resolve_internal_ref( $root, $target_ptr );
-                }
-            }
-
-            unless( defined( $target_schema ) )
-            {
-                # Pointer could not be resolved. As a safety fallback,
-                # make this node a no-op on the client (server will still enforce).
-                my $id = $$counter_ref++;
-                my $fn = "jsv_node_${id}";
-                $seen->{ $sp } = $fn;
-                push( @$funcs, <<JS_RUNTIME );
-// $sp
-function $fn(inst, path, ctx)
-{
-}
-
-JS_RUNTIME
-                return( $fn );
-            }
-
-            unless( ref( $target_schema ) eq 'HASH' )
-            {
-                die( "Internal error: \$ref target '$target_ptr' did not resolve to a schema object (got " .
-                     ( defined( $target_schema ) ? ref( $target_schema ) || 'scalar' : 'undef' ) .
-                     "). If you are using pointer-alias definitions, they must ultimately resolve to an object schema." );
-            }
-
-            # Compile the target, then merge sibling keywords
-            my $base_fn = $self->_compile_js_node( $target_schema, $target_ptr, $seen, $funcs, $counter_ref, $root, $opts );
-
-            # Create a wrapper that runs both the referenced schema AND local keywords
-            my $id = $$counter_ref++;
-            my $wrapper_fn = "jsv_node_$id";
-            $seen->{ $sp } = $wrapper_fn;
-
-            my @wrapper_body;
-            push( @wrapper_body, <<JS_RUNTIME );
-// $sp (\$ref + siblings)
-function $wrapper_fn(inst, path, ctx)
-{
-    $base_fn(inst, path, ctx);
-    if(ctx.errors.length >= ctx.maxErrors) return;
-JS_RUNTIME
-
-            # Now compile the current node again, but skip the $ref
-            my $local_S = { %$S };  # shallow copy
-            delete( $local_S->{'$ref'} );
-            my $local_sp = _join_ptr( $sp, '__local__' );
-            my $local_fn = $self->_compile_js_node( $local_S, $local_sp, $seen, $funcs, $counter_ref, $root, $opts );
-
-            if( $local_fn ne $wrapper_fn )
-            {
-                push( @wrapper_body, <<JS_RUNTIME );
-    $local_fn(inst, path, ctx);
-JS_RUNTIME
-            }
-
-            push( @wrapper_body, <<JS_RUNTIME );
-}
-JS_RUNTIME
-            push( @$funcs, join( '', @wrapper_body ) );
-            return( $wrapper_fn );
-        }
-
-        # External refs (URLs, etc.) are not resolved on the client.
-        # Full resolution is done server-side.
-    }
-
     my $id = $$counter_ref++;
     my $fn = "jsv_node_$id";
     $seen->{ $sp } = $fn;
 
     my @body;
-
+    my $qsp = _js_quote( $sp );
+    my $comment = _js_comment( $sp );
     push( @body, <<JS_RUNTIME );
-// $sp
+// $comment
 function $fn(inst, path, ctx)
 {
 JS_RUNTIME
+    if( JSON::is_bool( $S ) )
+    {
+        push( @body, "    _jsv_err(ctx, path, 'false', 'instance does not satisfy false schema', $qsp);\n" ) unless( $S );
+        push( @$funcs, join( '', @body ) . "}\n" );
+        return( $fn );
+    }
+    unless( ref( $S ) eq 'HASH' )
+    {
+        push( @$funcs, join( '', @body ) . "}\n" );
+        return( $fn );
+    }
+
+    # Guard reference recursion at the same instance path. Register the function before compiling its targets.
+    my $has_ref = exists( $S->{'$ref'} );
+    if( $has_ref )
+    {
+        my $guard = _js_quote( $fn );
+        push( @body, <<JS_RUNTIME );
+    var active = ctx.active || (ctx.active = Object.create(null));
+    var guard = $guard + ':' + path;
+    if(active[guard]) return;
+    active[guard] = true;
+    try
+    {
+JS_RUNTIME
+        my( $target_schema, $target_ptr ) = _js_reference_target( $S, $opts );
+        if( defined( $target_schema ) )
+        {
+            my $base_fn = $self->_compile_js_node( $target_schema, $target_ptr, $seen, $funcs, $counter_ref, $root, $opts );
+            push( @body, <<JS_RUNTIME );
+    $base_fn(inst, path, ctx);
+    if(ctx.maxErrors && ctx.errors.length >= ctx.maxErrors) return;
+JS_RUNTIME
+        }
+        # External or unsupported references remain server-side checks, but local keywords still apply.
+    }
 
     # NOTE: combinator (allOf / anyOf / oneOf / not / if-then-else)
     if( ref( $S ) eq 'HASH' )
@@ -1277,7 +1221,7 @@ JS_RUNTIME
                 my $sub_fn = $self->_compile_js_node( $S->{allOf}->[ $i ], $sub_sp, $seen, $funcs, $counter_ref, $root, $opts );
 
                 push( @body, <<JS_RUNTIME );
-    // $sub_sp
+    // Schema node
     $sub_fn(inst, path, ctx);
     if(ctx.maxErrors && ctx.errors.length >= ctx.maxErrors) return;
 JS_RUNTIME
@@ -1308,7 +1252,7 @@ JS_RUNTIME
                 push( @body, <<JS_RUNTIME );
         if(matched) return;
         ctx.errors = [];
-        // $sub_sp
+        // Schema node
         $sub_fn(inst, path, ctx);
         if(ctx.errors.length === 0)
         {
@@ -1351,7 +1295,7 @@ JS_RUNTIME
 
                 push( @body, <<JS_RUNTIME );
         ctx.errors = [];
-        // $sub_sp
+        // Schema node
         $sub_fn(inst, path, ctx);
         if(ctx.errors.length === 0)
         {
@@ -1416,7 +1360,7 @@ JS_RUNTIME
     {
         var baseErrors = ctx.errors;
         ctx.errors = [];
-        // $sub_sp
+        // Schema node
         $sub_fn(inst, path, ctx);
         var failed = (ctx.errors.length > 0);
         ctx.errors = baseErrors;
@@ -1433,7 +1377,7 @@ JS_RUNTIME
                 # Skip "not + required" style rules on the client;
                 # they are enforced server-side only.
                 push( @body, <<JS_RUNTIME );
-    // NOTE: 'not' at $sp is a negative-required pattern; skipped client-side.
+    // NOTE: 'not' is a negative-required pattern; skipped client-side.
 JS_RUNTIME
             }
         }
@@ -1450,13 +1394,13 @@ JS_RUNTIME
         var baseErrors = ctx.errors;
         var tmp = [];
         ctx.errors = tmp;
-        // $if_sp
+        // Schema node
         $if_fn(inst, path, ctx);
         var failed = (tmp.length > 0);
         ctx.errors = baseErrors;
 JS_RUNTIME
 
-            if( $S->{then} )
+            if( exists( $S->{then} ) )
             {
                 my $then_sp = _join_ptr( $sp, 'then' );
                 my $then_fn = $self->_compile_js_node( $S->{then}, $then_sp, $seen, $funcs, $counter_ref, $root, $opts );
@@ -1467,12 +1411,12 @@ JS_RUNTIME
         }
 JS_RUNTIME
             }
-            if( $S->{else} )
+            if( exists( $S->{else} ) )
             {
                 my $else_sp = _join_ptr( $sp, 'else' );
                 my $else_fn = $self->_compile_js_node( $S->{else}, $else_sp, $seen, $funcs, $counter_ref, $root, $opts );
                 push( @body, <<JS_RUNTIME );
-        else
+        if(failed)
         {
             $else_fn(inst, path, ctx);
         }
@@ -1571,7 +1515,7 @@ JS_RUNTIME
         @{$S->{enum}} )
     {
         my @vals  = @{$S->{enum}};
-        my @vs_js = map{ _js_quote( $_ ) } @vals;
+        my @vs_js = map{ "JSON.parse(" . _js_quote( _js_literal( $_ ) ) . ")" } @vals;
         my $qsp   = _js_quote( $sp );
 
         local $" = ', ';
@@ -1583,7 +1527,7 @@ JS_RUNTIME
         var list = [ @vs_js ];
         for(var i = 0; i < list.length; i++)
         {
-            if(v === list[i])
+            if(_jsv_equal(v, list[i]))
             {
                 ok = true;
                 break;
@@ -1598,32 +1542,17 @@ JS_RUNTIME
     }
 
     # NOTE: const
-    # 3) const (primitive only)
+    # 3) const compares JSON values without coercion.
     if( exists( $S->{const} ) )
     {
-        # For simplicity on the JS side, only support primitive const reliably.
-        # (Object/array equality is non-trivial; we keep it minimal for now.)
-        my $c   = $S->{const};
+        my $cv = _js_quote( _js_literal( $S->{const} ) );
         my $qsp = _js_quote( $sp );
-
-        if( !ref( $c ) )
-        {
-            my $cv = _js_quote( $c );
-            push( @body, <<JS_RUNTIME );
-    if(inst !== $cv)
+        push( @body, <<JS_RUNTIME );
+    if(!_jsv_equal(inst, JSON.parse($cv)))
     {
         _jsv_err(ctx, path, 'const', 'value does not match const', $qsp);
     }
 JS_RUNTIME
-        }
-        else
-        {
-            # Complex const -> skip in JS (server will still enforce)
-            push( @body, <<JS_RUNTIME );
-    // NOTE: const at $sp is non-primitive; not enforced client-side.
-
-JS_RUNTIME
-        }
     }
 
     # NOTE: required
@@ -1679,7 +1608,7 @@ JS_RUNTIME
         {
             my $min = int( $S->{minLength} );
             push( @body, <<JS_RUNTIME );
-        if(inst.length < $min)
+        if(_jsv_strlen(inst) < $min)
         {
             _jsv_err(ctx, path, 'minLength', 'string shorter than minLength $min', $qsp);
         }
@@ -1690,7 +1619,7 @@ JS_RUNTIME
         {
             my $max = int( $S->{maxLength} );
             push( @body, <<JS_RUNTIME );
-        if(inst.length > $max)
+        if(_jsv_strlen(inst) > $max)
         {
             _jsv_err(ctx, path, 'maxLength', 'string longer than maxLength $max', $qsp);
         }
@@ -1872,19 +1801,20 @@ JS_RUNTIME
         }
     }
 
-    # NOTE: items / minItems / maxItems
+    # NOTE: prefixItems / items / minItems / maxItems
     # 7) array items & minItems/maxItems
+    my $prefix = ref( $S->{prefixItems} ) eq 'ARRAY' ? $S->{prefixItems} : [];
     my $has_array_len =
         exists( $S->{minItems} ) ||
         exists( $S->{maxItems} );
 
-    if( exists( $S->{items} ) || $has_array_len )
+    if( @$prefix || exists( $S->{items} ) || $has_array_len )
     {
         my $qsp = _js_quote( $sp );
 
         # Precompile single-schema "items"
         my $items_fn;
-        if( exists( $S->{items} ) && ref( $S->{items} ) eq 'HASH' )
+        if( exists( $S->{items} ) && ( ref( $S->{items} ) eq 'HASH' || JSON::is_bool( $S->{items} ) ) )
         {
             my $items_ptr = _join_ptr( $sp, 'items' );
             $items_fn     = $self->_compile_js_node( $S->{items}, $items_ptr, $seen, $funcs, $counter_ref, $root, $opts );
@@ -1930,10 +1860,25 @@ JS_RUNTIME
 JS_RUNTIME
         }
 
+        # Validate each existing tuple position before applying items to the remainder.
+        for my $i ( 0 .. $#$prefix )
+        {
+            my $prefix_ptr = _join_ptr( $sp, 'prefixItems', $i );
+            my $prefix_fn = $self->_compile_js_node( $prefix->[$i], $prefix_ptr, $seen, $funcs, $counter_ref, $root, $opts );
+            push( @body, <<JS_RUNTIME );
+        if(inst.length > $i)
+        {
+            $prefix_fn(inst[$i], path + '/' + $i, ctx);
+            if(ctx.maxErrors && ctx.errors.length >= ctx.maxErrors) return;
+        }
+JS_RUNTIME
+        }
+
         if( $items_fn )
         {
+            my $start = scalar( @$prefix );
             push( @body, <<JS_RUNTIME );
-        for(var i = 0; i < inst.length; i++)
+        for(var i = $start; i < inst.length; i++)
         {
             $items_fn(inst[i], path + '/' + i, ctx);
             if(ctx.maxErrors && ctx.errors && ctx.errors.length >= ctx.maxErrors)
@@ -1966,13 +1911,13 @@ JS_RUNTIME
             my $child_fn  = $self->_compile_js_node( $child, $child_ptr, $seen, $funcs, $counter_ref, $root, $opts );
 
             my $qp            = _js_quote( $p );
-            my $path_suffix   = '/' . $p;
+            my $path_suffix   = substr( _join_ptr( '#', $p ), 1 );
             my $path_suffix_q = _js_quote( $path_suffix );
 
             push( @body, <<JS_RUNTIME );
         if(_jsv_hasOwn(inst, $qp))
         {
-            // $child_ptr
+            // Schema node
             $child_fn(inst[$qp], path + $path_suffix_q, ctx);
         }
 JS_RUNTIME
@@ -2026,7 +1971,7 @@ JS_RUNTIME
         for(var i = 0; i < inst.length; i++)
         {
             var tmpCtx = { errors: [], maxErrors: ctx.maxErrors };
-            // $contains_ptr
+            // Schema node
             $contains_fn(inst[i], path + '/' + i, tmpCtx);
             if(tmpCtx.errors.length === 0)
             {
@@ -2056,7 +2001,7 @@ JS_RUNTIME
         }
 
         # Plain "contains" only if no min/max are present
-        if( !$have_min && !$have_max )
+        if( !$have_min )
         {
             push( @body, <<JS_RUNTIME );
         if(matchCount === 0)
@@ -2071,6 +2016,16 @@ JS_RUNTIME
 JS_RUNTIME
     }
 
+    if( $has_ref )
+    {
+        push( @body, <<JS_RUNTIME );
+    }
+    finally
+    {
+        delete active[guard];
+    }
+JS_RUNTIME
+    }
     push( @body, <<JS_RUNTIME );
 }
 JS_RUNTIME
@@ -2084,20 +2039,27 @@ sub _compile_node
 {
     my( $root, $ptr, $S ) = @_;
 
-    # Non-hash schemas (incl. booleans) => trivial pass
+    # Boolean subschemas use the same semantics as the interpreter.
+    if( JSON::is_bool( $S ) )
+    {
+        return sub
+        {
+            my( $ctx, $inst ) = @_;
+            return( _v_node( $ctx, $ptr, $S, $inst ) );
+        };
+    }
+
+    # Non-hash, non-boolean schemas retain the existing fallback behaviour.
     return sub
     {
         my( $ctx, $inst ) = @_;
         return( { ok => 1, props => {}, items => {} } );
     } unless( ref( $S ) eq 'HASH' );
 
-    # NOTE: $ref / $dynamicRef must not be compiled inline
-    # A child node carrying a reference has no local keywords of its own, so
-    # compiling it would produce a closure that trivially succeeds and the
-    # referenced schema would never be applied. Referenced nodes are therefore
-    # delegated back to _v_node(), which resolves the reference before it
-    # considers the compiled path. There is no recursion risk here, because
-    # _v_node() handles the reference before it looks up the compiled index.
+    # NOTE: $ref / $dynamicRef must not be compiled inline.
+    # Delegate reference-bearing nodes to _v_node(), which evaluates the references
+    # and their sibling keywords together. It bypasses the compiled closure for
+    # these nodes to prevent recursive delegation.
     if( exists( $S->{'$ref'} ) ||
         exists( $S->{'$dynamicRef'} ) )
     {
@@ -2192,33 +2154,6 @@ sub _compile_node
         $child{ "ueprops" } = _compile_node( $root, _join_ptr( $ptr, "unevaluatedProperties" ), $S->{unevaluatedProperties} );
     }
 
-    # Combinators
-    for my $kw ( qw( allOf anyOf oneOf not ) )
-    {
-        next unless( exists( $S->{ $kw } ) );
-        if( $kw eq 'not' )
-        {
-            $child{ "not" } = _compile_node( $root, _join_ptr( $ptr, "not" ), $S->{not} ) if( ref( $S->{not} ) );
-            next;
-        }
-        if( ref( $S->{ $kw } ) eq 'ARRAY' )
-        {
-            for my $i ( 0 .. $#{$S->{ $kw }} )
-            {
-                my $cp = _join_ptr( $ptr, "$kw/$i" );
-                $child{ "$kw:$i" } = _compile_node( $root, $cp, $S->{ $kw }->[$i] );
-            }
-        }
-    }
-
-    # Conditionals
-    if( exists( $S->{if} ) && ref( $S->{if} ) eq 'HASH' )
-    {
-        $child{ "if" }   = _compile_node( $root, _join_ptr( $ptr, 'if' ),   $S->{if} );
-        $child{ "then" } = _compile_node( $root, _join_ptr( $ptr, 'then' ), $S->{then} ) if( exists( $S->{then} ) && ref( $S->{then} ) );
-        $child{ "else" } = _compile_node( $root, _join_ptr( $ptr, 'else' ), $S->{else} ) if( exists( $S->{else} ) && ref( $S->{else} ) );
-    }
-
     # Return specialized validator
     return sub
     {
@@ -2250,93 +2185,16 @@ sub _compile_node
         }
 
         # Strings
-        if( !ref( $inst ) && defined( $inst ) )
+        if( _match_type( $inst, 'string' ) )
         {
             if( $has_strlen ) { _k_string( $ctx, $inst, $S,           $ptr ) or return( _fail() ); }
             if( $has_format ) { _k_format( $ctx, $inst, $format_name, $ptr ) or return( _fail() ); }
 
             # contentEncoding / contentMediaType / contentSchema (compiled path)
-            if( exists( $S->{contentEncoding} ) ||
-                exists( $S->{contentMediaType} ) ||
-                exists( $S->{contentSchema} ) )
+            if( $ctx->{content_assert} && ( exists( $S->{contentEncoding} ) || exists( $S->{contentMediaType} ) || exists( $S->{contentSchema} ) ) )
             {
-                my $assert = $ctx->{content_assert} ? 1 : 0;
-                my $bytes  = "$inst";
-                my $decoded_ref;
-
-                if( exists( $S->{contentEncoding} ) )
-                {
-                    my $dec = _content_decode( $ctx, $S->{contentEncoding}, $bytes );
-                    if( !defined( $dec ) )
-                    {
-                        return( _err_res( $ctx, $ptr, "contentEncoding '$S->{contentEncoding}' decode failed", 'contentEncoding' ) ) if( $assert );
-                    }
-                    else
-                    {
-                        $bytes = $dec;
-                    }
-                }
-
-                if( exists( $S->{contentMediaType} ) )
-                {
-                    my( $mt, $params ) = _parse_media_type( $S->{contentMediaType} );
-                    if( my $cb = $ctx->{media_validators}->{ $mt } )
-                    {
-                        my( $ok, $msg, $maybe_decoded ) = _safe_invoke( $cb, $bytes, $params );
-                        if( !$ok )
-                        {
-                            return( _err_res( $ctx, $ptr, ( $msg || "contentMediaType '$mt' validation failed" ), 'contentMediaType' ) ) if( $assert );
-                        }
-                        # If the media validator decoded into a Perl structure, keep it
-                        $decoded_ref = $maybe_decoded if( ref( $maybe_decoded ) );
-                        # If it produced new octets/text, keep that too
-                        $bytes = $maybe_decoded if( defined( $maybe_decoded ) && !ref( $maybe_decoded ) );
-                    }
-                    else
-                    {
-                        if( $mt =~ m{\Atext/} && ( ( $params->{charset} || '' ) =~ /\Autf-?8\z/i ) )
-                        {
-                            local $@;
-                            my $ok = eval
-                            {
-                                require Encode;
-                                Encode::decode( 'UTF-8', $bytes, Encode::FB_CROAK );
-                                1;
-                            } ? 1 : 0;
-                            if( !$ok && $assert )
-                            {
-                                return( _err_res( $ctx, $ptr, "contentMediaType '$mt' invalid UTF-8", 'contentMediaType' ) );
-                            }
-                        }
-                    }
-                }
-
-                if( exists( $S->{contentSchema} ) )
-                {
-                    my $val;
-
-                    if( ref( $decoded_ref ) )
-                    {
-                        # already decoded by media validator (e.g. application/json)
-                        $val = $decoded_ref;
-                    }
-                    else
-                    {
-                        local $@;
-                        # still a string of bytes; try JSON decode now
-                        $val = eval{ JSON->new->allow_nonref(1)->utf8(1)->decode( $bytes ) };
-                    }
-
-                    if( !defined( $val ) )
-                    {
-                        return( _err_res( $ctx, $ptr, "contentSchema present but payload not JSON-decodable", 'contentSchema' ) ) if( $assert );
-                    }
-                    else
-                    {
-                        my $r = _v( $ctx, _join_ptr( $ptr, 'contentSchema' ), $S->{contentSchema}, $val );
-                        return( $r ) unless( $r->{ok} );
-                    }
-                }
+                my $r = _validate_content( $ctx, $ptr, $S, $inst );
+                return( $r ) unless( $r->{ok} );
             }
         }
 
@@ -2359,137 +2217,25 @@ sub _compile_node
             %ann_props = ( %ann_props, %{$r->{props}} );
         }
 
-        # Combinators
-        # allOf: all subschemas must pass, and we merge their annotations.
-        if( exists( $S->{allOf} ) && ref( $S->{allOf} ) eq 'ARRAY' )
+        # Combinators and conditionals share the interpreter's annotation semantics.
+        for my $comb ( qw( allOf anyOf oneOf not ) )
         {
-            my( %p, %it );
-            for my $i ( 0 .. $#{ $S->{allOf} } )
-            {
-                my $r = $child{ "allOf:$i" }->( $ctx, $inst );
-                return $r unless $r->{ok};
-                %p  = ( %p,  %{$r->{props}} );
-                %it = ( %it, %{$r->{items}} );
-            }
-            %ann_props = ( %ann_props, %p );
-            %ann_items = ( %ann_items, %it );
+            next unless( exists( $S->{ $comb } ) );
+            my $r = _k_combinator( $ctx, $ptr, $S, $inst, $comb );
+            return( $r ) unless( $r->{ok} );
+            %ann_props = ( %ann_props, %{$r->{props}} );
+            %ann_items = ( %ann_items, %{$r->{items}} );
+        }
+        if( exists( $S->{if} ) )
+        {
+            my $r = _k_if_then_else( $ctx, $ptr, $S, $inst );
+            return( $r ) unless( $r->{ok} );
+            %ann_props = ( %ann_props, %{$r->{props}} );
+            %ann_items = ( %ann_items, %{$r->{items}} );
         }
 
-        # anyOf: at least one subschema must pass; do NOT leak errors from
-        # non-selected branches into the main context.
-        if( exists( $S->{anyOf} ) && ref( $S->{anyOf} ) eq 'ARRAY' )
-        {
-            my $ok = 0;
-            my( %p, %it );
-            my @branch_errs;
-
-            for my $i ( 0 .. $#{ $S->{anyOf} } )
-            {
-                # Shadow context for this branch
-                my %shadow = %$ctx;
-                my @errs;
-                $shadow{errors}      = \@errs;
-                $shadow{error_count} = 0;
-
-                my $r = $child{ "anyOf:$i" }->( \%shadow, $inst );
-
-                if( $r->{ok} )
-                {
-                    $ok = 1;
-                    %p  = ( %p,  %{$r->{props}} );
-                    %it = ( %it, %{$r->{items}} );
-                    last;
-                }
-
-                push( @branch_errs, \@errs );
-            }
-
-            unless( $ok )
-            {
-                # No branch matched: merge collected branch errors into main context
-                for my $aref ( @branch_errs )
-                {
-                    next unless( @$aref );
-                    push( @{$ctx->{errors}}, @$aref );
-                    $ctx->{error_count} += scalar( @$aref );
-                }
-
-                return( _err_res( $ctx, $ptr, "instance does not satisfy anyOf", 'anyOf' ) );
-            }
-
-            %ann_props = ( %ann_props, %p );
-            %ann_items = ( %ann_items, %it );
-        }
-
-        # oneOf: exactly one subschema must pass; again, isolate branch errors.
-        if( exists( $S->{oneOf} ) && ref( $S->{oneOf} ) eq 'ARRAY' )
-        {
-            my $hits = 0;
-
-            for my $i ( 0 .. $#{ $S->{oneOf} } )
-            {
-                my %shadow = %$ctx;
-                my @errs;
-                $shadow{errors}      = \@errs;
-                $shadow{error_count} = 0;
-
-                my $r = $child{ "oneOf:$i" }->( \%shadow, $inst );
-                $hits++ if( $r->{ok} );
-            }
-
-            return( _err_res( $ctx, $ptr, "instance satisfies $hits subschemas in oneOf (expected exactly 1)", 'oneOf' ) )
-                unless( $hits == 1 );
-        }
-
-        # not: the inner schema must **fail**; its own errors are irrelevant
-        # on success, so we run it entirely in a shadow context.
-        if( exists( $S->{not} ) && ref( $S->{not} ) )
-        {
-            my %shadow = %$ctx;
-            my @errs;
-            $shadow{errors}      = \@errs;
-            $shadow{error_count} = 0;
-
-            my $r = $child{ "not" }->( \%shadow, $inst );
-
-            # If inner schema passes, then "not" fails
-            return( _err_res( $ctx, $ptr, "instance matches forbidden not-schema", 'not' ) )
-                if( $r->{ok} );
-
-            # Otherwise, "not" is satisfied; ignore inner errors entirely
-        }
-
-        # Conditionals
-        if( exists( $S->{if} ) && ref( $S->{if} ) )
-        {
-            # NOTE: the if branch is evaluated in a shadow context
-            # Parity with the interpreted path and with the documented behaviour: 'if' is a
-            # selector, never an assertion, so the errors it produces while probing the
-            # instance must not leak into the caller's error list. Only 'then' and 'else'
-            # report against the main context.
-            my %if_shadow = %$ctx;
-            my @if_errs;
-            $if_shadow{errors}      = \@if_errs;
-            $if_shadow{error_count} = 0;
-
-            my $cond = $child{ "if" }->( \%if_shadow, $inst );
-            if( $cond->{ok} )
-            {
-                if( exists( $child{ "then" } ) )
-                {
-                    my $r = $child{ "then" }->( $ctx, $inst );
-                    return( $r ) unless( $r->{ok} );
-                }
-            }
-            else
-            {
-                if( exists( $child{ "else" } ) )
-                {
-                    my $r = $child{ "else" }->( $ctx, $inst );
-                    return( $r ) unless( $r->{ok} );
-                }
-            }
-        }
+        my $r = _k_unevaluated( $ctx, $ptr, $S, $inst, \%ann_props, \%ann_items );
+        return( $r ) unless( $r->{ok} );
 
         _t( $ctx, $ptr, 'node', undef, 'pass' ) if( $ctx->{trace_on} );
         return( { ok => 1, props => \%ann_props, items => \%ann_items } );
@@ -2500,25 +2246,14 @@ sub _compile_node
 sub _compile_root
 {
     my( $schema ) = @_;
-
-    if( ref( $schema ) eq 'HASH' )
-    {
-        $schema->{'$defs'} ||= delete( $schema->{definitions} ) if( exists( $schema->{definitions} ) );
-    }
-
-    my $base = _normalize_uri( ( ref( $schema ) eq 'HASH' && $schema->{'$id'} ) ? $schema->{'$id'} : '#' );
-
-    my $anchors  = {};
-    my $id_index = {};
-
-    _index_schema_202012( $schema, $base, '#', $anchors, $id_index );
-
+    # Retain the original schema and index each resource relative to its containing resource.
+    my $index = { resources => {}, nodes => {} };
+    my $base = _index_schema_202012( $schema, '', '#', $index, 1 );
     return({
-        schema   => $schema,
-        anchors  => $anchors,     # "#/a/b/0"
-        id_index => $id_index,    # absolute IDs and #anchors
-        base     => $base,
-        fn_index => {},           # cache of ptr => compiled closure
+        schema => $schema,
+        base => $base,
+        resource_index => $index,
+        fn_index => {},
     });
 }
 
@@ -2545,10 +2280,98 @@ sub _content_decode
 }
 
 # Errors, utils, pointers, URIs
+sub _copy_resource_index
+{
+    my( $index ) = @_;
+    my %resources;
+    for my $uri ( keys( %{$index->{resources}} ) )
+    {
+        my $entry = $index->{resources}->{ $uri };
+        $resources{ $uri } = { %$entry, anchors => { %{$entry->{anchors}} } };
+    }
+    return( { resources => \%resources, nodes => { %{$index->{nodes}} } } );
+}
+
+sub _decode_fragment
+{
+    my( $fragment ) = @_;
+    my $bytes = Encode::encode( 'UTF-8', $fragment );
+    die( 'Invalid URI percent escape' ) if( $bytes =~ /%(?![0-9A-Fa-f]{2})/ );
+    $bytes =~ s/%([0-9A-Fa-f]{2})/chr( hex( $1 ) )/eg;
+    return( Encode::decode( 'UTF-8', $bytes, Encode::FB_CROAK ) );
+}
+
+sub _decimal_multiple
+{
+    my( $value, $divisor ) = @_;
+    my( $vs, $v, $ve ) = _decimal_parts( $value );
+    my( $ds, $d, $de ) = _decimal_parts( $divisor );
+    return(0) unless( defined( $v ) && defined( $d ) && $ds eq '' && $d ne '0' );
+    return(1) if( $v eq '0' );
+
+    # Neither coefficient has trailing zeroes, so a negative exponent difference cannot yield an integer quotient.
+    my $shift = $ve - $de;
+    return(0) if( $shift < 0 );
+    return(1) if( $d eq '1' );
+    my $digits = $v . ( '0' x $shift );
+
+    # Keep the intermediate remainder within the signed 32-bit integer range for the common case.
+    if( length( $d ) <= 8 )
+    {
+        my $rem = 0;
+        $rem = ( $rem * 10 + $_ ) % $d for( split( //, $digits ) );
+        return( $rem == 0 ? 1 : 0 );
+    }
+
+    # Decimal long division avoids native integer overflow for larger coefficients.
+    my $rem = '0';
+    for my $digit ( split( //, $digits ) )
+    {
+        $rem = $rem eq '0' ? $digit : $rem . $digit;
+        while( length( $rem ) > length( $d ) || ( length( $rem ) == length( $d ) && $rem ge $d ) )
+        {
+            my $borrow = 0;
+            my $j = length( $d ) - 1;
+            for( my $i = length( $rem ) - 1; $i >= 0; $i-- )
+            {
+                my $n = substr( $rem, $i, 1 ) - $borrow - ( $j >= 0 ? substr( $d, $j--, 1 ) : 0 );
+                $borrow = $n < 0 ? 1 : 0;
+                substr( $rem, $i, 1 ) = $n + 10 * $borrow;
+            }
+            $rem =~ s/\A0+(?=[0-9])//;
+        }
+    }
+    return( $rem eq '0' ? 1 : 0 );
+}
+
+sub _decimal_parts
+{
+    my( $value ) = @_;
+    my $json = _canon( $value );
+    return unless( $json =~ /\A(-?)(0|[1-9][0-9]*)(?:\.([0-9]+))?(?:[eE]([+-]?[0-9]+))?\z/ );
+    my( $sign, $whole, $fraction, $exponent ) = ( $1, $2, $3 // '', $4 // 0 );
+    my $digits = $whole . $fraction;
+    $digits =~ s/\A0+//;
+    return( '', '0', 0 ) unless( length( $digits ) );
+    $exponent -= length( $fraction );
+    if( $digits =~ s/(0+)\z// )
+    {
+        $exponent += length( $1 );
+    }
+    return( $sign, $digits, $exponent );
+}
+
+sub _decode_json_content
+{
+    my( $text ) = @_;
+    return( JSON->new->allow_nonref(1)->decode( $text ) );
+}
+
+# Errors, utils, pointers, URIs
 sub _err
 {
     my( $ctx, $schema_ptr, $msg, $keyword ) = @_;
-    return(0) if( $ctx->{error_count} >= $ctx->{max_errors} );
+    return(0) if( $ctx->{max_errors} && $ctx->{error_count} >= $ctx->{max_errors} );
 
     # Instance path: use current ptr_stack top if available, else '#'
     my $inst_path = $ctx->{ptr_stack} && @{$ctx->{ptr_stack}}
@@ -2714,55 +2537,78 @@ sub _get_args_as_hash
 
 sub _index_schema_202012
 {
-    my( $node, $base_uri, $ptr, $anchors, $id_index ) = @_;
-
-    $anchors->{ $ptr } = $node;
-
-    my $here_base = $base_uri;
-
-    if( ref( $node ) eq 'HASH' )
+    my( $node, $base, $ptr, $index, $resource_root ) = @_;
+    if( ref( $node ) eq 'HASH' && defined( $node->{'$id'} ) && !ref( $node->{'$id'} ) && length( $node->{'$id'} ) )
     {
-        if( exists( $node->{'$id'} ) && defined( $node->{'$id'} ) && $node->{'$id'} ne '' )
-        {
-            $here_base = _resolve_uri( $base_uri, $node->{'$id'} );
-            $id_index->{ $here_base } = $node;
-        }
+        $base = _resolve_uri( $base, $node->{'$id'} );
+        $base =~ s/#$//;
+        $resource_root = 1;
+    }
+    if( $resource_root )
+    {
+        die( "Duplicate schema resource identifier: $base" ) if( exists( $index->{resources}->{ $base } ) );
+        $index->{resources}->{ $base } = { schema => $node, pointer => $ptr, base => $base, anchors => {} };
+    }
+    return( $base ) unless( ref( $node ) eq 'HASH' );
+    $index->{nodes}->{ refaddr( $node ) } = { base => $base, pointer => $ptr };
+    my $resource = $index->{resources}->{ $base };
+    for my $kw ( '$anchor', '$dynamicAnchor' )
+    {
+        next unless( defined( $node->{ $kw } ) && !ref( $node->{ $kw } ) && length( $node->{ $kw } ) );
+        my $name = $node->{ $kw };
+        my $existing = $resource->{anchors}->{ $name };
+        die( "Duplicate schema anchor: $base#$name" ) if( $existing && refaddr( $existing->{schema} ) != refaddr( $node ) );
+        $resource->{anchors}->{ $name } = { schema => $node, pointer => $ptr, dynamic => ( $kw eq '$dynamicAnchor' ? 1 : 0 ) };
+    }
 
-        if( exists( $node->{'$anchor'} ) && defined( $node->{'$anchor'} ) && $node->{'$anchor'} ne '' )
+    # Only schema-bearing keywords may declare resources or anchors. Literal values and property names cannot do so.
+    for my $kw ( qw( properties patternProperties dependentSchemas definitions $defs ) )
+    {
+        next unless( ref( $node->{ $kw } ) eq 'HASH' );
+        for my $key ( sort( keys( %{$node->{ $kw }} ) ) )
         {
-            my $abs = $here_base . '#' . $node->{'$anchor'};
-            $id_index->{ $abs } = $node;
-        }
-
-        if( exists( $node->{'$dynamicAnchor'} ) && defined( $node->{'$dynamicAnchor'} ) && $node->{'$dynamicAnchor'} ne '' )
-        {
-            my $abs = $here_base . '#dyn:' . $node->{'$dynamicAnchor'};
-            $id_index->{ $abs } = $node;
-        }
-
-        for my $k ( sort( keys( %$node ) ) )
-        {
-            my $child = $node->{ $k };
-            my $child_ptr = _join_ptr( $ptr, $k );
-            _index_schema_202012( $child, $here_base, $child_ptr, $anchors, $id_index );
+            _index_schema_202012( $node->{ $kw }->{ $key }, $base, _join_ptr( $ptr, $kw, $key ), $index, 0 );
         }
     }
-    elsif( ref( $node ) eq 'ARRAY' )
+    for my $kw ( qw( allOf anyOf oneOf prefixItems type ) )
     {
-        for my $i ( 0 .. $#$node )
+        next unless( ref( $node->{ $kw } ) eq 'ARRAY' );
+        for my $i ( 0 .. $#{$node->{ $kw }} )
         {
-            my $child = $node->[$i];
-            my $child_ptr = _join_ptr( $ptr, $i );
-            _index_schema_202012( $child, $here_base, $child_ptr, $anchors, $id_index );
+            _index_schema_202012( $node->{ $kw }->[$i], $base, _join_ptr( $ptr, $kw, $i ), $index, 0 );
         }
     }
+    for my $kw ( qw( not if then else items contains propertyNames additionalProperties unevaluatedProperties unevaluatedItems contentSchema ) )
+    {
+        next unless( exists( $node->{ $kw } ) );
+        _index_schema_202012( $node->{ $kw }, $base, _join_ptr( $ptr, $kw ), $index, 0 );
+    }
+    return( $base );
 }
 
 sub _inst_addr
 {
     my( $inst, $ptr ) = @_;
-    return( "SCALAR:$ptr" ) unless( ref( $inst ) );
+    # Decoded content can contain a different scalar at the same instance path.
+    # Preserve both its JSON type and value when identifying an active evaluation.
+    return( 'SCALAR:' . _canon( [$ptr, $inst] ) ) unless( ref( $inst ) );
     return( ref( $inst ) . ':' . refaddr( $inst ) );
+}
+
+# Keyword groups
+# NOTE: instance pointer base
+# The pointer stack tracks the location of the failing value inside the *instance*,
+# which is what a user interface needs in order to highlight the offending field.
+# It must therefore be built from the current instance pointer, never from the
+# schema pointer, otherwise the reported path drifts into the schema as soon as
+# validation descends through a $ref or a combinator.
+sub _inst_ptr
+{
+    my( $ctx, $token ) = @_;
+    my $base = ( $ctx->{ptr_stack} && @{$ctx->{ptr_stack}} )
+             ? ( $ctx->{ptr_stack}->[-1] // '#' )
+             : '#';
+    return( _join_ptr( $base, $token ) );
 }
 
 # truthy helpers
@@ -2822,21 +2668,69 @@ sub _join_ptr
     return( $ptr );
 }
 
+sub _js_comment
+{
+    my( $value ) = @_;
+    $value =~ s/([\r\n\x{2028}\x{2029}])/sprintf( '\\u%04X', ord( $1 ) )/eg;
+    return( $value );
+}
+
+sub _js_literal
+{
+    my( $value ) = @_;
+    return( JSON->new->allow_nonref(1)->ascii(1)->canonical(1)->encode( $value ) );
+}
+
 sub _js_quote
 {
-    my $s = shift( @_ );
-    $s = '' unless( defined( $s ) );
-    $s =~ s/\\/\\\\/g;
-    $s =~ s/'/\\'/g;
-    $s =~ s/\r\n/\n/g;
-    $s =~ s/\r/\n/g;
-    $s =~ s/\n/\\n/g;
-    return( "'$s'" );
+    my( $value ) = @_;
+    $value = '' unless( defined( $value ) );
+    return( JSON->new->allow_nonref(1)->ascii(1)->encode( "$value" ) );
+}
+
+sub _js_reference_target
+{
+    my( $schema, $opts ) = @_;
+    my $index = $opts->{_resource_index};
+    my $meta = $index->{nodes}->{ refaddr( $schema ) };
+    my $base = $meta ? $meta->{base} : $opts->{_resource_base};
+    my( $uri, $fragment ) = split( /#/, _resolve_uri( $base, $schema->{'$ref'} ), 2 );
+    $uri //= '';
+    my $resource = $index->{resources}->{ $uri } or return;
+    $fragment = eval{ _decode_fragment( $fragment // '' ) };
+    return unless( defined( $fragment ) );
+    my( $target, $ptr );
+    if( $fragment eq '' )
+    {
+        ( $target, $ptr ) = @$resource{qw( schema pointer )};
+    }
+    elsif( $fragment =~ m{^/} )
+    {
+        $target = _jsv_resolve_internal_ref( $resource->{schema}, '#' . $fragment );
+        $ptr = $resource->{pointer} . $fragment;
+    }
+    else
+    {
+        my $entry = $resource->{anchors}->{ $fragment } or return;
+        ( $target, $ptr ) = @$entry{qw( schema pointer )};
+    }
+    # Use the indexed canonical pointer for schemas reached through an alias.
+    if( ref( $target ) eq 'HASH' && ( my $entry = $index->{nodes}->{ refaddr( $target ) } ) )
+    {
+        $ptr = $entry->{pointer};
+    }
+    return( $target, $ptr );
 }
 
 sub _json_equal
 {
     my( $a, $b ) = @_;
+    if( _is_number( $a ) && _is_number( $b ) )
+    {
+        my( $as, $ad, $ae ) = _decimal_parts( $a );
+        my( $bs, $bd, $be ) = _decimal_parts( $b );
+        return( $as eq $bs && $ad eq $bd && $ae == $be ? 1 : 0 ) if( defined( $ad ) && defined( $bd ) );
+    }
     return( _canon( $a ) eq _canon( $b ) );
 }
 
@@ -2849,8 +2743,9 @@ sub _jsv_resolve_internal_ref
 
     # Expect something like "#/definitions/address"
     $ptr =~ s/^#//;
+    return unless( $ptr =~ m{^/} );
 
-    my @tokens = split( /\//, $ptr );
+    my @tokens = split( /\//, $ptr, -1 );
     shift( @tokens ) if( @tokens && $tokens[0] eq '' );
 
     my $node = $root;
@@ -2859,6 +2754,7 @@ sub _jsv_resolve_internal_ref
     for my $tok ( @tokens )
     {
         # rfc6901 JSON Pointer unescaping
+        return if( $tok =~ /~(?![01])/ );
         $tok =~ s/~1/\//g;
         $tok =~ s/~0/~/g;
 
@@ -2883,7 +2779,7 @@ sub _jsv_resolve_internal_ref
         }
         elsif( ref( $node ) eq 'ARRAY' )
         {
-            unless( $tok =~ /^\d+$/ && $tok < @$node )
+            unless( $tok =~ /\A(?:0|[1-9][0-9]*)\z/ && $tok < @$node )
             {
                 warn( "_jsv_resolve_internal_ref: array index '$tok' out of range for pointer '$ptr'\n" )
                     if( $JSON::Schema::Validate::DEBUG );
@@ -2900,22 +2796,6 @@ sub _jsv_resolve_internal_ref
     }
 
     return( $node );
-}
-
-# Keyword groups
-# NOTE: instance pointer base
-# The pointer stack tracks the location of the failing value inside the *instance*,
-# which is what a user interface needs in order to highlight the offending field.
-# It must therefore be built from the current instance pointer, never from the
-# schema pointer, otherwise the reported path drifts into the schema as soon as
-# validation descends through a $ref or a combinator.
-sub _inst_ptr
-{
-    my( $ctx, $token ) = @_;
-    my $base = ( $ctx->{ptr_stack} && @{$ctx->{ptr_stack}} )
-             ? ( $ctx->{ptr_stack}->[-1] // '#' )
-             : '#';
-    return( _join_ptr( $base, $token ) );
 }
 
 sub _k_array_all
@@ -2963,17 +2843,21 @@ sub _k_array_all
                 }
                 $items_ann{ $i } = 1;
             }
-            elsif( exists( $S->{items} ) && ref( $S->{items} ) eq 'HASH' )
+            elsif( exists( $S->{items} ) && ( ref( $S->{items} ) eq 'HASH' || JSON::is_bool( $S->{items} ) ) )
             {
                 my $r = _v( $ctx, _join_ptr( $sp, "items" ), $S->{items}, $A->[$i] );
-                return( $r ) unless( $r->{ok} );
+                unless( $r->{ok} )
+                {
+                    pop( @{$ctx->{ptr_stack}} );
+                    return( $r );
+                }
                 $items_ann{ $i } = 1;
             }
 
             pop( @{$ctx->{ptr_stack}} );
         }
     }
-    elsif( ref( $S->{items} ) eq 'HASH' )
+    elsif( ref( $S->{items} ) eq 'HASH' || JSON::is_bool( $S->{items} ) )
     {
         for my $i ( 0 .. $#$A )
         {
@@ -3004,8 +2888,14 @@ sub _k_array_all
             $shadow{errors}      = \@errs;
             $shadow{error_count} = 0;
 
+            push( @{$ctx->{ptr_stack}}, _inst_ptr( $ctx, $i ) );
             my $tmp = _v( \%shadow, _join_ptr( $sp, "contains" ), $S->{contains}, $A->[$i] );
-            $matches++ if( $tmp->{ok} );
+            pop( @{$ctx->{ptr_stack}} );
+            if( $tmp->{ok} )
+            {
+                $matches++;
+                $items_ann{ $i } = 1;
+            }
         }
 
         my $minc = defined( $S->{minContains} ) ? $S->{minContains} : 1;
@@ -3013,30 +2903,6 @@ sub _k_array_all
 
         return( _err_res( $ctx, $sp, "contains matched $matches < minContains $minc", 'minContains' ) ) if( $matches < $minc );
         return( _err_res( $ctx, $sp, "contains matched $matches > maxContains $maxc", 'maxContains' ) ) if( $matches > $maxc );
-    }
-
-    if( exists( $S->{unevaluatedItems} ) )
-    {
-        my @unknown = ();
-        for my $i ( 0 .. $#$A )
-        {
-            next if( $items_ann{ $i } );
-            push( @unknown, $i );
-        }
-        my $UE = $S->{unevaluatedItems};
-        if( !_is_true( $UE ) && !_is_hash( $UE ) )
-        {
-            return( _err_res( $ctx, $sp, "unevaluatedItems not allowed at indices: " . join( ',', @unknown ), 'unevaluatedItems' ) ) if( @unknown );
-        }
-        elsif( ref( $UE ) eq 'HASH' )
-        {
-            for my $i ( @unknown )
-            {
-                my $r = _v( $ctx, _join_ptr( $sp, "unevaluatedItems" ), $UE, $A->[$i] );
-                return( $r ) unless( $r->{ok} );
-                $items_ann{ $i } = 1;
-            }
-        }
     }
 
     return( { ok => 1, props => {}, items => \%items_ann } );
@@ -3070,6 +2936,8 @@ sub _k_combinator
     if( $kw eq 'anyOf' )
     {
         my @branch_errs;
+        my( %props, %items );
+        my $matched = 0;
 
         for my $i ( 0 .. $#{$S->{anyOf}} )
         {
@@ -3083,20 +2951,29 @@ sub _k_combinator
 
             if( $r->{ok} )
             {
-                # One branch passed: combinator satisfied.
-                # Ignore all other branch errors.
-                return( { ok => 1, props => {}, items => {} } );
+                # All successful branches contribute annotations.
+                # Ignore errors from unsuccessful branches if any branch matches.
+                $matched = 1;
+                %props = ( %props, %{$r->{props}} );
+                %items = ( %items, %{$r->{items}} );
+                next;
             }
 
             push( @branch_errs, \@errs );
         }
 
+        return( { ok => 1, props => \%props, items => \%items } ) if( $matched );
+
         # No branch matched: merge collected branch errors into main context
         for my $aref ( @branch_errs )
         {
             next unless( @$aref );
-            push( @{$ctx->{errors}}, @$aref );
-            $ctx->{error_count} += scalar( @$aref );
+            for my $error ( @$aref )
+            {
+                last if( $ctx->{max_errors} && $ctx->{error_count} >= $ctx->{max_errors} );
+                push( @{$ctx->{errors}}, $error );
+                $ctx->{error_count}++;
+            }
         }
 
         return( _err_res( $ctx, $sp, "instance does not satisfy anyOf", 'anyOf' ) );
@@ -3130,17 +3007,20 @@ sub _k_combinator
 
         if( @ok_results == 1 )
         {
-            # Exactly one branch matched: combinator satisfied.
-            # Do NOT bubble up branch props/items through oneOf.
-            return( { ok => 1, props => {}, items => {} } );
+            # Exactly one branch matched: its annotations contribute to the parent.
+            return( $ok_results[0] );
         }
 
         # Zero or >1 matched -> failure; merge branch errors
         for my $aref ( @branch_errs )
         {
             next unless( @$aref );
-            push( @{$ctx->{errors}}, @$aref );
-            $ctx->{error_count} += scalar( @$aref );
+            for my $error ( @$aref )
+            {
+                last if( $ctx->{max_errors} && $ctx->{error_count} >= $ctx->{max_errors} );
+                push( @{$ctx->{errors}}, $error );
+                $ctx->{error_count}++;
+            }
         }
 
         return(
@@ -3218,11 +3098,12 @@ sub _k_if_then_else
     if( $cond->{ok} )
     {
         _t( $ctx, $sp, 'if', undef, 'pass', 'then' ) if( $ctx->{trace_on} );
-        return( { ok => 1, props => {}, items => {} } )
-            unless( exists( $S->{then} ) );
+        return( $cond ) unless( exists( $S->{then} ) );
 
-        # Apply "then" against the REAL context
-        return( _v( $ctx, _join_ptr( $sp, 'then' ), $S->{then}, $inst ) );
+        # Apply "then" against the real context and retain annotations from the successful condition.
+        my $r = _v( $ctx, _join_ptr( $sp, 'then' ), $S->{then}, $inst );
+        return( $r ) unless( $r->{ok} );
+        return( { ok => 1, props => { %{$cond->{props}}, %{$r->{props}} }, items => { %{$cond->{items}}, %{$r->{items}} } } );
     }
     else
     {
@@ -3246,11 +3127,10 @@ sub _k_number
             _t( $ctx, $ptr, 'multipleOf', undef, 'fail', 'arg<=0' ) if( $ctx->{trace_on} );
             return( _err( $ctx, $ptr, "multipleOf must be > 0", 'multipleOf' ) );
         }
-        # Float-tolerant multiple check
-        # my $ok = abs( ( $v / $arg ) - int( $v / $arg + 1e-10 ) ) < 1e-9;
-        my $ok = abs( ( $v / $arg ) - int( $v / $arg + 0.0000000001 ) ) < 1e-9;
+        # Test divisibility of the decimal JSON representations without rounding the quotient.
+        my $ok = _decimal_multiple( $v, $arg );
         _t( $ctx, $ptr, 'multipleOf', undef, $ok ? 'pass' : 'fail', "$v mod $arg" ) if( $ctx->{trace_on} );
-        return( $ok ? 1 : _err( $ctx, $ptr, "number not multipleOf $arg" ) );
+        return( $ok ? 1 : _err( $ctx, $ptr, "number not multipleOf $arg", 'multipleOf' ) );
     }
     elsif( $kw eq 'minimum' )
     {
@@ -3311,12 +3191,12 @@ sub _k_object_all
 
     if( my $P = $S->{properties} )
     {
-        for my $k ( keys( %$P ) )
+        for my $k ( sort( keys( %$P ) ) )
         {
             my $pd = $P->{ $k };
             next unless( ref( $pd ) eq 'HASH' );
 
-            if( exists( $pd->{required} ) )
+            if( exists( $pd->{required} ) && ( !ref( $pd->{required} ) || JSON::is_bool( $pd->{required} ) ) )
             {
                 $required{ $k } = $pd->{required} ? 1 : 0;
             }
@@ -3327,7 +3207,7 @@ sub _k_object_all
         }
     }
 
-    for my $rq ( grep{ $required{ $_ } } keys( %required ) )
+    for my $rq ( grep{ $required{ $_ } } sort( keys( %required ) ) )
     {
         next if( exists( $H->{ $rq } ) );
         _t( $ctx,$sp, 'required', undef, 'fail', $rq ) if( $ctx->{trace_on} );
@@ -3352,7 +3232,7 @@ sub _k_object_all
         return( { ok => 0, props => {}, items => {} } ) if( $bail_if_max->() );
     }
 
-    if( exists( $S->{propertyNames} ) && ref( $S->{propertyNames} ) eq 'HASH' )
+    if( exists( $S->{propertyNames} ) && ( ref( $S->{propertyNames} ) eq 'HASH' || JSON::is_bool( $S->{propertyNames} ) ) )
     {
         for my $k ( keys( %$H ) )
         {
@@ -3394,24 +3274,28 @@ sub _k_object_all
             $matched   = 1;
         }
 
-        unless( $matched )
+        # Every matching pattern applies, even when the property has an explicit schema.
+        # Keep the instance path on the stack until all matching patterns have been checked.
         {
             local $@;
-            for my $re ( keys( %$patprops ) )
+            for my $re ( sort( keys( %$patprops ) ) )
             {
                 my $re_ok = eval{ $k =~ /$re/ };
                 next unless( $re_ok );
+                $matched = 1;
 
                 my $r = _v( $ctx, _join_ptr( $sp, "patternProperties/$re" ), $patprops->{ $re }, $v );
                 if( !$r->{ok} )
                 {
                     $ok = 0;
-                    pop( @{$ctx->{ptr_stack}} );
-                    return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
+                    if( $bail_if_max->() )
+                    {
+                        pop( @{$ctx->{ptr_stack}} );
+                        return( { ok => 0, props => \%ann, items => {} } );
+                    }
                     next;
                 }
                 $ann{ $k } = 1;
-                $matched   = 1;
             }
         }
 
@@ -3437,6 +3321,10 @@ sub _k_object_all
                 }
                 $ann{ $k } = 1;
             }
+            elsif( $addl_set )
+            {
+                $ann{ $k } = 1;
+            }
         }
 
         pop( @{$ctx->{ptr_stack}} );
@@ -3444,7 +3332,7 @@ sub _k_object_all
 
     if( my $depR = $S->{dependentRequired} )
     {
-        for my $k ( keys( %$depR ) )
+        for my $k ( sort( keys( %$depR ) ) )
         {
             next unless( exists( $H->{ $k } ) );
             for my $need ( @{$depR->{ $k } || []} )
@@ -3459,7 +3347,7 @@ sub _k_object_all
 
     if( my $depS = $S->{dependentSchemas} )
     {
-        for my $k ( keys( %$depS ) )
+        for my $k ( sort( keys( %$depS ) ) )
         {
             next unless( exists( $H->{ $k } ) );
             my $r = _v( $ctx, _join_ptr( $sp, "dependentSchemas/$k" ), $depS->{ $k }, $H );
@@ -3468,35 +3356,9 @@ sub _k_object_all
                 $ok = 0;
                 return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
             }
-        }
-    }
-
-    if( exists( $S->{unevaluatedProperties} ) )
-    {
-        my @unknown = grep { !$ann{ $_ } } keys( %$H );
-        my $UE = $S->{unevaluatedProperties};
-
-        if( !_is_true( $UE ) && !_is_hash( $UE ) )
-        {
-            if( @unknown )
+            else
             {
-                _err_res( $ctx, $sp, "unevaluatedProperties not allowed: " . join( ',', @unknown ), 'unevaluatedProperties' );
-                $ok = 0;
-                return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
-            }
-        }
-        elsif( ref( $UE ) eq 'HASH' )
-        {
-            for my $k ( @unknown )
-            {
-                my $r = _v( $ctx, _join_ptr( $sp, "unevaluatedProperties" ), $UE, $H->{ $k } );
-                if( !$r->{ok} )
-                {
-                    $ok = 0;
-                    return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
-                    next;
-                }
-                $ann{ $k } = 1;
+                %ann = ( %ann, %{$r->{props}} );
             }
         }
     }
@@ -3547,7 +3409,10 @@ sub _k_type
     {
         if( ref( $alt ) eq 'HASH' )
         {
-            my $r = _v( $ctx, _join_ptr( $ptr, "type/$i" ), $alt, $v );
+            my %shadow = %$ctx;
+            $shadow{errors} = [];
+            $shadow{error_count} = 0;
+            my $r = _v( \%shadow, _join_ptr( $ptr, "type/$i" ), $alt, $v );
             return(1) if( $r->{ok} );
         }
         $i++;
@@ -3562,6 +3427,56 @@ sub _k_type
 
     my $exp = join( '|', map{ ref( $_ ) ? 'schema' : $_ } @alts );
     return( _err( $ctx, $ptr, "type mismatch: expected $exp", 'type' ) );
+}
+
+# Evaluate remaining properties or items only after all adjacent applicators have contributed annotations.
+sub _k_unevaluated
+{
+    my( $ctx, $sp, $S, $inst, $props, $items ) = @_;
+
+    my( $kw, $ann, @unknown );
+    if( ref( $inst ) eq 'HASH' && exists( $S->{unevaluatedProperties} ) )
+    {
+        $kw = 'unevaluatedProperties';
+        $ann = $props;
+        @unknown = grep { !$ann->{ $_ } } sort( keys( %$inst ) );
+    }
+    elsif( ref( $inst ) eq 'ARRAY' && exists( $S->{unevaluatedItems} ) )
+    {
+        $kw = 'unevaluatedItems';
+        $ann = $items;
+        @unknown = grep { !$ann->{ $_ } } ( 0 .. $#$inst );
+    }
+    else
+    {
+        return( { ok => 1, props => $props, items => $items } );
+    }
+
+    my $UE = $S->{ $kw };
+    if( @unknown && !_is_true( $UE ) && !_is_hash( $UE ) )
+    {
+        my $msg = $kw eq 'unevaluatedItems' ? 'unevaluatedItems not allowed at indices: ' : 'unevaluatedProperties not allowed: ';
+        return( _err_res( $ctx, $sp, $msg . join( ',', @unknown ), $kw ) );
+    }
+    my $ok = 1;
+    for my $k ( @unknown )
+    {
+        if( ref( $UE ) eq 'HASH' )
+        {
+            my $value = ref( $inst ) eq 'HASH' ? $inst->{ $k } : $inst->[$k];
+            push( @{$ctx->{ptr_stack}}, _inst_ptr( $ctx, $k ) );
+            my $r = _v( $ctx, _join_ptr( $sp, $kw ), $UE, $value );
+            pop( @{$ctx->{ptr_stack}} );
+            if( !$r->{ok} )
+            {
+                $ok = 0;
+                last if( $ctx->{max_errors} && $ctx->{error_count} >= $ctx->{max_errors} );
+                next;
+            }
+        }
+        $ann->{ $k } = 1;
+    }
+    return( { ok => $ok, props => $props, items => $items } );
 }
 
 sub _k_unique_keys
@@ -3643,7 +3558,7 @@ sub _match_type
     if( $t eq 'integer' )
     {
         return(0) unless( _is_number( $v ) );
-        return( ( $v =~ /\A-?(?:0|[1-9][0-9]*)\z/ ) ? 1 : 0 );
+        return( $v == int( $v ) ? 1 : 0 );
     }
 
     if( $t eq 'number' )
@@ -3661,13 +3576,6 @@ sub _match_type
     return(1) if( $t eq 'object' && ref( $v ) eq 'HASH' );
 
     return(0);
-}
-
-sub _normalize_uri
-{
-    my( $u ) = @_;
-    return( '#' ) unless( defined( $u ) && length( $u ) );
-    return( $u );
 }
 
 sub _parse_media_type
@@ -3823,17 +3731,6 @@ sub _prune_with_schema
     return( $data );
 }
 
-sub _ptr_of_node
-{
-    my( $root, $target ) = @_;
-    for my $p ( keys( %{$root->{anchors}} ) )
-    {
-        my $n = $root->{anchors}->{ $p };
-        return( $p ) if( $n eq $target );
-    }
-    return( '#' );
-}
-
 my %SCRIPT_LIKE = map{ $_ => 1 } qw(
     Hiragana Katakana Han Hangul Latin Cyrillic Greek
     Hebrew Thai Armenian Georgian
@@ -3907,6 +3804,8 @@ sub _re_to_js
         $re =~ s{"}{\\"}g;     # escape "
         $re =~ s{\n}{\\n}g;
         $re =~ s{\r}{\\r}g;
+        $re =~ s{\x{2028}}{\\u2028}g;
+        $re =~ s{\x{2029}}{\\u2029}g;
         $re =~ s{/}{\/}g;
     }
 
@@ -3918,33 +3817,58 @@ sub _re_to_js
 sub _register_builtin_media_validators
 {
     my( $self ) = @_;
-
-    # Example: application/json
-    $self->register_media_validator( 'application/json' => sub
-    {
-        my( $bytes, $params ) = @_;
-        local $@;
-        my $v = eval{ JSON->new->allow_nonref(1)->decode( $bytes ) };
-        return( 0, 'invalid JSON', undef ) if( $@ );
-        # JSON value is valid even if it’s 0, "", or false
-        return( 1, undef, $v );
-    } );
-
+    $self->register_media_validator( 'application/json' => \&_builtin_json_media ) unless( exists( $self->{media_validators}->{'application/json'} ) );
     return( $self );
 }
 
 sub _resolve_uri
 {
     my( $base, $ref ) = @_;
-    return( $ref ) if( !defined( $base ) || $base eq '' || $ref =~ /^[A-Za-z][A-Za-z0-9+\-.]*:/ );
-    if( $ref =~ /^\#/ )
+    $base //= '';
+    my( $bs, $ba, $bp, $bq ) = $base =~ m{\A(?:([A-Za-z][A-Za-z0-9+.-]*):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?};
+    my( $rs, $ra, $rp, $rq, $rf ) = $ref =~ m{\A(?:([A-Za-z][A-Za-z0-9+.-]*):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z}s;
+    return( $ref ) unless( defined( $rp ) );
+    my( $scheme, $authority, $path, $query ) = ( $rs, $ra, $rp, $rq );
+    if( !defined( $rs ) )
     {
-        ( my $no_frag = $base ) =~ s/\#.*$//;
-        return( $no_frag . $ref );
+        $scheme = $bs;
+        if( !defined( $ra ) )
+        {
+            $authority = $ba;
+            if( $rp eq '' )
+            {
+                $path = $bp // '';
+                $query = $bq unless( defined( $rq ) );
+            }
+            elsif( $rp !~ m{^/} )
+            {
+                my $dir = $bp // '';
+                $dir =~ s{[^/]*$}{};
+                $dir = '/' if( $dir eq '' && defined( $ba ) );
+                $path = $dir . $rp;
+            }
+        }
     }
-    return( $base . $ref ) if( $base =~ /\/$/ );
-    ( my $dir = $base ) =~ s{[^/]*$}{};
-    return( $dir . $ref );
+    # Remove dot segments while retaining leading relative parent segments when there is no absolute base.
+    if( $path =~ m{(?:^|/)\.\.?(?:/|$)} )
+    {
+        my @parts;
+        my $absolute = $path =~ m{^/};
+        for my $part ( split( m{/}, $path, -1 ) )
+        {
+            next if( $part eq '.' );
+            if( $part eq '..' )
+            {
+                if( @parts && $parts[-1] ne '..' && !( $absolute && @parts == 1 ) ) { pop( @parts ); }
+                elsif( !$absolute ) { push( @parts, $part ); }
+            }
+            else { push( @parts, $part ); }
+        }
+        push( @parts, '' ) if( $path =~ m{/(?:\.|\.\.)$} );
+        $path = join( '/', @parts );
+        $path = '/' if( $absolute && $path eq '' );
+    }
+    return( ( defined( $scheme ) ? "$scheme:" : '' ) . ( defined( $authority ) ? "//$authority" : '' ) . $path . ( defined( $query ) ? "?$query" : '' ) . ( defined( $rf ) ? "#$rf" : '' ) );
 }
 
 sub _safe_invoke
@@ -3976,14 +3900,6 @@ sub _safe_invoke
     return( 0, 'callback returned no value', undef );
 }
 
-sub _strlen
-{
-    my( $s ) = @_;
-    $s = Encode::decode( 'UTF-8', "$s", Encode::FB_DEFAULT ) unless( Encode::is_utf8( $s ) );
-    my @cp = unpack( 'U*', $s );
-    return( scalar( @cp ) );
-}
-
 # Strict base64: validates alphabet, padding, length, and round-trips
 sub _strict_base64_decode
 {
@@ -4011,6 +3927,13 @@ sub _strict_base64_decode
     $norm =~ s/\s+//g;
     return unless( $re eq $norm );
     return( $out );
+}
+
+sub _strlen
+{
+    my( $s ) = @_;
+    # The input is a decoded Perl string, not an encoded UTF-8 byte sequence.
+    return( length( $s ) );
 }
 
 sub _t
@@ -4043,51 +3966,44 @@ sub _v
 {
     my( $ctx, $schema_ptr, $schema, $inst ) = @_;
 
-    # Recursion guard only for reference types
-    if( ref( $inst ) )
-    {
-        my $inst_addr = _inst_addr( $inst, $ctx->{ptr_stack}->[-1] );
-        my $vkey      = "$schema_ptr|$inst_addr";
-        return( { ok => 1, props => {}, items => {} } ) if( $ctx->{visited}->{ $vkey }++ );
-    }
+    # The indexed resource, rather than the calling reference, determines the base URI.
+    my $meta = ref( $schema ) eq 'HASH' ? $ctx->{resource_index}->{nodes}->{ refaddr( $schema ) } : undef;
+    my $resource = $meta ? $meta->{base} : $ctx->{id_stack}->[-1];
+    local $ctx->{id_stack} = [ @{$ctx->{id_stack}}, $resource ] if( $resource ne $ctx->{id_stack}->[-1] );
 
-    # Enter dynamicAnchor scope if present
-    my $frame_added = 0;
-    if( ref( $schema ) eq 'HASH' &&
-        exists( $schema->{'$dynamicAnchor'} ) &&
-        defined( $schema->{'$dynamicAnchor'} ) &&
-        $schema->{'$dynamicAnchor'} ne '' )
-    {
-        my %frame = %{$ctx->{dyn_stack}->[-1]}; # inherit
-        $frame{ $schema->{'$dynamicAnchor'} } = $schema;
-        push( @{$ctx->{dyn_stack}}, \%frame );
-        $frame_added = 1;
-    }
-
-    my $res = _v_node( $ctx, $schema_ptr, $schema, $inst );
-
-    if( $frame_added )
-    {
-        pop( @{$ctx->{dyn_stack}} );
-    }
-
-    return( $res );
+    # Guard active recursion by schema identity and instance identity, including scalar values.
+    my $inst_addr = _inst_addr( $inst, $ctx->{ptr_stack}->[-1] );
+    my $identity = ref( $schema ) eq 'HASH' ? refaddr( $schema ) : $schema_ptr;
+    my $vkey = _canon( [$resource, $identity, $inst_addr] );
+    return( { ok => 1, props => {}, items => {} } ) if( $ctx->{visited}->{ $vkey } );
+    local $ctx->{visited}->{ $vkey } = 1;
+    return( _v_node( $ctx, $schema_ptr, $schema, $inst ) );
 }
 
 sub _v_node
 {
     my( $ctx, $schema_ptr, $schema, $inst ) = @_;
 
-    # $ref / $dynamicRef first
-    if( ref( $schema ) eq 'HASH' &&
-        exists( $schema->{'$ref'} ) )
+    # Boolean subschemas must be resolved before the compiled or interpreted path.
+    if( JSON::is_bool( $schema ) )
     {
-        return( _apply_ref( $ctx, $schema_ptr, $schema->{'$ref'}, $inst ) );
+        return( $schema ? { ok => 1, props => {}, items => {} } :
+            _err_res( $ctx, $schema_ptr, "instance does not satisfy false schema", 'false' ) );
     }
-    if( ref( $schema ) eq 'HASH' &&
-        exists( $schema->{'$dynamicRef'} ) )
+
+    # References are applicators. Evaluate each reference before its sibling keywords.
+    my @ref_results;
+    if( ref( $schema ) eq 'HASH' && exists( $schema->{'$ref'} ) )
     {
-        return( _apply_dynamic_ref( $ctx, $schema_ptr, $schema->{'$dynamicRef'}, $inst ) );
+        my $r = _apply_ref( $ctx, $schema_ptr, $schema->{'$ref'}, $inst );
+        return( $r ) unless( $r->{ok} );
+        push( @ref_results, $r );
+    }
+    if( ref( $schema ) eq 'HASH' && exists( $schema->{'$dynamicRef'} ) )
+    {
+        my $r = _apply_dynamic_ref( $ctx, $schema_ptr, $schema->{'$dynamicRef'}, $inst );
+        return( $r ) unless( $r->{ok} );
+        push( @ref_results, $r );
     }
     if( ref( $schema ) eq 'HASH' &&
         exists( $schema->{'$comment'} ) &&
@@ -4105,14 +4021,18 @@ sub _v_node
 
     _t( $ctx, $schema_ptr, 'node', undef, 'visit' ) if( $ctx->{trace_on} );
 
-    # Use compiled validator if enabled
-    if( $ctx->{compile_on} )
+    # Reference-bearing nodes use the interpreter to avoid re-entering the delegate closure.
+    if( $ctx->{compile_on} && !@ref_results )
     {
-        my $fn = $ctx->{root}->{fn_index}->{ $schema_ptr };
+        my $resource = $ctx->{id_stack}->[-1];
+        my $identity = ref( $schema ) eq 'HASH' ? refaddr( $schema ) : $schema_ptr;
+        my $key = _canon( [$resource, $identity, $schema_ptr] );
+        my $cache = ref( $schema ) eq 'HASH' && exists( $ctx->{root}->{resource_index}->{nodes}->{ $identity } ) ? $ctx->{root}->{fn_index} : $ctx->{external_fn_index};
+        my $fn = $cache->{ $key };
         unless( $fn )
         {
             $fn = _compile_node( $ctx->{root}, $schema_ptr, $schema );
-            $ctx->{root}->{fn_index}->{ $schema_ptr } = $fn;
+            $cache->{ $key } = $fn;
         }
         return( $fn->( $ctx, $inst ) );
     }
@@ -4156,7 +4076,7 @@ sub _v_node
     }
 
     # Strings
-    if( !ref( $inst ) && defined( $inst ) )
+    if( _match_type( $inst, 'string' ) )
     {
         if( exists( $schema->{minLength} ) || exists( $schema->{maxLength} ) || exists( $schema->{pattern} ) )
         {
@@ -4168,82 +4088,10 @@ sub _v_node
         }
 
         # contentEncoding / contentMediaType / contentSchema
-        if( exists( $schema->{contentEncoding} ) ||
-            exists( $schema->{contentMediaType} ) ||
-            exists( $schema->{contentSchema} ) )
+        if( $ctx->{content_assert} && ( exists( $schema->{contentEncoding} ) || exists( $schema->{contentMediaType} ) || exists( $schema->{contentSchema} ) ) )
         {
-            my $assert = $ctx->{content_assert} ? 1 : 0;
-            my $bytes  = "$inst";
-            my $decoded_ref;
-
-            if( exists( $schema->{contentEncoding} ) )
-            {
-                my $dec = _content_decode( $ctx, $schema->{contentEncoding}, $bytes );
-                if( !defined( $dec ) )
-                {
-                    return( _err_res( $ctx, $ptr, "contentEncoding '$schema->{contentEncoding}' decode failed", 'contentEncoding' ) ) if( $assert );
-                }
-                else
-                {
-                    $bytes = $dec;
-                }
-            }
-
-            if( exists( $schema->{contentMediaType} ) )
-            {
-                my( $mt, $params ) = _parse_media_type( $schema->{contentMediaType} );
-                if( my $cb = $ctx->{media_validators}->{ $mt } )
-                {
-                    my( $ok, $msg, $maybe_decoded ) = _safe_invoke( $cb, $bytes, $params );
-                    if( !$ok )
-                    {
-                        return( _err_res( $ctx, $ptr, ( $msg || "contentMediaType '$mt' validation failed", 'contentMediaType' ) ) ) if( $assert );
-                    }
-                    $decoded_ref = $maybe_decoded if( ref( $maybe_decoded ) );
-                    $bytes = $maybe_decoded if( defined( $maybe_decoded ) && !ref( $maybe_decoded ) );
-                }
-                else
-                {
-                    if( $mt =~ m{\Atext/} && ( ( $params->{charset} || '' ) =~ /\Autf-?8\z/i ) )
-                    {
-                        local $@;
-                        my $ok = eval
-                        {
-                            require Encode;
-                            Encode::decode( 'UTF-8', $bytes, Encode::FB_CROAK );
-                            1;
-                        } ? 1 : 0;
-                        if( !$ok && $assert )
-                        {
-                            return( _err_res( $ctx, $ptr, "contentMediaType '$mt' invalid UTF-8", 'contentMediaType' ) );
-                        }
-                    }
-                }
-            }
-
-            if( exists( $schema->{contentSchema} ) )
-            {
-                my $val;
-                if( ref( $decoded_ref ) )
-                {
-                    $val = $decoded_ref; # already decoded by media validator
-                }
-                else
-                {
-                    local $@;
-                    $val = eval{ JSON->new->allow_nonref(1)->utf8(1)->decode( $bytes ) };
-                }
-
-                if( !defined( $val ) )
-                {
-                    return( _err_res( $ctx, $ptr, "contentSchema present but payload not JSON-decodable", 'contentSchema' ) ) if( $assert );
-                }
-                else
-                {
-                    my $r = _v( $ctx, _join_ptr( $ptr, 'contentSchema' ), $schema->{contentSchema}, $val );
-                    return( $r ) unless( $r->{ok} );
-                }
-            }
+            my $r = _validate_content( $ctx, $ptr, $schema, $inst );
+            return( $r ) unless( $r->{ok} );
         }
     }
 
@@ -4288,8 +4136,68 @@ sub _v_node
         %ann_items = ( %ann_items, %{ $r->{items} } );
     }
 
+    # Include annotations from every successful reference before evaluating unevaluated keywords.
+    for my $r ( @ref_results )
+    {
+        %ann_props = ( %ann_props, %{$r->{props}} );
+        %ann_items = ( %ann_items, %{$r->{items}} );
+    }
+
+    my $r = _k_unevaluated( $ctx, $schema_ptr, $schema, $inst, \%ann_props, \%ann_items );
+    return( $r ) unless( $r->{ok} );
+
     _t( $ctx, $schema_ptr, 'node', undef, 'pass' ) if( $ctx->{trace_on} );
     return( { ok => 1, props => \%ann_props, items => \%ann_items } );
+}
+
+sub _validate_content
+{
+    my( $ctx, $ptr, $schema, $inst ) = @_;
+    my $text = "$inst";
+    my $octets = 0;
+    if( exists( $schema->{contentEncoding} ) )
+    {
+        $text = _content_decode( $ctx, $schema->{contentEncoding}, $text );
+        return( _err_res( $ctx, $ptr, "contentEncoding '$schema->{contentEncoding}' decode failed", 'contentEncoding' ) ) unless( defined( $text ) );
+        $octets = !utf8::is_utf8( $text );
+    }
+    my $decoded;
+    if( exists( $schema->{contentMediaType} ) )
+    {
+        my( $mt, $params ) = _parse_media_type( $schema->{contentMediaType} );
+        my $cb = $ctx->{media_validators}->{ $mt };
+        $cb ||= \&_builtin_json_media if( $mt eq 'application/json' );
+        # Only the built-in JSON validator needs character text. Custom callbacks retain their original input contract.
+        my $builtin_json = $cb && refaddr( $cb ) == refaddr( \&_builtin_json_media );
+        if( $octets && ( $builtin_json || ( !$cb && $mt =~ m{^text/} && ( $params->{charset} // '' ) =~ /\Autf-?8\z/i ) ) )
+        {
+            local $@;
+            my $chars = eval{ Encode::decode( 'UTF-8', $text, Encode::FB_CROAK | Encode::LEAVE_SRC ) };
+            return( _err_res( $ctx, $ptr, "contentMediaType '$mt' invalid UTF-8", 'contentMediaType' ) ) if( $@ );
+            $text = $chars;
+            $octets = 0;
+        }
+        if( $cb )
+        {
+            my( $ok, $msg, $out ) = _safe_invoke( $cb, $text, $params );
+            return( _err_res( $ctx, $ptr, ( $msg || "contentMediaType '$mt' validation failed" ), 'contentMediaType' ) ) unless( $ok );
+            $decoded = $out if( ref( $out ) );
+            $text = $out if( defined( $out ) && !ref( $out ) );
+            $octets = 0 if( utf8::is_utf8( $text ) );
+        }
+    }
+    if( exists( $schema->{contentSchema} ) )
+    {
+        my $val = $decoded;
+        unless( ref( $decoded ) )
+        {
+            local $@;
+            $val = eval{ $octets ? JSON->new->allow_nonref(1)->utf8(1)->decode( $text ) : _decode_json_content( $text ) };
+            return( _err_res( $ctx, $ptr, 'contentSchema present but payload not JSON-decodable', 'contentSchema' ) ) if( $@ );
+        }
+        return( _v( $ctx, _join_ptr( $ptr, 'contentSchema' ), $schema->{contentSchema}, $val ) );
+    }
+    return( { ok => 1, props => {}, items => {} } );
 }
 
 # NOTE: JSON::Schema::Validate::Error
@@ -4548,7 +4456,7 @@ and the original announcement on Reddit: L<https://www.reddit.com/r/perl/comment
 
 =head1 VERSION
 
-v0.9.1
+v0.9.2
 
 =head1 DESCRIPTION
 
@@ -4595,6 +4503,8 @@ C<const>, C<enum>.
 =item * Numbers
 
 C<multipleOf>, C<minimum>, C<maximum>, C<exclusiveMinimum>, C<exclusiveMaximum>.
+
+In the Perl validator, C<multipleOf> and numeric scalar comparisons for C<const> and C<enum> use the decimal representations produced by the JSON backend. This avoids rounding the quotient to a nearby integer, but cannot recover precision already lost when a number was decoded or normalised.
 
 =item * Strings
 
@@ -4728,7 +4638,7 @@ You can also use C<ignore_req_vocab> for short.
 
 Defaults to C<200>
 
-Sets the maximum number of errors to be recorded.
+Sets the maximum number of errors to be recorded. A value of C<0> disables this limit.
 
 =item C<normalize_instance =E<gt> 1|0>
 
@@ -4935,9 +4845,7 @@ C<type> (including unions).
 
 =item * Constants / enumerations
 
-C<const> (primitive values only) and C<enum>.
-
-Complex object/array C<const> values are currently ignored client-side and enforced server-side only.
+C<const> and C<enum>, including objects and arrays. JSON value types are preserved.
 
 =item * Numbers
 
@@ -4961,11 +4869,13 @@ or are handled by the normal C<type> keyword if you explicitly declared C<< type
 
 C<minLength>, C<maxLength>, C<pattern>.
 
+The Perl validator uses Perl regular expression semantics, not the ECMA-262 dialect. For strict end-of-input matching in Perl, use C<\z>; the C<$> anchor can also match before a final newline. Use C<[0-9]> when ASCII digits are required.
+
 Patterns are converted from Perl syntax to JavaScript using a conservative converter (e.g. C<\x{FF70}> to C<\uFF70>, C<\p{Katakana}> to C<\p{scx=Katakana}>). When the browser does not support the necessary Unicode features, such patterns are skipped client-side.
 
 =item * Arrays
 
-C<items> (single-schema form), C<minItems>, C<maxItems>, C<contains>, C<minContains>, C<maxContains>.
+C<prefixItems>, C<items> (single-schema form), C<minItems>, C<maxItems>, C<contains>, C<minContains>, C<maxContains>.
 
 =item * Objects
 
@@ -4997,11 +4907,11 @@ C<format> (client-side format checks are skipped).
 
 =item *
 
-C<prefixItems>, C<patternProperties>, C<unevaluatedItems>, C<unevaluatedProperties>, C<contentEncoding>, C<contentMediaType>, C<contentSchema>, external C<$ref> and C<$dynamicRef> targets.
+C<patternProperties>, C<unevaluatedItems>, C<unevaluatedProperties>, C<contentEncoding>, C<contentMediaType>, C<contentSchema>, external C<$ref> and C<$dynamicRef> targets.
 
 =back
 
-In other words: the JS validator is a fast, user-friendly I<pre-flight> check for web forms; the Perl validator remains the source of truth.
+In other words: the JS validator is a fast, user-friendly I<pre-flight> check for web forms; the Perl validator remains the source of truth. Unsupported constraints can also affect branch selection in combinators and conditionals, so a client-side failure is not in itself proof that the instance is invalid under the complete schema.
 
 =head3 Example: integrating the generated JS in a form
 
@@ -5341,7 +5251,7 @@ This returns the current object.
 
     $js->set_resolver( sub{ my( $absolute_uri ) = @_; ...; return $schema_hashref } );
 
-Install a resolver for external documents. It is called with an absolute URI (formed from the current base C<$id> and the C<$ref>) and must return a Perl hash reference representation of a JSON Schema. If the returned hash contains C<'$id'>, it will become the new base for that document; otherwise, the absolute URI is used as its base.
+Install a resolver for external documents. It receives the resolved reference URI, including any fragment. It must return a Perl hash reference or a JSON boolean representing the complete external schema, not merely the referenced fragment. A relative C<$id> in the returned schema is resolved against the retrieval URI. References within that resource are resolved locally. Resolver answers are cached only for the duration of a validation call. Identical schemas with the same canonical identifier may be retrieved through different URIs; conflicting resource definitions are rejected.
 
 =head2 set_vocabulary_support
 
@@ -5447,7 +5357,7 @@ Currently supported overrides:
 
 =item * C<max_errors>
 
-Maximum number of errors to collect before stopping validation.
+Maximum number of errors to collect before stopping validation. A value of C<0> disables this limit.
 
 =item * C<trace_on>, C<trace_limit>
 
@@ -5477,7 +5387,7 @@ L</is_valid> is a convenience wrapper around C<validate> that defaults C<< max_e
 
 =item * Recursion & Cycles
 
-The validator guards on the pair C<(schema_pointer, instance_address)>, so self-referential schemas and cyclic instance graphs will not infinite-loop.
+The validator guards active evaluations by resource URI, schema pointer and instance address (or instance path, JSON type and value for scalars). Independent evaluations of the same reference are not skipped.
 
 =item * Union Types with Inline Schemas
 
@@ -5547,7 +5457,7 @@ L<URI>/C<IRI> and media‐type parsing is intentionally pragmatic rather than fu
 
 =item * Compilation vs. Interpretation
 
-Both code paths are correct by design. The interpreter is simpler and great while developing a schema; toggle C<< ->compile >> when moving to production or after the schema stabilises. You may enable compilation lazily (call C<compile> any time) or eagerly via the constructor (C<< compile => 1 >>).
+Both Perl code paths are intended to enforce the same constraints. The interpreter is useful while developing a schema; toggle C<< ->compile >> when moving to production or after the schema stabilises. You may enable compilation lazily (call C<compile> any time) or eagerly via the constructor (C<< compile => 1 >>).
 
 =back
 

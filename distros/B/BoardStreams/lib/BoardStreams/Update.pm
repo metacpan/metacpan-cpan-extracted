@@ -5,7 +5,7 @@ use experimental 'class';
 # the channel's state through it and queues events; both are committed
 # together under one sequence number.
 class BoardStreams::Update {
-    our $VERSION = "v0.0.58";
+    our $VERSION = "v0.0.60";
 
     field $state :param;
     field @events;

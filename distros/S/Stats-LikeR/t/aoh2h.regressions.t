@@ -52,7 +52,7 @@ use warnings FATAL => 'all';
 use B ();
 use Hash::Util qw(lock_keys);
 use Scalar::Util qw(dualvar refaddr);
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::More;
 use Tie::Hash ();	# Tie::StdHash, for the rows tied below
 

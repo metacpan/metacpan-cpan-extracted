@@ -1,5 +1,46 @@
 Revision history for Perl module JSON::Schema::Validate
 
+v0.9.2 2026-11-28T15:37:02+0900
+    - Defer unevaluatedProperties and unevaluatedItems until adjacent applicators
+      have contributed their annotations in both Perl validation modes.
+    - Collect annotations from all successful anyOf branches, the sole successful
+      oneOf branch, successful conditionals, dependentSchemas and contains.
+    - Honour boolean schemas and subschemas, including boolean roots, items,
+      contains, propertyNames and references to boolean schemas.
+    - Restrict recursion guards to active evaluations and preserve schema resource
+      identity, instance identity and the type and value of decoded scalars.
+    - Apply all matching patternProperties subschemas and preserve instance paths
+      across failed patterns.
+    - Evaluate both $ref and $dynamicRef alongside their sibling keywords and
+      include their annotations before processing unevaluated keywords.
+    - Index schema resources and anchors independently of literal instance values.
+      Resolve references within their resource, including relative identifiers,
+      external documents, dynamic anchors and percent-encoded JSON Pointers.
+    - Isolate external resolver answers and compiled validators between validation
+      calls. Reject conflicting resource identifiers and ambiguous anchors.
+    - Distinguish nested required arrays from the property-level required extension.
+    - Enforce max_errors when merging alternative branch errors and interpret zero
+      as unlimited. Isolate errors from failed inline type alternatives.
+    - Apply string constraints only to strings, count decoded characters correctly
+      and recognise integers represented in exponential notation.
+    - Use exact decimal divisibility and normalised decimal comparison for
+      multipleOf and numeric scalar equality, without additional dependencies.
+      Reject near multiples and accept negative and decimal multiples.
+    - Assert content keywords only when content assertions are enabled. Correct
+      UTF-8 decoding and JSON null handling while preserving custom callbacks.
+    - Correct generated JavaScript reference caching, recursive references and
+      anchor resolution; preserve local constraints and unlimited error collection.
+    - Preserve JSON types in generated const and enum checks, support boolean
+      schemas, correct conditional syntax, string lengths and array item offsets.
+    - Honour the default minimum of one contains match even when maxContains is set.
+    - Escape line terminators in generated JavaScript strings and comments.
+    - Reuse identical canonical schema resources retrieved through different URIs,
+      whilst rejecting conflicting resource definitions.
+    - Validate prefixItems in generated JavaScript before applying items to the
+      remaining array positions.
+    - Add regression tests for annotation composition, recursion, resource scope,
+      numerical constraints, error limits, content and generated JavaScript.
+
 v0.9.1 2026-08-20T11:32:02+0900
     - Corrected _compile_node
 

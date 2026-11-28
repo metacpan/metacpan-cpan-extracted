@@ -6,14 +6,15 @@ use Carp      qw();
 use Exporter  qw(import);
 use Ref::Util qw(is_coderef);
 
-use Ekorn::Pipeline::Errors qw(croakf);
-use Ekorn::Pipeline::Gather qw(gather);
-use Ekorn::Pipeline::Stage  qw();
-use Ekorn::Pipeline::Stop   qw();
+use Ekorn::Pipeline::Errors  qw(croakf);
+use Ekorn::Pipeline::Gather  qw(gather);
+use Ekorn::Pipeline::Context qw(kept_origin);
+use Ekorn::Pipeline::Stage   qw();
+use Ekorn::Pipeline::Stop    qw();
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.4.5';
+our $VERSION = 'v0.5.0';
 
 our @EXPORT = qw(take drop);    ## no critic (Modules::ProhibitAutomaticExportation)
 
@@ -67,11 +68,16 @@ sub take_first : prototype() () {
 # run out; nothing if there were none.
 sub take_last : prototype() () {
     return gather {
-        my @kept;
+        my @kept;    # the last value, and its origin
         return {
             # Without a signature, as it's called for each value.
-            step  => sub { @kept = ($_[0]); return },
-            flush => sub () { splice @kept },
+            step  => sub { @kept = ($_[0], kept_origin); return },
+            flush => sub () {
+                my($value, $origin) = splice @kept or return;
+                return $origin->gives($value);
+            },
+            # It holds values back: the one it gives came from the last.
+            holds => 1,
         };
     };
 }
@@ -227,7 +233,10 @@ as the stage of the sink C<keep_first>.
 
 Passes on the last value, once there are no more, reading every one to
 find it; nothing if there were none. If a stage before it stops the
-pipeline, it passes on the last value to reach it.
+pipeline, it passes on the last value to reach it. It holds values
+back, and says where its value came from, so the stages after it get
+that value's original, from v0.5.0; before, it had none, as a flush's
+values have (L<Ekorn::Pipeline::Context/kept_origin>).
 
 Each C<take_...> stage passes on what the C<keep_...> sink of the same
 name, in L<Ekorn::Pipeline::Sinks>, gives as its result, so the stages

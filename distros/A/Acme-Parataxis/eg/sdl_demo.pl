@@ -2,7 +2,18 @@ use v5.40;
 use blib;
 $|++;
 use Acme::Parataxis qw[:all];
-use SDL3            qw[:all];
+
+BEGIN {
+    eval {
+        require SDL3;
+        SDL3->import(':all');
+        1;
+    } or
+        do {
+        print "SDL3 is not installed; skipping the SDL demo.\n";
+        exit 0;
+        };
+}
 
 # A tiny SDL3 animation where every frame tick is a Parataxis park rather
 # than a raw SDL_Delay: each bouncing square is its own fiber that steps its

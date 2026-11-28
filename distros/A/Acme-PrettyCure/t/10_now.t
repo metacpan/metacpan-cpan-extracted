@@ -5,13 +5,10 @@ use Test::More;
 
 use Acme::PrettyCure;
 
-my ( $tsubomi, $erika, $itsuki, $yuri )
-    = Acme::PrettyCure->now;
+my @now = Acme::PrettyCure->now;
+my @dokidoki = Acme::PrettyCure->girls('DokiDoki');
 
-isa_ok $tsubomi, 'Acme::PrettyCure::CureBlossom';
-isa_ok $erika,   'Acme::PrettyCure::CureMarine';
-isa_ok $itsuki,  'Acme::PrettyCure::CureSunshine';
-isa_ok $yuri,    'Acme::PrettyCure::CureMoonlight';
+is_deeply \@now, \@dokidoki, 'now "DokiDoki! Precure"';
 
 done_testing;
 

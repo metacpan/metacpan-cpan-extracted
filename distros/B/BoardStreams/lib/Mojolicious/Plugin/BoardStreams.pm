@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::BoardStreams;
 use v5.44;
 
-our $VERSION = "v0.0.58";
+our $VERSION = "v0.0.60";
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 

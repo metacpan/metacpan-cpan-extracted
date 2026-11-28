@@ -1,5 +1,34 @@
 Revision history for Mail::DKIM2
 
+0.36    2026-11-28
+        dkim2-milter, from an originating host's report (thanks, Al
+        Iverson):
+        - Outbound mode stamps m=1 from the message itself when there is
+          no snapshot store. 0.35 computed a Message-Instance only with
+          --snapshot-dir, so a host that just sends its own mail never
+          signed ("no Message-Instance field to sign over").
+        - --mode both now decides each transaction by where the message
+          comes from, as OpenDKIM does: outbound (signed) for a client on
+          loopback or a unix socket (Postfix gives non_smtpd_milters
+          127.0.0.1), one that authenticated ({auth_authen}), or one in
+          the new --internal-hosts; inbound (verified, stamped, never
+          signed) for anything else. 0.35 verified and signed in the same
+          transaction: with --snapshot-dir (the shipped
+          dkim2-milter.service) a locally sent message was signed over a
+          second m=1 with an A-R inserted after signing, permerror at
+          every receiver; and mail from outside with a From in one of our
+          domains would have been signed. One both socket now also serves
+          a list host: the post is snapshotted on arrival and the list's
+          re-injected copy diffed against it.
+        - New --authserv-id for the Authentication-Results it adds
+          (default still "localhost").
+        - --help documents --mode and --authserv-id, and no longer lists
+          --verify/--no-verify and --sign/--no-sign, which never existed.
+          The "verify only" SYNOPSIS example now passes --mode inbound
+          (without it the milter refused to start with no key).
+        - POD: an originating-host Postfix setup; deploy/examples/ has
+          dkim2-milter-originating.service.
+
 0.35    2026-11-16
         Security: three faults reported against 0.34.
         - CVE-2026-129847: a line in the header section that is not a

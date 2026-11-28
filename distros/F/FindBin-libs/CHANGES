@@ -1,3 +1,14 @@
+-   5.5.3 Wed Nov 25 23:06:33 EST 2026
+
+    Installs on every perl from v5.8.1 (v5.8.0 is no longer supported).
+
+    Prerequisites follow the perl: File::Util::SecureDir, YAML::Tiny,
+    and List::Util 1.45 are required only on v5.40 and later.
+
+-   5.5.2 Mon Nov 23 22:27:20 EST 2026
+
+    Fix Makefile.PL bug; sorry about that. 
+
 -   5.5.1 Fri Nov 20 12:19:02 EST 2026
 
     fixed test: fixtures are unique tempdirs, so leftovers from

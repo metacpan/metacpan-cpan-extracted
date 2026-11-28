@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.82      2026-11-27 04:28:57 -0700
+  - Drop support for Perl 5.22 (new min: 5.24)
+  - Include `docs/PERLSTYLE.md` when minting dists that require 5.42
+    or newer
+
 2.81      2026-10-16 02:00:12 -0600
   - bump gh checkout action template to v7
   - default ci to test only 5.42+

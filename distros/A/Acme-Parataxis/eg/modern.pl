@@ -14,8 +14,8 @@ async {
     say 'Main: Fiber 1 returned ' . $res1;
     say 'Creating a manual fiber for bidirectional communication...';
 
-    # Even if you create it with Acme::Parataxis->new,
-    # you can use 'await' if it's running in the scheduler
+    # Fibers made with ->new are driven by call()/transfer(); await() is for
+    # fibers spawned into the scheduler (and for Future objects).
     my $f2 = Acme::Parataxis->new(
         code => sub {
             say '  Fiber 2: Yielding some data...';

@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use feature 'say';
 use File::Temp;
 use Scalar::Util 'looks_like_number';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::Exception;
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';

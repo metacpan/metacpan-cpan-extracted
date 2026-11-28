@@ -658,23 +658,23 @@ local ($::_g0 = do {1.1.0 ~~ Str}, $::_e0 = do {""}); ::ok defined($::_g0) == de
 # 
 # ## Uni
 # 
-# Строки Unicode с флагом utf8 или если декодирование в utf8 происходит без ошибок.
+# Строки с флагом utf8 или с номерами символов меньше 128.
 # 
 ::done_testing; }; subtest 'Uni' => sub { 
 local ($::_g0 = do {"↭" ~~ Uni}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"↭" ~~ Uni # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {123 ~~ Uni}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '123 ~~ Uni # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {do {no utf8; "↭" ~~ Uni}}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'do {no utf8; "↭" ~~ Uni} # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {123 ~~ Uni}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '123 ~~ Uni # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {do {no utf8; "↭" ~~ Uni}}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'do {no utf8; "↭" ~~ Uni} # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## Bin
 # 
-# Бинарные строки без флага utf8 и октетов с номерами меньше 128.
+# Строки без флага utf8.
 # 
 ::done_testing; }; subtest 'Bin' => sub { 
 local ($::_g0 = do {123 ~~ Bin}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '123 ~~ Bin # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {"z" ~~ Bin}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"z" ~~ Bin # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {"↭" ~~ Bin}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"↭" ~~ Bin # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {do {no utf8; "↭" ~~ Bin }}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'do {no utf8; "↭" ~~ Bin }   # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {do {no utf8; "↭" ~~ Bin }}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'do {no utf8; "↭" ~~ Bin }   # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## StartsWith\[begin]

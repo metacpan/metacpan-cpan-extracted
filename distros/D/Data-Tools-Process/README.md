@@ -44,6 +44,14 @@
 
     # --------------------------------------------------------------------------
 
+    # check if the current directory was removed under the process
+    die "current directory is gone" if cwd_gone();
+
+    # the same for any path
+    print "log dir is gone\n" if path_gone( '/var/log/myapp' );
+
+    # --------------------------------------------------------------------------
+
 # FUNCTIONS
 
 ## fork\_exec\_cmd( $command )
@@ -155,6 +163,24 @@ Returns:
 ## pidfile\_remove( $pid\_file\_name )
 
 Removes $pid\_file\_name. Returns undef.
+
+## path\_gone( $path )
+
+Checks if $path is gone. Returns true if $path cannot be stat()-ed (it does
+not exist, or the stat fails with ESTALE or similar on a network file
+system), or if its link count is 0 (it was unlinked). Returns false if
+$path is still there.
+
+Note that a link count of 0 can only be seen through something still
+holding the removed entry, like the current directory ('.') of a process
+whose directory was removed. A removed path given by name just fails stat().
+
+## cwd\_gone()
+
+The same as path\_gone( '.' ): returns true if the current working directory
+of the process was removed (or is no longer accessible on a network file
+system), false otherwise. Useful for long running processes and daemons
+started with daemonize\_here(), whose directory may be removed under them.
 
 # REQUIRED MODULES
 
@@ -614,6 +640,7 @@ Data::Tools::Process::ForkPool - pools of forked processes with messaging
       sleep( 0.1 );
       }
     fpool_stop_all( 'WORKERS' );
+    fpool_wait_all( 'WORKERS', 5 ); # wait up to 5 seconds for all to exit
 
     # forked worker
     sub worker
@@ -699,11 +726,14 @@ and exits with its return value. If \\&sub dies, the error is printed to
 STDERR and it exits with 255. exit() runs END blocks and destructors in the
 forked process too.
 
-## fpool\_wait\_all( $pool )
+## fpool\_wait\_all( $pool, $timeout )
 
-Reaps all already exited processes of the pool, does not block. Returns
-the count of reaped processes, undef if none were reaped or there is no
-such pool. Unread messages of a reaped process are discarded.
+Reaps all already exited processes of the pool. Without $timeout (or with
+0 or a negative one) it does not block. With $timeout (seconds) it also
+waits for the rest to exit, checking once per second, and returns as soon
+as the pool is empty or the timeout expires. Returns the count of reaped
+processes, undef if none were reaped or there is no such pool. Unread
+messages of a reaped process are discarded.
 
 ## fpool\_wait\_one( $pool )
 

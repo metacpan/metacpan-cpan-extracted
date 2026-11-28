@@ -9,6 +9,7 @@ examples/eligible_users.pl
 examples/factorial.pl
 examples/family.pl
 examples/generators.pl
+examples/json_datalog.pl
 examples/list_member.pl
 examples/monkey.pl
 examples/Murdoku.pl
@@ -45,8 +46,11 @@ lib/Logic/Relational/Goal/Label.pm
 lib/Logic/Relational/Goal/Not.pm
 lib/Logic/Relational/Goal/True.pm
 lib/Logic/Relational/Goal/Unify.pm
+lib/Logic/Relational/Manual/JSONDatalog.pod
 lib/Logic/Relational/Program.pm
 lib/Logic/Relational/Query.pm
+lib/Logic/Relational/Query/Plan.pm
+lib/Logic/Relational/Query/Runner.pm
 lib/Logic/Relational/Serializer.pm
 lib/Logic/Relational/Solution.pm
 lib/Logic/Relational/State.pm
@@ -100,6 +104,10 @@ t/33-boolean-queries.t
 t/34-tabling-and-cycles.t
 t/35-autotable-left-recursion.t
 t/36-max-steps.t
+t/37-query-data-spec.t
+t/38-query-negation.t
+t/39-query-limits-and-timeouts.t
+t/40-program-describe.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

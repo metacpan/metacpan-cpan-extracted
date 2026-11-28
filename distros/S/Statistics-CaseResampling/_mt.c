@@ -1,7 +1,20 @@
 #include "mt.h"
 
+#include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#ifdef _WIN32
+#  ifndef WIN32_LEAN_AND_MEAN
+#    define WIN32_LEAN_AND_MEAN
+#  endif
+#  include <windows.h>
+#elif !defined(__VMS) && (defined(__unix__) || defined(__unix) || defined(__APPLE__) || defined(__linux__) || defined(__CYGWIN__))
+#  include <sys/types.h>
+#  include <fcntl.h>
+#  include <unistd.h>
+#  define CS_HAVE_URANDOM 1
+#endif
 
 /* This code is based on mt19937ar.c, written by Takuji Nishimura and
    Makoto Matsumoto (20020126). Further details are available at
@@ -30,8 +43,11 @@ struct mt *mt_setup(uint32_t seed)
 {
     struct mt *self = malloc(sizeof(struct mt));
 
-    if (self)
+    if (self) {
         mt_init_seed( self, seed );
+        self->auto_seeded = 0;
+        self->pid = 0;
+    }
 
     return self;
 }
@@ -44,6 +60,8 @@ struct mt *mt_setup_array( uint32_t *array, int n )
 
     if (self) {
         mt_init_seed( self, 19650218UL );
+        self->auto_seeded = 0;
+        self->pid = 0;
 
         i = 1; j = 0;
         k = ( N > n ? N : n );
@@ -74,8 +92,74 @@ void mt_free(struct mt *self)
         free(self);
 }
 
-/* Returns a pseudorandom number which is uniformly distributed in [0,1) */
-double mt_genrand(struct mt *self)
+int mt_os_entropy(uint32_t *out, int nwords)
+{
+    if (out == NULL || nwords <= 0)
+        return 0;
+#ifdef _WIN32
+    {
+        typedef long (__stdcall *cs_bcrypt_fn)(void *, unsigned char *, unsigned long, unsigned long);
+        typedef unsigned char (__stdcall *cs_rtl_fn)(void *, unsigned long);
+        HMODULE hBcrypt;
+        HMODULE hAdvapi;
+        unsigned long nbytes = (unsigned long)((size_t)nwords * sizeof(uint32_t));
+
+        hBcrypt = LoadLibraryA("bcrypt.dll");
+        if (hBcrypt != NULL) {
+            cs_bcrypt_fn fn = (cs_bcrypt_fn)GetProcAddress(hBcrypt, "BCryptGenRandom");
+            if (fn != NULL && fn(NULL, (unsigned char *)out, nbytes, 0x00000002UL) == 0) {
+                FreeLibrary(hBcrypt);
+                return 1;
+            }
+            FreeLibrary(hBcrypt);
+        }
+
+        hAdvapi = LoadLibraryA("advapi32.dll");
+        if (hAdvapi != NULL) {
+            cs_rtl_fn fn = (cs_rtl_fn)GetProcAddress(hAdvapi, "SystemFunction036");
+            if (fn != NULL && fn(out, nbytes) != 0) {
+                FreeLibrary(hAdvapi);
+                return 1;
+            }
+            FreeLibrary(hAdvapi);
+        }
+        return 0;
+    }
+#elif defined(CS_HAVE_URANDOM)
+    {
+        int saved_errno = errno;
+        int fd;
+        unsigned char *ptr = (unsigned char *)out;
+        size_t need = (size_t)nwords * sizeof(uint32_t);
+        size_t got = 0;
+
+        fd = open("/dev/urandom", O_RDONLY);
+        if (fd < 0) {
+            errno = saved_errno;
+            return 0;
+        }
+        while (got < need) {
+            ssize_t r = read(fd, ptr + got, need - got);
+            if (r < 0) {
+                if (errno == EINTR)
+                    continue;
+                break;
+            }
+            if (r == 0)
+                break;
+            got += (size_t)r;
+        }
+        close(fd);
+        errno = saved_errno;
+        return (got == need) ? 1 : 0;
+    }
+#else
+    return 0;
+#endif
+}
+
+/* Returns a uniformly distributed 32-bit pseudorandom integer */
+uint32_t mt_genrand_int32(struct mt *self)
 {
     int kk;
     uint32_t y;
@@ -98,12 +182,39 @@ double mt_genrand(struct mt *self)
 
         self->mti = 0;
     }
-  
+
     y  = self->mt[self->mti++];
     y ^= y >> 11;
     y ^= y <<  7 & 0x9d2c5680;
     y ^= y << 15 & 0xefc60000;
     y ^= y >> 18;
 
-    return y*(1.0/4294967296.0);
+    return y;
+}
+
+/* Returns an unbiased pseudorandom integer in [0, range) using Lemire's method */
+uint32_t mt_genrand_bounded(struct mt *self, uint32_t range)
+{
+    uint32_t x, l;
+    cs_u64 m;
+    if (range <= 1)
+        return 0;
+    x = mt_genrand_int32(self);
+    m = (cs_u64)x * (cs_u64)range;
+    l = (uint32_t)m;
+    if (l < range) {
+        uint32_t t = (uint32_t)(0u - range) % range;
+        while (l < t) {
+            x = mt_genrand_int32(self);
+            m = (cs_u64)x * (cs_u64)range;
+            l = (uint32_t)m;
+        }
+    }
+    return (uint32_t)(m >> 32);
+}
+
+/* Returns a pseudorandom number which is uniformly distributed in [0,1) */
+double mt_genrand(struct mt *self)
+{
+    return mt_genrand_int32(self) * (1.0 / 4294967296.0);
 }

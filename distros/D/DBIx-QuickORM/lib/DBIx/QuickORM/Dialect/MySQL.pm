@@ -2,26 +2,11 @@ package DBIx::QuickORM::Dialect::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
-
-use Carp qw/croak/;
-use Scalar::Util qw/blessed/;
-use DBIx::QuickORM::Util qw/column_key load_class/;
-use DBIx::QuickORM::Affinity qw/affinity_from_type/;
+our $VERSION = '0.000031';
 
 use DBI();
 
-use DBIx::QuickORM::Schema;
-use DBIx::QuickORM::Schema::Table;
-use DBIx::QuickORM::Schema::Table::Column;
-use DBIx::QuickORM::Schema::View;
-
 use parent 'DBIx::QuickORM::Dialect';
-use Object::HashBase qw{
-    +dbi_driver
-    +db_vendor
-    +all_triggers
-};
 
 =pod
 
@@ -29,782 +14,354 @@ use Object::HashBase qw{
 
 =head1 NAME
 
-DBIx::QuickORM::Dialect::MySQL - MySQL-family dialect for DBIx::QuickORM.
+DBIx::QuickORM::Dialect::MySQL - MySQL dialect, and base for MariaDB.
 
 =head1 DESCRIPTION
 
-Dialect implementation for the MySQL family of databases, covering both the
-C<DBD::mysql> and C<DBD::MariaDB> drivers. It provides async query support,
-transaction and savepoint control, and live schema introspection from
-C<information_schema>.
+MySQL through L<DBD::MariaDB>, the only supported driver for the MySQL family.
+Backtick quoting, no C<RETURNING>, native error codes, and async queries
+through the driver. The namespace is C<DATABASE()>.
 
-At C<init> time a generic instance promotes itself to a vendor-specific
-subclass (MariaDB, Percona, or Community) when the running server's vendor can
-be detected, falling back to this class with a warning otherwise.
+Which dialect a handle gets is a server fact: a server whose version names
+MariaDB gets L<DBIx::QuickORM::Dialect::MariaDB>. Any other server (MySQL
+Community, Percona) gets this one.
 
 =head1 SYNOPSIS
 
-    my $dialect = DBIx::QuickORM::Dialect::MySQL->new(dbh => $dbh, db_name => $name);
-
-=head1 ATTRIBUTES
-
-=over 4
-
-=item dbi_driver
-
-The C<DBD::*> driver class backing the connection (C<DBD::mysql> or
-C<DBD::MariaDB>), resolved lazily from the live handle.
-
-=item db_vendor
-
-Cached result of server vendor detection; see the C<db_vendor> method.
-
-=back
-
-=cut
-
-=pod
+    # this class or MariaDB for DBD::MariaDB
+    my $dialect = DBIx::QuickORM::Dialect->for_dbh($dbh);
 
 =head1 PUBLIC METHODS
 
 =over 4
 
-=item $bool = $dialect->async_supported
+=item $char = $dialect->quote_char
 
-=item $bool = $dialect->async_cancel_supported
+A backtick.
 
-Feature flags for async query support.
+=item $bool = $dialect->supports_returning_insert
 
-=item %args = $dialect->async_prepare_args(%params)
+=item $bool = $dialect->supports_returning_update
 
-=item $bool = $dialect->async_ready(sth => $sth)
+=item $bool = $dialect->supports_returning_delete
 
-=item $res = $dialect->async_result(sth => $sth)
+All false: MySQL has no C<RETURNING>.
 
-=item $dialect->async_cancel
+=item $bool = $dialect->supports_isolation
 
-Driver-appropriate async query helpers. C<async_cancel> always croaks: the
-MySQL family cannot cancel an in-flight async query.
+True.
 
-=cut
+=item @sql = $dialect->begin_sql($level)
 
-sub datetime_formatter     { 'DateTime::Format::MySQL' }
+C<SET TRANSACTION ISOLATION LEVEL $level> then C<BEGIN> when given a level,
+otherwise C<BEGIN>. Without C<SESSION>, the level applies to the next
+transaction only.
 
-sub async_supported        { 1 }
-sub async_cancel_supported { 0 }
-sub async_prepare_args     { my ($self, %params) = @_; $self->dbi_driver eq 'DBD::mysql' ? (async => 1) : (mariadb_async => 1) }
-sub async_ready            { my ($self, %params) = @_; $self->dbi_driver eq 'DBD::mysql' ? $params{sth}->mysql_async_ready() : $params{sth}->mariadb_async_ready() }
-sub async_result           { my ($self, %params) = @_; $self->dbi_driver eq 'DBD::mysql' ? $params{sth}->mysql_async_result() : $params{sth}->mariadb_async_result() }
-sub async_cancel           { my $self = shift; croak "Dialect '" . $self->dialect_name . "' does not support canceling async queries" }
+=item $bool = $dialect->having_uses_alias
 
-=pod
+True: the server resolves the alias in C<HAVING> and computes the column
+once, but it computes a repeated expression a second time.
 
-=item $bool = $dialect->cas_count_reliable(\%attrs)
+=item $n = $dialect->bind_limit
 
-The MySQL and MariaDB drivers enable the found-rows client flag by default, so
-the affected-row count reflects rows matched. This returns false only when that
-flag (C<mysql_client_found_rows> / C<mariadb_client_found_rows>) was explicitly turned
-off in the connect attributes.
+65535, the most placeholders a prepared statement may hold.
 
-=cut
+=item ($parser, $formatter, \%instants) = $dialect->datetime_format
 
-sub cas_count_reliable {
-    my $self = shift;
-    my ($attrs) = @_;
-    for my $key (qw/mysql_client_found_rows mariadb_client_found_rows/) {
-        return 0 if exists $attrs->{$key} && !$attrs->{$key};
-    }
-    return 1;
-}
+L<DateTime::Format::MySQL> for both. C<TIMESTAMP> stores an instant: the
+server converts it from and to the session time zone. C<DATETIME> does not.
 
-=pod
+=item $bool = $dialect->supports_async
 
-=item $name = $dialect->dialect_name
+True.
 
-Returns C<'MySQL'>.
+=item $attrs = $dialect->async_prepare_attrs
 
-=cut
+C<< {mariadb_async => 1} >>.
 
-sub dialect_name { 'MySQL' }
+=item $bool = $dialect->async_ready($dbh, $sth)
 
-=pod
+=item $dialect->async_result($dbh, $sth)
 
-=item $stype = $dialect->supports_type($type)
+C<mariadb_async_ready> and C<mariadb_async_result> on the statement. The
+C<mariadb_> prefix names the driver, but they work against every server of
+the family.
 
-Returns the native type name for a supported logical type (e.g. C<json>),
-or nothing. MariaDB stores C<JSON> as an alias for C<LONGTEXT> but accepts
-the keyword.
+=item $dialect->cancel_async($dbh, $sth)
 
-=cut
-
-my %TYPES = (
-    json      => 'JSON',
-    text      => 'TEXT',
-    longtext  => 'LONGTEXT',
-    blob      => 'BLOB',
-    datetime  => 'DATETIME',
-    timestamp => 'TIMESTAMP',
-);
-sub supports_type {
-    my $self = shift;
-    my ($type) = @_;
-    return undef unless defined $type;
-    return $TYPES{lc($type)};
-}
-
-=pod
+Waits for the result and discards it: the driver cannot cancel a query on its
+own connection.
 
 =back
 
 =cut
 
-BEGIN {
-    my $mariadb = eval { require DBD::MariaDB; 1 };
-    my $mysql   = eval { require DBD::mysql; 1 };
-
-    croak "You must install either DBD::MariaDB or DBD::mysql" unless $mariadb || $mysql;
-
-    *DEFAULT_DBI_DRIVER = $mariadb ? sub() { 'DBD::MariaDB' } : sub() { 'DBD::mysql' };
-}
+sub quote_char                { '`' }
+sub supports_returning_insert { 0 }
+sub supports_returning_update { 0 }
+sub supports_returning_delete { 0 }
+sub supports_isolation        { 1 }
+sub begin_sql                 { $_[1] ? ("SET TRANSACTION ISOLATION LEVEL $_[1]", 'BEGIN') : ('BEGIN') }
+sub having_uses_alias         { 1 }
+sub bind_limit                { 65535 }
+sub datetime_format           { ('DateTime::Format::MySQL', 'DateTime::Format::MySQL', {timestamp => 1}) }
+sub supports_async            { 1 }
+sub async_prepare_attrs       { {mariadb_async => 1} }
+sub async_ready               { $_[2]->mariadb_async_ready }
+sub async_result              { $_[2]->mariadb_async_result }
+sub cancel_async              { $_[2]->mariadb_async_result }
 
 =pod
-
-=head1 PUBLIC METHODS (continued)
 
 =over 4
 
-=item $driver = $dialect->dbi_driver
+=item $class = $dialect->dialect_for_dbh($dbh)
 
-=item $driver = DBIx::QuickORM::Dialect::MySQL->dbi_driver
-
-The C<DBD::*> driver class. As a class method returns the installed default;
-as an instance method resolves and caches it from the live handle.
-
-=cut
-
-sub dbi_driver {
-    my $in = shift;
-
-    return DEFAULT_DBI_DRIVER() unless blessed($in);
-
-    return $in->{+DBI_DRIVER} if $in->{+DBI_DRIVER};
-
-    my $dbh = $in->dbh;
-
-    return $in->{+DBI_DRIVER} = "DBD::" . $dbh->{Driver}->{Name};
-}
-
-=pod
-
-=item $val = $dialect->quote_binary_data
-
-Driver-appropriate bind type for binary data: C<undef> for C<DBD::mysql>,
-C<DBI::SQL_BINARY> for C<DBD::MariaDB>.
-
-=cut
-
-sub quote_binary_data {
-    my $self = shift;
-    my $driver = $self->dbi_driver;
-    return undef if $driver eq 'DBD::mysql';
-    return DBI::SQL_BINARY if $driver eq 'DBD::MariaDB';
-    croak "Unknown DBD::Driver '$driver'";
-}
-
-=pod
-
-=item $dialect->init
-
-Validates the connection and, for a generic instance, promotes it to a
-vendor-specific subclass when the server vendor can be detected.
-
-=cut
-
-sub init {
-    my $self = shift;
-
-    if (blessed($self) eq __PACKAGE__) {
-        # The detected vendor is cached on the object, so the subclass init()
-        # after the rebless (and anything later) does not re-probe the server.
-        if (my $vendor = $self->db_vendor) {
-            if (my $class = load_class("DBIx::QuickORM::Dialect::MySQL::${vendor}")) {
-                bless($self, $class);
-                return $self->init();
-            }
-            elsif ($@ !~ m{Can't locate DBIx/QuickORM/Dialect/MySQL/${vendor}\.pm in \@INC}) {
-                die $@;
-            }
-
-            warn "Detected db vendor '$vendor', but no vendor-specific dialect 'DBIx::QuickORM::Dialect::MySQL::${vendor}' could be found. Using the generic 'DBIx::QuickORM::Dialect::MySQL', which can mean degraded capabilities compared to a dedicated dialect.\n";
-        }
-        else {
-            warn "Could not detect the db vendor (MariaDB, Percona, or Community). Using the generic 'DBIx::QuickORM::Dialect::MySQL', which can mean degraded capabilities compared to a dedicated dialect.\n";
-        }
-    }
-
-    return $self->SUPER::init();
-}
-
-=pod
-
-=item $field = $dialect->dsn_dbname_field
-
-DSN field name used to specify the database name. The MySQL family uses
-C<database>: C<DBD::MariaDB> does not accept C<dbname>, while C<DBD::mysql>
-accepts both.
-
-=cut
-
-sub dsn_dbname_field { 'database' }
-
-=pod
-
-=item $field = $dialect->dsn_socket_field($driver)
-
-DSN field name used to specify a unix socket for the given driver.
-
-=cut
-
-sub dsn_socket_field {
-    my $this = shift;
-    my ($driver) = @_;
-
-    return 'mariadb_socket' if $driver eq 'DBD::MariaDB';
-    return 'mysql_socket' if $driver eq 'DBD::mysql';
-
-    $this->SUPER::dsn_socket_field($driver);
-}
-
-=pod
-
-=item $version = $dialect->db_version
-
-Server version string from C<SELECT version()>.
-
-=cut
-
-sub db_version {
-    my $self = shift;
-
-    my $dbh = $self->{+DBH};
-
-    my $sth = $dbh->prepare("SELECT version()");
-    $sth->execute();
-
-    my ($ver) = $sth->fetchrow_array;
-    return $ver;
-}
-
-=pod
-
-=item $vendor = $dialect->db_vendor
-
-Detects the server vendor (C<MariaDB>, C<Percona>, or C<Community>) from the
-version strings, or C<undef> when it cannot be determined. The result is
-cached on the object.
-
-=cut
-
-sub db_vendor {
-    my $self = shift;
-
-    return $self->{+DB_VENDOR} if exists $self->{+DB_VENDOR};
-
-    my $dbh = $self->{+DBH};
-
-    for my $cmd ('SELECT @@version_comment', 'SELECT version()') {
-        my $sth = $dbh->prepare($cmd);
-        $sth->execute();
-        my ($val) = $sth->fetchrow_array;
-
-        my $vendor = $self->_vendor_from_string($val);
-        return $self->{+DB_VENDOR} = $vendor if $vendor;
-    }
-
-    # Single quotes: under ANSI_QUOTES mode double quotes denote identifiers,
-    # not string literals.
-    my $sth = $dbh->prepare("SHOW VARIABLES LIKE '%version%'");
-    $sth->execute();
-
-    while (my @vals = $sth->fetchrow_array) {
-        for my $val (@vals) {
-            my $vendor = $self->_vendor_from_string($val);
-            return $self->{+DB_VENDOR} = $vendor if $vendor;
-        }
-    }
-
-    return $self->{+DB_VENDOR} = undef;
-}
-
-=pod
-
-=item $sql = $dialect->upsert_statement($pk)
-
-Returns the MySQL upsert clause C<ON DUPLICATE KEY UPDATE>.
+L<DBIx::QuickORM::Dialect::MariaDB> when C<SELECT version()> names MariaDB,
+otherwise this class.
 
 =back
 
 =cut
 
-sub upsert_statement {
-    my $self = shift;
-    my ($pk) = @_;
-    return "ON DUPLICATE KEY UPDATE";
-}
+sub dialect_for_dbh {
+    my $class = shift;
+    my ($dbh) = @_;
 
-sub upsert_noop_assignment {
-    my $self = shift;
-    my ($quoted_col) = @_;
-    # MySQL needs VALUES(col) so it still reports the row via last_insert_id.
-    return "$quoted_col = VALUES($quoted_col)";
-}
+    my ($version) = $dbh->selectrow_array('SELECT version()');
+    return $class unless $version =~ m/mariadb/i;
 
-###############################################################################
-# {{{ Schema Builder Code
-###############################################################################
+    require DBIx::QuickORM::Dialect::MariaDB;
+    return 'DBIx::QuickORM::Dialect::MariaDB';
+}
 
 =pod
-
-=head1 SCHEMA INTROSPECTION METHODS
 
 =over 4
 
-=item $tables = $dialect->build_tables_from_db(%params)
+=item \%kinds = $dialect->native_error_kinds
 
-=item ($pk, $unique, $links) = $dialect->build_table_keys_from_db($table, %params)
+The native codes, since MySQL reports a generic SQLSTATE for most errors:
 
-=item $columns = $dialect->build_columns_from_db($table, %params)
+=for highlighter language=text
 
-=item $indexes = $dialect->build_indexes_from_db($table, %params)
-
-Introspect tables, keys, columns, and indexes for the connected database from
-C<information_schema>, invoking the C<autofill> hooks supplied in C<%params> as
-each piece of metadata is built.
+    1205                    lock_timeout           (lock wait timeout)
+    1213                    deadlock
+    1062, 1169, 1586        unique_violation       (duplicate key)
+    1216, 1217, 1451, 1452  foreign_key_violation  (missing or still-referenced parent row)
+    1048, 1364              not_null_violation     (NULL, or no value and no default)
+    3819                    check_violation        (failed CHECK)
 
 =back
 
 =cut
 
-my %TABLE_TYPES = (
-    'BASE TABLE' => 'DBIx::QuickORM::Schema::Table',
-    'VIEW'       => 'DBIx::QuickORM::Schema::View',
-    'TEMPORARY'  => 'DBIx::QuickORM::Schema::Table',
+my %NATIVE_KIND = (
+    1205 => 'lock_timeout',
+    1213 => 'deadlock',
+    3819 => 'check_violation',
+    (map { $_ => 'unique_violation' } 1062,      1169, 1586),
+    (map { $_ => 'foreign_key_violation' } 1216, 1217, 1451, 1452),
+    (map { $_ => 'not_null_violation' } 1048,    1364),
 );
 
-my %TEMP_TYPES = (
-    'BASE TABLE' => 0,
-    'VIEW'       => 0,
-    'TEMPORARY'  => 1,
-);
-
-sub build_tables_from_db {
-    my $self = shift;
-    my %params = @_;
-
-    my $dbh = $self->{+DBH};
-
-    my $sth = $dbh->prepare('SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = ?');
-    $sth->execute($self->{+DB_NAME});
-    my @table_list = @{$sth->fetchall_arrayref};
-
-    # Sweep all columns, indexes, and constraints for the database in one query
-    # each, grouped by table, rather than a query-per-table. The per-table
-    # builders below consume these pre-fetched rows.
-    my $all_columns = $self->_fetch_all_columns;
-    my $all_indexes = $self->_fetch_all_indexes;
-    my $all_keys    = $self->_fetch_all_keys;
-
-    my %tables;
-
-    for my $row (@table_list) {
-        my ($tname, $type) = @$row;
-        next if $params{autofill}->skip(table => $tname);
-
-        my $table = {name => $tname, db_name => $tname, is_temp => $TEMP_TYPES{$type} // 0};
-        my $class = $TABLE_TYPES{$type} // 'DBIx::QuickORM::Schema::Table';
-        $params{autofill}->hook(pre_table => {table => $table, class => \$class});
-
-        $table->{columns} = $self->build_columns_from_db($tname, %params, column_rows => $all_columns->{$tname} // []);
-        $params{autofill}->hook(columns => {columns => $table->{columns}, table => $table});
-
-        $table->{indexes} = $self->build_indexes_from_db($tname, %params, index_rows => $all_indexes->{$tname} // []);
-        $params{autofill}->hook(indexes => {indexes => $table->{indexes}, table => $table});
-
-        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params, key_rows => $all_keys->{$tname} // []);
-
-        $params{autofill}->hook(post_table => {table => $table, class => \$class});
-
-        # Hooks may rename the table; key by the final name.
-        my $final_name = $table->{name};
-        $tables{$final_name} = $class->new($table);
-        $params{autofill}->hook(table => {table => $tables{$final_name}});
-    }
-
-    return \%tables;
-}
-
-sub build_table_keys_from_db {
-    my $self = shift;
-    my ($table, %params) = @_;
-
-    my $rows = $params{key_rows} // $self->_query_keys($table);
-
-    my ($pk, %unique, @links);
-
-    my %keys;
-    for my $row (@$rows) {
-        my $item = $keys{$row->{con}} //= {type => lc($row->{type})};
-
-        push @{$item->{columns} //= []} => $row->{col};
-
-        next unless $row->{type} eq 'FOREIGN KEY';
-
-        my $link = $item->{link} //= [[$table, $item->{columns}],[$row->{ftab},[]]];
-        push @{$link->[1]->[1]} => $row->{fcol};
-    }
-
-    for my $key (sort keys %keys) {
-        my $item = $keys{$key};
-
-        my $type = delete $item->{type};
-        if ($type eq 'foreign key') {
-            push @links => $item->{link};
-        }
-        elsif ($type eq 'unique' || $type eq 'primary key') {
-            $unique{column_key(@{$item->{columns}})} = $item->{columns};
-            $pk = $item->{columns} if $type eq 'primary key';
-        }
-    }
-
-    $params{autofill}->hook(links       => {links       => \@links, table_name => $table});
-    $params{autofill}->hook(primary_key => {primary_key => $pk, table_name => $table});
-    $params{autofill}->hook(unique_keys => {unique_keys => \%unique, table_name => $table});
-
-    return ($pk, \%unique, \@links);
-}
-
-sub build_columns_from_db {
-    my $self = shift;
-    my ($table, %params) = @_;
-
-    croak "A table name is required" unless $table;
-
-    my $rows = $params{column_rows} // $self->_query_columns($table);
-
-    my %columns;
-    for my $res (@$rows) {
-        next if $params{autofill}->skip(column => ($table, $res->{COLUMN_NAME}));
-
-        my $col = {};
-
-        $params{autofill}->hook(pre_column => {column => $col, table_name => $table, column_info => $res});
-
-        $col->{name} = $res->{COLUMN_NAME};
-        $col->{db_name} = $res->{COLUMN_NAME};
-        $col->{order} = $res->{ORDINAL_POSITION};
-        $col->{type} = \"$res->{DATA_TYPE}";
-        $col->{nullable} = $self->_col_field_to_bool($res->{IS_NULLABLE});
-
-        # EXTRA can carry more than one token (e.g. "auto_increment DEFAULT_GENERATED"),
-        # so match the word rather than the whole string.
-        $col->{identity} = 1 if $res->{EXTRA} && $res->{EXTRA} =~ m/\bauto_increment\b/i;
-
-        # Both MySQL (5.7+) and MariaDB (10.2+) populate GENERATION_EXPRESSION
-        # for stored/virtual GENERATED columns and leave it null/empty for
-        # ordinary columns. EXTRA strings vary between vendors and may include
-        # DEFAULT_GENERATED (a default expression, not a generated column), so
-        # GENERATION_EXPRESSION is the canonical signal.
-        $col->{generated} = 1
-            if defined($res->{GENERATION_EXPRESSION}) && length $res->{GENERATION_EXPRESSION};
-
-        $col->{volatile} //= 1 if $self->column_is_volatile_by_metadata(
-            $col,
-            default   => $res->{COLUMN_DEFAULT},
-            on_update => ($res->{EXTRA} && $res->{EXTRA} =~ m/\bon update\b/i) ? 1 : 0,
-        );
-
-        $col->{affinity} //= affinity_from_type($res->{DATA_TYPE});
-        $col->{affinity} //= 'string'  if grep { $self->_col_field_to_bool($res->{$_}) } grep { m/CHARACTER/ } keys %$res;
-        $col->{affinity} //= 'numeric' if grep { $self->_col_field_to_bool($res->{$_}) } grep { m/NUMERIC/ } keys %$res;
-        $col->{affinity} //= $self->affinity_from_db_type($res->{DATA_TYPE});
-
-        $params{autofill}->process_column($col);
-        $params{autofill}->hook(post_column => {column => $col, table_name => $table, column_info => $res});
-
-        $columns{$col->{name}} = DBIx::QuickORM::Schema::Table::Column->new($col);
-        $params{autofill}->hook(column => {column => $columns{$col->{name}}, table_name => $table, column_info => $res});
-    }
-
-    return \%columns;
-}
+sub native_error_kinds { \%NATIVE_KIND }
 
 =pod
-
-=head1 PRIVATE METHODS
 
 =over 4
 
-=item $vendor_or_undef = $dialect->_vendor_from_string($val)
+=item $ns = $dialect->namespace($dbh)
 
-Maps a server version/comment string to a vendor name, or undef when the
-string (possibly undefined) names no known vendor.
-
-=cut
-
-sub _vendor_from_string {
-    my $self = shift;
-    my ($val) = @_;
-
-    return undef unless defined $val;
-
-    return 'MariaDB' if $val =~ m/MariaDB/i;
-    return 'Percona' if $val =~ m/Percona/i;
-
-    # Oracle ships both "MySQL Community Server" and "MySQL Enterprise
-    # Server"; both are upstream MySQL, which the Community dialect covers.
-    return 'Community' if $val =~ m/(?:Community|Enterprise)/i;
-
-    return undef;
-}
-
-=pod
+C<DATABASE()>, or undef when the connection has no database selected.
 
 =back
 
 =cut
 
-sub build_indexes_from_db {
-    my $self = shift;
-    my ($table, %params) = @_;
-
-    my $rows = $params{index_rows} // $self->_query_indexes($table);
-
-    my %out;
-    for my $r (@$rows) {
-        my ($name, $col, $nu, $type) = @$r;
-        my $idx = $out{$name} //= {name => $name, unique => $nu ? 0 : 1, type => $type, columns => []};
-        push @{$idx->{columns}} => $col;
-    }
-
-    return [map { $params{autofill}->hook(index => {index => $out{$_}, table_name => $table}); $out{$_} } sort keys %out];
+sub namespace {
+    my $self  = shift;
+    my ($dbh) = @_;
+    my ($ns)  = $dbh->selectrow_array('SELECT DATABASE()');
+    return $ns;
 }
 
 =pod
 
 =over 4
 
-=item @triggers = $dialect->triggers_for_table($table)
+=item $dialect->init_session($dbh, $time_zone)
 
-Returns the triggers on a table, each as a
-C<< { event => 'INSERT'|'UPDATE'|'DELETE', body => $action_statement } >>
-hashref, for volatile-column and has-triggers detection.
+C<SET NAMES utf8mb4>, then C<SET time_zone>. Also records the pid that owns
+the handle, for C<release_inherited>.
+
+C<UTC> is sent as C<+00:00>, which works without the server's time zone
+tables. Any other zone name needs them.
 
 =back
 
 =cut
 
-sub triggers_for_table {
+sub init_session {
     my $self = shift;
-    my ($table) = @_;
-    return @{$self->_all_triggers->{$table} // []};
+    my ($dbh, $time_zone) = @_;
+
+    $dbh->do('SET NAMES utf8mb4');
+    $dbh->{private_DBIx_QuickORM_pid} = $$;
+
+    $time_zone = '+00:00' if $time_zone eq 'UTC';
+    return $dbh->do('SET time_zone = ' . $dbh->quote($time_zone));
 }
 
 =pod
 
-=head1 PRIVATE METHODS (schema introspection)
-
 =over 4
 
-=item $by_table = $dialect->_all_triggers
+=item $dialect->release_inherited($dbh)
 
-All triggers in the connected database keyed by table name, fetched once from
-C<information_schema.triggers> (cached), so trigger detection adds a single
-query rather than one per table.
+Points the child's copy of the handle's socket at F</dev/null>, then
+disconnects, so the parent's session is untouched. Does nothing for an
+inactive handle.
 
-=item $by_table = $dialect->_fetch_all_columns
-
-=item $by_table = $dialect->_fetch_all_indexes
-
-=item $by_table = $dialect->_fetch_all_keys
-
-Sweep all column, index, and constraint metadata for the connected database in
-a single query each, returning a hashref of table name to the rows for that
-table (in the same shape the matching single-table C<_query_*> helper returns).
-
-=item $rows = $dialect->_query_columns($table)
-
-=item $rows = $dialect->_query_indexes($table)
-
-=item $rows = $dialect->_query_keys($table)
-
-Single-table fallbacks used when the per-table builders are called without
-pre-fetched rows. Each issues one query scoped to C<$table>.
+DBD::MariaDB closes every handle it holds when a process exits,
+C<InactiveDestroy> or not, so a forked child that exits normally would
+otherwise end the parent's session. At exit this runs for every still-active
+handle whose recorded pid is not this process.
 
 =back
 
 =cut
 
-sub _all_triggers {
+sub release_inherited {
     my $self = shift;
+    my ($dbh) = @_;
 
-    return $self->{+ALL_TRIGGERS} if $self->{+ALL_TRIGGERS};
+    return unless $dbh->{Active};
 
-    my %map;
-    my $sql = <<'    SQL';
-        SELECT event_object_table AS tbl, event_manipulation AS event, action_statement AS body
-          FROM information_schema.triggers
-         WHERE trigger_schema = ?
-    SQL
+    $self->_null_socket($dbh->{mariadb_sockfd});
 
-    my $rows = eval { $self->dbh->selectall_arrayref($sql, {Slice => {}}, $self->{+DB_NAME}) } || [];
-    for my $r (@$rows) {
-        next unless defined $r->{tbl};
-        push @{$map{$r->{tbl}}} => {event => $r->{event}, body => $r->{body}};
+    # Statements still open on the handle are the parent's.
+    $dbh->{Warn} = 0;
+    $dbh->disconnect;
+    return;
+}
+
+=pod
+
+=over 4
+
+=item $sql = $dialect->tables_sql
+
+=item $sql = $dialect->fields_sql
+
+=item $sql = $dialect->pk_sql
+
+=item $sql = $dialect->unique_sql
+
+=item $sql = $dialect->fk_sql
+
+The scan queries (see L<C<scan>|DBIx::QuickORM::Dialect/"PUBLIC METHODS">),
+over C<information_schema> for base tables in C<DATABASE()>.
+
+Field types are C<COLUMN_TYPE>.
+
+A column the database fills is auto-increment, generated, or has a default.
+Generated columns refuse values.
+
+MariaDB reports the default of a nullable column without one as the text
+C<NULL>, which is not a default. On MySQL that text is also how a string
+default C<'NULL'> appears, so such a nullable column misses C<db_fills>.
+Key columns are never nullable.
+
+A unique index over a column prefix or an
+expression is left out.
+
+=back
+
+=cut
+
+sub tables_sql {
+    return <<"    EOT";
+        SELECT TABLE_NAME
+          FROM information_schema.TABLES
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_TYPE   = 'BASE TABLE'
+    EOT
+}
+
+sub fields_sql {
+    return <<"    EOT";
+        SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, NULL,
+               CASE WHEN EXTRA LIKE '%auto_increment%'
+                      OR COALESCE(GENERATION_EXPRESSION, '') <> ''
+                      OR (COLUMN_DEFAULT IS NOT NULL AND NOT (COLUMN_DEFAULT = 'NULL' AND IS_NULLABLE = 'YES'))
+                    THEN 1 END,
+               CASE WHEN COALESCE(GENERATION_EXPRESSION, '') <> '' THEN 1 END
+          FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+    EOT
+}
+
+sub pk_sql {
+    return <<"    EOT";
+        SELECT TABLE_NAME, COLUMN_NAME
+          FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND INDEX_NAME   = 'PRIMARY'
+      ORDER BY TABLE_NAME, SEQ_IN_INDEX
+    EOT
+}
+
+sub unique_sql {
+    return <<"    EOT";
+        SELECT TABLE_NAME, INDEX_NAME, CASE WHEN SUB_PART IS NULL THEN COLUMN_NAME END
+          FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND NON_UNIQUE   = 0
+           AND INDEX_NAME  <> 'PRIMARY'
+    EOT
+}
+
+sub fk_sql {
+    return <<"    EOT";
+        SELECT TABLE_NAME, CONSTRAINT_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+          FROM information_schema.KEY_COLUMN_USAGE
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND REFERENCED_TABLE_NAME IS NOT NULL
+      ORDER BY TABLE_NAME, CONSTRAINT_NAME, ORDINAL_POSITION
+    EOT
+}
+
+=pod
+
+=over 4
+
+=item \%field = $dialect->field_facts($db_type)
+
+As inherited, but a type whose name ends in C<int> has no C<size>:
+C<int(11)> is a display width.
+
+=back
+
+=cut
+
+sub field_facts {
+    my $self  = shift;
+    my $field = $self->SUPER::field_facts(@_);
+    delete $field->{size} if $field->{type} =~ m/int$/;
+    return $field;
+}
+
+# Runs before DBI's END block (DBI is loaded first), which would close the parent's session.
+END {
+    local ($?, $@, $!);
+    my %drivers = DBI->installed_drivers;
+    my $drh     = $drivers{MariaDB};
+    for my $dbh (grep { $_ && $_->{Active} } $drh ? @{$drh->{ChildHandles} // []} : ()) {
+        my $pid = $dbh->{private_DBIx_QuickORM_pid};
+        __PACKAGE__->release_inherited($dbh) if $pid && $pid != $$;
     }
-
-    return $self->{+ALL_TRIGGERS} = \%map;
 }
-
-sub _fetch_all_columns {
-    my $self = shift;
-
-    my $dbh = $self->{+DBH};
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT *
-          FROM information_schema.columns
-         WHERE table_schema = ?
-      ORDER BY table_name, ordinal_position
-    EOT
-    $sth->execute($self->{+DB_NAME});
-
-    my %by_table;
-    while (my $res = $sth->fetchrow_hashref) {
-        my $tname = $res->{TABLE_NAME} // $res->{table_name};
-        push @{$by_table{$tname} //= []} => $res;
-    }
-
-    return \%by_table;
-}
-
-sub _query_columns {
-    my $self = shift;
-    my ($table) = @_;
-
-    my $dbh = $self->{+DBH};
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT *
-          FROM information_schema.columns
-         WHERE table_name    = ?
-           AND table_schema  = ?
-    EOT
-    $sth->execute($table, $self->{+DB_NAME});
-
-    return $sth->fetchall_arrayref({});
-}
-
-sub _fetch_all_indexes {
-    my $self = shift;
-
-    my $dbh = $self->dbh;
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT table_name,
-               index_name,
-               column_name,
-               non_unique,
-               index_type
-          FROM INFORMATION_SCHEMA.STATISTICS
-         WHERE table_schema = ?
-      ORDER BY table_name, index_name, seq_in_index
-    EOT
-    $sth->execute($self->{+DB_NAME});
-
-    my %by_table;
-    while (my ($tname, $name, $col, $nu, $type) = $sth->fetchrow_array) {
-        push @{$by_table{$tname} //= []} => [$name, $col, $nu, $type];
-    }
-
-    return \%by_table;
-}
-
-sub _query_indexes {
-    my $self = shift;
-    my ($table) = @_;
-
-    my $dbh = $self->dbh;
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT index_name,
-               column_name,
-               non_unique,
-               index_type
-          FROM INFORMATION_SCHEMA.STATISTICS
-         WHERE table_name = ?
-           AND table_schema = ?
-      ORDER BY index_name, seq_in_index
-    EOT
-    $sth->execute($table, $self->{+DB_NAME});
-
-    return $sth->fetchall_arrayref;
-}
-
-sub _fetch_all_keys {
-    my $self = shift;
-
-    my $dbh = $self->{+DBH};
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT tco.table_name             AS tab,
-               tco.constraint_name        AS con,
-               tco.constraint_type        AS type,
-               kcu.column_name            AS col,
-               kcu.referenced_table_name  AS ftab,
-               kcu.referenced_column_name AS fcol
-          FROM information_schema.table_constraints tco
-          JOIN information_schema.key_column_usage  kcu
-            ON tco.constraint_schema = kcu.constraint_schema
-           AND tco.constraint_name   = kcu.constraint_name
-           AND tco.table_name        = kcu.table_name
-         WHERE tco.table_schema NOT IN ('sys','information_schema', 'mysql', 'performance_schema')
-           AND tco.table_schema = ?
-      ORDER BY tco.table_name, tco.constraint_name, kcu.ordinal_position
-    EOT
-    $sth->execute($self->{+DB_NAME});
-
-    my %by_table;
-    while (my $row = $sth->fetchrow_hashref) {
-        push @{$by_table{$row->{tab}} //= []} => $row;
-    }
-
-    return \%by_table;
-}
-
-sub _query_keys {
-    my $self = shift;
-    my ($table) = @_;
-
-    my $dbh = $self->{+DBH};
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT tco.constraint_name          AS con,
-               tco.constraint_type          AS type,
-               kcu.column_name              AS col,
-               kcu.referenced_table_name    AS ftab,
-               kcu.referenced_column_name   AS fcol
-          FROM information_schema.table_constraints tco
-          JOIN information_schema.key_column_usage  kcu
-            ON tco.constraint_schema = kcu.constraint_schema
-           AND tco.constraint_name   = kcu.constraint_name
-           AND tco.table_name        = kcu.table_name
-         WHERE tco.table_schema NOT IN ('sys','information_schema', 'mysql', 'performance_schema')
-           AND tco.table_name        = ?
-           AND tco.table_schema      = ?
-      ORDER BY tco.table_schema, tco.table_name, tco.constraint_name, kcu.ordinal_position
-    EOT
-    $sth->execute($table, $self->{+DB_NAME});
-
-    return $sth->fetchall_arrayref({});
-}
-
-###############################################################################
-# }}} Schema Builder Code
-###############################################################################
 
 1;
 
@@ -812,7 +369,7 @@ __END__
 
 =head1 SOURCE
 
-The source code repository for DBIx::QuickORM can be found at
+The source code repository for DBIx-QuickORM can be found at
 L<https://github.com/exodist/DBIx-QuickORM>.
 
 =head1 MAINTAINERS

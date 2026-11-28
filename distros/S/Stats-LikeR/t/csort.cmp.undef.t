@@ -2,7 +2,7 @@
 
 require 5.010;
 use warnings FATAL => 'all';   # the exact environment that used to die
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::Exception; # throws_ok / dies_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';

@@ -7,16 +7,17 @@ use IO::Socket::INET;
 # Create a simple echo server in a coroutine
 Acme::Parataxis::run(
     sub {
-        my $server = IO::Socket::INET->new( LocalAddr => '127.0.0.1', LocalPort => 9999, Proto => 'tcp', Listen => 5, Reuse => 1 ) or
+        my $server = IO::Socket::INET->new( LocalAddr => '127.0.0.1', LocalPort => 0, Proto => 'tcp', Listen => 5, Reuse => 1 ) or
             die 'Could not create server: ' . $!;
+        my $port = $server->sockport;
         $server->blocking(0);
         $server->autoflush(1);
-        say 'Server listening on 127.0.0.1:9999';
+        say "Server listening on 127.0.0.1:$port";
         my $client_done = 0;
         Acme::Parataxis->spawn(
             sub {
                 say 'Client starting...';
-                my $client = IO::Socket::INET->new( PeerAddr => '127.0.0.1', PeerPort => 9999, Proto => 'tcp' ) or
+                my $client = IO::Socket::INET->new( PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp' ) or
                     die 'Could not create client: ' . $!;
                 $client->blocking(0);
                 $client->autoflush(1);

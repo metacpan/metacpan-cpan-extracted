@@ -12,7 +12,7 @@
 # build, headroom for long double and quadmath.
 require 5.010; use strict; use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my %d = (
 	y => [1.2,2.9,3.1,4.8,5.2,6.9,7.1,8.4,9.9,10.3,11.8,12.1],

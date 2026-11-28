@@ -45,7 +45,7 @@ use warnings FATAL => 'all';
 use File::Spec;
 use File::Temp 'tempdir';
 use IO::Compress::Gzip '$GzipError';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::Exception; # throws_ok, lives_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';

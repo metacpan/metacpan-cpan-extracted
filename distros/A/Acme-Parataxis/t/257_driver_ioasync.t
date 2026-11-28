@@ -40,19 +40,33 @@ sub socket_pairs ($n) {
 # RLIMIT_NOFILE is not the only ceiling, and on NetBSD it is not the binding one. The platform's FD_SETSIZE bounds
 # the descriptor NUMBER rather than the count: 300 pairs open 600 descriptors and reach fd 605, comfortably past
 # NetBSD's FD_SETSIZE of 256 and nowhere near Linux's 1024, and an fd_set that size cannot name a descriptor at all.
-# Two descriptors per pair, plus a listener and the handful of handles already open, is the budget that leaves.
 # Measured from C because perl cannot measure it - `getconf FD_SETSIZE` is not a valid symbol and answers 20, and
 # Fcntl::FD_SETSIZE() dies at runtime - and on NetBSD that number is the whole difference between this leg passing
 # and not.
+#
+# The 16 below is only a first guess at how many descriptors this process already holds. A NetBSD smoker had 17 of
+# its own, so the old 120-pair guess opened fds 17..256 and the last await_read was refused for fd 256. Check the
+# descriptors the probe actually allocated and back off by whole pairs until the top one fits, rather than trusting
+# that guess.
 sub pairs_that_fit ($want) {
     my $n   = $want;
     my $cap = int( ( Acme::Parataxis::fd_setsize() - 16 ) / 2 );
     $n = $cap if $n > $cap;
     while ( $n > 8 ) {
-        my ($probe) = eval { socket_pairs($n) };
-        return $n if $probe;
-        die $@ unless $!{EMFILE} || $!{ENFILE};
-        $n = int( $n / 2 );
+        my ( $w, $r ) = eval { socket_pairs($n) };
+        if ( !$w ) {
+            die $@ unless $!{EMFILE} || $!{ENFILE};
+            $n = int( $n / 2 );
+            next;
+        }
+        my $top = 0;
+        for my $fh ( @$w, @$r ) {
+            my $fd = fileno($fh) // -1;
+            $top = $fd if $fd > $top;
+        }
+        my $limit = Acme::Parataxis::fd_setsize();
+        return $n if $top < $limit;
+        $n -= int( ( $top - $limit + 2 ) / 2 );
     }
     return $n;
 }

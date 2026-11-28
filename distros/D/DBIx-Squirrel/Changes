@@ -2,6 +2,26 @@ Revision history for DBIx-Squirrel
 
 Unreleased
 
+v4.3.0 2026-11-27
+
+    result_original gives each value its own row past stages that hold
+    values back, as Ekorn::Pipeline v0.5.0, now required, keeps it.
+
+    It ships roadmap 2026-0065, from a task of Ekorn-Pipeline's.
+    Requires Ekorn::Pipeline >= v0.5.0, < v0.6.0.
+
+    - result_original keeps its promise, the row a result is made
+      from, past stages that hold values back. take_last's value has
+      its row, where it had undef; a batch from batch, made from many
+      rows, has undef, where it had the row that filled it; collect's
+      result is undef, as before (roadmap 2026-0065).
+    - A stage made with gather that holds values back can say so,
+      holds set true among its parts by name, and say which row each
+      value it gives came from, with kept_origin, new in
+      DBIx::Squirrel::Context and Tooling's :context, Ekorn's own sub.
+      One that doesn't say so is taken for a map, as before (roadmap
+      2026-0065).
+
 v4.2.0 2026-11-26
 
     The README, the user guide and the reference each come in two

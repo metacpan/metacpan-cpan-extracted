@@ -10,7 +10,6 @@ lib/Mojolicious/Plugin/Tables/resources/public/favicon.ico
 lib/Mojolicious/Plugin/Tables/resources/public/img/missing.jpg
 lib/Mojolicious/Plugin/Tables/resources/public/img/reliant-robin.jpg
 lib/Mojolicious/Plugin/Tables/resources/public/img/tables.png
-lib/Mojolicious/Plugin/Tables/resources/public/index.html
 lib/Mojolicious/Plugin/Tables/resources/public/js/tables.js
 lib/Mojolicious/Plugin/Tables/resources/templates/exception.json.ep
 lib/Mojolicious/Plugin/Tables/resources/templates/exception.production.html.ep

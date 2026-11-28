@@ -12,7 +12,7 @@ package Data::Tools::Process::Forks;
 use strict;
 use Exporter;
 use POSIX;
-our $VERSION = '1.60';
+our $VERSION = '1.61';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

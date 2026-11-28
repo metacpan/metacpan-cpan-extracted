@@ -2,7 +2,7 @@ package Mail::DKIM2::Gate;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Carp ();
 use Scalar::Util qw(blessed);

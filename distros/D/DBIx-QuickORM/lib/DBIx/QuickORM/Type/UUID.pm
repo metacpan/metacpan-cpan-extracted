@@ -2,15 +2,13 @@ package DBIx::QuickORM::Type::UUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000031';
+
+use Carp qw/croak/;
+use UUID();
 
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::Type';
-
-use DBIx::QuickORM::Util qw/parse_conflate_args/;
-
-use UUID qw/uuid7 parse unparse/;
-use Carp qw/croak/;
 
 =pod
 
@@ -18,145 +16,211 @@ use Carp qw/croak/;
 
 =head1 NAME
 
-DBIx::QuickORM::Type::UUID - UUID inflate/deflate type.
+DBIx::QuickORM::Type::UUID - UUIDs stored as text or as 16 bytes.
 
 =head1 DESCRIPTION
 
-A L<DBIx::QuickORM::Role::Type> implementation for UUID columns. Values
-inflate to the canonical hyphenated string form. Deflation honors the
-column affinity: C<string> produces the hyphenated form, C<binary>
-produces the packed 16-byte form.
+The inflated form is the 36-character string. A field of C<binary> affinity
+(C<binary(16)>, C<bytea>, C<BLOB>) stores the 16 bytes. Any other field,
+including a native C<uuid> column, stores the string as given.
 
-C<qorm_affinity> picks C<string> for native C<uuid> types (and by default),
-C<binary> for binary/blob storage. C<qorm_sql_type> uses a native C<uuid>
-type when available, otherwise C<VARCHAR(36)>. When registered for autofill
-this type claims the C<uuid> SQL type and any column whose name contains
-"uuid".
+A primary key field of this type that an insert leaves out gets a new
+version 7 UUID, unless the database fills the column and can return it
+with C<RETURNING> (so on MySQL it is generated). The field's
+C<generate> hint changes that (see
+L<DBIx::QuickORM::Role::Type/Field hints>).
 
-C<new> returns a fresh v7 UUID string; it is handy as a Perl default for a
-UUID column.
+=head1 SYNOPSIS
+
+    # CREATE TABLE sessions (id UUID PRIMARY KEY, owner_uuid BYTEA)
+
+    my $uuid    = '0190a6e8-1d2c-7c3b-9f00-123456789abc';
+    my $session = $orm->insert(
+        sessions => {
+            id         => $uuid,
+            owner_uuid => $uuid,
+        },
+    );
+
+    my $sid   = $session->field('id');            # the string, from a native uuid column
+    my $owner = $session->field('owner_uuid');    # the string, stored as 16 bytes
+
+    my $fresh = $orm->insert(sessions => {owner_uuid => $uuid});    # id gets a new version 7 UUID
 
 =cut
 
-sub new { shift; uuid7() }
+my $UUID = qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/i;
 
-sub qorm_inflate {
-    my $params = parse_conflate_args(@_);
-    my $val    = $params->{value};
-    return undef unless defined $val;
-    my $class  = $params->{class} // __PACKAGE__;
+=head1 PUBLIC METHODS
 
-    return $class->looks_like_uuid($val) // $class->looks_like_bin($val) // croak "'$val' does not look like a UUID";
-}
+=over 4
 
-sub qorm_deflate {
-    my $params   = parse_conflate_args(@_);
-    my $val      = $params->{value};
-    return undef unless defined $val;
-    my $affinity = $params->{affinity} or croak "Could not determine affinity";
-    my $class    = $params->{class} // __PACKAGE__;
+=item @types = $type->base_types
 
-    if (my $uuid = $class->looks_like_uuid($val)) {
-        return $uuid if $affinity eq 'string';
+C<uuid>.
 
-        my $b;
-        parse($val, $b);
-        return $b;
-    }
+=item $bool = $type->inflated_is_immutable_for_cache
 
-    if (my $uuid = $class->looks_like_bin($val)) {
-        return $val if $affinity eq 'binary';
-        return $uuid;
-    }
+True: a UUID inflates to a plain string.
 
-    croak "'$val' does not look like a uuid";
-}
+=back
 
-sub qorm_compare {
+=cut
+
+sub base_types                      { 'uuid' }
+sub inflated_is_immutable_for_cache { 1 }
+
+=pod
+
+=over 4
+
+=item $bool = $type->is_inflated($value)
+
+True for a 36-character UUID string.
+
+=back
+
+=cut
+
+sub is_inflated {
     my $class = shift;
-    my ($a, $b) = @_;
-
-    $a = $class->looks_like_uuid($a) // $class->looks_like_bin($a) // $a if defined $a;
-    $b = $class->looks_like_uuid($b) // $class->looks_like_bin($b) // $b if defined $b;
-
-    my $da = defined($a);
-    my $db = defined($b);
-
-    # Equality contract: true when the two values are the same.
-    return $a eq $b if $da && $db;
-    return 1 unless $da || $db;    # both undef: equal
-    return 0;                      # exactly one defined: not equal
+    my ($value) = @_;
+    return $value =~ $UUID ? 1 : 0;
 }
 
-sub qorm_affinity {
+=pod
+
+=over 4
+
+=item $bool = $type->matches($field_name, \%field, $dialect)
+
+True for a field named C<uuid>, C<..._uuid>, C<uuid_...>, or C<..._uuid_...>
+that can hold one: C<binary> affinity of size 16 or no size, or C<string>
+affinity of size 36 or no size.
+
+C<uuid_count int> is not a UUID.
+
+=back
+
+=cut
+
+sub matches {
     my $class = shift;
-    my %params = @_;
+    my ($name, $field) = @_;
 
-    if (my $sql_type = $params{sql_type}) {
-        return 'string' if lc($sql_type) eq 'uuid';
-        return 'binary' if $sql_type =~ m/(bin(ary)?|bytea?|blob)/i;
-    }
-
-    if (my $dialect = $params{dialect}) {
-        return 'string' if $dialect->supports_type('uuid');
-    }
-
-    return 'string';
+    return 0 unless $name =~ m/(?:^|_)uuid(?:_|$)/i;
+    my $size     = $field->{size};
+    my $affinity = $field->{affinity} // '';
+    return 1 if $affinity eq 'binary' && (!$size || $size == 16);
+    return 1 if $affinity eq 'string' && (!$size || $size == 36);
+    return 0;
 }
 
-sub qorm_sql_type {
-    my $self = shift;
-    my ($dialect) = @_;
+=pod
 
-    if (my $stype = $dialect->supports_type('uuid')) {
-        return $stype;
-    }
+=over 4
 
-    # Document how to set up binary(16)
-    # Basically use the post_column hook in Autofill
-    return 'VARCHAR(36)';
+=item $uuid = $type->inflate($raw, \%field, $conn)
+
+The lowercase string for the 16 bytes of a binary field, or text as stored.
+
+A binary value that is not 16 bytes croaks, naming the field when its
+record has its C<table> and C<name>.
+
+=back
+
+=cut
+
+sub inflate {
+    my $class = shift;
+    my ($raw, $field) = @_;
+    return $raw unless ($field->{affinity} // '') eq 'binary';
+
+    croak "A binary UUID must be 16 bytes, got " . length($raw) . $class->_for_field($field) unless length($raw) == 16;
+
+    my $str;
+    UUID::unparse_lower($raw, $str);
+    return $str;
 }
 
-# looks_like_bin / looks_like_uuid take their argument via pop so they work
-# both as functions (looks_like_uuid($v)) and as methods ($class->looks_like_uuid($v)).
-sub looks_like_bin {
-    my $in = pop;
-    use bytes;
-    return undef unless length($in) == 16;
-    my $s;
-    unparse($in, $s);
-    return $s;
+=pod
+
+=over 4
+
+=item $bool = $type->inflate_is_identity(\%field)
+
+True for a text field, which C<inflate> returns as stored.
+
+=back
+
+=cut
+
+sub inflate_is_identity { ($_[1]->{affinity} // '') ne 'binary' ? 1 : 0 }
+
+=pod
+
+=over 4
+
+=item $raw = $type->deflate($uuid, \%field, $conn)
+
+The 16 bytes for a binary field, or the value as given for any other field.
+
+A reference croaks. For a binary field, so does anything but a UUID string.
+The croak names the field when its record has its C<table> and C<name>.
+
+=back
+
+=cut
+
+sub deflate {
+    my $class = shift;
+    my ($value, $field) = @_;
+
+    my $binary = ($field->{affinity} // '') eq 'binary';
+    croak "'$value' is not a UUID" . $class->_for_field($field) if ref($value) || ($binary && $value !~ $UUID);
+    return $value unless $binary;
+
+    my $bin;
+    UUID::parse($value, $bin);
+    return $bin;
 }
 
-sub looks_like_uuid {
-    my $in = pop;
-    # Return the canonical (lowercase) hyphenated form so inflation and
-    # comparison are case-insensitive and match the form produced from binary.
-    return lc($in) if $in && $in =~ m/^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$/i;
-    return undef;
-}
+=pod
 
-sub qorm_register_type {
-    my $self = shift;
-    my ($types, $affinities) = @_;
+=over 4
 
-    my $class = ref($self) || $self;
+=item $uuid = $type->generate_key_value(\%field, $conn)
 
-    $types->{uuid} //= $class;
+A new version 7 UUID string, from L<UUID/uuid7>.
 
-    push @{$affinities->{binary}} => sub {
-        my %params = @_;
-        return $class if $params{name}    =~ m/uuid/i;
-        return $class if $params{db_name} =~ m/uuid/i;
-        return;
-    };
+=back
 
-    push @{$affinities->{string}} => sub {
-        my %params = @_;
-        return $class if $params{name}    =~ m/uuid/i;
-        return $class if $params{db_name} =~ m/uuid/i;
-        return;
-    };
+=cut
+
+sub generate_key_value { UUID::uuid7() }
+
+=pod
+
+=over 4
+
+=item $key = $type->canonical_key_value($value, \%field, $conn)
+
+The lowercase hyphenated string for a key value given as that string, in
+upper case, or as 16 bytes, told apart by length alone (the digits are not
+checked). Any other length is returned as given.
+
+=back
+
+=cut
+
+sub canonical_key_value {
+    my $class   = shift;
+    my ($value) = @_;
+    my $len     = length($value);
+    return $value                                          if $value !~ m/[A-F]/ && $len == 36;
+    return lc($value)                                      if $len == 36;
+    return $class->inflate($value, {affinity => 'binary'}) if $len == 16;
+    return $value;
 }
 
 1;
@@ -165,7 +229,7 @@ __END__
 
 =head1 SOURCE
 
-The source code repository for DBIx::QuickORM can be found at
+The source code repository for DBIx-QuickORM can be found at
 L<https://github.com/exodist/DBIx-QuickORM>.
 
 =head1 MAINTAINERS

@@ -18,7 +18,7 @@
 # over the worst and is inside the 6e-5 absolute (7e-5 relative at a root near 0.87) that
 # the stopping rule can leave.
 require 5.010; use strict; use warnings FATAL => 'all';
-use Test::More; use Stats::LikeR;
+use Test::More; use Stats::LikeR qw(:all);
 my @rows = (
 	[3,1,1,3, 'two.sided', 0.5, 0.4857142857142856,6.4083088670057906,1.0279467372248501,50.166572003816768],
 	[3,1,1,3, 'two.sided', 0.95, 0.4857142857142856,6.4083088670057906,0.21173291530550312,621.93375054541684],

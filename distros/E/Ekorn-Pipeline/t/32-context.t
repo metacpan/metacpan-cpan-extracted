@@ -76,9 +76,11 @@ subtest 'what is exported' => sub {
         use Ekorn::Pipeline::Context;
     }
     ok !Context::Nothing->can($_), "$_ not by default"
-        for qw(result_number result_original);
+        for qw(result_number result_original kept_origin);
+    # Proposed (roadmap 2026-0060): kept_origin, for stages that hold
+    # values back.
     is [sort @Ekorn::Pipeline::Context::EXPORT_OK],
-        [qw(result_number result_original)], 'both on request';
+        [qw(kept_origin result_number result_original)], 'all on request';
 };
 
 subtest 'a bare call is a term, as each has an empty prototype' => sub {
@@ -167,8 +169,10 @@ subtest 'a flush, and the stages after it' => sub {
     my @log;
     my $p = $class->new(batch(2), sub { "@{$_[0]}" }, log_into(\@log));
     is [$p->(1 .. 3)], ['1 2', '3'], 'a batch';
-    is \@log, ['1 2:1:2', '3:2:-'],
-        "a batch filled by a value has its original; one from the flush has none";
+    # Proposed (roadmap 2026-0060): a batch is made from many values, so
+    # has no original, wherever it's given; it had the last's.
+    is \@log, ['1 2:1:-', '3:2:-'],
+        "a batch, made from many, has no original";
 };
 
 subtest 'a value reaching a sink is a result' => sub {

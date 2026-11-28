@@ -28,15 +28,15 @@ const row = (name, version = '1.00', path = 'A/AU/AUTHOR/Example-1.00.tar.gz') =
   ({name, version, path, text: `${name}  ${version}  ${path}`});
 const tick = () => new Promise(resolve => setImmediate(resolve));
 
-function setup({modules, complete = false, filter = '', next_after = null, tree = 'tree1'}) {
+function setup({modules, complete = false, filter = '', next_after = null, tree = 'tree1', sourceVersions = false}) {
   const elements = Object.fromEntries(['cpan-index', 'module-filter', 'module-rows',
     'module-status', 'load-more', 'load-all', 'module-filter-form', 'check-cves', 'only-cves',
-    'only-cves-label', 'cve-state', 'cve-spinner', 'cve-message', 'cve-column'].map(id => [id, new Element()]));
-  for (const id of ['check-cves', 'only-cves-label', 'cve-state', 'cve-column']) elements[id].hidden = true;
+    'only-cves-label', 'cve-state', 'cve-spinner', 'cve-message', 'cve-column', 'group-modules', 'group-modules-label'].map(id => [id, new Element()]));
+  for (const id of ['check-cves', 'only-cves-label', 'cve-state', 'cve-column', 'group-modules-label']) elements[id].hidden = true;
   elements['only-cves'].checked = true;
   const root = elements['cpan-index'];
   root.dataset = {filter, tree, complete: String(complete), nextAfter: next_after || '', previousBefore: '',
-    jsonUrl: '/pan/test/modules/', authorsUrl: '/pan/test/authors/id/'};
+    jsonUrl: '/pan/test/modules/', authorsUrl: '/pan/test/authors/id/', sourceVersions: String(sourceVersions)};
   elements['module-filter'].value = filter;
   elements['module-rows'].children = modules.map(data => {
     const tr = new Element();
@@ -64,6 +64,14 @@ function setup({modules, complete = false, filter = '', next_after = null, tree 
     type(value) { elements['module-filter'].value = value; elements['module-filter'].fire('input'); },
     async flush() { const callbacks = [...timers.values()]; timers.clear(); callbacks.forEach(fn => fn()); await tick(); },
     names() { return elements['module-rows'].children.filter(tr => !tr.hidden).map(tr => tr.children[0].textContent); },
+    // [name, ...folded names, toggle text] of each visible row
+    groups() {
+      return elements['module-rows'].children.filter(tr => !tr.hidden).map(tr => {
+        const cell = tr.children[0];
+        return cell.children.length ? cell.children.map(el => el.textContent) : [cell.textContent];
+      });
+    },
+    group(on) { elements['group-modules'].checked = on; elements['group-modules'].fire('change'); },
     more() { elements['load-more'].fire('click'); },
     all() { elements['load-all'].fire('click'); }
   };
@@ -113,6 +121,25 @@ async function run() {
   partial.type('AUTHOR');
   await partial.flush();
   assert.equal(partial.requests.length, 3, 'an unrelated filter needs fresh results');
+
+  const sourced = setup({modules: [row('Alpha')], next_after: 'Alpha', sourceVersions: true});
+  const changelogUrl = '/pan/test/authors/id/A/AU/AUTHOR/Beta-2.00.tar.gz/Changes?source=upstream';
+  sourced.more();
+  sourced.requests[0].respond({modules: [
+    {...row('Beta'), source_version: '2.00', review_url: changelogUrl},
+    {...row('Gamma'), source_version: '1.00'}
+  ], filter: '', tree: 'tree1', complete: false, next_after: null, previous_before: 'Beta'});
+  await tick();
+  const sourceCells = sourced.elements['module-rows'].children.map(tr => tr.children[2]);
+  assert.equal(sourceCells[0].textContent, '', 'an unindexed module has an empty source cell');
+  assert.equal(sourceCells[2].textContent, '1.00', 'a matching version is plain text');
+  assert.equal(sourceCells[2].children.length, 0);
+  sourced.type('Beta');
+  await sourced.flush();
+  assert.equal(sourced.requests.length, 1, 'source versions survive local filtering');
+  const changelog = sourced.elements['module-rows'].children[0].children[2].children[0];
+  assert.deepEqual([changelog.textContent, changelog.href, changelog.target, changelog.rel],
+    ['2.00', changelogUrl, '_blank', 'noopener']);
 
   const races = setup({modules: [], complete: false});
   races.type('old');
@@ -294,6 +321,59 @@ async function run() {
   failedCves.requests[2].respondText('{}');
   await tick();
   assert.equal(failedCves.elements['only-cves-label'].hidden, false, 'successful retry enables CVE filtering');
+
+  const distB = 'B/BB/BOB/Other-1.00.tar.gz';
+  const big = Array.from({length: 13}, (_, i) => row('Big::M' + String(i).padStart(2, '0')));
+  const grouped = setup({complete: true, sourceVersions: true, modules: [
+    row('Big'), ...big,
+    row('Foo'), row('Foo1'), row('Foo::Bar'), row('Foo::Bar::Deep'), row('Foo::Moved'),
+    row('Foo::Other', '1.00', distB), row('Foo::Other::Sub', '1.00', distB), row('Foo::Zed', '2.00'), row('FooBar')
+  ].map(r => r.name === 'Foo::Moved' ? {...r, review_url: '/review'} : r)});
+  assert.equal(grouped.elements['group-modules-label'].hidden, false, 'grouping checkbox is revealed by the script');
+  assert.equal(grouped.elements['module-rows'].children.length, 23, 'not grouped by default');
+  grouped.group(true);
+  assert.deepEqual(grouped.groups(), [
+    ['Big', ...big.slice(0, 10).map(r => r.name), 'Show 3 more'],
+    ['Foo', 'Foo::Bar', 'Foo::Bar::Deep', 'Foo::Zed'],
+    ['Foo1'],
+    ['Foo::Moved'],
+    ['Foo::Other', 'Foo::Other::Sub'],
+    ['FooBar']
+  ], 'namespace children of the same distribution fold under the nearest such parent');
+  const fooCell = grouped.elements['module-rows'].children[1].children[0];
+  assert.equal(fooCell.children[1].className, 'submodule');
+  assert.equal(fooCell.children[1].children.length, 0, 'same version is not repeated');
+  assert.equal(fooCell.children[3].children[0].textContent, ' 2.00', 'a differing version is shown');
+  assert.match(grouped.elements['module-status'].textContent, /Showing 23 modules in 6 rows \(all matches\)/);
+  const toggle = () => grouped.elements['module-rows'].children[0].children[0].children.at(-1);
+  toggle().fire('click');
+  assert.deepEqual(grouped.groups()[0], ['Big', ...big.map(r => r.name), 'Show fewer'], 'expands the whole group');
+  grouped.type('m1');
+  await grouped.flush();
+  assert.deepEqual(grouped.groups(), [['Big::M10'], ['Big::M11'], ['Big::M12']],
+    'filtering still matches the folded modules, which stand alone without their parent');
+  grouped.type('big');
+  await grouped.flush();
+  assert.equal(grouped.groups()[0].length, 15, 'expansion is remembered while filtering');
+  toggle().fire('click');
+  assert.equal(grouped.groups()[0].at(-1), 'Show 3 more', 'collapses again');
+  grouped.type('Foo::');
+  await grouped.flush();
+  assert.deepEqual(grouped.groups(), [['Foo::Bar', 'Foo::Bar::Deep'], ['Foo::Moved'], ['Foo::Other', 'Foo::Other::Sub'], ['Foo::Zed']],
+    'groups are rebuilt from the filtered rows');
+  grouped.group(false);
+  assert.deepEqual(grouped.names(), ['Foo::Bar', 'Foo::Bar::Deep', 'Foo::Moved', 'Foo::Other', 'Foo::Other::Sub', 'Foo::Zed'],
+    'unchecking restores one row per module');
+  assert.equal(grouped.requests.length, 0, 'grouping never contacts the server');
+
+  const groupedCves = setup({complete: true, modules: [row('Aff', '1.00', 'A/AU/AUTHOR/Bundled-1.00.tar.gz'),
+    row('Aff::Sub', '1.00', 'A/AU/AUTHOR/Bundled-1.00.tar.gz'), row('Safe'), row('Safe::Sub')]});
+  groupedCves.group(true);
+  groupedCves.elements['check-cves'].fire('click');
+  groupedCves.requests[0].respondText(JSON.stringify({Bundled: [{cves: ['CVE-2026-0001'], affected_versions: ['<2.0']}]}));
+  await tick();
+  assert.deepEqual(groupedCves.groups(), [['Aff', 'Aff::Sub']], 'Only CVEs composes with grouping');
+  assert.match(groupedCves.elements['module-status'].textContent, /2 affected of 4 loaded/, 'folded modules are counted');
 }
 
 run().catch(error => { console.error(error); process.exitCode = 1; });

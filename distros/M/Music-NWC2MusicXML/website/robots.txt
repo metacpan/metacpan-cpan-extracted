@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nwc2musicxml.nigelhorne.com/sitemap.xml

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 57+8+8+6+4;
+use Test::More tests => 61+8+8+6+4;
 use Statistics::CaseResampling ':all';
 use List::Util ('min', 'max');
 
@@ -13,13 +13,15 @@ cmp_ok(approx_erf(100), '>', 0.95);
 is_approx(approx_erf_inv(approx_erf(0.4)), 0.4);
 is_approx(approx_erf_inv(approx_erf(0.2)), 0.2);
 is_approx(approx_erf_inv(approx_erf(0.6)), 0.6);
-eval {approx_erf_inv(0)};
-ok(!!$@);
+is_approx(approx_erf_inv(0), 0);
+is_approx(approx_erf_inv(-0.5), -approx_erf_inv(0.5));
 eval {approx_erf_inv(1)};
 ok(!!$@);
 eval {approx_erf_inv(-1)};
 ok(!!$@);
 eval {approx_erf_inv(100)};
+ok(!!$@);
+eval {approx_erf_inv(-2)};
 ok(!!$@);
 
 
@@ -55,19 +57,20 @@ cmp_ok(max(@$means), '<=', 11);
 
 my @tests = (
   [  [1], 1  ],
-  [  [1,2], 1  ],
+  [  [1,2], 1.5  ],
   [  [1,2,3], 2  ],
-  [  [1,2,3,4], 2  ],
-  [  [4,3,2,1], 2  ],
-  [  [4,1,2,3], 2  ],
+  [  [1,2,3,4], 2.5  ],
+  [  [4,3,2,1], 2.5  ],
+  [  [4,1,2,3], 2.5  ],
   [  [5,4,1,2,3], 3  ],
 );
 for my $test (@tests) {
   my ($data, $result) = @$test;
   is_approx(median($data), $result, "[@$data] has median $result");
-  my $k = int(@$data/2) + (@$data & 1);
-  my $kth = select_kth($data, $k);
-  my $median = median($data);
+  my $n = scalar(@$data);
+  my $kth = ($n & 1)
+    ? select_kth($data, int($n/2) + 1)
+    : 0.5 * (select_kth($data, $n/2) + select_kth($data, $n/2 + 1));
   is_approx(median($data), $kth, "[@$data] median() and select_kth() agree");
 }
 

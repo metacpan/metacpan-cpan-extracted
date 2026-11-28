@@ -1,8 +1,24 @@
+# Perl::Critic settings for xt/02_perlcritic.t (#6). The severity is the default (5, gentle).
+
 [TestingAndDebugging::ProhibitNoStrict]
 allow=refs
 
 [TestingAndDebugging::RequireUseStrict]
-equivalent_modules = Any::Moose
+equivalent_modules = Moo Moo::Role
 
 [TestingAndDebugging::RequireUseWarnings]
-equivalent_modules = Any::Moose
+equivalent_modules = Moo Moo::Role
+
+# PPI, which Perl::Critic parses with, does not know `use feature 'class'`: `class`, `field`,
+# `method` and `ADJUST` are plain words to it. These policies are off, as they are wrong on that
+# code at any severity:
+#
+# - `class NAME;` and `class NAME { ... }` are not seen as packages, so the code after them is
+#   "not contained in explicit package"
+# - `use v5.38` and later turn on the `module_true` feature, so a module needs no `1;` at its end
+# - `use v5.44;` is how a module asks for the newest Perl
+#
+# Policies about subroutines (Subroutines::*) do not see `method` either, so they check no method.
+[-Modules::RequireExplicitPackage]
+[-Modules::RequireEndWithOne]
+[-ValuesAndExpressions::ProhibitVersionStrings]

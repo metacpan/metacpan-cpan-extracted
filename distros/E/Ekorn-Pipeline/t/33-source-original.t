@@ -113,8 +113,10 @@ subtest "a flush's values have none" => sub {
     $class->new(batch(2), sub { join ',', @{ $_[0] } }, log_into(\@log))
         ->iterator(rows_of(\@rows))
         ->all;
-    is \@log, ['n1,n2:2', 'n3:-'],
-        "a batch filled by a value has its row; the flush's, none";
+    # Proposed (roadmap 2026-0060): a batch is made from many rows, so has
+    # no original, wherever it's given; it had the row that filled it.
+    is \@log, ['n1,n2:-', 'n3:-'],
+        "a batch, made from many rows, has none";
 };
 
 subtest 'feeds and tees, unchanged' => sub {

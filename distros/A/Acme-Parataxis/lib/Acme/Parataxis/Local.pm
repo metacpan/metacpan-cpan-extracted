@@ -9,7 +9,7 @@ use feature 'class';
 #
 # Keys are a monotonic process-wide id, never a refaddr: a recycled memory address must not
 # alias a newer Local's slot.
-class Acme::Parataxis::Local v0.1.6 {
+class Acme::Parataxis::Local v0.1.7 {
     use Acme::Parataxis;
     use Carp qw[croak];
     my $NEXT_ID = 0;

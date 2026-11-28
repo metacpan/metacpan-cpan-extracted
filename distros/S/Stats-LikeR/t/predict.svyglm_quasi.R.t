@@ -11,7 +11,7 @@
 # Re-run: write the data into R as shown and run those two calls.
 require 5.010; use strict; use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my @x   = (-0.9,-0.7,-0.5,-0.4,-0.2,0,0.1,0.3,0.4,0.6,0.8,0.9);
 my @y   = (0,0,1,0,0,1,0,1,1,0,1,1);

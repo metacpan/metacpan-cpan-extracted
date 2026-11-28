@@ -22,7 +22,7 @@
 require 5.010; use strict; use warnings FATAL => 'all';
 use utf8;
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 sub near {
 	my ($g, $w, $name) = @_;

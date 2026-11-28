@@ -5,23 +5,26 @@ use experimental 'class';
 # Perl counterpart of the JavaScript client, ported from it and meant to
 # behave identically. See the POD at the end of this file.
 class BoardStreams::Client {
-    our $VERSION = "v0.0.58";
+    our $VERSION = "v0.0.60";
 
     use Mojo::UserAgent;
     use RxPerl::Mojo qw(rx_behavior_subject rx_interval rx_observable rx_timer);
-    use Scalar::Util qw(refaddr);
+    use Scalar::Util qw(blessed refaddr);
     use Time::HiRes qw(time);
 
     use BoardStreams ();
     use BoardStreams::Client::Channel;
     use BoardStreams::Client::Membership;
     use BoardStreams::Client::Error;
+    use BoardStreams::Client::Handshake;
 
     field $url :param;
     field $min_delay :param = 0.5;    # seconds before the first reconnection attempt; doubles per attempt
     field $max_delay :param = 30;     # upper limit for that delay, in seconds
     field $idle_delay :param = 30;   # seconds the connection is kept with no channel joined; undef for ever
     field $ua :param = undef;         # a Mojo::UserAgent to connect with
+    field $headers :param = undef;    # headers for the handshake request: a hash, or a sub returning one
+    field $on_handshake :param = undef;    # sub that is shown the answer to each handshake and judges it
 
     field $status_subject = rx_behavior_subject->new('connecting');
     field %channels;                   # memberships by channel name
@@ -85,14 +88,29 @@ class BoardStreams::Client {
 
     method _connect {
         my $mine = $socket = {};
-        $ua->websocket($url => sub ($ua, $tx) {
-            my $current = $socket && refaddr $socket == refaddr $mine;
+        # Asked for anew at every attempt, so that they can carry a date,
+        # a nonce or a signature.
+        my $sent = eval { ref $headers eq 'CODE' ? $headers->() : $headers };
+        if (my $error = $@) {
+            warn "BoardStreams: the headers callback died, so this connection attempt is abandoned: $error";
+            return $self->_lost($mine);
+        }
+        $sent = { %{ $sent // {} } };
+        $ua->websocket($url => $sent => sub ($ua, $tx) {
+            my $is_current = sub { $socket && refaddr $socket == refaddr $mine };
+            # The application judges the answer before anything of this
+            # connection is used.
+            my $verdict = $is_current->() ? $self->_judge($tx, $sent) : 1;
+            my $current = $is_current->();    # it may have closed the client meanwhile
             unless ($tx->is_websocket) {
-                $self->_lost($mine) if $current;
-                return;
+                return unless $current;
+                return $self->_fail($verdict) if ref $verdict;
+                return $self->_lost($mine);
             }
             return $tx->finish unless $current;    # given up on while it was connecting
             $mine->{tx} = $tx;
+            return $self->_fail($verdict) if ref $verdict;
+            return $self->_lost($mine) unless $verdict;
 
             # Nothing is sent when the socket opens: the connection counts
             # as established only once the server's first heartbeat has
@@ -125,6 +143,27 @@ class BoardStreams::Client {
                 $self->_lost($mine);
             });
         });
+    }
+
+    # Shows the answer to a handshake to the application. Returns an error
+    # object if the client is to stop for good, false if this connection
+    # is to be dropped and another attempted, and true otherwise.
+    method _judge ($tx, $sent) {
+        return 1 unless $on_handshake and defined $tx->res->code;
+        my $handshake = BoardStreams::Client::Handshake->new(
+            code     => $tx->res->code,
+            accepted => $tx->is_websocket ? 1 : 0,
+            headers  => $tx->res->headers,
+            body     => $tx->res->body,
+            sent     => $sent,
+        );
+        my $verdict = eval { $on_handshake->($handshake) };
+        if (my $error = $@) {
+            warn "BoardStreams: the on_handshake callback died, so this connection is not used: $error";
+            return 0;
+        }
+        return $verdict if blessed $verdict and $verdict->isa('BoardStreams::Client::Error');
+        return $verdict ? 1 : 0;
     }
 
     # The server speaks another version of the protocol; reconnecting would
@@ -333,9 +372,24 @@ regardless.
 A L<Mojo::UserAgent> to connect with, for example one with TLS options or
 cookies set. By default the client makes its own.
 
+=item headers
+
+Headers to add to the handshake request of every connection attempt: a
+hash reference, or a sub that returns one. A sub is called anew for each
+attempt, automatic reconnections included, so that the headers can carry a
+fresh date, nonce or signature.
+
+=item on_handshake
+
+A sub that is shown the answer to each handshake and decides what to make
+of it; see L</THE HANDSHAKE>.
+
 =back
 
-Note that the JavaScript client takes these three delays in milliseconds.
+Note that the JavaScript client takes these three delays in milliseconds,
+and has the C<headers> and C<on_handshake> options (as C<headers> and
+C<onHandshake>) under Node.js only, because a browser's WebSocket can
+neither send headers nor show the answer's.
 
 =head2 join
 
@@ -361,6 +415,98 @@ C<idle_delay>.
 =head2 close
 
 Closes the connection for good and leaves all channels.
+
+=head1 THE HANDSHAKE
+
+A connection begins with an HTTP request, the handshake, which the server
+answers with status 101 to open the WebSocket, or with another status to
+refuse. The C<headers> and C<on_handshake> options let the application take
+part in that, for example so that two servers can prove to each other who
+they are:
+
+    my $bs = BoardStreams::Client->new(
+        url     => 'wss://other.example.com/boardstreams',
+        headers => sub { sign_request() },    # a hash of headers, new each time
+        on_handshake => sub ($handshake) {
+            if ($handshake->accepted) {
+                return 1 if answer_is_genuine($handshake->sent->{'X-Nonce'}, $handshake->headers);
+                return BoardStreams::Client::Error->new(reason => 'bad_signature');
+            }
+            return BoardStreams::Client::Error->new(reason => 'unauthorized', data => $handshake->body)
+                if $handshake->code == 401 or $handshake->code == 403;
+            return 1;
+        },
+    );
+
+C<on_handshake> is called with a C<BoardStreams::Client::Handshake> object
+whenever a handshake was answered: before any message of an accepted
+connection is processed, and when the server refused. It is not called
+when there was no answer at all, as when the server cannot be reached. The
+object has these methods:
+
+=over
+
+=item code
+
+The HTTP status of the answer; 101 when the server accepted.
+
+=item accepted
+
+True if the answer opened a WebSocket connection.
+
+=item headers
+
+The headers of the answer, a L<Mojo::Headers> object.
+
+=item header
+
+    my $value = $handshake->header('X-Signature');
+
+One header of the answer.
+
+=item body
+
+The body of the answer: what a refusal says. Empty for an accepted
+handshake.
+
+=item sent
+
+The headers that the C<headers> option added to this request, as a hash
+reference; so a nonce that was sent can be compared with what came back.
+
+=back
+
+What the callback returns decides what happens next:
+
+=over
+
+=item *
+
+A C<BoardStreams::Client::Error> object: the client stops for good, as it
+does on a protocol mismatch. The connection is closed, the status becomes
+C<closed>, there is no reconnection, and every channel, joined already or
+later, is refused with that error.
+
+=item *
+
+Any other false value: the connection is dropped, nothing of it reaches
+any channel, and the client tries again after its usual delay.
+
+=item *
+
+A true value: the connection is used. For a handshake that the server
+refused there is nothing to use, so the client tries again after its usual
+delay, which is also what it does without this option.
+
+=back
+
+A callback that dies is treated as having returned false, with a warning.
+A C<headers> sub that dies abandons that attempt, with a warning, and the
+client tries again.
+
+On the server, the counterpart is an C<under> in front of the WebSocket
+route (the plugin's C<routes> option), which checks the request and puts
+its own headers on the answer.
 
 =head1 CHANNELS
 
@@ -443,6 +589,11 @@ C<BoardStreams: $reason>.
 A channel that the server removes this client from, or deletes, ends with
 the status C<rejected> and the server's reason (C<kicked> or C<deleted>
 unless it gave another).
+
+An application makes such objects itself to return them from
+C<on_handshake>:
+
+    BoardStreams::Client::Error->new(reason => 'unauthorized', data => { status => 401 })
 
 =head1 SEE ALSO
 

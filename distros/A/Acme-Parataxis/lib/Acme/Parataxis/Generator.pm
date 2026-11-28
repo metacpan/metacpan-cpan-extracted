@@ -4,7 +4,7 @@ use feature 'class';
 use Acme::Parataxis;
 
 # Stackful lazy iterator backed by a private coroutine.
-class Acme::Parataxis::Generator v0.1.6 {
+class Acme::Parataxis::Generator v0.1.7 {
     use Carp qw[croak];
     our $RESERVED;
     our $DRAIN = \do { my $x = 1 };    # an opaque scalar ref, so no user yield/die value can collide with the marker

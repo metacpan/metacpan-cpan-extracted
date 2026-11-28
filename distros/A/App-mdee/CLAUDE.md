@@ -26,6 +26,7 @@ em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command i
 - `lib/App/mdee.pm` - Perl module (version info only, generated from script/mdee)
 - `lib/App/Greple/md.pm` - Greple module for Markdown syntax highlighting (bundled)
 - `lib/App/Greple/md/Blocks.pm` - Paragraph positions for `refill`, from the CommonMark module, Markdown::Perl or pandoc
+- `lib/App/Greple/md/Mermaid.pm` - Draws the Mermaid diagrams of the fenced code blocks for `image_types=...:mermaid` with `mmdr` of mermaid-rs-renderer (`mermaid_command`), into `mdee-mermaid-UID` of the temporary directory (`File::Spec->tmpdir`; a real directory of the user, 0700, because /tmp is shared; left for the system to clean up, and the files stay for ansi2pdf on paper) by the digest of the command, its options and the code; each diagram in a run of its own, with the background in a file of `-c` and, having no scale, the size from `--size` multiplied as `-w`/`-H`; a diagram that cannot be drawn is not shown and is tried again the next time
 - `lib/App/Greple/md/widen.pm` - A function for `--begin`, a no-break space after characters that macOS terminals draw over two columns (`-t widen`)
 - `t/00_compile.t` - Compile tests for both App::mdee and App::Greple::md
 - `t/01_mdee.t` - mdee command integration tests
@@ -43,8 +44,9 @@ em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command i
 - `t/14_escape.t` - control characters and escape sequences of the file are removed, colors stay
 - `t/15_front_matter.t` - front matter is shown as a code block (marks in place of colors), only at the top, not folded; `front_matter=0`
 - `t/17_table_br.t` - a `<br>` in a table cell breaks the cell (skipped with an ansicolumn that does not take U+2028 as a line break in a cell)
-- `t/18_intact.t` - `intact=table` joins the lines of a formatted table into one by US, the last newline kept, and the table is not folded as text; the lines of a row (ansicolumn `--table-group`) and the header with its rule and the first row are joined by GS instead, so that a pane does not end inside them; with refill, the lines of a table that a parser reports as a paragraph are not folded
-- `t/19_image.t` - `image_types=png:jpeg:gif` (`Text::ANSI::Image`, `App::Greple::md::Image`): only the types listed, the rows of an image below a line which is an image, the APC sent to `image_tty`, `intact=image`, what is not shown, GitHub URLs of the repository, `--refill` below an image; the terminal is given by `image_term`
+- `t/18_intact.t` - `intact=table` joins the lines of a formatted table into one by US, the last newline kept, and the table is not folded as text; the lines of a row (ansicolumn `--table-group`) and the header with its rule and the first row are joined by GS instead, so that a pane does not end inside them (`keep.table=head`, the default; `--keep table=...` of mdee: `none` joins nothing by GS, `row` only the lines of a row, `all` the whole table); with refill, the lines of a table that a parser reports as a paragraph are not folded
+- `t/19_image.t` - `image_types=png:jpeg:gif` (`Text::ANSI::Image`, `App::Greple::md::Image`): only the types listed, the rows of an image below a line which is an image, the APC sent to `image_tty`, `intact=image`, `image_align` (the middle of the fold width or of the terminal width by default, `left`, an unknown value dies), what is not shown, GitHub URLs of the repository, `--refill` below an image; the terminal is given by `image_term`
+- `t/20_mermaid.t` - `image_types=mermaid` with a stub of `mmdr` that fails on options it does not have: the rows below the closing fence, two runs for each diagram (the size and the image), the background in the file of `-c`, the cache (private to the user), the dark theme and the look by the config, scale 1, a size not told, the own `-c` and `-w` of the command, a quoted command, a diagram that fails (tried again), a block in an HTML comment (not drawn), `intact=image` (the rows on the line after the fence), `--refill` above and below a diagram, an unwritable cache, a symbolic link in place of the cache (not used), files cleaned up by the system (drawn again); the cache is in `TMPDIR`; the tests give `mermaid_scale=3` and `image_align=left`, and check the default scale 1.5 apart
 - `t/10_blocks.t` - `App::Greple::md::Blocks`: both parsers report the same paragraph lines (skipped without one)
 - `t/Util.pm` - Test helper for greple-based tests
 - `t/runner/` - Submodule (p5-script-runner) for finding greple path
@@ -149,6 +151,7 @@ The `default` associative array supports:
 | `default[fold_width]` | `--fold-width` | `80` |
 | `default[base_color]` | `--base-color` | `DarkCyan` |
 | `default[lateral]` | `--lateral` | `1` |
+| `default[keep]` | `--keep` | `table=all` |
 
 `default[lateral]` is left out where nup cannot make the row (`-w`, rows, PDF; with `--parallel`, App::nup 1.17 puts the files side by side in one row), while `-L` given with `-w` is an error; with `--lateral` set either way, `default[width]` is not used, because `-w` after the file name would make rows of the pages again.
 

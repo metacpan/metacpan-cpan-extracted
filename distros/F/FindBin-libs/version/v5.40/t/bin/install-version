@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package Installer;
+use v5.40;
+
+use File::Basename        qw( dirname );
+use File::Path            qw( make_path );
+use File::Spec::Functions qw( abs2rel catfile rel2abs );
+
+########################################################################
+# locate install paths
+########################################################################
+
+my $bin_d       = rel2abs dirname $0;
+my $test_d      = dirname $bin_d;
+
+my $version_t   = catfile $bin_d, 'install-tests.d', '03-version_t';
+my $dest_d      = catfile $test_d, '03-version';
+
+-e $version_t
+or die "Missing template: '$version_t' for '$dest_d'.\n";
+
+make_path $dest_d;
+
+########################################################################
+# PERL_VERSION cases, one test each: t/03-version/NN-<case>.t checks
+# that Makefile.PL selects the newest version/ directory at or below
+# <case>; the test computes the expected directory from its name.
+#
+# each directory's own version, a point release above it, the
+# versions just below and above each boundary, and versions below
+# every directory and above the newest.
+########################################################################
+
+my @casez
+= qw
+(
+    v5.8        v5.14       v5.28       v5.40
+    v5.8.1      v5.14.1     v5.28.3     v5.40.1
+    v5.9        v5.13.99    v5.15       v5.27.99
+    v5.29       v5.30.1     v5.39.99    v5.41
+    v5.44       v5.7.99
+);
+
+########################################################################
+# remove stale symlinks
+########################################################################
+
+for my $old ( glob catfile $dest_d, '*.t' )
+{
+    unlink $old
+    or die "Cannot unlink stale test '$old': $!\n";
+
+    say "Removed: $old";
+}
+
+########################################################################
+# create symlinks for each case
+########################################################################
+
+my $target      = abs2rel $version_t, $dest_d;
+
+while( my ( $i, $case ) = each @casez )
+{
+    my $link    = catfile $dest_d, sprintf '%02d-%s.t', $i + 1, $case;
+
+    symlink $target, $link
+    or die "Cannot symlink '$link' -> '$target': $!\n";
+
+    say $link;
+}

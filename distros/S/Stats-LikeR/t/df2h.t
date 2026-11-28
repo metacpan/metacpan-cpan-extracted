@@ -48,7 +48,7 @@ use strict;
 use warnings FATAL => 'all';
 use B ();
 use Scalar::Util qw(refaddr);
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::More;
 use Tie::Array ();	# Tie::StdArray
 use Tie::Hash ();	# Tie::StdHash

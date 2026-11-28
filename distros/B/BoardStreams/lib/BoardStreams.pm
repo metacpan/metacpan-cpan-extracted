@@ -1,7 +1,7 @@
 package BoardStreams;
 use v5.44;
 
-our $VERSION = "v0.0.58";
+our $VERSION = "v0.0.60";
 
 # The version of the protocol spoken between server and client: the
 # messages that travel over the WebSocket and what they mean. A server and
@@ -13,7 +13,7 @@ our $VERSION = "v0.0.58";
 # change to PROTOCOL_VERSION in the JavaScript client (src/index.ts).
 # Leave it alone otherwise, including when the change is one that both
 # older servers and older clients keep working with.
-use constant PROTOCOL_VERSION => 1;
+use constant PROTOCOL_VERSION => 2;
 
 1;
 __END__
@@ -78,7 +78,7 @@ reconnection takes effect once.
 
 The clients and this distribution work together when they speak the same
 version of the BoardStreams protocol. That is a number of its own
-(C<BoardStreams::PROTOCOL_VERSION>, currently 1), which only goes up when a
+(C<BoardStreams::PROTOCOL_VERSION>, currently 2), which only goes up when a
 release makes the protocol incompatible with earlier ones. The server
 announces it on each connection, and a client that speaks another refuses
 to go on. The version numbers of the libraries do not have to match.
@@ -101,8 +101,12 @@ Path of the WebSocket route. Defaults to C</boardstreams>.
 
 =item routes
 
-Route object to attach that route to, for example one behind an C<under>.
-Defaults to the application's routes.
+Route object to attach that route to, for example one behind an C<under>
+that lets only some clients connect. Defaults to the application's routes.
+The C<under> may answer at once or later (returning C<undef> and calling
+C<< $c->continue >> when it knows). Headers that it sets on C<< $c->res >> are sent
+with the answer to the WebSocket handshake, where a client such as
+L<BoardStreams::Client> can check them.
 
 =item retention
 

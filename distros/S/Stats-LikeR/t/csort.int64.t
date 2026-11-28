@@ -5,7 +5,7 @@
 # inexact for IVs that differ only below 2**53 -- max(2**63-1, 2**63) gives
 # 9223372036854775807 there).  Regenerate by sorting the inputs with perl.
 require 5.010; use strict; use warnings FATAL => 'all';
-use Test::More; use Config; use Stats::LikeR;
+use Test::More; use Config; use Stats::LikeR qw(:all);
 SKIP: {
 	skip 'needs 64-bit IVs', 11 if $Config{ivsize} < 8;
 	my @ids = (1800000000000000003, 1800000000000000001, 1800000000000000002);

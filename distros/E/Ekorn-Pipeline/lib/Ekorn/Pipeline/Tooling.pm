@@ -19,7 +19,7 @@ use Ekorn::Pipeline::Factories     qw(:all);
 use Ekorn::Pipeline::JSON          qw(:all);
 use Ekorn::Pipeline::CSV           qw(:all);
 
-our $VERSION = 'v0.4.5';
+our $VERSION = 'v0.5.0';
 
 our %EXPORT_TAGS = (
     core => [qw(Stop gather)],
@@ -28,9 +28,9 @@ our %EXPORT_TAGS = (
         qw(drop drop_if    drop_while),
     ],
     batch   => [qw(batch         collect)],
-    taps    => [qw(peek          count_into dump_to tee)],
-    context => [qw(result_number result_original)],
-    sources => [qw(from_array    from_fh from_file counter)],
+    taps    => [qw(peek          count_into      dump_to tee)],
+    context => [qw(result_number result_original kept_origin)],
+    sources => [qw(from_array    from_fh         from_file counter)],
     sinks   => [
         qw(count_items keep keep_all keep_first keep_last keep_single),
         qw(to_fh to_file),
@@ -134,9 +134,10 @@ C<:flow>, C<:batch> and C<:taps>.
 
 =item C<:context>
 
-Everything L<Ekorn::Pipeline::Context> exports: C<result_number> and
-C<result_original>. New in v0.3.15. DBIx::Squirrel::Tooling has a tag
-of the same name, holding the same functions, from its v3.6.1.
+Everything L<Ekorn::Pipeline::Context> exports: C<result_number>,
+C<result_original> and, from v0.5.0, C<kept_origin>. New in v0.3.15.
+DBIx::Squirrel::Tooling has a tag of the same name, from its v3.6.1,
+holding the same C<result_number> and C<result_original>.
 
 =item C<:sources>
 

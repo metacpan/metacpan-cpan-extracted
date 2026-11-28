@@ -1,5 +1,9 @@
 Revision history for Alien-uPB-Core
 
+0.23      2026-11-28 09:57:48 CET
+
+    - New revision of uPB (fixes compilation warnings)
+
 0.22      2026-11-23 15:23:31 CET
 
     - Release 0.21_01 as stable without changes

@@ -12,7 +12,7 @@
 # Intercept 0.035714285714285587, slope 1.9976190476190476.
 require 5.010; use strict; use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 { package Cnt;
   our $n = 0;

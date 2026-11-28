@@ -57,7 +57,7 @@ reconnection takes effect once.
 
 The clients and this distribution work together when they speak the same
 version of the BoardStreams protocol. That is a number of its own
-(`BoardStreams::PROTOCOL_VERSION`, currently 1), which only goes up when a
+(`BoardStreams::PROTOCOL_VERSION`, currently 2), which only goes up when a
 release makes the protocol incompatible with earlier ones. The server
 announces it on each connection, and a client that speaks another refuses
 to go on. The version numbers of the libraries do not have to match.
@@ -78,8 +78,12 @@ See `examples/counter.pl` for a complete application.
 
 - routes
 
-    Route object to attach that route to, for example one behind an `under`.
-    Defaults to the application's routes.
+    Route object to attach that route to, for example one behind an `under`
+    that lets only some clients connect. Defaults to the application's routes.
+    The `under` may answer at once or later (returning `undef` and calling
+    `$c->continue` when it knows). Headers that it sets on `$c->res` are sent
+    with the answer to the WebSocket handshake, where a client such as
+    [BoardStreams::Client](https://metacpan.org/pod/BoardStreams%3A%3AClient) can check them.
 
 - retention
 

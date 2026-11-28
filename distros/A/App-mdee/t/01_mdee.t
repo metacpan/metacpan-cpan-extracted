@@ -630,6 +630,46 @@ subtest q(table style option) => sub {
     }
 };
 
+# Test: table keep option
+subtest q(keep option) => sub {
+    my $help = `$mdee --help 2>&1`;
+    like($help, qr/--keep TYPE=WHAT/, q(--help shows --keep option));
+
+    my $default = `COLUMNS=200 $mdee -ddn $test_md 2>&1`;
+    unlike($default, qr/keep\.table=/, q(no keep.table parameter by default));
+    my $head = `COLUMNS=200 $mdee -ddn --keep table=head $test_md 2>&1`;
+    unlike($head, qr/keep\.table=/, q(--keep table=head is the default));
+
+    for my $keep (qw(none row all)) {
+	my $out = `COLUMNS=200 $mdee -ddn --keep table=$keep $test_md 2>&1`;
+	like($out, qr/debug: greple .*keep\.table=$keep/, qq(--keep table=$keep is passed to the md module));
+    }
+
+    # only when tables are kept intact
+    my $nonup = `COLUMNS=200 $mdee -ddn --no-nup --keep table=all $test_md 2>&1`;
+    unlike($nonup, qr/keep\.table=/, q(--keep is not passed without nup));
+    my $commas = `COLUMNS=200 $mdee -ddn --keep table=row,table=all $test_md 2>&1`;
+    like($commas, qr/keep\.table=all/, q(--keep takes settings joined by commas, the last one wins));
+
+    for my $keep (qw(header unknown)) {
+	my $bad = `$mdee -n --keep table=$keep $test_md 2>&1`;
+	like($bad, qr/--keep: table=none, row, head or all expected/, qq(--keep table=$keep is rejected));
+    }
+    my $type = `$mdee -n --keep code=all $test_md 2>&1`;
+    like($type, qr/--keep: unknown type .code./, q(an unknown type is rejected));
+
+    # default[keep] of config.sh, which the option overrides
+    my $tmp = tempdir(CLEANUP => 1);
+    mkdir "$tmp/mdee";
+    open my $fh, q(>), "$tmp/mdee/config.sh" or die;
+    print $fh "default[keep]=table=all\n";
+    close $fh;
+    my $config = `XDG_CONFIG_HOME=$tmp COLUMNS=200 $mdee -ddn $test_md 2>&1`;
+    like($config, qr/debug: greple .*keep\.table=all/, q(default[keep] sets the default));
+    my $option = `XDG_CONFIG_HOME=$tmp COLUMNS=200 $mdee -ddn --keep table=head $test_md 2>&1`;
+    unlike($option, qr/keep\.table=/, q(--keep overrides default[keep]));
+};
+
 subtest q(widen theme) => sub {
     my $out = `COLUMNS=200 $mdee -n -t widen $test_md 2>&1`;
     like($out, qr/--begin '&widen\(chars=2460-24FF:1F5D1\)' --/, q(gives the function and the characters to the md module));

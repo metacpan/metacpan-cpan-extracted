@@ -13,7 +13,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my $nan = 9**9**9 / 9**9**9;
 my $inf = 9**9**9;

@@ -3,14 +3,18 @@ use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 use DBIx::Squirrel;
-use DBIx::Squirrel::Context      qw(iterator result_number result_original);
-use DBIx::Squirrel::Stages::Rows qw(as_hash  pluck);
+use DBIx::Squirrel::Context qw(
+    iterator kept_origin result_number result_original
+);
+use DBIx::Squirrel::Stages::Rows qw(as_hash pluck);
 use Ekorn::Pipeline              qw();
 use Ekorn::Pipeline::Factories   qw(sink_one);
 use Ekorn::Pipeline::Operators;
 use Ekorn::Pipeline::Sinks   qw(keep_all keep_first keep_last count_items);
 use Ekorn::Pipeline::Sources qw(from_array);
-use Ekorn::Pipeline::Stages::Batch qw(collect);
+use DBIx::Squirrel::Gather;
+use DBIx::Squirrel::Stages::Batch qw(batch collect);
+use DBIx::Squirrel::Stages::Flow  qw(take_last);
 
 # What a stage may ask, wherever a statement is read: through | and in
 # a pipeline of the user's own, as the design's section 5 has it.
@@ -170,6 +174,39 @@ subtest "without a statement's columns, pluck and as_hash croak" => sub {
         'as_hash, in a pushed run';
     is from_array({name => 'Abba'}) | pluck('name') | keep_all, ['Abba'],
         'pluck by name, on a hash row, uses its keys';
+};
+
+# From Ekorn::Pipeline v0.5.0 (roadmap 2026-0065), a stage that holds
+# values back and says so passes each on with its own row, in a flush
+# too; a value made from many rows has none.
+subtest 'result_original, after stages that hold values back' => sub {
+    my $with_row = sub { [$_->[1], result_original] };
+    is [$dbh->iterate($sql, take_last, $with_row)->all],
+        [['Cream', [3, 'Cream']]], "take_last's value, its own row";
+    is [$dbh->iterate($sql, batch(2), sub { result_original })->all],
+        [undef, undef], 'a batch, none';
+
+    # Each row, given only once the next has come: one behind.
+    my $one_behind = gather {
+        my @held;    # [row, origin]
+        my $give = sub ($held) { $held->[1]->gives($held->[0]) };
+        return {
+            step => sub ($row) {
+                push @held, [$row, kept_origin];
+                return @held > 1 ? $give->(shift @held) : ();
+            },
+            flush => sub () {
+                map { $give->($_) } splice @held;
+            },
+            holds => 1,
+        };
+    };
+    my $with_name = sub { [$_, result_original->[1]] };
+    is [$dbh->iterate($sql, pluck('name'), $one_behind, $with_name)->all],
+        [map { [$_, $_] } @names], "a gather of the user's own, by holds";
+    is $dbh->iterate($sql) | $one_behind | sub { result_original->[0] }
+        | keep_all,
+        [1, 2, 3], 'the same, through |';
 };
 
 done_testing;

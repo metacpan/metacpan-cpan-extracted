@@ -4,7 +4,7 @@ Music::NWC2MusicXML - Convert NoteWorthy Composer 2 `.nwc` score files to MusicX
 
 ## Version
 
-0.002.4
+0.003.1
 
 ## Synopsis
 
@@ -247,8 +247,7 @@ Return the `Music::NWC2MusicXML::Diagnostics` instance.
 - Parallel batch processing is not implemented; files are converted sequentially.
 - MusicXML validation against the official DTD/XSD is not performed
 internally; use an external validator with `--validate`.
-- Tuplet time-modification and multi-voice `RestChord` records are not yet
-emitted (Phase 4 items).
+- Multi-voice `RestChord` records are not yet emitted (Phase 4 item).
 
 ## Dependencies
 

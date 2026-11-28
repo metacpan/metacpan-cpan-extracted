@@ -39,7 +39,7 @@
 require 5.010;
 use strict;
 use warnings FATAL => 'all';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::Exception; # throws_ok / lives_and
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';

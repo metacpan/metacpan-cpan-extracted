@@ -14,7 +14,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Scalar::Util qw(looks_like_number reftype);
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::Exception;    # dies_ok, throws_ok, lives_ok
 use Test::More;
 

@@ -1,0 +1,167 @@
+{
+   "abstract" : "Add index and search methods to Apache::Session",
+   "author" : [
+      "LLNG Team <https://lemonldap-ng.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Web-Session",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Authen::SASL" : "0",
+            "DBD::Cassandra" : "0",
+            "DBI" : "0",
+            "IO::Socket::Timeout" : "0",
+            "Net::LDAP" : "0.44",
+            "Redis::Fast" : "0"
+         },
+         "requires" : {
+            "Apache::Session" : "0",
+            "Crypt::URandom" : "0",
+            "JSON" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Web::Session" : {
+         "file" : "lib/Web/Session.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Cassandra" : {
+         "file" : "lib/Web/Session/Cassandra.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::DBI" : {
+         "file" : "lib/Web/Session/DBI.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::File" : {
+         "file" : "lib/Web/Session/File.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Generate::SHA256" : {
+         "file" : "lib/Web/Session/Generate/SHA256.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::LDAP" : {
+         "file" : "lib/Web/Session/LDAP.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::MariaDB" : {
+         "file" : "lib/Web/Session/MariaDB.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::MariaDBJSON" : {
+         "file" : "lib/Web/Session/MariaDBJSON.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::MySQL" : {
+         "file" : "lib/Web/Session/MySQL.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::MySQLJSON" : {
+         "file" : "lib/Web/Session/MySQLJSON.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Patroni" : {
+         "file" : "lib/Web/Session/Patroni.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::PgJSON" : {
+         "file" : "lib/Web/Session/PgJSON.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Postgres" : {
+         "file" : "lib/Web/Session/Postgres.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Redis" : {
+         "file" : "lib/Web/Session/Redis.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::SQLite" : {
+         "file" : "lib/Web/Session/SQLite.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Serialize::JSON" : {
+         "file" : "lib/Web/Session/Serialize/JSON.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::Cassandra" : {
+         "file" : "lib/Web/Session/Store/Cassandra.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::DBI" : {
+         "file" : "lib/Web/Session/Store/DBI.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::DBI::Rollback" : {
+         "file" : "lib/Web/Session/Store/DBI.pm"
+      },
+      "Web::Session::Store::File" : {
+         "file" : "lib/Web/Session/Store/File.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::LDAP" : {
+         "file" : "lib/Web/Session/Store/LDAP.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::MariaDBJSON" : {
+         "file" : "lib/Web/Session/Store/MariaDBJSON.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::MySQL" : {
+         "file" : "lib/Web/Session/Store/MySQL.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::Patroni" : {
+         "file" : "lib/Web/Session/Store/Patroni.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::Postgres" : {
+         "file" : "lib/Web/Session/Store/Postgres.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::Postgres::Loan" : {
+         "file" : "lib/Web/Session/Store/Postgres.pm"
+      },
+      "Web::Session::Store::Redis" : {
+         "file" : "lib/Web/Session/Store/Redis.pm",
+         "version" : "v1.0.0"
+      },
+      "Web::Session::Store::SQLite" : {
+         "file" : "lib/Web/Session/Store/SQLite.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/linagora/perl-Web-Session"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

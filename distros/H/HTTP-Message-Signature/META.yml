@@ -5,13 +5,14 @@ author:
 build_requires:
   Data::Dumper: '0'
   File::Spec: '0'
-  HTTP::Request: '0'
+  HTTP::Response: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   JSON::MaybeXS: '0'
   Module::Metadata: '0'
   Path::Tiny: '0'
   Test2::Tools::Exception: '0'
+  Test2::Tools::Warnings: '0'
   Test2::V0: '0'
   Test::More: '0'
   strict: '0'
@@ -35,10 +36,9 @@ name: HTTP-Message-Signature
 provides:
   HTTP::Message::Signature:
     file: lib/HTTP/Message/Signature.pm
-    version: v0.0.3
+    version: v0.1.0
 recommends:
-  Cpanel::JSON::XS: '4.82'
-  HTTP::Tiny: '0.096'
+  JSON::XS: '4.06'
   Plack::Request: '0.99'
   Ref::Util::XS: '0'
   Type::Tiny::XS: '0'
@@ -47,11 +47,11 @@ requires:
   Crypt::PK::Ed25519: '0'
   Crypt::PK::RSA: '0'
   HTTP::Message: '0'
-  HTTP::StructuredField: v0.0.3
-  HTTP::Tiny: '0'
-  Hash::MultiValue: '0'
+  HTTP::Request: '0'
+  HTTP::StructuredField: v0.0.5
   Hash::Ordered: '0'
   JSON: '0'
+  LWP::UserAgent: '0'
   List::Util: '1.29'
   MIME::Base64: '0'
   Moo: '0'
@@ -69,7 +69,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-HTTP-Message-Signature/issues
   repository: git://github.com/robrwo/perl-HTTP-Message-Signature.git
-version: v0.0.3
+version: v0.1.0
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

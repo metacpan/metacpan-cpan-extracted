@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use File::Temp 'tempfile';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # Regression tests for bugs fixed in read_table (Perl) and _parse_csv_file (XS).
 # Every assertion here fails against the pre-fix code.

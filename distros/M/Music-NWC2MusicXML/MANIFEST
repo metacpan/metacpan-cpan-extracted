@@ -33,6 +33,20 @@ t/mutant_killers.t
 t/no404s.t
 t/path.t
 t/transaction.t
+t/triplets.t
 t/unit.t
+website/css/site.css
+website/html/api.html
+website/html/changelog.html
+website/html/commands.html
+website/html/formats.html
+website/html/index.html
+website/html/install.html
+website/html/limitations.html
+website/html/quickstart.html
+website/index.html
+website/README.md
+website/robots.txt
+website/sitemap.xml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

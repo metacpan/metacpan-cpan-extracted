@@ -14,20 +14,20 @@ use Statistics::CaseResampling ':all';
   my $rme = resample_means([], 10);
   is_deeply($rme, [], 'resample_means([], 10) returns empty array without crash');
 
-  is(median([]), 0, 'median([]) returns 0 without crash');
-  is(median_absolute_deviation([]), 0, 'median_absolute_deviation([]) returns 0 without crash');
-  is(first_quartile([]), 0, 'first_quartile([]) returns 0 without crash');
-  is(third_quartile([]), 0, 'third_quartile([]) returns 0 without crash');
+  eval { median([]) };
+  like($@, qr/empty sample/i, 'median([]) croaks on empty array');
+  eval { median_absolute_deviation([]) };
+  like($@, qr/empty sample/i, 'median_absolute_deviation([]) croaks on empty array');
+  eval { first_quartile([]) };
+  like($@, qr/empty sample/i, 'first_quartile([]) croaks on empty array');
+  eval { third_quartile([]) };
+  like($@, qr/empty sample/i, 'third_quartile([]) croaks on empty array');
 
-  my ($l, $med, $u) = median_simple_confidence_limits([], 0.95);
-  is($l, 0, 'median_simple_confidence_limits([]) lower is 0');
-  is($med, 0, 'median_simple_confidence_limits([]) median is 0');
-  is($u, 0, 'median_simple_confidence_limits([]) upper is 0');
+  eval { median_simple_confidence_limits([], 0.95) };
+  like($@, qr/empty sample/i, 'median_simple_confidence_limits([]) croaks on empty array');
 
-  my ($l2, $st, $u2) = simple_confidence_limits_from_samples(0, [], 0.95);
-  is($l2, 0, 'simple_confidence_limits_from_samples([]) lower is 0');
-  is($st, 0, 'simple_confidence_limits_from_samples([]) stat is 0');
-  is($u2, 0, 'simple_confidence_limits_from_samples([]) upper is 0');
+  eval { simple_confidence_limits_from_samples(0, [], 0.95) };
+  like($@, qr/empty sample/i, 'simple_confidence_limits_from_samples([]) croaks on empty array');
 }
 
 # SCR-02: ithreads use-after-free and double-free protection
@@ -68,19 +68,19 @@ use Statistics::CaseResampling ':all';
   is(median([10]), 10, 'median([10]) == 10');
 
   # n = 2
-  is(first_quartile([10, 20]), 10, 'first_quartile([10, 20]) == 10');
-  is(third_quartile([10, 20]), 20, 'third_quartile([10, 20]) == 20 (not OOB heap garbage)');
-  is(median([10, 20]), 10, 'median([10, 20]) == 10');
+  is(first_quartile([10, 20]), 12.5, 'first_quartile([10, 20]) == 12.5');
+  is(third_quartile([10, 20]), 17.5, 'third_quartile([10, 20]) == 17.5 (not OOB heap garbage)');
+  is(median([10, 20]), 15, 'median([10, 20]) == 15');
 
   # n = 3
-  is(first_quartile([10, 20, 30]), 10, 'first_quartile([10, 20, 30]) == 10');
-  is(third_quartile([10, 20, 30]), 30, 'third_quartile([10, 20, 30]) == 30');
+  is(first_quartile([10, 20, 30]), 15, 'first_quartile([10, 20, 30]) == 15');
+  is(third_quartile([10, 20, 30]), 25, 'third_quartile([10, 20, 30]) == 25');
   is(median([10, 20, 30]), 20, 'median([10, 20, 30]) == 20');
 
   # n = 4
-  is(first_quartile([10, 20, 30, 40]), 20, 'first_quartile([10, 20, 30, 40]) == 20');
-  is(third_quartile([10, 20, 30, 40]), 40, 'third_quartile([10, 20, 30, 40]) == 40');
-  is(median([10, 20, 30, 40]), 20, 'median([10, 20, 30, 40]) == 20');
+  is(first_quartile([10, 20, 30, 40]), 17.5, 'first_quartile([10, 20, 30, 40]) == 17.5');
+  is(third_quartile([10, 20, 30, 40]), 32.5, 'third_quartile([10, 20, 30, 40]) == 32.5');
+  is(median([10, 20, 30, 40]), 25, 'median([10, 20, 30, 40]) == 25');
 }
 
 # SCR-04: Confidence limits bounds clamping on extreme confidence levels
@@ -145,7 +145,8 @@ use Statistics::CaseResampling ':all';
   like($@, qr/Population standard deviation requires at least 1 data point/, 'population_standard_deviation rejects empty array');
 
   is(population_standard_deviation(10, [10]), 0, 'population_standard_deviation([10]) == 0');
-  is(mean([]), 0, 'mean([]) == 0 without division by zero');
+  eval { mean([]) };
+  like($@, qr/empty sample/i, 'mean([]) croaks on empty array');
 }
 
 # SCR-08: median_absolute_deviation allocator safety
@@ -160,6 +161,23 @@ use Statistics::CaseResampling ':all';
   ok(defined $rnd, 'setup_array creates RdGen object');
   my $val = $rnd->genrand();
   ok($val >= 0 && $val < 1, 'genrand produces random number in [0, 1)');
+}
+
+# SCR-10: No CLONE_SKIP redefinition warning when loading under perl -w (GH #3)
+{
+  require IPC::Open3;
+  require Symbol;
+  is(Statistics::CaseResampling::RdGen::CLONE_SKIP(), 1, 'RdGen::CLONE_SKIP returns 1');
+
+  my @blib = map { "-I$_" } grep { -d $_ } ('blib/lib', 'blib/arch');
+  my $err = Symbol::gensym();
+  my $pid = IPC::Open3::open3(undef, my $out, $err, $^X, @blib, '-w', '-e', 'require Statistics::CaseResampling');
+  my $stderr = do { local $/; <$err> };
+  close $out;
+  close $err;
+  waitpid($pid, 0);
+  is($? >> 8, 0, 'perl -we require Statistics::CaseResampling exited cleanly');
+  is(defined($stderr) ? $stderr : '', '', 'no warnings emitted when loading under -w');
 }
 
 done_testing();

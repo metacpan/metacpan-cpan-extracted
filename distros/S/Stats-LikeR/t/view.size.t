@@ -44,7 +44,7 @@ use Test::More;
 use Test::Exception;
 use Test::LeakTrace 'no_leaks_ok';
 use Scalar::Util 'weaken';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 $ENV{COLUMNS} = 1000;	# one block of columns, whatever the terminal
 

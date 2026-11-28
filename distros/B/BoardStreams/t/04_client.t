@@ -15,10 +15,15 @@ my $PROTOCOL = BoardStreams::PROTOCOL_VERSION;
 # The scripted server keeps every connection it was given, in order.
 my @connections;
 my $accepting = 1;
+# What the handshakes carried, and how the server is to answer them.
+my (@handshakes, $refuse, %answer, @on_open);
 my $app = Mojolicious->new;
 $app->log->level('fatal');
 $app->routes->websocket('/boardstreams' => sub ($c) {
     return $c->finish(1013) unless $accepting;
+    push @handshakes, $c->req->headers->to_hash;
+    return $c->render(text => $refuse->{body}, status => $refuse->{status}) if $refuse;
+    $c->res->headers->header($_ => $answer{$_}) for keys %answer;
     $c->inactivity_timeout(300);
     my $connection = { c => $c, got => [], closed => 0, ready => 0 };
     push @connections, $connection;
@@ -27,6 +32,7 @@ $app->routes->websocket('/boardstreams' => sub ($c) {
     Mojo::IOLoop->timer(0.02 => sub { $connection->{ready} = 1 });
     $c->on(json   => sub ($c, $message) { push $connection->{got}->@*, $message });
     $c->on(finish => sub { $connection->{closed} = 1 });
+    $c->send({ json => $_ }) for @on_open;
 });
 my $daemon = Mojo::Server::Daemon->new(app => $app, listen => ['http://127.0.0.1'], silent => 1)->start;
 my $url    = 'ws://127.0.0.1:' . $daemon->ports->[0] . '/boardstreams';
@@ -578,6 +584,153 @@ subtest 'a server that cannot be reached is retried' => sub {
     is_deeply [@$statuses[0 .. 3]], [qw(connecting disconnected connecting disconnected)], 'connecting and failing in turn';
     $bs->close;
     is $statuses->[-2], 'closed', 'until it is closed';
+};
+
+# The handshake: what the client adds to the request, and what the
+# application makes of the answer.
+
+sub handshake_setup (%with) {
+    @connections = @handshakes = ();
+    $refuse      = $with{refuse};
+    %answer      = %{ $with{answer} // {} };
+    @on_open     = @{ $with{on_open} // [] };
+}
+my $poison = [
+    { type => 'heartbeat', interval => 1000, protocol => $PROTOCOL },
+    { type => 'joined', channel => 'counter', seq => 9, state => { from => 'a connection that was refused' } },
+];
+
+subtest 'headers are added to every handshake, computed anew each time' => sub {
+    handshake_setup();
+    my $attempt = 0;
+    my $bs = client(headers => sub { { 'X-Attempt' => ++$attempt, 'X-Nonce' => "nonce-$attempt" } });
+    my $server = connection_number(1);
+    greet($server);
+    $server->{c}->finish;
+    connection_number(2);
+    is_deeply [map { [@$_{qw(X-Attempt X-Nonce)}] } @handshakes], [[1, 'nonce-1'], [2, 'nonce-2']],
+        'both the first connection and the reconnection carried them, with fresh values';
+    $bs->close;
+
+    handshake_setup();
+    my $ua = Mojo::UserAgent->new->inactivity_timeout(0);
+    $ua->on(start => sub ($ua, $tx) { $tx->req->headers->header('X-From-Ua' => 'yes') });
+    my $fixed = client(headers => { 'X-Fixed' => 'always' }, ua => $ua);
+    connection_number(1);
+    is $handshakes[0]{'X-Fixed'},   'always', 'a plain hash of headers works too';
+    is $handshakes[0]{'X-From-Ua'}, 'yes',    '...together with a user agent of one\'s own';
+    $fixed->close;
+};
+
+subtest 'an answer that the application accepts' => sub {
+    handshake_setup(answer => { 'X-Signature' => 'signed:nonce-1' });
+    my @seen;
+    my $bs = client(
+        headers      => sub { { 'X-Nonce' => 'nonce-1' } },
+        on_handshake => sub ($handshake) {
+            push @seen, $handshake;
+            return $handshake->header('x-signature') eq 'signed:' . $handshake->sent->{'X-Nonce'};
+        },
+    );
+    my $channel = $bs->join('counter');
+    my $server  = connection_number(1);
+    is scalar @seen, 1, 'the callback saw the answer';
+    isa_ok $seen[0], 'BoardStreams::Client::Handshake';
+    is $seen[0]->code, 101, '...its status';
+    ok $seen[0]->accepted, '...that the server accepted';
+    is $seen[0]->headers->header('X-Signature'), 'signed:nonce-1', '...its headers';
+    is $seen[0]->body, '', '...and no body';
+    is_deeply $seen[0]->sent, { 'X-Nonce' => 'nonce-1' }, '...along with the headers this attempt sent';
+    greet($server);
+    is_deeply [take($server, 1, 'join')], [{ type => 'join', channel => 'counter' }], 'the connection is then used as usual';
+    $bs->close;
+};
+
+subtest 'an answer that the application refuses, for good' => sub {
+    handshake_setup(on_open => $poison);
+    my $bs = client(on_handshake => sub ($handshake) {
+        return BoardStreams::Client::Error->new(reason => 'bad_signature', data => { code => $handshake->code });
+    });
+    my $statuses = collect($bs->status_o);
+    my $channel  = $bs->join('counter');
+    my $states   = collect($channel->state_o);
+    error_like($channel->joined, 'bad_signature', { code => 101 }, 'joined()');
+    my $server = connection_number(1);
+    wait_for(sub { $server->{closed} }, 'the connection is closed');
+    idle(0.6);
+    is_deeply $server->{got}, [], 'nothing was sent on it';
+    is_deeply $states, ['(complete)'], 'nothing that the server sent on it reached the channel';
+    is_deeply $statuses, ['connecting', 'closed', '(complete)'], 'the client stopped without ever being connected';
+    is scalar @connections, 1, 'it does not try again';
+    error_like($bs->join('other')->joined, 'bad_signature', { code => 101 }, 'a channel joined afterwards');
+};
+
+subtest 'an answer that the application refuses, to try again' => sub {
+    handshake_setup(on_open => $poison);
+    my (@warnings, $calls);
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    my $bs = client(on_handshake => sub ($handshake) {
+        @on_open = () if ++$calls == 2;    # the server behaves from the third connection on
+        die "cannot tell\n" if $calls == 2;
+        return $calls > 2;
+    });
+    my $statuses = collect($bs->status_o);
+    my $channel  = $bs->join('counter');
+    my $states   = collect($channel->state_o);
+    my $third    = connection_number(3);
+    ok $connections[0]{closed}, 'a connection whose answer was not accepted is closed';
+    ok $connections[1]{closed}, '...and so is one whose callback died';
+    like $warnings[0], qr/on_handshake callback died.*cannot tell/, '...with a warning';
+    is_deeply [map { $_->{got}->@* } @connections[0, 1]], [], 'nothing was sent on either';
+    is_deeply $states, [], 'nothing that they sent reached the channel';
+    is_deeply $statuses, ['connecting', 'disconnected', 'connecting', 'disconnected', 'connecting'],
+        'the client went through its usual reconnection, without being connected';
+    greet($third);
+    is_deeply [take($third, 1, 'join')], [{ type => 'join', channel => 'counter' }], 'the accepted connection is used';
+    server_says($third, { type => 'joined', channel => 'counter', seq => 0, state => { n => 1 } });
+    wait_for(sub { @$states }, 'joined');
+    is_deeply $states, [{ n => 1 }], 'the state is the one from the accepted connection';
+    $bs->close;
+};
+
+subtest 'a handshake that the server refuses, for good' => sub {
+    handshake_setup(refuse => { status => 401, body => 'who are you?' });
+    my @seen;
+    my $bs = client(on_handshake => sub ($handshake) {
+        push @seen, $handshake;
+        return 1 if $handshake->accepted;
+        return BoardStreams::Client::Error->new(reason => 'unauthorized', data => { status => $handshake->code });
+    });
+    my $statuses = collect($bs->status_o);
+    my $channel  = $bs->join('counter');
+    error_like($channel->joined, 'unauthorized', { status => 401 }, 'joined()');
+    is $seen[0]->code, 401, 'the callback saw the status';
+    ok !$seen[0]->accepted, '...that it was a refusal';
+    is $seen[0]->body, 'who are you?', '...and what the refusal said';
+    is_deeply $statuses, ['connecting', 'closed', '(complete)'], 'the client stopped';
+    idle(0.6);
+    is scalar @handshakes, 1, 'it does not try again';
+};
+
+subtest 'a handshake that the server refuses, to try again' => sub {
+    handshake_setup(refuse => { status => 403, body => 'not yet' });
+    my @codes;
+    my $bs = client(on_handshake => sub ($handshake) { push @codes, $handshake->code; return 1 });
+    my $channel = $bs->join('counter');
+    wait_for(sub { @codes >= 3 }, 'the client kept trying');
+    is_deeply [@codes[0 .. 2]], [403, 403, 403], 'each refusal was shown to the callback';
+    $refuse = undef;
+    my $server = connection_number(1);
+    greet($server);
+    is_deeply [take($server, 1, 'join')], [{ type => 'join', channel => 'counter' }], 'and once the server lets it in, it joins';
+    is $codes[-1], 101, 'the accepted answer was shown too';
+    $bs->close;
+
+    handshake_setup(refuse => { status => 403, body => 'not yet' });
+    my $plain = client();
+    wait_for(sub { @handshakes >= 3 }, 'without the callback a refused handshake is retried, as before');
+    $plain->close;
+    $refuse = undef;
 };
 
 done_testing;

@@ -1,6 +1,6 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.81 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.82 {
 
-  use 5.022;
+  use 5.024;
   use Moose;
   use Dist::Zilla;
   use PerlX::Maybe qw( maybe provided );
@@ -333,7 +333,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.81
+version 2.82
 
 =head1 SYNOPSIS
 

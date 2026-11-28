@@ -5,7 +5,7 @@ use experimental 'class';
 # browsers over WebSockets, and keeps channel state and events in
 # PostgreSQL so that they survive disconnections and restarts.
 class BoardStreams::Hub {
-    our $VERSION = "v0.0.58";
+    our $VERSION = "v0.0.60";
 
     use Future::AsyncAwait future_class => "Mojo::Promise";
     use Mojo::IOLoop;
@@ -313,7 +313,7 @@ class BoardStreams::Hub {
         # Forget the connection now, so that nothing more is sent on it.
         delete $conns{$id};
         $self->_leave($id, $_) for keys $conn->{channels}->%*;
-        $conn->{c}->finish(4000);
+        $conn->{tx}->finish(4000);
         return 1;
     }
 
@@ -361,24 +361,30 @@ class BoardStreams::Hub {
         # another, or the one that replaces this.
         return $c->finish(1001) if $stopping;
         $self->_watch_for_stop;
+        # From here on the connection is used through its transaction. The
+        # controller's own send and on each answer the handshake as well,
+        # which is one answer too many per call when this route was reached
+        # asynchronously (behind an "under" that continues later): the
+        # server then closes the connection it has just opened.
+        my $tx = $c->tx;
         my $id = ++$next_conn;
         my $user = $identify ? $identify->($c) : undef;
-        $conns{$id} = { c => $c, channels => {}, user => (defined $user ? "$user" : undef) };
+        $conns{$id} = { c => $c, tx => $tx, channels => {}, user => (defined $user ? "$user" : undef) };
         $c->inactivity_timeout($heartbeat_interval * 2 + 10);
         # Two signs of life per interval: a WebSocket ping, whose automatic
         # pong tells this side that the browser is there, and a heartbeat
         # message, which is the only one of the two that the browser's
         # JavaScript can see.
         my $beat = sub (@extra) {
-            $c->send([1, 0, 0, 0, 9, '']);
-            $c->send({ json => { type => 'heartbeat', interval => $heartbeat_interval, @extra } });
+            $tx->send([1, 0, 0, 0, 9, '']);
+            $tx->send({ json => { type => 'heartbeat', interval => $heartbeat_interval, @extra } });
         };
         # The first heartbeat also announces the protocol version; a client
         # that speaks another refuses to go on.
         $beat->(protocol => BoardStreams::PROTOCOL_VERSION);
         my $ping = Mojo::IOLoop->recurring($heartbeat_interval => sub { $beat->() });
 
-        $c->on(json => sub ($c, $msg) {
+        $tx->on(json => sub ($tx, $msg) {
             return unless ref $msg eq 'HASH' and defined $msg->{type} and defined $msg->{channel};
             my $type = $msg->{type};
             my $p = $type eq 'join'    ? $self->_join($id, $msg)
@@ -388,11 +394,14 @@ class BoardStreams::Hub {
                   :                      undef;
             $p->catch(sub ($err) { $log->error("BoardStreams: $type failed: $err") }) if blessed $p;
         });
-        $c->on(finish => sub {
+        $tx->on(finish => sub {
             Mojo::IOLoop->remove($ping);
             my $conn = delete $conns{$id} or return;
             $self->_leave($id, $_) for keys $conn->{channels}->%*;
         });
+        # The handshake is answered here, exactly once, with whatever
+        # headers earlier steps of the route have put on the response.
+        $c->rendered(101) unless $tx->established;
         return $self;
     }
 
@@ -412,7 +421,7 @@ class BoardStreams::Hub {
 
     method _send ($id, $msg) {
         my $conn = $conns{$id} or return;
-        $conn->{c}->send({ json => $msg });
+        $conn->{tx}->send({ json => $msg });
     }
 
     # Starts the per-process machinery; must run inside the worker's event loop.
@@ -479,7 +488,7 @@ class BoardStreams::Hub {
         for my $id (keys %conns) {
             my $conn = delete $conns{$id};
             $self->_leave($id, $_) for keys $conn->{channels}->%*;
-            $conn->{c}->finish($code);
+            $conn->{tx}->finish($code);
         }
     }
 
@@ -505,7 +514,7 @@ class BoardStreams::Hub {
     # other, and they reconnect, to whichever process answers.
     method _stop {
         return if $stopping++;
-        my @transactions = map { $_->{c}->tx } values %conns;
+        my @transactions = map { $_->{tx} } values %conns;
         $log->info(sprintf 'BoardStreams: stopping gracefully; closing %d connection(s)', scalar @transactions);
         $self->_drop_all(1001);
         # A browser that does not answer the close must not hold the
@@ -572,7 +581,7 @@ class BoardStreams::Hub {
                 # so that the browser retries, instead of leaving it joined
                 # to nothing.
                 $log->warn("BoardStreams: cannot join $channel: $@");
-                $conn->{c}->finish(1013) if $conns{$id};
+                $conn->{tx}->finish(1013) if $conns{$id};
             }
         })->();
     }
@@ -680,7 +689,7 @@ class BoardStreams::Hub {
                         delete $of->{$id};
                         $self->_enter($id, $channel, undef, 1)->catch(sub ($err) {
                             $log->warn("BoardStreams: cannot resync $channel: $err");
-                            $conns{$id}{c}->finish(1013) if $conns{$id};
+                            $conns{$id}{tx}->finish(1013) if $conns{$id};
                         });
                     }
                     delete $members{$channel} unless %$of;

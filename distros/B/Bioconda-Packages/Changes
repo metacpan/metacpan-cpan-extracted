@@ -1,5 +1,8 @@
 Revision history for Bioconda-Packages
 
+2026.11.6  2026-11-27
+      - Database update: rebuilt from bioconda-recipes 5a417578.
+
 2026.11.5  2026-11-26
       - Database update: rebuilt from bioconda-recipes bce1f0d0.
 

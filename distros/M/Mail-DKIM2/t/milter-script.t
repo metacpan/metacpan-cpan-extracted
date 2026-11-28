@@ -72,7 +72,7 @@ sub spawn_milter {
             '--socket', "unix:$sock",
             '--keydir', "$dir/keys",
             '--dns-json', "$DNS_JSON",
-            '--snapshot-dir', "$dir/snap",
+            ($o{nosnap} ? () : ('--snapshot-dir', "$dir/snap")),
             @{ $o{extra} || [] }
             or die "exec: $!";
     }
@@ -158,6 +158,17 @@ sub run_milter {
     die "bad OPTNEG reply $code" unless $code eq 'O';
 
     my @mods;
+    # client => address: an SMFIC_CONNECT, as Postfix sends (127.0.0.1 for
+    # non_smtpd_milters). auth => login: the {auth_authen} macro at MAIL.
+    if (defined $a{client}) {
+        my $af = $a{client} =~ /:/ ? '6' : '4';
+        # Postfix's default milter_connect_macros include "_" ("name [addr]"):
+        # without Socket6, Sendmail::PMilter hands on no IPv6 address.
+        pkt($s, 'D', "C_\0" . ($a{underscore} // "client.example [$a{client}]") . "\0");
+        pkt($s, 'C', "client.example\0$af" . pack('n', 25) . "$a{client}\0");
+        die 'connect' unless read_verdict($s, \@mods) eq 'c';
+    }
+    pkt($s, 'D', "M{auth_authen}\0$a{auth}\0") if defined $a{auth};
     pkt($s, 'M', "<$a{from}>\0");   die 'envfrom' unless read_verdict($s, \@mods) eq 'c';
     for my $r (@{$a{rcpt}}) {
         pkt($s, 'R', "<$r>\0");     die 'envrcpt' unless read_verdict($s, \@mods) eq 'c';
@@ -1266,6 +1277,112 @@ sub unsigned_arrival {
     my $out = apply_mods($second, $mods);
     is(scalar(inserted($mods, 'DKIM2-Signature')), 1, 'two inbound: signed');
     is(verify($out)->result, 'pass', 'two inbound: the copy verifies');
+}
+
+# --- An originating host (Al Iverson, 0.35): non_smtpd_milters, no snapshot
+# store. Locally generated mail has no instance and no token; the milter
+# stamps m=1 from the message itself and signs it.
+for my $case (['outbound', 1], ['both', 1], ['both', 0]) {
+    my ($mode, $nosnap) = @$case;
+    my $name = "originating ($mode" . ($nosnap ? ', no --snapshot-dir' : '') . ')';
+    my (undef, $s) = spawn_milter(mode => $mode, nosnap => $nosnap);
+    (my $p = $LOCAL) =~ s/<post\@test1/<orig-$mode-$nosnap\@test1/;
+    my ($v, $mods) = run_milter(sock => $s, client => '127.0.0.1',
+        from => 'author@test2.dkim2.com', rcpt => ['someone@example.org'], message => $p);
+    is($v, 'c', "$name: milter continues");
+    is(scalar(inserted($mods, 'Message-Instance')), 1, "$name: one Message-Instance m=1")
+        or diag(join "\n", (split /\n/, milter_log())[-8 .. -1]);
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 1, "$name: signed");
+    is(scalar(inserted($mods, 'Authentication-Results')), 0, "$name: no Authentication-Results");
+    unlike(join(' ', map { $_->{value} } inserted($mods, 'X-DKIM2-Info')), qr/verify=/,
+        "$name: no verify= X-DKIM2-Info");
+    is(verify(apply_mods($p, $mods))->result, 'pass', "$name: the message verifies");
+}
+
+# --- --mode both goes by where the message comes from (OpenDKIM's model) ---
+# Outbound (signed): loopback, an authenticated client, --internal-hosts.
+# Inbound (verified and stamped, never signed): anything else, a client the
+# MTA named no address for included -- even with a From in our own domain.
+{
+    my (undef, $s) = spawn_milter(mode => 'both',
+        extra => ['--internal-hosts', '198.51.100.0/24, 2001:db8::/32']);
+    my $n = 0;
+    for my $c (['::1',          undef,   'out', 'IPv6 loopback'],
+               ['192.0.2.7',    'alice', 'out', 'authenticated client'],
+               ['198.51.100.9', undef,   'out', '--internal-hosts IPv4'],
+               ['2001:db8::5',  undef,   'out', '--internal-hosts IPv6'],
+               ['::ffff:127.0.0.1', undef, 'out', 'IPv4-mapped loopback'],
+               ['192.0.2.7',    undef,   'in',  'outside client'],
+               ['198.51.101.9', undef,   'in',  'just outside --internal-hosts'],
+               [undef,          undef,   'in',  'no client address']) {
+        my ($client, $auth, $dir, $name) = @$c;
+        (my $p = $LOCAL) =~ s/<post\@test1/<both-src-@{[$n++]}\@test1/;
+        my ($v, $mods) = run_milter(sock => $s, client => $client, auth => $auth,
+            from => 'author@test2.dkim2.com', rcpt => ['someone@example.org'], message => $p);
+        is($v, 'c', "both, $name: milter continues");
+        my $signed = scalar inserted($mods, 'DKIM2-Signature');
+        my $ar     = scalar inserted($mods, 'Authentication-Results');
+        if ($dir eq 'out') {
+            ok($signed && !$ar, "both, $name: outbound (signed, no A-R)")
+                or diag(join "\n", (split /\n/, milter_log())[-6 .. -1]);
+            is(verify(apply_mods($p, $mods))->result, 'pass', "both, $name: verifies");
+        } else {
+            ok(!$signed && $ar, "both, $name: inbound (A-R, not signed)")
+                or diag(join "\n", (split /\n/, milter_log())[-6 .. -1]);
+            is(scalar(inserted($mods, 'X-DKIM2-Arrival')), 1, "both, $name: arrival verdict");
+        }
+    }
+    # The "_" macro's name part comes from DNS: an address in it is not the
+    # client's.
+    {
+        (my $p = $LOCAL) =~ s/<post\@test1/<both-src-ptr\@test1/;
+        my ($v, $mods) = run_milter(sock => $s, client => '2001:db9::1',
+            underscore => '[127.0.0.1].evil.example [2001:db9::1]',
+            from => 'author@test2.dkim2.com', rcpt => ['someone@example.org'], message => $p);
+        is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'both, bracketed name in "_": inbound');
+    }
+    like(`$^X -I$LIB $SCRIPT --mode both --keydir $dir/keys --internal-hosts 10.0.0.0/33 2>&1`,
+         qr/--internal-hosts: bad prefix length/, '--internal-hosts: a bad prefix is refused');
+}
+
+# --- --mode both on one socket for a list host: the post arrives from
+# outside (inbound: m=1, snapshot), the list manager re-injects its changed
+# copy over loopback (outbound: diff against that snapshot, signed).
+{
+    my (undef, $s) = spawn_milter(mode => 'both');
+    (my $p = $LOCAL) =~ s/<post\@test1/<both-list\@test1/;
+    my ($iv, $imods) = run_milter(sock => $s, client => '192.0.2.7',
+        from => 'author@test2.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $p);
+    my $arrived = apply_mods($p, $imods);
+    like($arrived, qr/^X-DKIM2-Snapshot: [0-9a-f]{32}\r$/m, 'both list: arrival snapshot token');
+    (my $copy = $arrived) =~ s/^Subject: /Subject: [list] /m;
+    $copy .= "--$EOL" . "list footer$EOL";
+    my ($ov, $omods) = run_milter(sock => $s, client => '127.0.0.1',
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $copy);
+    my $out = apply_mods($copy, $omods);
+    is(scalar(inserted($omods, 'DKIM2-Signature')), 1, 'both list: the copy is signed');
+    unlike($out, qr/^X-DKIM2-(?:Snapshot|Arrival):/mi, 'both list: no token or verdict leaves');
+    is(verify($out)->result, 'pass', 'both list: the copy verifies')
+        or diag(join "\n", (split /\n/, milter_log())[-8 .. -1]);
+}
+
+# --- --authserv-id names this host in the Authentication-Results it adds ---
+{
+    my (undef, $s) = spawn_milter(mode => 'inbound', extra => ['--authserv-id', 'mx.test2.dkim2.com']);
+    (my $p = $LOCAL) =~ s/<post\@test1/<authserv\@test1/;
+    my ($v, $mods) = run_milter(sock => $s,
+        from => 'author@test2.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $p);
+    my ($ar) = inserted($mods, 'Authentication-Results');
+    like($ar->{value} // '', qr/\Amx\.test2\.dkim2\.com; dkim2=none/, 'authserv-id: used in the A-R');
+}
+
+# --- --help documents the options the program takes, and only those ---
+{
+    my $help = `$^X -I$LIB $SCRIPT --help 2>&1`;
+    like($help, qr/--mode/, '--help documents --mode');
+    like($help, qr/--authserv-id/, '--help documents --authserv-id');
+    like($help, qr/--internal-hosts/, '--help documents --internal-hosts');
+    unlike($help, qr/--no-verify|--no-sign/, '--help has no --no-verify / --no-sign');
 }
 
 done_testing;

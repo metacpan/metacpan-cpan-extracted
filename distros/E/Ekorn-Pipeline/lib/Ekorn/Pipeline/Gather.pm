@@ -11,7 +11,7 @@ use Ekorn::Pipeline::Errors qw(croakf);
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.4.5';
+our $VERSION = 'v0.5.0';
 
 our @EXPORT = qw(gather);    ## no critic (Modules::ProhibitAutomaticExportation)
 
@@ -94,7 +94,9 @@ however it ended, told how, as L</Ends> describes.
 It returns them as a list, in that order, giving C<undef> for the flush
 to have only an end, or by name, as a hash reference, as in
 C<< {step => $step, end => $end} >>: L<Ekorn::Pipeline/Made for a run>
-has how.
+has how. By name, it can also say the stage holds values back,
+C<< holds => 1 >>, as L<Ekorn::Pipeline::Context/kept_origin> describes:
+not beside a pipeline returned as the step, which croaks. New in v0.5.0.
 
 What the flush returns goes through the rest of the stages, just like
 what a step returns: nothing, one value, or several. It's called even
@@ -180,7 +182,9 @@ and the flushes after it are still called.
 Inside a flush, and the stages it sends values to,
 L<Ekorn::Pipeline/ending> is true. Code that tells its stages where a
 value came from can use it to say the value comes from many, not
-one.
+one; but a value that a stage that holds values back gives from its
+flush came from one value, and has its original
+(L<Ekorn::Pipeline::Context/kept_origin>).
 
 =head1 FUNCTIONS
 

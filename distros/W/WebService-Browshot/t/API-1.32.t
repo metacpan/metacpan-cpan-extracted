@@ -28,7 +28,7 @@ my $ua = BrowshotTestUA->new();
 $browshot->{_ua} = $ua;
 my $directory = tempdir(CLEANUP => 1);
 
-is($browshot->api_version(), '1.32', 'API 1.32');
+is($browshot->api_version(), '2.0', 'Latest supported API version');
 
 my %options = (
 	instance_id => 373, pdf => 1, pdf_format => 'a4', pdf_background => 1,

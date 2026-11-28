@@ -14,6 +14,10 @@
   const cveSpinner = document.getElementById('cve-spinner');
   const cveMessage = document.getElementById('cve-message');
   const cveColumn = document.getElementById('cve-column');
+  const groupModules = document.getElementById('group-modules');
+  const groupModulesLabel = document.getElementById('group-modules-label');
+  const groupPreview = 10;
+  const expandedGroups = new Set();
   let cveIndex = null;
   let checkingCves = false;
   let source = {
@@ -40,24 +44,108 @@
     all.textContent = loadingAll ? 'Stop' : 'Load all';
   }
 
+  // Presentation only: fold a module under an earlier module of the listed rows when the
+  // earlier name is a namespace prefix of it and both rows describe the same distribution.
+  // It works on whatever rows the filter left, so filtering still sees every module.
+  function groupRows(rows) {
+    const groups = [];
+    const open = [];
+    for (const row of rows) {
+      while (open.length && !row.name.startsWith(open[open.length - 1].row.name)) open.pop();
+      let head = null;
+      if (groupModules.checked) {
+        for (let i = open.length - 1; i >= 0 && !head; i--) {
+          const candidate = open[i].row;
+          // A different review link means the module would move to a different distribution.
+          if (row.name.startsWith(candidate.name + '::') && row.path === candidate.path
+              && (row.review_url ?? null) === (candidate.review_url ?? null)) head = open[i];
+        }
+      }
+      if (head) {
+        head.children.push(row);
+      } else {
+        const group = {row, children: []};
+        groups.push(group);
+        open.push(group);
+      }
+    }
+    return groups;
+  }
+
+  function moduleCell(group) {
+    const {row, children} = group;
+    const td = document.createElement('td');
+    if (!children.length) {
+      td.textContent = row.name;
+      return td;
+    }
+    const name = document.createElement('span');
+    name.textContent = row.name;
+    td.append(name);
+    const expanded = expandedGroups.has(row.name);
+    for (const child of expanded ? children : children.slice(0, groupPreview)) {
+      const sub = document.createElement('span');
+      sub.className = 'submodule';
+      sub.textContent = child.name;
+      if (child.version !== row.version) {
+        const version = document.createElement('span');
+        version.className = 'submodule-version';
+        version.textContent = ' ' + child.version;
+        sub.append(version);
+      }
+      td.append(sub);
+    }
+    if (children.length > groupPreview) {
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'submodule-toggle';
+      toggle.textContent = expanded ? 'Show fewer' : `Show ${children.length - groupPreview} more`;
+      toggle.addEventListener('click', () => {
+        if (expanded) expandedGroups.delete(row.name); else expandedGroups.add(row.name);
+        render();
+      });
+      td.append(toggle);
+    }
+    return td;
+  }
+
   function render() {
     cveColumn.hidden = !cveIndex;
     const fragment = document.createDocumentFragment();
     let affected = 0;
-    for (const row of source.modules) {
+    const groups = groupRows(source.modules);
+    for (const group of groups) {
+      const row = group.row;
       const tr = document.createElement('tr');
       const advisories = cveIndex ? CPANInGitCves.findAdvisories(cveIndex, row) : [];
       if (advisories.length) {
-        ++affected;
+        // Advisories belong to the distribution, so the folded modules are affected too
+        affected += 1 + group.children.length;
         tr.className = 'cve-affected';
       }
       tr.hidden = !!cveIndex && onlyCves.checked && !advisories.length;
-      for (const value of [row.name, row.version]) {
+      tr.append(moduleCell(group));
+      {
         const td = document.createElement('td');
-        td.textContent = value;
+        td.textContent = row.version;
         tr.append(td);
       }
       if (advisories.length) tr.children[1].title = advisories.flatMap(advisory => advisory.ids).join(', ');
+      if (root.dataset.sourceVersions === 'true') {
+        const td = document.createElement('td');
+        td.className = 'source-version';
+        if (row.review_url) {
+          const link = document.createElement('a');
+          link.textContent = row.source_version;
+          link.href = row.review_url;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          td.append(link);
+        } else {
+          td.textContent = row.source_version ?? '';
+        }
+        tr.append(td);
+      }
       const reports = document.createElement('td');
       reports.className = 'cve-reports';
       reports.hidden = !cveIndex;
@@ -83,7 +171,7 @@
     body.replaceChildren(fragment);
     status.textContent = cveIndex
       ? `${affected} affected of ${source.modules.length} loaded modules.${source.next_after ? ' Load more to check additional modules.' : ''}`
-      : `Showing ${source.modules.length} modules${source.complete ? ' (all matches).' : '.'}`;
+      : `Showing ${source.modules.length} modules${groups.length < source.modules.length ? ` in ${groups.length} rows` : ''}${source.complete ? ' (all matches).' : '.'}`;
     updatePagination();
   }
 
@@ -185,6 +273,10 @@
     }
   });
   onlyCves.addEventListener('change', render);
+  groupModulesLabel.hidden = false;
+  groupModules.addEventListener('change', render);
+  // A browser may restore the checkbox as checked when the page is reloaded.
+  if (groupModules.checked) render();
   checkCves.hidden = false;
   checkCves.addEventListener('click', async () => {
     if (checkingCves || cveIndex) return;

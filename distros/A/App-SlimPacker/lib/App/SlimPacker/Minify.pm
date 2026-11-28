@@ -4,7 +4,7 @@ use warnings;
 use PPI;
 use Scalar::Util 'refaddr';
 use Exporter 'import';
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our @EXPORT_OK = qw(
     process process_deps minify_file name_gen needs_space
     module_deps collect_bundle_globals
@@ -1834,7 +1834,7 @@ App::SlimPacker::Minify - PPI-based Perl source minifier and bundle-aware renami
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 

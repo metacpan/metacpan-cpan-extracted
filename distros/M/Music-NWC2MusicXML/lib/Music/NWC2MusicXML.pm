@@ -4,13 +4,11 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 
 # ---------------------------------------------------------------------------
 # Post-release roadmap
 # ---------------------------------------------------------------------------
-# TODO: emit <time-modification>/<tuplet> for triplet and other tuplet groups
-#       (durations are stored as correct rationals; only the notation element is missing)
 # TODO: read custom page dimensions from PgSetup (Width/Height) instead of
 #       assuming A4 (210 x 297 mm) in _compute_page_layout
 # TODO: multi-voice staves -- split simultaneous RestChord streams into
@@ -72,7 +70,7 @@ Music::NWC2MusicXML - Convert NoteWorthy Composer 2 C<.nwc> score files to Music
 
 =head1 VERSION
 
-0.003.0
+0.003.1
 
 =head1 SYNOPSIS
 
@@ -589,8 +587,7 @@ __END__
 =item * MusicXML validation against the official DTD/XSD is not performed
 internally; use an external validator with C<--validate>.
 
-=item * Tuplet time-modification and multi-voice C<RestChord> records are not yet
-emitted (Phase 4 items).
+=item * Multi-voice C<RestChord> records are not yet emitted (Phase 4 item).
 
 =back
 

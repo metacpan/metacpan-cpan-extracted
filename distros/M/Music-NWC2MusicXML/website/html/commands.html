@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commands — Music::NWC2MusicXML</title>
+<meta name="description" content="Every nwc2musicxml option, what counts as input, the exit codes and worked examples of single-file, batch and recursive conversion.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="commands.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Music::NWC2MusicXML">
+<meta property="og:title" content="Commands — Music::NWC2MusicXML">
+<meta property="og:description" content="Every nwc2musicxml option, what counts as input, the exit codes and worked examples of single-file, batch and recursive conversion.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Music::NWC2MusicXML</span>
+			<span class="brand-tag">NoteWorthy Composer scores to MusicXML</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="commands.html" class="current" aria-current="page">Commands</a>
+			<a href="api.html">Perl API</a>
+			<a href="formats.html">What converts</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Commands</h1>
+	<p class="lead">
+		One program, <code>nwc2musicxml</code>. What it is given decides whether
+		it converts a single file or a batch, and whether it does the work itself
+		or hands it to the batch path.
+	</p>
+
+	<h2>Synopsis</h2>
+<pre><code>nwc2musicxml [options] input.nwc [output.musicxml]
+nwc2musicxml [options] file1.nwc file2.nwc ...
+nwc2musicxml [options] --output-dir DIR file-or-dir ...
+nwc2musicxml [options] --recursive --output-dir DIR directory
+</code></pre>
+
+	<h2>What counts as input</h2>
+	<ul>
+		<li>A file whose name ends in <code>.nwc</code>, in any case.</li>
+		<li>A directory, which contributes the <code>.nwc</code> files directly inside it; other file types are ignored rather than reported.</li>
+		<li>A directory with <code>--recursive</code>, which contributes every <code>.nwc</code> file below it.</li>
+		<li>Two positional arguments are read as input and output only when the first ends in <code>.nwc</code>, the second does not, and no <code>--output-dir</code> was given. Otherwise every argument is an input.</li>
+	</ul>
+
+	<h2>Options</h2>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>Option</th><th>Effect</th></tr></thead>
+			<tbody>
+				<tr>
+					<td><code>--output-dir DIR</code><br><span class="muted small">also <code>-o</code></span></td>
+					<td>Write every output file into this directory. It is created if it does not exist.</td>
+				</tr>
+				<tr>
+					<td><code>--recursive</code><br><span class="muted small">also <code>-r</code></span></td>
+					<td>Descend into subdirectories of a directory argument, keeping the relative structure underneath <code>--output-dir</code>.</td>
+				</tr>
+				<tr>
+					<td><code>--overwrite</code></td>
+					<td>Replace output files that already exist. Without it an existing output is left alone, which makes a second run convert only what is new.</td>
+				</tr>
+				<tr>
+					<td><code>--validate</code></td>
+					<td>Run the internal consistency checks: pitch validity, tie and slur pairing, measure durations against the time signature, empty staves. Problems are reported as warnings.</td>
+				</tr>
+				<tr>
+					<td><code>--format FORMAT</code></td>
+					<td>Output format. Only <code>musicxml</code>, the default, is implemented; anything else is refused rather than silently ignored.</td>
+				</tr>
+				<tr>
+					<td><code>--warnings FILE</code></td>
+					<td>Write warnings to this UTF-8 file as well as to standard error.</td>
+				</tr>
+				<tr>
+					<td><code>--verbose</code><br><span class="muted small">also <code>-v</code></span></td>
+					<td>One line per file as it is converted.</td>
+				</tr>
+				<tr>
+					<td><code>--quiet</code><br><span class="muted small">also <code>-q</code></span></td>
+					<td>Suppress all output that is not an error. Warnings are not suppressed; <code>--warnings</code> and the exit status still report them.</td>
+				</tr>
+				<tr>
+					<td><code>--debug</code></td>
+					<td>Trace the pipeline itself: records as they are dispatched, staff headers, annotation decisions. For diagnosing one score, not for a batch.</td>
+				</tr>
+				<tr>
+					<td><code>--help</code><br><span class="muted small">also <code>-h</code></span></td>
+					<td>Print the usage text and exit 1.</td>
+				</tr>
+				<tr>
+					<td><code>--version</code><br><span class="muted small">also <code>-V</code></span></td>
+					<td>Print the program name and version and exit 0.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<p class="caption">
+		Short options can be bundled — <code>-rv</code> is
+		<code>--recursive --verbose</code> — and case matters, so
+		<code>-V</code> is the version while <code>-v</code> is verbose.
+	</p>
+
+	<h2>Exit codes</h2>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>Code</th><th>Meaning</th><th>What to do</th></tr></thead>
+			<tbody>
+				<tr><td><code>0</code></td><td>Converted, no warnings.</td><td>Nothing.</td></tr>
+				<tr><td><code>1</code></td><td>Converted, with warnings.</td><td>Read the warnings: part of the score was not understood, and the output should be checked.</td></tr>
+				<tr><td><code>2</code></td><td>Invalid or unsupported input.</td><td>The file is missing, unreadable, or not an NWC 2.x container.</td></tr>
+				<tr><td><code>3</code></td><td>Output error.</td><td>The output file or directory could not be written: permissions, or a full disc.</td></tr>
+				<tr><td><code>4</code></td><td>Internal error.</td><td>A bug. Report it with the file and the <code>--debug</code> trace.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		A batch reports <code>1</code> when any file warned, and a per-file
+		failure is counted and reported without stopping the batch. A script that
+		wants to distinguish "some files failed" from "some files warned" should
+		use the Perl API, where the counts are returned separately.
+	</p>
+
+	<h2>Examples</h2>
+<pre><code><span class="comment"># beside the input</span>
+nwc2musicxml Pilgrim.nwc
+
+<span class="comment"># an explicit output path</span>
+nwc2musicxml Pilgrim.nwc out/Pilgrim.musicxml
+
+<span class="comment"># every score in a folder, into one output folder</span>
+nwc2musicxml --output-dir musicxml *.nwc
+
+<span class="comment"># a tree, keeping its shape, replacing what is already there</span>
+nwc2musicxml -r --overwrite -o musicxml scores/
+
+<span class="comment"># check a score and keep a log of what was said about it</span>
+nwc2musicxml --validate --warnings conv.log Pilgrim.nwc
+</code></pre>
+
+	<h2>Batch output</h2>
+	<p>
+		A batch prints a summary when it finishes: how many files were processed,
+		how many converted, how many warned, and how many failed. The summary goes
+		to standard error, so standard output stays free for whatever the calling
+		script is doing with it.
+	</p>
+
+	<h2>The same work in Perl</h2>
+	<p>
+		Everything the command does is a method call. <code>--output-dir</code> is
+		<code>output_dir</code>, <code>--recursive</code> is
+		<code>recursive</code>, and the progress messages are
+		<code>log_level</code>. <a href="api.html">The Perl API page</a> has the
+		signatures.
+	</p>
+
+	<div class="note">
+		<span class="note-title">The manual page</span>
+		<p>
+			<code>perldoc nwc2musicxml</code> prints the same options and examples
+			from the installed distribution, which is the version to trust if this
+			page and your installation ever disagree.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="quickstart.html">← Quick start</a>
+		<a href="api.html">Perl API →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Music::NWC2MusicXML 0.003.1 — Copyright 2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/pod/Music::NWC2MusicXML">MetaCPAN</a> ·
+			<a href="https://metacpan.org/pod/nwc2musicxml">nwc2musicxml</a> ·
+			<a href="https://github.com/nigelhorne/NWC2MusicXML">Source</a> ·
+			<a href="https://nigelhorne.github.io/nwc2musicxml/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

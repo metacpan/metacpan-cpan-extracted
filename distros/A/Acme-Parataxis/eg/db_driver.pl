@@ -46,6 +46,10 @@ my $QUERY_LATENCY_MS = 20;
 my @QUERIES          = ( 1 .. 12, 1 .. 12 );    # 24, two rounds so the row count is 2 * 78
 my $EXPECTED_ROWS    = 2 * ( 12 * 13 / 2 );
 my $PORT             = 0;                       # set once the child reports the port it bound
+my $STARTUP_WAIT     = do {                     # seconds; raise on loaded hosts if needed
+    my $e = $ENV{PARATAXIS_DB_STARTUP_WAIT};
+    ( defined $e && $e =~ /\A[1-9][0-9]*\z/ ) ? $e : 10;
+};
 
 # A child perl running a non-blocking, round-robin line server. It never forks
 # and never threads, so this is the same shape on every platform; concurrency
@@ -225,7 +229,7 @@ my ( $sfh, $spath ) = tempfile( 'parataxis-db-server-XXXXXX', TMPDIR => 1, UNLIN
 print $sfh $SERVER or die "cannot write the database program: $!";
 close $sfh         or die "cannot write the database program: $!";
 open my $child, '-|', $^X, $spath, $ppath, $QUERY_LATENCY_MS or die "cannot start the database: $!";
-for ( 1 .. 200 ) {
+for ( 1 .. int( $STARTUP_WAIT / 0.05 ) ) {
     if ( open my $rfh, '<', $ppath ) {
         chomp( my $l = <$rfh> // '' );
         close $rfh;
@@ -233,7 +237,7 @@ for ( 1 .. 200 ) {
     }
     select undef, undef, undef, 0.05;
 }
-die "the database never reported a port\n" if !$PORT;
+die "the database never reported a port within ${STARTUP_WAIT}s\n" if !$PORT;
 say "parataxis database driver: talking to a blocking server on 127.0.0.1:$PORT";
 say sprintf '  %d queries, %d rows expected, %dms server latency per query', scalar @QUERIES, $EXPECTED_ROWS, $QUERY_LATENCY_MS;
 run(
@@ -281,19 +285,19 @@ run(
         say sprintf '  %d fibers were resident in the one shared closure read_reply() at the same time', $INSIDE_MAX;
         say '';
 
-        # 3. The point of the demo, and the self-test. The overlap is checked
-        #    two ways on purpose: $INSIDE_MAX is the mechanism (fibers really
-        #    were resident in the shared closure together) and is exact, while
-        #    the wall clock is the consequence and is only given a loose bound
-        #    so a loaded machine cannot make this flaky.
+        # 3. The point of the demo, and the self-test. The overlap is checked by
+        #    $INSIDE_MAX: fibers really were resident in the shared closure
+        #    together. The wall clock is reported, not asserted, because a
+        #    loaded host can make any speedup ratio flaky.
         my @bad;
         push @bad, "row count: got " . scalar(@parked) . ", expected $EXPECTED_ROWS" if @parked != $EXPECTED_ROWS;
         push @bad, 'the two transports returned different rows'                      if join( "\0", @blocking ) ne join( "\0", @parked );
         push @bad, "the waits never overlapped: only $INSIDE_MAX fiber(s) in the shared closure at once" if $INSIDE_MAX < 2;
-        push @bad, sprintf 'no speedup: async %.3fs vs sync %.3fs', $t_park, $t_block if $t_park * 3 > $t_block;
         die "self-test failed:\n  - $_\n" for @bad;
+        my $ratio = $t_park > 0 ? $t_block / $t_park : 0;
         say sprintf '  identical rows from both transports: %d',                             scalar @parked;
-        say sprintf '  %.1fx faster with the same server, the same SQL and the same result', $t_block / $t_park;
+        say sprintf '  %.1fx faster with the same server, the same SQL and the same result', $ratio;
+        say '  timing varies with host load; the resident-fiber count above is the exact overlap check.';
         say '  the only difference was await_read() where the driver used to call sysread().';
         stop();
     }

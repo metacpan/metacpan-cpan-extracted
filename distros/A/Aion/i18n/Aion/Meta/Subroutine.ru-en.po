@@ -18,6 +18,9 @@ msgstr "Creates a wrapper function that checks the signature."
 msgid "Сверяет свою (ожидаемую) сигнатуру с объявленной у функции в модуле и выбрасывает исключение, если сигнатуры не совпадают."
 msgstr "Checks its (expected) signature against the one declared by the function in the module and throws an exception if the signatures do not match."
 
+msgid "Но вторая сигнатура может иметь суженные типы."
+msgstr "But the second signature may have narrowed types."
+
 msgid "Строковое описание функции."
 msgstr "String description of the function."
 

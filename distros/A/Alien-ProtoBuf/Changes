@@ -1,5 +1,10 @@
 Revision history for Alien-ProtoBuf
 
+0.11      2026-11-28 09:57:20 CET
+
+    - Try to set C++ standard version correctly for newer
+      protobuf versions
+
 0.10      2026-11-12 09:13:49 CET
 
     - Add minimum Alien::Base version

@@ -27,7 +27,7 @@ our
      $NOSUCH, $BIGINT, $REPEATERS,
      $BACKOFF_FLOOR, $MAX_FAILED_BULKWALKS, $SLOW_DEVICE_TABLES);
 
-$VERSION = '3.985004';
+$VERSION = '3.985005';
 
 =head1 NAME
 
@@ -35,7 +35,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.985004
+SNMP::Info - Version 3.985005
 
 =head1 AUTHOR
 
@@ -412,6 +412,13 @@ See documentation in L<SNMP::Info::FDP> for details.
 SNMP Interface to data available through the F<IEEE8021-Q-BRIDGE-MIB>
 
 See documentation in L<SNMP::Info::IEEE802_Bridge> for details.
+
+=item SNMP::Info::IEEE802_STP
+
+Spanning trees from the F<IEEE8021-SPANNING-TREE-MIB> and
+F<IEEE8021-MSTP-MIB>.
+
+See documentation in L<SNMP::Info::IEEE802_STP> for details.
 
 =item SNMP::Info::IEEE802dot11
 
@@ -1092,6 +1099,12 @@ See documentation in L<SNMP::Info::Layer3::Lantronix> for details.
 Subclass for Lenovo switches running CNOS.
 
 See documentation in L<SNMP::Info::Layer3::Lenovo> for details.
+
+=item SNMP::Info::Layer3::Maipu
+
+Subclass for Maipu switches running MyPower.
+
+See documentation in L<SNMP::Info::Layer3::Maipu> for details.
 
 =item SNMP::Info::Layer3::Meraki
 
@@ -2666,6 +2679,11 @@ sub device_type {
     # sysServices; the TNS switches under 57344.2 keep the generic classes.
     return 'SNMP::Info::Layer3::Tachyon'
         if $soid =~ /^\.?1\.3\.6\.1\.4\.1\.57344\.1(?:\.|$)/;
+
+    # Maipu switches register under mpSwitch (5651.1.102) and may serve
+    # sysServices without layer 2; routers under 5651.1.101 keep Layer3.
+    return 'SNMP::Info::Layer3::Maipu'
+        if $soid =~ /^\.?1\.3\.6\.1\.4\.1\.5651\.1\.102(?:\.|$)/;
 
     # SONiC reports a fixed sysServices of 72 and, by distribution, Net-SNMP's,
     # Dell's or Broadcom's sysObjectID, so only sysDescr identifies it. Some

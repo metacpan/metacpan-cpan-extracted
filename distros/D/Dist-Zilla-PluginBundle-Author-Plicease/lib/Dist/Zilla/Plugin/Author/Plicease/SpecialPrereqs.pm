@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.81 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.82 {
 
-  use 5.022;
+  use 5.024;
   use Moose;
   use experimental qw( postderef );
   use Dist::Zilla::Plugin::Author::Plicease;
@@ -294,7 +294,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.81
+version 2.82
 
 =head1 SYNOPSIS
 

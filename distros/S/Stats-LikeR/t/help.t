@@ -14,7 +14,7 @@
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # Wrap a call so any help text lands in a string instead of the TAP stream.
 # Returns ($printed, $died_with, @returned).

@@ -11,7 +11,7 @@ use experimental 'class';
 # This is a port of the Channel class of the JavaScript client and is meant
 # to behave identically.
 class BoardStreams::Client::Channel {
-    our $VERSION = "v0.0.58";
+    our $VERSION = "v0.0.60";
 
     use Mojo::Promise;
     use RxPerl::Mojo qw(rx_behavior_subject rx_observable rx_replay_subject rx_subject op_filter op_map);

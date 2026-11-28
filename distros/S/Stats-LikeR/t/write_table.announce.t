@@ -32,7 +32,7 @@ sub child_stdout {
 	my ($code) = @_;
 	my $script = "$dir/child_" . ++$child_no . ".pl";
 	open my $fh, '>', $script or die "cannot write $script: $!";
-	print {$fh} "use Stats::LikeR;\n", $code, "\n";
+	print {$fh} "use Stats::LikeR qw(:all);\n", $code, "\n";
 	close $fh or die "cannot write $script: $!";
 
 	my @inc = map { "-I$_" } grep { !ref $_ } @INC;

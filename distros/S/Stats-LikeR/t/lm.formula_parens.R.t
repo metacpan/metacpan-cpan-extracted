@@ -11,7 +11,7 @@
 # Re-run: d <- data.frame(y=..., x=1:8, z=...); coef(lm(<formula>, d)).
 require 5.010; use strict; use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my %d = (y => [1,2.5,3,4.5,5,7.5,7,8.5], x => [1..8], z => [2,1,4,3,6,5,8,9]);
 # [formula, [coefficient name, R value] ...]

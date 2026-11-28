@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perl API — Music::NWC2MusicXML</title>
+<meta name="description" content="new, convert, batch_convert and diagnostics: the Music::NWC2MusicXML API, its arguments and return values, plus the three stages underneath it.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="api.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Music::NWC2MusicXML">
+<meta property="og:title" content="Perl API — Music::NWC2MusicXML">
+<meta property="og:description" content="new, convert, batch_convert and diagnostics: the Music::NWC2MusicXML API, its arguments and return values, plus the three stages underneath it.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Music::NWC2MusicXML</span>
+			<span class="brand-tag">NoteWorthy Composer scores to MusicXML</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="commands.html">Commands</a>
+			<a href="api.html" class="current" aria-current="page">Perl API</a>
+			<a href="formats.html">What converts</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Perl API</h1>
+	<p class="lead">
+		The facade is deliberately small: build one converter and use it for as
+		many scores as you have. The stages underneath it are public too, and can
+		be driven one at a time when something needs inspecting between them.
+	</p>
+
+	<div class="toc">
+		<p>On this page</p>
+		<ul>
+			<li><a href="#program">A complete program</a></li>
+			<li><a href="#new">new</a></li>
+			<li><a href="#convert">convert</a></li>
+			<li><a href="#batch">batch_convert</a></li>
+			<li><a href="#diagnostics">diagnostics</a></li>
+			<li><a href="#defaults">Class-level defaults</a></li>
+			<li><a href="#stages">The stages on their own</a></li>
+		</ul>
+	</div>
+
+	<h2 id="program">A complete program</h2>
+<pre><code>use strict;
+use warnings;
+
+use Music::NWC2MusicXML;
+
+my $converter = Music::NWC2MusicXML-&gt;new(log_level =&gt; 'normal');
+
+for my $input (@ARGV) {
+	my $out = $converter-&gt;convert(input =&gt; $input, overwrite =&gt; 1);
+	if (defined $out) {
+		print &quot;converted $input -&gt; $out\n&quot;;
+	} else {
+		warn &quot;could not convert $input\n&quot;;
+	}
+}
+
+exit($converter-&gt;diagnostics-&gt;has_warnings ? 1 : 0);
+</code></pre>
+
+	<h2 id="new">new</h2>
+	<p>
+		Builds a converter and the decoder, parser and generator it will use, so
+		they are constructed once rather than per file.
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>Argument</th><th>Meaning</th></tr></thead>
+			<tbody>
+				<tr><td><code>log_level</code></td><td><code>quiet</code>, <code>normal</code> (the default), <code>verbose</code> or <code>debug</code>.</td></tr>
+				<tr><td><code>warnings_fh</code></td><td>An open filehandle for warnings. Defaults to standard error, via the diagnostics object.</td></tr>
+				<tr><td><code>validate</code></td><td>Run the extended consistency checks. Off by default; the same thing as <code>--validate</code>.</td></tr>
+			</tbody>
+		</table>
+	</div>
+<pre><code>my $c = Music::NWC2MusicXML-&gt;new(log_level =&gt; 'verbose', validate =&gt; 1);
+</code></pre>
+	<p>Returns the blessed converter. It emits no messages of its own.</p>
+
+	<h2 id="convert">convert</h2>
+	<p>
+		The single-file entry point: decode, parse, generate, write. Fatal problems
+		<code>croak</code>; everything that can be survived is a warning and the
+		conversion continues.
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>Argument</th><th>Meaning</th></tr></thead>
+			<tbody>
+				<tr><td><code>input</code></td><td>Path to the <code>.nwc</code> file. Required.</td></tr>
+				<tr><td><code>output</code></td><td>Path for the MusicXML file. Optional; defaults to the input path with <code>.musicxml</code> in place of <code>.nwc</code>.</td></tr>
+				<tr><td><code>overwrite</code></td><td>Replace an existing output file. Off by default, in which case an existing file is left alone.</td></tr>
+			</tbody>
+		</table>
+	</div>
+<pre><code>my $out = $c-&gt;convert(
+	input     =&gt; 'Pilgrim.nwc',
+	output    =&gt; 'out/Pilgrim.musicxml',
+	overwrite =&gt; 1,
+);
+</code></pre>
+	<p>
+		Returns the output path on success and <code>undef</code> on failure, with
+		the reason on the diagnostics object. It writes the output file and
+		updates the diagnostic counters as side effects.
+	</p>
+
+	<h2 id="batch">batch_convert</h2>
+	<p>
+		Converts a list of files in sequence. A file that fails is caught and
+		counted; the rest of the list is still converted, and a summary is printed
+		at the end.
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>Argument</th><th>Meaning</th></tr></thead>
+			<tbody>
+				<tr><td><code>inputs</code></td><td>Array reference of input paths. Required.</td></tr>
+				<tr><td><code>output_dir</code></td><td>Directory for the outputs. Optional; by default each file is written beside its input.</td></tr>
+				<tr><td><code>overwrite</code></td><td>Replace existing outputs. Off by default.</td></tr>
+				<tr><td><code>recursive</code></td><td>Keep each file's relative path below <code>output_dir</code>. Off by default.</td></tr>
+				<tr><td><code>base_dir</code></td><td>The directory stripped when working out that relative path, so the output does not repeat <code>scores/</code> because the input began there.</td></tr>
+			</tbody>
+		</table>
+	</div>
+<pre><code>my $counts = $c-&gt;batch_convert(
+	inputs     =&gt; [ glob('scores/**/*.nwc') ],
+	output_dir =&gt; 'musicxml',
+	recursive  =&gt; 1,
+	base_dir   =&gt; 'scores',
+	overwrite  =&gt; 1,
+);
+
+# { processed =&gt; 12, successful =&gt; 11, warnings =&gt; 3, failed =&gt; 1 }
+printf &quot;%d of %d converted, %d failed\n&quot;,
+	$counts-&gt;{successful}, $counts-&gt;{processed}, $counts-&gt;{failed};
+</code></pre>
+	<p>
+		Returns a hash reference of counts: <code>processed</code>,
+		<code>successful</code>, <code>warnings</code> and <code>failed</code>.
+		It does not <code>croak</code> because one score was bad.
+	</p>
+
+	<h2 id="diagnostics">diagnostics</h2>
+	<p>
+		Returns the <code>Music::NWC2MusicXML::Diagnostics</code> object the
+		converter has been using. It carries the warning count, and every message
+		the pipeline produces goes through its catalogue, so warnings read the same
+		way whether they came from the decoder, the parser or the generator.
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>Code</th><th>Meaning</th><th>Resolution</th></tr></thead>
+			<tbody>
+				<tr><td><code>error_no_input</code></td><td>The <code>input</code> parameter was missing.</td><td>Pass an input path.</td></tr>
+				<tr><td><code>error_file_not_found</code></td><td>The input file does not exist, or cannot be read.</td><td>Check the path and its permissions.</td></tr>
+				<tr><td><code>error_decode</code></td><td>The NWC decoding stage failed.</td><td>The file is not an NWC 2.x container, or its payload is damaged. See the embedded error.</td></tr>
+				<tr><td><code>error_parse</code></td><td>The NWCTXT parsing stage failed.</td><td>See the embedded error: it names the record that could not be understood.</td></tr>
+				<tr><td><code>error_generate</code></td><td>MusicXML generation failed.</td><td>See the embedded error. Usually a score the model could not describe.</td></tr>
+				<tr><td><code>error_write</code></td><td>The output file could not be written.</td><td>Check permissions and free space.</td></tr>
+				<tr><td><code>error_mkdir</code></td><td>The output directory could not be created.</td><td>Check the permissions of its parent.</td></tr>
+			</tbody>
+		</table>
+	</div>
+<pre><code>my $diag = $c-&gt;diagnostics;
+if ($diag-&gt;has_warnings) {
+	print &quot;converted with warnings\n&quot;;
+}
+</code></pre>
+
+	<h2 id="defaults">Class-level defaults</h2>
+	<p>
+		The converter uses <a href="https://metacpan.org/pod/Object::Configure">Object::Configure</a>,
+		so defaults can be set once for the whole process instead of being
+		repeated at each <code>new</code>:
+	</p>
+<pre><code>use Music::NWC2MusicXML;
+
+Music::NWC2MusicXML-&gt;configure(log_level =&gt; 'verbose');
+
+my $c = Music::NWC2MusicXML-&gt;new;   <span class="comment"># already verbose</span>
+</code></pre>
+	<p>
+		That is convenient in a long-running program, and worth knowing about in
+		one that is not yours: a module or a configuration file that has called
+		<code>configure</code> changes the behaviour of every later
+		<code>new</code>. An explicit argument still wins.
+	</p>
+
+	<h2 id="stages">The stages on their own</h2>
+	<p>
+		The facade chains three objects, and nothing stops you chaining them
+		yourself. That is how a score can be inspected between decoding and
+		generation — and it is what the golden-file regression test does:
+	</p>
+<pre><code>use Music::NWC2MusicXML::NWC;
+use Music::NWC2MusicXML::Parser;
+use Music::NWC2MusicXML::MusicXML;
+
+my $score = Music::NWC2MusicXML::Parser-&gt;new-&gt;parse(
+	Music::NWC2MusicXML::NWC-&gt;read('t/input/my_score.nwc')
+);
+
+my $xml = Music::NWC2MusicXML::MusicXML-&gt;new-&gt;generate($score);
+
+open my $fh, '&gt;', 't/input/my_score.musicxml' or die $!;
+print {$fh} $xml;
+close $fh;
+</code></pre>
+	<div class="table-wrap">
+		<table>
+			<thead><tr><th>Stage</th><th>Call</th><th>Gives you</th></tr></thead>
+			<tbody>
+				<tr><td>Decode</td><td><code>Music::NWC2MusicXML::NWC-&gt;read($path)</code></td><td>The NWCTXT text the container was built from: pipe-delimited records, one per line.</td></tr>
+				<tr><td>Parse</td><td><code>Music::NWC2MusicXML::Parser-&gt;new-&gt;parse($text)</code></td><td>A <code>Score</code> of <code>Staff</code> objects, each holding <code>Event</code> objects with exact rational durations.</td></tr>
+				<tr><td>Generate</td><td><code>Music::NWC2MusicXML::MusicXML-&gt;new-&gt;generate($score)</code></td><td>The MusicXML document, as a string.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		The score model is plain data with accessors, so a program that needs to
+		know what a file contains — the staves, their instruments, the number of
+		measures — can stop after parsing and ask, without producing XML at all.
+	</p>
+
+	<div class="pager">
+		<a href="commands.html">← Commands</a>
+		<a href="formats.html">What converts →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Music::NWC2MusicXML 0.003.1 — Copyright 2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/pod/Music::NWC2MusicXML">MetaCPAN</a> ·
+			<a href="https://metacpan.org/pod/nwc2musicxml">nwc2musicxml</a> ·
+			<a href="https://github.com/nigelhorne/NWC2MusicXML">Source</a> ·
+			<a href="https://nigelhorne.github.io/nwc2musicxml/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

@@ -28,7 +28,7 @@ resources:
   bugtracker: https://github.com/miyagawa/CGI-PSGI/issues
   homepage: https://github.com/miyagawa/CGI-PSGI
   repository: https://github.com/miyagawa/CGI-PSGI.git
-version: '0.16'
+version: '0.17'
 x_contributors:
   - 'Anirvan Chatterjee <x.github@chatterjee.net>'
   - 'Chia-liang Kao <clkao@clkao.org>'

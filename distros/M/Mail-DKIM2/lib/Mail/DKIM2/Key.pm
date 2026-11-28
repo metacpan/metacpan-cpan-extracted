@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Scalar::Util ();
 use MIME::Base64 qw(decode_base64);

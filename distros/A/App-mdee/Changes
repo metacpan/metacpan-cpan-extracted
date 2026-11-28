@@ -1,5 +1,24 @@
 Revision history for Perl extension App-mdee
 
+1.32 2026-11-28T01:14:25Z
+
+    - Mermaid diagrams: with mermaid in --image (not in the default,
+      --image=png,jpeg,gif,mermaid), a fenced code block of mermaid is
+      followed by the image of its diagram, drawn by mmdr of
+      mermaid-rs-renderer and kept in mdee-mermaid-UID of the temporary
+      directory (--config mermaid_theme, mermaid_background,
+      mermaid_scale, mermaid_command); by AIKAWA Shigechika (#15)
+    - Images are put in the middle of the fold width
+      (--config image_align=left for the left end)
+    - --refill: a paragraph between a code block and an image below it
+      is folded again (#14, by AIKAWA Shigechika)
+
+1.31 2026-11-27T11:08:34Z
+
+    - --keep TYPE=WHAT (default[keep] in config.sh) tells what of a
+      block is kept in one pane of nup: for table, none, row, head
+      (the default, as before) or all
+
 1.30 2026-11-27T02:51:27Z
 
     - Require App::nup 1.26, and give it the output width by -w and

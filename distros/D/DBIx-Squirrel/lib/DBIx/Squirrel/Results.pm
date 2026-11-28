@@ -9,7 +9,7 @@ use DBIx::Squirrel::Result   qw();
 
 use namespace::clean;
 
-our $VERSION = 'v4.2.0';
+our $VERSION = 'v4.3.0';
 
 our @ISA = ('DBIx::Squirrel::Iterator');
 

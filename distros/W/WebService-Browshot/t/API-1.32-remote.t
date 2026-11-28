@@ -8,8 +8,7 @@ use WebService::Browshot;
 plan skip_all => 'Set BROWSHOT_REMOTE_TESTS and BROWSHOT_KEY to enable API tests'
 	if (! $ENV{BROWSHOT_REMOTE_TESTS} || ! $ENV{BROWSHOT_KEY});
 
-my %args = (key => $ENV{BROWSHOT_KEY});
-$args{base} = $ENV{BROWSHOT_BASE} if ($ENV{BROWSHOT_BASE});
+my %args = (key => $ENV{BROWSHOT_KEY}, base => $ENV{BROWSHOT_BASE} || 'https://api.browshot.com/api/v1/');
 my $browshot = WebService::Browshot->new(%args);
 my $account = $browshot->account_info();
 ok(exists $account->{balance}, 'Authenticated account has a balance');

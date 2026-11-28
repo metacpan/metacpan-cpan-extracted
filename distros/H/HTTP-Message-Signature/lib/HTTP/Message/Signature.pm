@@ -8,27 +8,30 @@ use Moo;
 use Carp qw( carp croak );
 use Crypt::PK::Ed25519;
 use Crypt::PK::RSA;
-use Hash::MultiValue;
 use Hash::Ordered;
 use HTTP::Message;
-use HTTP::StructuredField v0.0.3;
-use HTTP::Tiny;
-use JSON          qw( decode_json );
+use HTTP::Request;
+use HTTP::StructuredField v0.0.5;
+use LWP::UserAgent;
+use JSON          qw( decode_json ); # used by CryptX
 use List::Util    1.29 qw( first pairmap );
 use MIME::Base64  qw( decode_base64 );
 use PerlX::Maybe  qw( maybe );
-use Ref::Util     qw( is_plain_hashref );
+use Ref::Util     qw( is_blessed_ref is_plain_hashref );
 use String::Util  qw( trim unquote );
 use Syntax::Keyword::Match;
-use Types::Common qw( Bool HashRef InstanceOf NonEmptyStr  );
+use Types::Common qw( Bool HashRef InstanceOf NonEmptyStr PositiveInt );
 use Types::URI    qw( Uri );
 use URI;
+
+# RECOMMEND PREREQ: Ref::Util::XS
+# RECOMMEND PREREQ: Type::Tiny::XS
 
 use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.3';
+our $VERSION = 'v0.1.0';
 
 
 
@@ -59,11 +62,18 @@ has is_response => (
 );
 
 
+has request => (
+    is        => 'ro',
+    isa       => InstanceOf [qw/ HTTP::Request /],
+    predicate => 1,
+);
+
+
 has user_agent => (
     is      => 'lazy',
-    isa     => InstanceOf ['HTTP::Tiny'],
+    isa     => InstanceOf ['LWP::UserAgent'],
     builder => sub($self) {
-        return HTTP::Tiny->new;
+        return LWP::UserAgent->new;
     },
 );
 
@@ -71,8 +81,17 @@ has user_agent => (
 has signature_agent => (
     is      => 'lazy',
     isa     => NonEmptyStr,
+    coerce  => sub($uri) {
+        if (is_blessed_ref($uri) && $uri->isa("URI")) {
+            return $uri->scheme . "://" . $uri->authority;
+        }
+        return "$uri";
+    },
     builder => sub($self) {
-        my $agent = join(",", $self->headers->header("signature-agent") );
+        my $agent = join(",", $self->headers->header("signature-agent") // "" );
+        if ( !$agent && $self->is_response ) {
+            return $self->request->uri;
+        }
         if ( $agent =~ /\A [a-z\*][a-z0-1_\-\.\*]* = /ax ) {
             my ($key) = $self->headers->header("signature-agent-key") || $self->signature_labels;
             my $agents = HTTP::StructuredField->parse_dictionary(  $agent );
@@ -124,16 +143,44 @@ has public_keys_json => (
     isa     => NonEmptyStr,
     builder => sub($self) {
 
-        # TODO: add support for caching keys by URL
-
         state $types = { map { $_ => 1 } qw[ application/http-message-signatures-directory+json application/json ] };
 
         my $uri = $self->signature_agent_uri;
         croak "agent_uri should be an https URL" unless $uri->scheme eq "https";
-        my $res =
-          $self->user_agent->get( "$uri", { headers => { 'Accept' => join( ",", keys $types->%* ) } } );
-        if ( $res->{success} && $types->{ $res->{headers}{'content-type'} } ) {
-            return $res->{content};
+
+        my $req = HTTP::Request->new(
+            GET => $uri,
+            [
+                Accept       => join( ",", keys $types->%* ),
+                'User-Agent' => sprintf( 'Perl-%s-%s', __PACKAGE__, $VERSION ),
+            ]
+        );
+
+        my $res = $self->user_agent->request($req);
+
+        if ( $res->is_success && $types->{ $res->content_type } ) {
+
+            if ( $self->verify_public_keys ) {
+
+                if ( $res->header("Signature-Input") && $res->header("Signature") ) {
+
+                    my $check = __PACKAGE__->new(
+                        request          => $req,
+                        response         => $res,
+                        require_tag      => "http-message-signatures-directory",
+                        public_keys_json => $res->decoded_content,
+                    );
+
+                    $check->verify or croak "signatures-directory was not signed";
+
+                }
+                else {
+                    carp "signatures-directory response was unsigned";
+                }
+
+            }
+
+            return $res->decoded_content;
         }
 
         croak "error retrieving ${uri}";
@@ -141,12 +188,33 @@ has public_keys_json => (
 );
 
 
+has verify_public_keys => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+);
+
+
 has public_keys => (
     is      => 'lazy',
     isa     => HashRef,       # TODO make strict validation optional
     builder => sub($self) {
-        return decode_json( $self->public_keys_json );
+        my $pks = decode_json( $self->public_keys_json );
+        my $max = $self->max_keys;
+        if ( defined $pks->{keys}[$max] ) {
+            splice( $pks->{keys}->@*, $max );
+            carp "public_keys truncated to the first ${max} keys";
+        }
+        return $pks;
     },
+);
+
+
+
+has max_keys => (
+    is      => 'ro',
+    isa     => PositiveInt,
+    default => 100,
 );
 
 
@@ -163,10 +231,28 @@ sub is_expired($self) {
 }
 
 
-sub verify( $self, $label = undef ) {
+sub verify( $self, $options = undef ) {
 
-    ($label) = $self->signature_labels unless defined $label;
+    $options //= {};
+    $options = { label => $options } unless is_plain_hashref($options);
+
+    my $label = $options->{label};
+
+    unless (defined $label) {
+        ($label) = $self->signature_labels;
+        $options->{label} //= $label;
+    }
+
     my $input = $self->signature_input->get($label) or croak "signature-input label ${label} was not found";
+
+    if ( $options->{check_expires} //= 1 ) {
+        croak "signature is expired" if $self->is_expired;
+    }
+
+    if ( $options->{check_created} //= 1 ) {
+        my $created = $self->signature_input->get("created");
+        croak "signature is postdated" if $created && $created > time;
+    }
 
     if ( $self->has_require_tag ) {
         my $check = $input->params->get("tag");
@@ -202,12 +288,14 @@ sub verify( $self, $label = undef ) {
 
     my $sig = $self->signature_header->get($label)->value;
 
-    my $base = $self->_generate_signature_base($label);
+    my $base = $self->_generate_signature_base($options);
 
     return $pk->verify_message( $sig, $base, @params );
 }
 
-sub _generate_signature_base( $self, $label ) {
+sub _generate_signature_base( $self, $options ) {
+
+    my $label = $options->{label};
 
     my @buffer;
 
@@ -230,7 +318,7 @@ sub _generate_signature_base( $self, $label ) {
 
         my $name = unquote($field->value, braces => 1 );
         if ( substr($name, 0, 1) eq '@' ) {
-            _process_header_field( $self->_get_derived_field($field) );
+            _process_header_field( $self->_get_derived_field( $field, $options ) );
         }
         else {
 
@@ -260,54 +348,64 @@ sub _generate_signature_base( $self, $label ) {
     return join( "\n", @buffer );
 }
 
-sub _get_derived_field( $self, $field ) {
+sub _get_derived_field( $self, $field, $options ) {
 
     my $name = $field->value;
 
     # Note: HTTP::Message has uri_canonical but Plack::Request does not.
 
     state $handlers = {
-        '@status'     => sub( $message, $ ) { $message->code },
-        '@method'     => sub( $message, $ ) { $message->method },
-        '@target-uri' => sub( $message, $ ) { $message->uri },
-        '@authority'  => sub( $message, $ ) { $message->uri->authority },
-        '@scheme'     => sub( $message, $ ) { $message->uri->scheme },
-        '@path'       => sub( $message, $ ) { $message->uri->path },
-        '@query'      => sub( $message, $ ) {
+        '@status'     => sub( $message, $, $ ) { $message->code },
+        '@method'     => sub( $message, $, $ ) { $message->method },
+        '@target-uri' => sub( $message, $, $ ) { $message->uri },
+        '@authority'  => sub( $message, $, $ ) { $message->uri->authority },
+        '@scheme'     => sub( $message, $, $ ) { $message->uri->scheme },
+        '@path'       => sub( $message, $, $ ) { $message->uri->path },
+        '@query'      => sub( $message, $, $ ) {
             my $query = $message->uri_canonical->query;
             if ( defined $query ) {
                 return '?' . $query;
             }
             return undef;
         },
-        '@query-param' => sub( $message, $param ) {
-            if ( my ($name) = $param =~ /\A name = " ((?:\w+-)*\w+) " \z/ax ) {
-
-                # Note: RFC 9421 Sec 2.2.8 says named parameters with multiple values must not be included
-                my @values = $message->uri->query_param($name);
-                croak "multipe query-param values for '${name}'" if @values > 1;
-                return $values[0];
-            }
-        },
+        '@query-param' => sub( $message, $, $params ) {
+                if ( my ($key) = $params->keys ) {
+                    # Note: RFC 9421 Sec 2.2.8 says named parameters with multiple values must not be included
+                    my @values = $message->uri->query_param($key);
+                    croak "multipe query-param values for '${key}'" if @values > 1;
+                    return $values[0];
+                }
+        }
     };
 
     croak "unsupported field ${name}" unless exists $handlers->{$name};
 
-    my $quoted = "\"${name}\"";
+    my $quoted  = "\"${name}\"";
+    my $message = $self->message;
 
     my ($param, @extra) = $field->params->keys;
     if ( defined $param ) {
         croak "extra parameters in field ${name}" if @extra;
         $quoted .= ";" . unquote($param);
+        if ( $param eq "req" ) {
+            $message = $self->request;
+        }
     }
 
-    return ( maybe $quoted => $handlers->{$name}->( $self->message, $param ) );
+    return ( maybe $quoted => $handlers->{$name}->( $message, $options, $field->params ) );
 }
 
 
 sub BUILDARGS( $, @args ) {
 
     my %args = @args == 1 && is_plain_hashref( $args[0] ) ? $args[0]->%* : @args;
+
+    if (my $res = $args{response}) {
+        $args{message} = $res;
+    }
+    elsif (my $req = $args{request}) {
+        $args{message} = $req;
+    }
 
     my $message = $args{message};
     if ( is_plain_hashref($message) ) {
@@ -336,28 +434,48 @@ HTTP::Message::Signature - Verify HTTP Message Signatures (RFC 9421)
 
 =head1 VERSION
 
-version v0.0.3
+version v0.1.0
 
 =head1 SYNOPSIS
 
     use HTTP::Message::Signature;
 
+    # To verify a request
+
     try {
 
         my $sig = HTTP::Message::Signature->new(
-            message     => $request,         # HTTP::Request, Plack::Request or PSGI env hash
+            request     => $request,         # HTTP::Message, Plack::Request or PSGI env hash
             require_tag => 'web-bot-auth',
         );
-
-        $sig->is_expired and die "expired signature";
 
         $sig->verify or die "bad signature";
 
     }
     catch ($e) {
-
         ...
+    }
 
+    # To verify a response
+
+    use LWP::UserAgent;
+
+    my $agent    = LWP::UserAgent->new(...);
+    my $request  = HTTP::Request->new(...);
+    my $response = $agent->request($request);
+
+    try {
+
+        my $sig = HTTP::Message::Signature->new(
+            response => $response,
+            request  => $request,
+        );
+
+        $sig->verify or die "bad signature";
+
+    }
+    catch (e) {
+        ...
     }
 
 =head1 STATUS
@@ -382,6 +500,8 @@ Note that you can pass a L<PSGI> environment hash reference to the constructor.
 
 This is required.
 
+One may also use C<response> or C<request> in the constructor.
+
 =head2 is_request
 
 True if L</message> is a request.
@@ -390,11 +510,19 @@ True if L</message> is a request.
 
 True if L</message> is a response.
 
+=head2 request
+
+An L<HTTP::Request>. This is the corresponding request to a response in L</message>.
+
+=head2 has_request
+
+A predicate for request.
+
 =head2 user_agent
 
 The user agent used for requesting keys.
 
-This is a L<HTTP::Tiny> object.
+This is a L<LWP::UserAgent> object.
 
 =head2 signature_agent
 
@@ -427,9 +555,21 @@ The keys will be fetched from L</signature_agent_uri>.
 
 Cached keys should be saved here instead of L</public_keys>.
 
+=head2 verify_public_keys
+
+When true, the L</public_keys_json> will be verified when retrieved.
+
+This is false by default.
+
 =head2 public_keys
 
 This is the parsed L</public_keys_json>.
+
+=head2 max_keys
+
+This is the maximum number of public keys that will be processed.
+
+This is only enforced when setting keys through L</public_keys_json>.
 
 =head2 require_tag
 
@@ -451,11 +591,30 @@ This can be checked before verification to avoid the work of checking a signatur
 
 =head2 verify
 
-  $sig->verify( $label ) or die "Signature ${label} is not verified";
+  $sig->verify( \%options ) or die "Signature did not verify";
 
 Returns true if the signature was verified.
 
-The C<$label> defaults to the first L</signature_labels> if omitted.
+Options contains the following:
+
+=over
+
+=item C<label>
+
+This defaults to the first L</signature_labels> if omitted.
+
+=item C<check_expires>
+
+When true (by default), the expiration is checked.
+
+=item C<check_created>
+
+When true (by default), the created time is checked.
+
+=back
+
+Note: C<\%options> were added in v0.1.0.
+The C<label> was passed as the second argument in earlier versions,
 
 =for Pod::Coverage BUILDARGS
 

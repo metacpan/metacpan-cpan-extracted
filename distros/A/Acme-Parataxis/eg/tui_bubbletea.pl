@@ -343,16 +343,17 @@ sub input_fiber ( $ch, $quit ) {
                         }
                     }
                     else {
-                        Acme::Parataxis->await_read( $STDIN, 20 );
-                        my $extra = '';
-                        sysread( $STDIN, $extra, 8 );
-                        $seq .= $extra;
-                        while (1) {
-                            Acme::Parataxis->await_read( $STDIN, 5 );
-                            my $more = '';
-                            my $n    = sysread( $STDIN, $more, 8 );
-                            last unless $n && $n > 0;
-                            $seq .= $more;
+                        if ( Acme::Parataxis->await_read( $STDIN, 20 ) == 1 ) {
+                            my $extra = '';
+                            sysread( $STDIN, $extra, 8 );
+                            $seq .= $extra;
+                            while (1) {
+                                last unless Acme::Parataxis->await_read( $STDIN, 5 ) == 1;
+                                my $more = '';
+                                my $n    = sysread( $STDIN, $more, 8 );
+                                last unless $n && $n > 0;
+                                $seq .= $more;
+                            }
                         }
                     }
                     if    ( $seq eq "\e[A" )     { $ch->put( MsgKey("\e[A") ) }
@@ -428,7 +429,7 @@ async {
     hide_cursor();
     my $messages = Acme::Parataxis::Channel->new( capacity => 64 );
 
-    # Shared quit signal broadcast() wakes all fibers checking it
+    # Shared quit flag. send() remembers the signal when no one is waiting, and every fiber polls count.
     my $quit = Acme::Parataxis::Signal->new( count => 0 );
 
     # Query initial terminal size
@@ -449,7 +450,7 @@ async {
             'Channel-based message passing',
             'SIGWINCH resize support',
             'No Term::ReadKey dependency'
-        ],
+        ]
     };
 
     # Spawn concurrent fibers (use `fiber` it has the & prototype)

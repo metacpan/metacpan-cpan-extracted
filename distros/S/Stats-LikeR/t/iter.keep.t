@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use File::Temp 'tempdir';
 use File::Spec;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
 

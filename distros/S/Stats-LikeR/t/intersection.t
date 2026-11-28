@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 require 5.010;
 use Test::More;
 use Test::LeakTrace;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # basic intersection
 my @basic = intersection([1, 2, 3], [2, 3, 4]);

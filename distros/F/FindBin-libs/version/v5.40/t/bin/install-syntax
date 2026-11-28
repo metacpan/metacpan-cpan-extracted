@@ -8,6 +8,7 @@ use v5.40;
 use File::Basename        qw( basename dirname );
 use File::Path            qw( make_path        );
 use File::Spec::Functions qw( abs2rel catfile rel2abs );
+use YAML::Tiny;
 
 ########################################################################
 # locate project root and install paths
@@ -25,6 +26,22 @@ or die "chdir '$work_d': $!";
 
 -e $perl_t
 or die "Missing template: $perl_t";
+
+# the tests.yaml groups are copies of _stub_t made by install-tests,
+# which already has a syntax test; they are not checked again.
+
+my $yaml_f = catfile $test_d, 'etc', 'tests.yaml';
+
+my $yaml
+= YAML::Tiny->read( $yaml_f )
+or die "Cannot read test groups from '$yaml_f': "
+. YAML::Tiny->errstr . "\n";
+
+my $skip_re
+= join '|'
+=> map { quotemeta }
+   qw( blib version ), map { "t/$_" } sort keys $yaml->[0]->%*
+;
 
 make_path $dest_d;
 
@@ -51,7 +68,7 @@ my $target = abs2rel $perl_t, $dest_d;
 my %seen;
 my @perl_paths
 = grep { ! $seen{ $_ }++ }
-  grep { ! m{^ (?: blib | version ) /}x }
+  grep { ! m{ ^ (?: $skip_re ) / }x }
   grep { /\S/ }
   map  { chomp; $_ }
   (

@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.7] - 2026-11-28
+
+All about the benchmarks this time.
+
+### Changed
+
+- Remove always-on scheduler bookkeeping to tidy up our hot path:
+  - Skip priority scans and disabled `maybe_yield()` calls
+  - Track live fibers incrementally
+  - Gate diagnostic counters
+  - Keep park/queue state in pre-sized fiber slots
+  - Use raw fiber lookups plus a shared `['WAITING']` marker on the park/resume path.
+- Eliminate repeated C job-pool scans and lock churn:
+  - Maintain pending counts and free/pending/sleep bitmaps
+  - Drain completions under one lock
+  - Merge completion publication with the next claim
+  - Deliver results in a flat buffer
+- Make short waits cheaper without turning long idle periods into busy loops:
+  - Bounded sub-millisecond polling after job activity
+  - Longer fast-poll budget
+  - Wall clock spin windows for sub-tick sleeps
+  - High res `yield` spin for Windows sleeps up to 8 ms
+- Reduce startup and virtual-timer work with a single fiber-table scan/call and ordered timers using a compacted fired prefix and parallel deadline/fiber arrays instead of per-timer arrayrefs.
+- Trim common wait/cleanup paths by inlining the usual `Channel::get()`/`put()` case, skipping fiber-local cleanup when no locals exist and stopping backtrace capture at the first library frame.
+
+### Fixed
+
+- Size the high-volume driver tests against the descriptors they actually allocate, so a platform with more than the assumed 16 pre-existing handles (NetBSD 11, whose `FD_SETSIZE` is 256) no longer parks a read on an unnameable fd and loses a wakeup. (https://matrix.perl-magpie.org/results/e76ea43a-e600-11f1-83c9-deb385cf8ea6)
+
 ## [v0.1.6] - 2026-11-20
 
 ### Fixed
@@ -252,7 +281,8 @@ Another dist targetting a specific CPAN smoker. I cannot replicate the failure i
 ### Changes
   - It exists! It shouldn't but it does.
 
-[Unreleased]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.6...HEAD
+[Unreleased]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.7...HEAD
+[v0.1.7]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.6...v0.1.7
 [v0.1.6]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.5...v0.1.6
 [v0.1.5]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.4...v0.1.5
 [v0.1.4]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.3...v0.1.4

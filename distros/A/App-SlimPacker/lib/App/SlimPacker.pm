@@ -7,7 +7,7 @@ use App::SlimPacker::Minify qw(
     rename_module_name rename_module_path
 );
 use Exporter 'import';
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our @EXPORT_OK = qw(
     process process_deps minify_file name_gen needs_space
     pack_string perl_switches plugin_search_paths inline_plugins
@@ -164,7 +164,7 @@ App::SlimPacker - fatpack-style bundling helpers with PPI-based minification for
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 

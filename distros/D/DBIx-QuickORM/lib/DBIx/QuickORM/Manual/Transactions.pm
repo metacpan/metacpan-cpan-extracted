@@ -2,306 +2,352 @@ package DBIx::QuickORM::Manual::Transactions;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000031';
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Manual::Transactions - Transactions, savepoints, retries, and the rows you hold, by example.
+
+=head1 DESCRIPTION
+
+C<< $orm->txn >> opens a transaction. One opened inside another is a
+savepoint.
+
+=head1 SCHEMA
+
+The examples use PostgreSQL and this schema:
+
+=for highlighter language=sql
+
+    CREATE TABLE users (
+        id          SERIAL PRIMARY KEY,
+        name        TEXT NOT NULL,
+        email       TEXT UNIQUE,
+        prefs       JSON,
+        referred_by INTEGER REFERENCES users (id),
+        created     TIMESTAMP NOT NULL DEFAULT now()
+    );
+
+    CREATE TABLE posts (
+        id      SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users (id),
+        title   TEXT NOT NULL,
+        views   INTEGER NOT NULL DEFAULT 0
+    );
+
+=head1 BLOCK FORM
+
+=for highlighter language=perl
+
+    $orm->txn(sub {
+        my $ann = $orm->insert(users => {name => 'Ann'});
+        $orm->insert(posts => {
+            user_id => $ann->field('id'),
+            title   => 'Hello',
+        });
+    });    # commits when the block returns
+
+    my $ok = eval {
+        $orm->txn(sub {
+            $orm->insert(users => {name => 'Bob'});
+            die "no\n";    # rolls back, and the exception is rethrown
+        });
+        1;
+    };
+
+    # returns what the block returns
+    my $count = $orm->txn(sub { $orm->handle('users')->count });
+
+    $orm->txn(sub {
+        my $txn = shift;
+        $orm->insert(users => {name => 'Cy'});
+        # or commit: the transaction is over, and the rest of the block runs outside it
+        $txn->rollback;
+    });
+
+=head1 OBJECT FORM
+
+    my $txn = $orm->txn;
+    $orm->insert(users => {name => 'Di'});
+    $txn->commit;
+
+    my $undo = $orm->txn;
+    $orm->insert(users => {name => 'Eve'});
+    $undo->rollback;
+
+C<commit> and C<rollback> end the transaction, not your code: what follows
+them runs outside it. A transaction object that goes out of scope unfinished
+is rolled back, with a warning saying where it was opened.
+
+=head1 SAVEPOINTS
+
+    $orm->txn(sub {
+        $orm->insert(users => {name => 'Fay'});
+        eval {
+            $orm->txn(sub {
+                $orm->insert(users => {name => 'Gus'});
+                die "undo Gus only\n";
+            });
+        };
+        $orm->insert(users => {name => 'Hal'});
+    });    # Fay and Hal are committed, but Gus was rolled back with his savepoint
+
+    my $outer = $orm->txn;
+    my $inner = $orm->txn;    # a savepoint
+    $orm->insert(users => {name => 'Ian'});
+    $inner->rollback;         # the innermost open transaction has to finish first
+    $outer->commit;           # without Ian
+
+Committing or rolling back C<$outer> while C<$inner> is still open croaks.
+DuckDB has no savepoints, so nesting croaks there
+(L<DBIx::QuickORM::Manual::Dialects/TRANSACTIONS>).
+
+=head1 A FAILED STATEMENT
+
+    $orm->insert(users => {name => 'Lu', email => 'lu@example.com'});
+
+    $orm->txn(sub {
+        # the failure rolls back only the nested transaction
+        my $dup = !eval {
+            $orm->txn(sub {
+                $orm->insert(users => {name => 'Lu2', email => 'lu@example.com'});
+            });
+            1;
+        };
+        $orm->insert(users => {name => 'Mo'});
+    });    # Mo is committed
+
+    my $ok = eval {
+        $orm->txn(sub {
+            $orm->insert(users => {name => 'Ned'});
+            # caught, but the failure marks the transaction failed
+            eval { $orm->insert(users => {name => 'Ned2', email => 'lu@example.com'}) };
+        });    # croaks: the commit rolls back instead, so Ned is gone too
+        1;
+    };
+
+A statement that fails inside a transaction marks it failed, even when your
+code catches the error. From then on every statement croaks, except the
+rollback. A commit rolls back instead, then croaks. This holds on every
+database, so no failed work is ever taken for committed.
+
+To recover and go on, run the work that may fail in a nested transaction.
+Rolling back the savepoint clears the mark. The block form does that when
+the exception leaves it. C<find_or_insert> does this itself. DuckDB has no
+savepoints, so there a failure leaves the transaction nothing but its
+rollback.
+
+=head1 ISOLATION
+
+    # every outermost transaction opens at read committed unless told otherwise
+    $orm->txn(sub { $orm->insert(users => {name => 'Kim'}) });
+
+    # one transaction at another level
+    my $total = $orm->txn(
+        sub { $orm->handle('posts')->count },
+        isolation => 'repeatable read',
+    );
+
+    # another default for every transaction of this ORM
+    my $strict = DBIx::QuickORM->new(
+        connect   => sub { DBI->connect($dsn, $user, $pass, {RaiseError => 1}) },
+        isolation => 'serializable',
+    );
+
+    # a plain BEGIN: the database's own default level
+    $orm->txn(sub { $orm->handle('users')->count }, isolation => 'server');
+
+Every outermost transaction states its isolation level when it opens. The
+default is C<read committed> on every database that can set a level, so a
+transaction behaves the same on PostgreSQL and the MySQL family, whose
+servers default to different levels. Stating it each time also means a
+changed server or session setting cannot change it.
+
+The levels are C<read uncommitted>, C<read committed>, C<repeatable read>,
+and C<serializable>, in upper or lower case. C<server> sends a plain C<BEGIN>
+and leaves the level to the database. Anything else croaks.
+
+The level comes from the C<txn> call's C<isolation>, else the ORM's
+C<isolation> (C<new> argument, or C<override> in the DSL), else C<read
+committed>. Only an outermost transaction takes one. A savepoint runs at its
+transaction's level. A retried block begins at the same level each time.
+
+What each database is sent, and its own default:
+
+=over 4
+
+=item PostgreSQL
+
+C<BEGIN ISOLATION LEVEL READ COMMITTED>, one statement. The server's default
+is C<read committed>. C<read uncommitted> runs as C<read committed>.
+
+=item MySQL and MariaDB
+
+C<SET TRANSACTION ISOLATION LEVEL READ COMMITTED>, then C<BEGIN>. The SET
+covers the next transaction only. The server's default is C<repeatable
+read>.
+
+=item SQLite
+
+C<BEGIN>. SQLite has no level to set: its transactions are serializable.
+
+=item DuckDB
+
+C<BEGIN>. DuckDB has no level to set: its transactions use snapshot
+isolation.
+
+=back
+
+On SQLite and DuckDB the default sends nothing extra. There, leave
+C<isolation> out or give C<server>: naming any level, C<read committed>
+included, croaks when a transaction opens, whether the C<txn> call or the ORM
+names it.
+
+The MySQL family with binary logging on and C<binlog_format=STATEMENT>:
+InnoDB refuses writes at C<read committed> and C<read uncommitted>, since
+statement-based logging needs C<repeatable read>. Use C<ROW> (MySQL's
+default) or C<MIXED> (MariaDB's), or give the ORM
+C<< isolation => 'repeatable read' >>.
+
+=head1 RETRY
+
+    use DBIx::QuickORM::Value qw/sql/;
+
+    my $post_id = $orm->handle('posts')->only->field('id');
+
+    $orm->txn(
+        sub {
+            my $post = $orm->find(posts => $post_id);
+            $post->update({views => $post->field('views') + 1});
+        },
+        # the database reports a conflicting write as a serialization failure
+        isolation => 'serializable',
+        retry     => 3,    # then the block runs again, up to 3 more times
+    );
+
+    my $post = $orm->find(posts => $post_id);
+
+    # the database does the arithmetic, so concurrent increments all count
+    $post->update({views => sql('views + 1')});
+
+Only an outermost transaction can be retried, and the block must be safe to
+run again. C<< retry => 3 >> allows four attempts. The last failure is
+rethrown. L<DBIx::QuickORM::Manual::Errors> shows which errors count.
+
+At the default C<read committed> level a read-then-write like this does not
+fail: the second writer silently overwrites the first. C<isolation>
+makes the database notice the conflict. Better, let the database do the
+arithmetic with C<sql()> (L<DBIx::QuickORM::Manual::Values>), or use
+C<cas_update> (below) when the new value depends on what was read.
+
+=head1 THE ROWS YOU HOLD
+
+C<< $row->is_canon >> asks whether a row object's data is the ORM's canonical
+copy of its row (L<DBIx::QuickORM::Manual::Caching>).
+
+    my $post = $orm->find(posts => $post_id);    # canonical: the ORM's cached copy of the row
+
+    my ($before, $inside);
+    $orm->txn(sub {
+        # false: a row read before the transaction is not canonical inside it
+        $before = $post->is_canon;
+
+        # read again: the database holds the same data, so $post's copy is reused
+        my $same = $orm->find(posts => $post_id);
+        $inside = $post->is_canon;    # true
+    });
+
+    my $after = $post->is_canon;    # true: the commit kept the copy the transaction reused
+
+    my $gone;
+    $orm->txn(sub {
+        my $txn = shift;
+        my $tmp = $orm->insert(users => {name => 'Jo'});
+        $txn->rollback;
+        $gone = $tmp->is_canon;    # false: a rollback forgets everything the transaction held
+    });
+
+    my $stale;
+    $orm->txn(sub {
+        my $post = $orm->find(posts => $post_id);
+        eval {
+            $orm->txn(sub {
+                $post->update({views => 99});
+                die "undo\n";
+            });
+        };
+        $stale = $post->is_canon;    # false: the savepoint's data was rolled back
+        $post->refresh;              # reads the database: back to the earlier views
+    });
+
+A commit keeps the copies the transaction read or wrote, and its deletes,
+held weakly unless C<retain_cache>. A rollback forgets them. Either way, rows
+from before that the transaction did not touch are canonical again once it
+ends.
+
+Once the transaction writes, deletes, re-reads with changed data, or clears
+(C<clear_cache>) a row, that row's copy from before is gone, even after a
+rollback. A bulk C<update> or C<delete> drops every copy of its table's rows
+from before the transaction. So after a rollback no row the transaction wrote,
+or re-read with changed data, is canonical: C<refresh> one it updated, and
+insert again one it inserted.
+
+A savepoint starts with the row cache of the transaction around it. Rolling
+it back restores that, so a row changed or deleted inside it is canonical
+again in its earlier form. A row object that took the savepoint's data is
+not, so C<refresh> it.
+
+Row state follows the transaction. A rollback undoes its deletes: those rows
+are no longer C<was_deleted>. It undoes its inserts too: those rows are no
+longer C<is_in_db>, and can be inserted again. A savepoint rollback undoes
+only what the savepoint did.
+
+When a commit or rollback statement itself fails, the outcome is unknown and
+the error says so. Row state then follows the rollback rules as a guess. The
+database may in fact have committed. Re-read the rows the transaction
+touched before trusting C<is_in_db> or C<was_deleted>.
+
+Caveat: a row inserted in the transaction and then re-read with changed data
+(not through C<update> or C<refresh>) may still report C<is_in_db> after the
+rollback. C<refresh> it to check.
+
+=head1 WRITING A ROW READ BEFORE THE TRANSACTION
+
+    my $post = $orm->find(posts => $post_id);
+
+    $orm->txn(sub {
+        # croaks: $post is not canonical inside the transaction
+        my $ok = eval { $post->update({views => 5}); 1 };
+
+        # succeeds only if views still equals the value $post read
+        $post->cas_update({views => 5}) or die "Changed elsewhere\n";
+    });
+
+    $orm->txn(sub {
+        $post->refresh;                 # reads the database: $post is canonical again
+        $post->update({views => 6});    # then update as usual
+    });
+
+Inside a transaction C<update> and C<delete> check that the row is canonical,
+whatever the ORM-wide C<enforce_canon> says, unless the call passes
+C<< enforce_canon => 0 >> (L<DBIx::QuickORM::Manual::Caching/ENFORCE_CANON>).
+C<cas_update> never checks: it compares the fields it changes (or the C<cas>
+fields) with the database instead.
+
+=cut
 
 1;
 
 __END__
 
-=head1 NAME
-
-DBIx::QuickORM::Manual::Transactions - A guide to transactions in
-L<DBIx::QuickORM>.
-
-=head1 DESCRIPTION
-
-This guide covers transactions in L<DBIx::QuickORM>: starting a transaction,
-nesting transactions as savepoints, queuing success / fail / completion
-callbacks, controlling a transaction by hand, and automatically retrying work
-when a connection is lost.
-
-Transactions are controlled through the connection
-(L<DBIx::QuickORM::Connection>). Each transaction or savepoint is represented
-by a L<DBIx::QuickORM::Connection::Transaction> object.
-
-This is part of the L<DBIx::QuickORM> documentation; see
-L<DBIx::QuickORM::Manual> for the documentation hub.
-
-=head1 BASIC TRANSACTIONS
-
-The simplest way to run a transaction is to pass an action callback to
-C<txn()> on the connection:
-
-    $con->txn(sub {
-        my $txn = shift;
-        $foo->update(...);
-        $bar->insert(...);
-    });
-
-If the callback returns normally the transaction is committed. If it throws an
-exception, the transaction is rolled back and the exception propagates.
-
-C<transaction()> is a full alias for C<txn()>; use whichever reads better.
-
-C<txn()> always returns a L<DBIx::QuickORM::Connection::Transaction> object.
-When you pass an action callback the returned object is already complete, so
-you can inspect its outcome (see L</"THE TRANSACTION OBJECT"> below).
-
-=head2 MANUAL CONTROL FROM INSIDE THE CALLBACK
-
-The callback receives the transaction object as its only argument. You can end
-the transaction early by calling C<commit> or C<rollback> on it; either one
-breaks out of the action callback:
-
-    $con->txn(sub {
-        my $txn = shift;
-        ...
-        $txn->rollback if $should_abort;     # exits the callback, rolls back
-        ...
-        $txn->commit("looks good");          # exits the callback, commits
-    });
-
-C<abort> is an alias for C<rollback>. Both C<commit> and C<rollback> accept an
-optional reason string.
-
-=head1 NESTED TRANSACTIONS AND SAVEPOINTS
-
-Calls to C<txn()> may be nested. The outermost call starts a real database
-transaction; each nested call creates a savepoint instead. Committing an inner
-transaction releases its savepoint; rolling one back rolls back to its
-savepoint without disturbing the outer transaction.
-
-    $con->txn(sub {            # real transaction
-        $foo->insert(...);
-
-        $con->txn(sub {        # savepoint
-            $bar->insert(...);
-            # rolling this back undoes only $bar's insert
-        });
-
-        $baz->insert(...);
-    });                        # commit happens here
-
-Use C<is_savepoint> on a transaction object to tell which kind it is.
-
-=head1 CALLBACKS
-
-You can queue callbacks to run when a transaction finishes. They are fired
-after the underlying commit or rollback has been issued.
-
-=over 4
-
-=item on_success
-
-Runs only if the transaction commits.
-
-=item on_fail
-
-Runs only if the transaction is rolled back.
-
-=item on_completion
-
-Runs when the transaction finishes, regardless of outcome.
-
-=back
-
-Pass them as parameters to C<txn()>:
-
-    $con->txn(
-        on_success    => sub { my $txn = shift; ... },
-        on_fail       => sub { my $txn = shift; ... },
-        on_completion => sub { my $txn = shift; ... },
-        action        => sub { my $txn = shift; ... },
-    );
-
-You can also queue callbacks against an existing transaction object directly
-with C<add_success_callback>, C<add_fail_callback>, and
-C<add_completion_callback>.
-
-=head2 PARENT AND ROOT CALLBACKS
-
-When you are inside a nested transaction you can attach callbacks to an outer
-transaction instead of the current one. This is useful when a savepoint wants
-to defer work until the enclosing transaction actually commits.
-
-The C<on_parent_*> variants attach to the immediate parent transaction; the
-C<on_root_*> variants attach to the outermost (root) transaction no matter how
-deeply nested you are:
-
-    $con->txn(
-        on_parent_success    => sub { ... },
-        on_parent_fail       => sub { ... },
-        on_parent_completion => sub { ... },
-
-        on_root_success    => sub { ... },
-        on_root_fail       => sub { ... },
-        on_root_completion => sub { ... },
-
-        action => sub { ... },
-    );
-
-When there is no parent or root transaction above the current one, the
-corresponding parent / root callbacks are simply no-ops.
-
-=head1 LONG-LIVED TRANSACTIONS
-
-If you need a transaction that is not bound to a single callback, call C<txn()>
-without an action. It returns a live L<DBIx::QuickORM::Connection::Transaction>
-object that you control by hand:
-
-    my $txn = $con->txn();
-    ...
-    $txn->commit;    # or $txn->rollback;
-
-If the transaction object falls completely out of scope and is destroyed while
-still open, it is rolled back automatically as a safety net. Never rely on this
-for normal flow; commit or roll back explicitly.
-
-=head1 THE TRANSACTION OBJECT
-
-A L<DBIx::QuickORM::Connection::Transaction> exposes its state:
-
-=over 4
-
-=item $txn->state
-
-Returns one of C<active>, C<committed>, or C<rolled_back>. Derived from
-C<result>.
-
-=item $txn->committed
-
-=item $txn->rolled_back
-
-True/false/undef booleans derived from C<result>: C<committed> is true after a
-successful commit, C<rolled_back> is its inverse, and both return undef while
-the transaction is still open.
-
-=item $txn->exception
-
-The exception that forced a rollback, if any. Set when the transaction body
-threw or the object fell out of scope; undef for a normal commit or an explicit
-C<rollback>.
-
-=item $txn->is_savepoint
-
-True when this transaction is a savepoint (i.e. it was nested inside another
-transaction).
-
-=item $txn->result
-
-Undef while the transaction is still open; C<1> after a successful commit, C<0>
-after a rollback.
-
-=back
-
-See L<DBIx::QuickORM::Connection::Transaction> for the full interface.
-
-=head1 INSPECTING THE CURRENT TRANSACTION
-
-The connection can tell you whether a transaction is active:
-
-=over 4
-
-=item $con->in_txn
-
-Returns true if any transaction is active. If the transaction is managed by
-L<DBIx::QuickORM> the transaction object is returned; if a transaction is open
-but not managed by the ORM, a plain true value is returned instead.
-C<in_transaction> is an alias.
-
-=item $con->current_txn
-
-Returns the current L<DBIx::QuickORM::Connection::Transaction>, or undef if
-none is active. Note that this returns undef for transactions not managed by
-the ORM, so do not use it as a generic "am I in a transaction" check; use
-C<in_txn> for that. C<current_transaction> is an alias.
-
-=back
-
-=head1 AUTOMATIC RETRY
-
-Some failures (notably a dropped connection) are worth retrying. Two helpers on
-the connection handle this.
-
-C<auto_retry> runs a callback, retrying it until it succeeds or a retry count
-is exhausted. If the connection appears to be down between attempts it
-reconnects before retrying. The default count is C<1> (so up to two attempts
-total). It returns whatever the callback returns (in scalar context).
-
-    my $result = $con->auto_retry(sub { ... });
-    my $result = $con->auto_retry($count, sub { ... });
-
-C<auto_retry_txn> is the transaction-aware convenience form. It runs the action
-inside a transaction and retries the whole transaction on failure. It is
-roughly equivalent to:
-
-    $con->auto_retry(sub { $con->txn(sub { ... }) });
-
-Usage:
-
-    $con->auto_retry_txn(sub { my $txn = shift; ... });
-    $con->auto_retry_txn(\%params, sub { my $txn = shift; ... });
-    $con->auto_retry_txn(%params, action => sub { my $txn = shift; ... });
-
-Use C<< count => $NUM >> to set the maximum number of retries (default C<1>);
-all other parameters are passed through to C<txn()>.
-
-B<Important:> C<auto_retry> cannot be used inside an open transaction, and will
-croak if you try. Retrying only makes sense around a whole transaction, not in
-the middle of one, because a half-applied transaction cannot be safely
-replayed. Reach for C<auto_retry_txn> when you want the retry to wrap the
-transaction itself.
-
-=head1 TRANSACTIONS AND ROW STATE
-
-Row objects are transaction-aware: a row tracks its data through the
-transaction / savepoint stack, so changes made inside a transaction are unwound
-correctly when that transaction (or savepoint) rolls back. The mechanics of
-this are described elsewhere rather than repeated here; see
-L<DBIx::QuickORM::Row> for how a row stages and unwinds pending changes, and
-L<DBIx::QuickORM::Connection> for the connection-level details.
-
-=head1 TRANSACTIONS AND ASYNC QUERIES
-
-Transactions and out-of-band queries interact. You cannot start a transaction
-while an async query is active, and by default an active aside or forked query
-also blocks a new transaction (the C<force>, C<ignore_aside>, and
-C<ignore_forks> parameters to C<txn()> relax this). For the full picture of
-async, aside, and forked queries and how they relate to transactions, see
-L<DBIx::QuickORM::Manual::Async>.
-
-=head1 SEE ALSO
-
-=over 4
-
-=item L<DBIx::QuickORM::Manual>
-
-The documentation hub.
-
-=item L<DBIx::QuickORM::Connection>
-
-The connection object, where transactions are controlled.
-
-=item L<DBIx::QuickORM::Connection::Transaction>
-
-The transaction / savepoint object.
-
-=item L<DBIx::QuickORM::Manual::Async>
-
-Asynchronous, aside, and forked queries and how they interact with
-transactions.
-
-=item L<DBIx::QuickORM::Row>
-
-The row object, including transaction-aware row state - pending changes staged
-against the current transaction or savepoint that unwind when it rolls back.
-
-=back
-
 =head1 SOURCE
 
 The source code repository for DBIx-QuickORM can be found at
-L<https://github.com/exodist/DBIx-QuickORM/>.
+L<https://github.com/exodist/DBIx-QuickORM>.
 
 =head1 MAINTAINERS
 

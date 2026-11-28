@@ -3,9 +3,10 @@ abstract: 'parse RFC 9651 HTTP Structured Fields using libsfparse'
 author:
   - 'Robert Rothenberg <perl@rhizomnic.com>'
 build_requires:
+  B: '0'
   Digest::MD5: '0'
   ExtUtils::MakeMaker: '0'
-  JSON::PP: '2.27103'
+  JSON: '0'
   MIME::Base64: '0'
   Test2::V0: '0'
 configure_requires:
@@ -23,11 +24,15 @@ no_index:
     - inc
 requires:
   Exporter: '5.57'
+  Hash::Ordered: '0.009'
+  Math::Int64: '0'
+  Ref::Util: '0.200'
+  Sub::Util: '1.40'
   XSLoader: '0'
   perl: '5.020'
 resources:
   repository: https://github.com/robrwo/perl-HTTP-StructuredField
-version: v0.0.3
+version: v0.0.5
 x_contributors:
   - 'Paul Johnson <paul@pjcj.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

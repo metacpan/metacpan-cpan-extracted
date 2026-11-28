@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use File::Temp 'tempfile';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # read_table's .xlsx support decompresses the parts with core
 # IO::Uncompress::Unzip and parses the worksheet XML in XS (xlsx_ws_scan in

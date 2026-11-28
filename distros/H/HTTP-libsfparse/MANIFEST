@@ -7,6 +7,8 @@ MANIFEST.SKIP
 ppport.h
 README.md
 libsfparse.xs
+perl_math_int64.c
+perl_math_int64.h
 src/LICENSE.sfparse
 src/sfparse.c
 src/sfparse.h

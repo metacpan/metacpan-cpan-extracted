@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use Test::LeakTrace;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 # size => N : last group holds the remainder
 {

@@ -25,7 +25,7 @@
 # those worst cases, measured on 5.44.0-quadmath.
 require 5.010; use strict; use warnings FATAL => 'all';
 use Test::More;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 srand(7);
 my (@y, @x, @s, @c, @w);

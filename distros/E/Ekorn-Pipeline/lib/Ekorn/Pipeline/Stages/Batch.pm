@@ -10,7 +10,7 @@ use Ekorn::Pipeline::Gather qw(gather);
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.4.5';
+our $VERSION = 'v0.5.0';
 
 our @EXPORT = qw(batch collect);    ## no critic (Modules::ProhibitAutomaticExportation)
 
@@ -34,6 +34,8 @@ sub batch ($size) {
                 return @batch < $size ? () : [splice @batch];
             },
             flush => sub () { @batch ? [splice @batch] : () },
+            # It holds values back: a batch, made from many, has no original.
+            holds => 1,
         };
     };
 }
@@ -107,7 +109,9 @@ Both are exported by default, and by C<:all>.
 Passes values on in batches of C<$size>, each an array reference. Once
 the values run out, the last batch goes on, which may be shorter.
 There's never an empty batch: with no values, there's no batch at
-all.
+all. A batch is made from many values, so has no original, from
+v0.5.0; before, one filled by a value had that value's
+(L<Ekorn::Pipeline::Context/kept_origin>).
 
 =head2 collect
 

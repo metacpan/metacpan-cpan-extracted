@@ -5,14 +5,16 @@ use warnings;
 
 require Exporter;
 
-our $VERSION = '0.18';
+our $VERSION = '1.01';
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
   resample
   resample_medians
   resample_means
+  resample_quantiles
   select_kth
+  quantile
   median
   median_absolute_deviation
   first_quartile
@@ -20,6 +22,14 @@ our @EXPORT_OK = qw(
   mean
   simple_confidence_limits_from_samples
   median_simple_confidence_limits
+  basic_confidence_limits_from_samples
+  percentile_confidence_limits_from_samples
+  bca_confidence_limits_from_samples
+  median_percentile_confidence_limits
+  median_exact_confidence_limits
+  mean_percentile_confidence_limits
+  mean_bca_confidence_limits
+  mean_studentized_confidence_limits
   approx_erf
   approx_erf_inv
   nsigma_to_alpha
@@ -33,13 +43,39 @@ our %EXPORT_TAGS = ('all' => \@EXPORT_OK);
 require XSLoader;
 XSLoader::load('Statistics::CaseResampling', $VERSION);
 
-our $Rnd = Statistics::CaseResampling::RdGen::setup(rand());
+our $Rnd;
+my $_Seed_Counter = 0;
 
-sub CLONE {
-  $Rnd = Statistics::CaseResampling::RdGen::setup(rand());
+sub _fallback_seed {
+  my $tid = defined(&threads::tid) ? threads->tid() : 0;
+  return (
+    int(rand(4294967296)),
+    int(rand(4294967296)),
+    $$ & 0xffffffff,
+    time() & 0xffffffff,
+    $tid & 0xffffffff,
+    (++$_Seed_Counter) & 0xffffffff,
+  );
 }
 
-sub Statistics::CaseResampling::RdGen::CLONE_SKIP { 1 }
+sub _new_default_rng {
+  local $!;
+  my @seed = Statistics::CaseResampling::RdGen::_os_entropy(4);
+  @seed = _fallback_seed() if @seed != 4;
+  my $rng = Statistics::CaseResampling::RdGen::setup_array(@seed);
+  $rng->_mark_auto_seeded($$);
+  return $rng;
+}
+
+sub _reseed_default_rng {
+  $Rnd = _new_default_rng();
+}
+
+$Rnd = _new_default_rng();
+
+sub CLONE {
+  $Rnd = _new_default_rng();
+}
 
 
 1;
@@ -53,14 +89,23 @@ Statistics::CaseResampling - Efficient resampling and calculation of medians wit
 
   use Statistics::CaseResampling ':all';
   
-  my $sample = [1,3,5,7,1,2,9]; # ... usually MUCH more data ...
-  my $confidence = 0.95; # ~2*sigma or "90% within confidence limits"
-  #my $confidence = 0.37; # ~1*sigma or "~66% within confidence limits"
+  my $sample = [1,3,5,7,1,2,9,4,6,8]; # ... usually MUCH more data ...
+  my $confidence = 0.95; # 95% confidence limits (~1.96*sigma)
+  #my $confidence = 1 - nsigma_to_alpha(1); # ~1*sigma (~68.27% confidence limits)
   
-  # calculate the median of the sample with lower and upper confidence
-  # limits using resampling/bootstrapping:
+  # calculate the median of the sample with distribution-free exact
+  # binomial confidence limits:
   my ($lower_cl, $median, $upper_cl)
-    = median_simple_confidence_limits($sample, $confidence);
+    = median_exact_confidence_limits($sample, $confidence);
+  
+  # or using percentile bootstrapping (defaults to 1000 resamples; use
+  # 5000-10000+ for reliable tail limits):
+  my ($lower_cl_boot, $median_boot, $upper_cl_boot)
+    = median_percentile_confidence_limits($sample, $confidence, 5000);
+  
+  # or all-in-C BCa bootstrap confidence limits for the mean:
+  my ($lower_bca, $mean_bca, $upper_bca)
+    = mean_bca_confidence_limits($sample, $confidence, 5000);
   
   # There are many auxiliary functions:
   
@@ -71,18 +116,21 @@ Statistics::CaseResampling - Efficient resampling and calculation of medians wit
   my $medians = resample_medians($sample, $n_resamples);
   # $medians is now an array reference containing the medians
   # of $n_resamples resample runs
-  # This is vastly more efficient that doing the same thing with
+  # This is vastly more efficient than doing the same thing with
   # repeated resample() calls!
   # Analogously:
   my $means = resample_means($sample, $n_resamples);
   
-  # you can get the cl's from a set of separately resampled medians, too:
-  my ($lower_cl, $median, $upper_cl)
-    = simple_confidence_limits_from_samples($median, $medians, $confidence);
+  # you can get two-sided percentile (or basic, or BCa) confidence limits
+  # from a set of separately resampled statistics, too:
+  my ($lower_m, $mean, $upper_m)
+    = percentile_confidence_limits_from_samples(mean($sample), $means, $confidence);
   
   # utility functions:
   print median([1..5]), "\n"; # prints 3
   print mean([1..5]), "\n"; # prints 3, too, surprise!
+  print quantile([1..4], 0.5), "\n"; # prints 2.5
+  print sample_standard_deviation($sample), "\n";
   print select_kth([1..5], 1), "\n"; # inefficient way to calculate the minimum
 
 =head1 DESCRIPTION
@@ -90,8 +138,9 @@ Statistics::CaseResampling - Efficient resampling and calculation of medians wit
 The purpose of this (XS) module is to calculate the median (or in principle
 also other statistics) with confidence intervals on a sample. To do that,
 it uses a technique called bootstrapping. In a nutshell, it resamples the
-sample a lot of times and for each resample, it calculates the median.
-From the distribution of medians, it then calculates the confidence limits.
+sample a lot of times and for each resample, it calculates the statistic.
+From the distribution of resampled statistics, it then calculates the
+confidence limits.
 
 In order to implement the confidence limit calculation, various other
 functions had to be implemented efficiently (both algorithmically efficient
@@ -99,6 +148,64 @@ and done in C). These functions may be useful in their own right and are
 thus exposed to Perl. Most notably, this exposes a median (and general selection)
 algorithm that works in linear time as opposed to the trivial implementation
 that requires C<O(n*log(n))>.
+
+=head2 Statistical caveats
+
+Case resampling (nonparametric bootstrap) assumes that the observations in
+C<$sample> are independent and identically distributed (i.i.d.). If your data
+exhibits autocorrelation, time trends, or clustering, standard case resampling
+will underestimate uncertainty.
+
+Additionally, bootstrap confidence intervals for the median have limited
+coverage accuracy on very small samples (e.g. C<N E<lt> 15>) or when the data
+contains many tied values; prefer L</"median_exact_confidence_limits(SAMPLE, CONFIDENCE)">
+when a distribution-free confidence interval for the median is required.
+
+=head2 Input validation and error handling
+
+All functions reject C<undef> and non-numeric values, both inside sample
+arrays and in scalar parameters (probabilities, confidence levels, run
+counts, and C<erf>/C<alpha>/C<nsigma> arguments). Numeric strings, C<NaN>,
+and C<Inf> are accepted; C<NaN> propagates deterministically through summary
+statistics and order statistics regardless of element ordering.
+
+All summary statistic and confidence-limit functions croak on empty
+samples (C<[]>). The raw resampling helpers (C<resample()>,
+C<resample_medians()>, C<resample_means()>, and C<resample_quantiles()>)
+return C<[]> on an empty sample and require run counts in C<1..100000000>.
+
+=head2 Upgrading from 0.x to 1.00
+
+Version 1.00 fixes several long-standing statistical correctness bugs that
+change outputs for some legacy calls:
+
+=over 4
+
+=item *
+
+C<simple_confidence_limits_from_samples()> and
+C<median_simple_confidence_limits()> now compute true two-sided
+C<alpha/2> and C<1 - alpha/2> tails with Type 7 quantile interpolation
+instead of one-sided C<alpha> tails and truncated 1-based indices.
+
+=item *
+
+C<median()>, C<median_absolute_deviation()>, C<resample_medians()>,
+C<first_quartile()>, and C<third_quartile()> now use Hyndman-Fan Type 7
+interpolation (averaging the two middle elements for even C<N>).
+
+=item *
+
+C<approx_erf_inv()> now accepts its full domain C<(-1, 1)>,
+C<alpha_to_nsigma()> requires C<alpha> in C<(0, 1]>, and
+C<nsigma_to_alpha()> requires C<nsigma E<gt>= 0>.
+
+=item *
+
+Empty samples and C<undef>/non-numeric inputs croak instead of silently
+returning or coercing to C<0>.
+
+=back
 
 =head2 Random numbers
 
@@ -110,11 +217,17 @@ If you want to change the seed of the RNG, do this:
 
   $Statistics::CaseResampling::Rnd
     = Statistics::CaseResampling::RdGen::setup($seed);
- 
+
 or
 
   $Statistics::CaseResampling::Rnd
-    = Statistics::CaseResampling::RdGen::setup(@seed);
+    = Statistics::CaseResampling::RdGen::setup_array(@seed);
+
+The default module RNG is automatically seeded from native OS entropy
+(C<BCryptGenRandom>/C<RtlGenRandom> on Windows, C</dev/urandom> on Unix,
+or process/time/PRNG fallback state when unavailable) and is reseeded
+across C<ithreads> cloning and C<fork()>. Explicitly seeded RNG objects
+retain their exact deterministic sequence.
 
 Do not use the embedded random number generator for other purposes.
 Use C<Math::Random::MT> instead! At this point, you cannot change
@@ -136,11 +249,6 @@ are usually (under the hood, in C) implemented using the
 basic building blocks. Unfortunately, that means you may
 want to read the documentation backwards. :)
 
-Additionally, there is a whole set of general purpose, fast (XS)
-functions for calculating statistical metrics. They're useful
-without the bootstrapping related stuff, so they're listed in
-the L</"OTHER FUNCTIONS"> section below.
-
 All of these functions are written in C for speed.
 
 =head2 resample(ARRAYREF)
@@ -161,136 +269,214 @@ C<NMEDIANS> resamples of the original input sample.
 Returns a reference to an array containing the means of
 C<NMEANS> resamples of the original input sample.
 
-=head2 simple_confidence_limits_from_median_samples(STATISTIC, STATISTIC_SAMPLES, CONFIDENCE)
+=head2 resample_quantiles(ARRAYREF, P, NQUANTILES)
 
-Calculates the confidence limits for I<STATISTIC>. Returns
-the lower confidence limit, the statistic, and the upper confidence
-limit. I<STATISTIC_SAMPLES> is the output of, for example, C<resample_means(\@sample)>.
-I<CONFIDENCE> indicates the fraction of data within the confidence limits
-(assuming a normal, symmetric distribution of the statistic =E<gt> I<simple confidence
-limits>).
+Returns a reference to an array containing the Type 7 sample quantile
+at probability I<P> in C<[0, 1]> of C<NQUANTILES> resamples of the
+original input sample.
 
-For example, to get the 90% confidence (~2 sigma) interval for the mean of your sample,
-you can do the following:
+=head2 percentile_confidence_limits_from_samples(STATISTIC, STATISTIC_SAMPLES, CONFIDENCE)
+
+Calculates two-sided percentile bootstrap confidence limits at level
+I<CONFIDENCE> (in C<(0, 1)>) using linear quantile interpolation at
+C<alpha/2> and C<1 - alpha/2>, where C<alpha = 1 - CONFIDENCE>. Returns
+C<($lower_cl, $statistic, $upper_cl)>.
+
+For example, to get a 95% confidence interval for the mean of your sample:
 
   my $sample = [<numbers>];
-  my $means = resample_means($sample, $n_resamples);
+  my $means = resample_means($sample, 5000);
   my ($lower_cl, $mean, $upper_cl)
-    = simple_confidence_limits_from_samples(mean($sample), $means, 0.90);
+    = percentile_confidence_limits_from_samples(mean($sample), $means, 0.95);
+
+For reliable tail limits at 95% or higher confidence, use at least
+5000-10000 bootstrap samples.
+
+=head2 basic_confidence_limits_from_samples(STATISTIC, STATISTIC_SAMPLES, CONFIDENCE)
+
+Calculates two-sided basic (pivotal) bootstrap confidence limits at level
+I<CONFIDENCE> (in C<(0, 1)>) as
+C<2 * STATISTIC - quantile(STATISTIC_SAMPLES, 1 - alpha/2)> and
+C<2 * STATISTIC - quantile(STATISTIC_SAMPLES, alpha/2)>, where
+C<alpha = 1 - CONFIDENCE>. Returns C<($lower_cl, $statistic, $upper_cl)>.
+
+Note that for heavily skewed distributions or bounded statistics (e.g.
+strictly positive measurements), the basic bootstrap reflection can produce
+limits outside the parameter support; prefer
+L</"percentile_confidence_limits_from_samples(STATISTIC, STATISTIC_SAMPLES, CONFIDENCE)">
+or L</"bca_confidence_limits_from_samples(STATISTIC, STATISTIC_SAMPLES, JACKKNIFE_SAMPLES, CONFIDENCE)">
+in those cases.
+
+=head2 bca_confidence_limits_from_samples(STATISTIC, STATISTIC_SAMPLES, JACKKNIFE_SAMPLES, CONFIDENCE)
+
+Calculates two-sided bias-corrected and accelerated (BCa) bootstrap
+confidence limits at level I<CONFIDENCE> (in C<(0, 1)>).
+I<JACKKNIFE_SAMPLES> must be an array reference of leave-one-out
+jackknife estimates of the statistic on the original sample. Returns
+C<($lower_cl, $statistic, $upper_cl)>.
+
+BCa intervals correct for both median bias and skewness (via the
+acceleration constant) and are transformation-respecting.
+
+=head2 mean_percentile_confidence_limits(SAMPLE, CONFIDENCE, [NSAMPLES])
+
+All-in-C two-sided percentile bootstrap confidence limits for the arithmetic
+mean of I<SAMPLE> at level I<CONFIDENCE> in C<(0, 1)>. I<NSAMPLES> defaults
+to C<1000> (use C<5000> or more for stable 95%+ limits). Returns
+C<($lower_cl, $mean, $upper_cl)>.
+
+=head2 mean_bca_confidence_limits(SAMPLE, CONFIDENCE, [NSAMPLES])
+
+All-in-C two-sided bias-corrected and accelerated (BCa) bootstrap
+confidence limits for the arithmetic mean of I<SAMPLE>, computing the
+leave-one-out jackknife means in C<O(n)> time without Perl overhead.
+I<NSAMPLES> defaults to C<1000>. Returns C<($lower_cl, $mean, $upper_cl)>.
+
+=head2 mean_studentized_confidence_limits(SAMPLE, CONFIDENCE, [NSAMPLES])
+
+All-in-C two-sided studentized (bootstrap-t) confidence limits for the
+arithmetic mean of I<SAMPLE> (requiring at least 2 observations).
+I<NSAMPLES> defaults to C<1000>. Returns C<($lower_cl, $mean, $upper_cl)>.
+Offers second-order accuracy for location statistics, though individual
+small-sample bootstrap replicates with zero sample variance can yield
+infinite endpoints.
+
+=head2 median_percentile_confidence_limits(SAMPLE, CONFIDENCE, [NSAMPLES])
+
+Calculates two-sided percentile bootstrap confidence limits for the exact
+median of I<SAMPLE>. I<NSAMPLES> defaults to C<1000> (use C<5000> or more
+for stable 95%+ limits). Returns C<($lower_cl, $median, $upper_cl)>.
+
+=head2 median_exact_confidence_limits(SAMPLE, CONFIDENCE)
+
+Calculates exact distribution-free confidence limits for the median of
+I<SAMPLE> using the symmetric binomial distribution C<Binomial(n, 0.5)> on
+the order statistics, returning C<($lower_cl, $median, $upper_cl)> with
+at least I<CONFIDENCE> coverage (assuming continuous i.i.d. observations).
+Achieving guaranteed coverage at level I<CONFIDENCE> requires
+C<1 - 2**(1 - N) E<gt>= CONFIDENCE> (for example, C<N E<gt>= 6> at 95%
+confidence); smaller samples return C<[min, max]>. This requires no Monte
+Carlo resampling and runs in C<O(n)> expected time.
+
+=head2 simple_confidence_limits_from_samples(STATISTIC, STATISTIC_SAMPLES, CONFIDENCE)
+
+Alias/equivalent to
+L</"basic_confidence_limits_from_samples(STATISTIC, STATISTIC_SAMPLES, CONFIDENCE)">:
+calculates two-sided basic (pivotal) bootstrap confidence limits at level
+I<CONFIDENCE> using C<alpha/2> and C<1 - alpha/2> quantiles, returning
+C<($lower_cl, $statistic, $upper_cl)>.
+
+For example:
+
+  my $sample = [<numbers>];
+  my $means = resample_means($sample, 5000);
+  my ($lower_cl, $mean, $upper_cl)
+    = simple_confidence_limits_from_samples(mean($sample), $means, 0.95);
 
 If you want to apply this logic to other statistics such as the first
-or third quartile, you have to manually resample and lose the advantage of
-doing it in C:
+or third quartile, you can use C<resample_quantiles()>:
 
   my $sample = [<numbers>];
-  my $quartiles = [];
-  foreach (1..1000) {
-    push @$quartiles, first_quartile(resample($sample));
-  }
+  my $quartiles = resample_quantiles($sample, 0.25, 5000);
   my ($lower_cl, $firstq, $upper_cl)
-    = simple_confidence_limits_from_samples(
-        first_quartile($sample), $quartiles, 0.90
+    = percentile_confidence_limits_from_samples(
+        first_quartile($sample), $quartiles, 0.95
       );
 
-For a reliable calculation of the confidence limits, you should use at least
-1000 samples if not more. Yes. This whole procedure is B<expensive>.
-
-For medians, however, use the following function:
+For medians, prefer L</"median_exact_confidence_limits(SAMPLE, CONFIDENCE)">
+or L</"median_percentile_confidence_limits(SAMPLE, CONFIDENCE, [NSAMPLES])">.
 
 =head2 median_simple_confidence_limits(SAMPLE, CONFIDENCE, [NSAMPLES])
 
-Calculates the confidence limits for the C<CONFIDENCE> level
-for the median of I<SAMPLE>. Returns the lower confidence limit,
-the median, and the upper confidence limit.
+Calculates two-sided basic (pivotal) bootstrap confidence limits for the
+median of I<SAMPLE> at level I<CONFIDENCE> (using C<alpha/2> and
+C<1 - alpha/2> tails). Returns C<($lower_cl, $median, $upper_cl)>.
+I<NSAMPLES> defaults to C<1000>.
 
-In order to calculate the limits, a lot of resampling has to be done.
-I<NSAMPLES> defaults to C<1000>. Try running this a couple of times
-on your data interactively to see how the limits still vary a little
-bit at this setting.
+Note that basic (pivotal) bootstrap reflection can undercover on
+discrete/small-sample medians due to order-statistic spacing asymmetry;
+prefer L</"median_exact_confidence_limits(SAMPLE, CONFIDENCE)"> or
+L</"median_percentile_confidence_limits(SAMPLE, CONFIDENCE, [NSAMPLES])">
+for medians.
 
 =head1 OTHER FUNCTIONS
 
 =head2 approx_erf($x)
 
-Calculates an approximatation of the error function of I<x>.
-Implemented after
-
-  Winitzki, Sergei (6 February 2008).
-  "A handy approximation for the error function and its inverse" (PDF). 
-  http://homepages.physik.uni-muenchen.de/~Winitzki/erf-approx.pdf
-
-Quoting: Relative precision better than C<1.3e-4>.
+Calculates the error function of I<x> (using the C math library C<erf()>
+where available, with a high-precision fallback otherwise).
 
 =head2 approx_erf_inv($x)
 
-Calculates an approximation of the inverse of the
-error function of I<x>.
-
-Algorithm from the same source as C<approx_erf>.
-
-Quoting: Relative precision better than C<2e-3>.
+Calculates the inverse of the error function of I<x> for I<x> in C<(-1, 1)>
+to near machine precision.
 
 =head2 nsigma_to_alpha($nsigma)
 
-Calculates the probability that a measurement from a normal
-distribution is further away from the mean than C<$nsigma>
-standard deviations.
+Calculates the two-sided probability C<erfc($nsigma / sqrt(2))> that a
+measurement from a normal distribution is further away from the mean than
+C<$nsigma> standard deviations, for C<$nsigma E<gt>= 0>.
 
-The confidence level (what you pass as the
-C<CONFIDENCE> parameter to some functions in this module)
-is C<1 - nsigma_to_alpha($nsigma)>.
+The two-sided confidence level is C<1 - nsigma_to_alpha($nsigma)>.
 
 =head2 alpha_to_nsigma($alpha)
 
-Inverse of C<nsigma_to_alpha()>.
+Inverse of C<nsigma_to_alpha()> for C<$alpha> in C<(0, 1]>.
 
 =head2 mean(ARRAYREF)
 
-Calculates the mean of a sample.
+Calculates the arithmetic mean of a sample using compensated summation
+(and overflow-safe scaling for extreme magnitudes).
+
+=head2 quantile(ARRAYREF, P)
+
+Calculates the sample quantile for probability I<P> in C<[0, 1]> in
+C<O(n)> expected time (C<O(n log n)> worst case) using Hyndman-Fan
+Type 7 linear interpolation (the default in R, NumPy, and Julia). At
+C<P = 0.5>, this computes the exact median, averaging the two middle
+elements when N is even.
 
 =head2 median(ARRAYREF)
 
-Calculates the median (second quartile)
-of a sample. Works in linear time thanks
-to using a selection instead of a sort.
-
-Unfortunately, the way
-this is implemented, the median of an even number of parameters
-is, here, defined as the C<n/2-1>th largest number and not
-the average of the C<n/2-1>th and the C<n/2>th number. This shouldn't
-matter for nontrivial sample sizes!
+Calculates the median (second quartile) of a sample using C<quantile($sample, 0.5)>,
+averaging the two middle elements when N is even. Runs in C<O(n)> expected
+time (C<O(n log n)> worst case).
 
 =head2 median_absolute_deviation(ARRAYREF)
 
-Calculates the median absolute deviation (MAD) in what I believe is O(n).
-Take care to rescale the MAD before using it in place of a standard deviation.
+Calculates the median absolute deviation (MAD) in C<O(n)> expected time.
+Note that for consistency with a normal standard deviation, a normally
+distributed sample requires rescaling by C<1 / (sqrt(2) * erfinv(0.5))>
+(approximately C<1.4826>).
 
 =head2 first_quartile(ARRAYREF)
 
-Calculates the first quartile of the sample.
+Calculates the first quartile of the sample using Hyndman-Fan Type 7
+interpolation (equivalent to C<quantile($sample, 0.25)>).
 
 =head2 third_quartile(ARRAYREF)
 
-Calculates the third quartile of the sample.
+Calculates the third quartile of the sample using Hyndman-Fan Type 7
+interpolation (equivalent to C<quantile($sample, 0.75)>).
 
 =head2 select_kth(ARRAYREF, K)
 
-Selects the kth smallest element from the sample.
+Selects the kth smallest element (1-based) from the sample in C<O(n)>
+expected time (hardened with introselect heapsort fallback for C<O(n log n)>
+worst-case time).
 
-This is the general function that implements the median/quartile
-calculation. You get the median with this definition of K:
+=head2 sample_standard_deviation([$mean,] ARRAYREF)
 
-  my $k = int(@$sample/2) + (@$sample & 1);
-  my $median = select_kth($sample, $k);
+Calculates the sample standard deviation (with Bessel's C<N - 1>
+correction). May be called with either C<(\@sample)> (computing the
+sample mean automatically) or C<($mean, \@sample)>. Note that Bessel's
+C<N - 1> denominator is only statistically appropriate when C<$mean> is
+the sample mean of C<@sample>.
 
-=head2 sample_standard_deviation
+=head2 population_standard_deviation([$mean,] ARRAYREF)
 
-Given the sample mean and an anonymous array of numbers (the sample),
-calculates the sample standard deviation.
-
-=head2 population_standard_deviation
-
-Same as sample_standard_deviation, but without the correction to C<N>.
+Same as C<sample_standard_deviation>, but dividing by C<N> instead of C<N - 1>.
+May be called as C<(\@sample)> or C<($mean, \@sample)>.
 
 =head1 TODO
 
@@ -300,17 +486,10 @@ One could calculate more statistics in C for performance.
 
 L<Math::Random::MT>
 
-On the approximation of the error function:
-
-  Winitzki, Sergei (6 February 2008).
-  "A handy approximation for the error function and its inverse" (PDF). 
-  http://homepages.physik.uni-muenchen.de/~Winitzki/erf-approx.pdf
-
-The ~O(n) median implementation is based on C.A.R. Hoare's quickselect
-algorithm. See
-L<http://en.wikipedia.org/wiki/Selection_algorithm#Partition-based_general_selection_algorithm>.
-Right now, it does not implement the Median of Medians algorithm that would
-guarantee linearity.
+The selection implementation uses Hoare's quickselect with an introselect
+heapsort fallback to guarantee C<O(n log n)> worst-case time while keeping
+C<O(n)> expected runtime. See
+L<http://en.wikipedia.org/wiki/Introselect>.
 
 =head1 AUTHOR
 
@@ -321,11 +500,10 @@ patches.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010, 2011, 2012, 2013, 2025 by Steffen Mueller
+Copyright (C) 2010, 2011, 2012, 2013, 2025, 2026 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.0 or,
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-

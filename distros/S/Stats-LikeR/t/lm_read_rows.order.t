@@ -30,7 +30,7 @@
 require 5.010; use strict; use warnings FATAL => 'all';
 use Test::More;
 use File::Temp qw(tempdir);
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 my $tol = 1e-9;
 my @ROWNAME_KEYS = qw(row_names _row rownames .rownames);
@@ -111,7 +111,7 @@ my $script = "$dir/child.pl";
 open my $fh, '>', $script or die "$script: $!";
 print $fh <<'CHILD';
 use strict; use warnings;
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 my $d = { row_names => ['a', 'b'], x => [1 .. 5], y => [2, 1, 5, 3, 7], k1 => [1 .. 5], note => 'meta' };
 my $c = lm(formula => 'y ~ x', data => $d)->{coefficients}{x};
 print abs($c - 1.2) < 1e-9 ? "ok\n" : "bad $c\n";

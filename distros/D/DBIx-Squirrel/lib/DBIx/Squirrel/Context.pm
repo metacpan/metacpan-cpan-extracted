@@ -11,9 +11,9 @@ use Ekorn::Pipeline::Context qw();
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v4.2.0';
+our $VERSION = 'v4.3.0';
 
-our @EXPORT_OK = qw(iterator result_number result_original);
+our @EXPORT_OK = qw(iterator kept_origin result_number result_original);
 
 # Croak at the line that called DBIx::Squirrel.
 our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
@@ -36,12 +36,19 @@ sub iterator : prototype() () {
 *result_number = \&Ekorn::Pipeline::Context::result_number;
 
 # The row the result is being made from, as it was fetched; undef for a
-# result a flush is making, which comes from every row: Ekorn's own sub,
-# under our name, as our statement source gives Ekorn the row as its
-# original part, which Ekorn passes through chains (roadmap 2026-0046).
+# result made from many rows, as a flush's or a batch's are, unless a
+# stage that holds values back says which row it came from: Ekorn's own
+# sub, under our name, as our statement source gives Ekorn the row as
+# its original part, which Ekorn passes through chains (roadmap
+# 2026-0046) and past stages that hold values back (roadmap 2026-0065).
 # Outside a run reading a statement, it's the value the run's source
 # gave (roadmap 2026-0032, D2).
 *result_original = \&Ekorn::Pipeline::Context::result_original;
+
+# For a stage that holds values back, the origin of the value it's
+# keeping: Ekorn's own sub, under our name, so the two :context tags
+# stay the same (roadmap 2026-0065, D1).
+*kept_origin = \&Ekorn::Pipeline::Context::kept_origin;
 
 # For DBIx::Squirrel's stages: the context of the run, if its source is a
 # statement, with its columns and the row it gave last; otherwise undef.
@@ -115,14 +122,24 @@ prototype, so C<result_number + 1> adds one.
 =head2 result_original
 
 The row the result is being made from, as it was fetched, before any
-stage changed it. In a flush of a stage made with
-L<DBIx::Squirrel::Gather>, and the stages after it, it's C<undef>.
-What a flush gives comes from every row, not one. It's
-L<Ekorn::Pipeline::Context>'s, with an empty prototype: the
-statement's source gives Ekorn the row as its original, and Ekorn
-passes it through chains, so it's there wherever a statement is read.
-In a run that reads no statement, it's the value the run's source
-gave, or that was pushed.
+stage changed it. A value a stage made from many rows has none, so for
+a batch, and in a flush of a stage made with L<DBIx::Squirrel::Gather>
+and the stages after it, it's C<undef>. A stage that holds values back
+and says so, as C<take_last> does, passes each value on with its own
+row, in a flush too. It's L<Ekorn::Pipeline::Context>'s, with an empty
+prototype: the statement's source gives Ekorn the row as its original,
+and Ekorn passes it through chains, so it's there wherever a statement
+is read. In a run that reads no statement, it's the value the run's
+source gave, or that was pushed.
+
+=head2 kept_origin
+
+For a stage that holds values back: in its step, the origin of the
+value it's keeping, which it gives back with what it makes of the
+value, so the stages after it get that value's row from
+L</result_original>. It's L<Ekorn::Pipeline::Context>'s; its
+reference's "Stages that hold values back" says how such a stage is
+written.
 
 =head2 statement_context
 

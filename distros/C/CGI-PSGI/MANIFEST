@@ -16,10 +16,12 @@ t/author-podspell.t
 t/author-synopsis.t
 t/cgi502.t
 t/cookie.t
+t/header_lines.t
 t/header_security.t
 t/http.t
 t/psgi.t
 t/psgi_headers.t
 t/redirect.t
+t/short_read.t
 t/upload.t
 t/wrappers.t

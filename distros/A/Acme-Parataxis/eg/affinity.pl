@@ -18,7 +18,7 @@ async {
     my %distribution;
     for my $f (@futures) {
         my $core = await $f;
-        if ( defined $core ) {
+        if ( defined $core && $core >= 0 ) {
             $distribution{$core}++;
         }
         else {

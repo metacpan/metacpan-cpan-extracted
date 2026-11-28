@@ -2,7 +2,7 @@
 
 require 5.010;
 use warnings FATAL => 'all';
-use Stats::LikeR; # Adjust this if add_data is exported from a different module
+use Stats::LikeR qw(:all); # Adjust this if add_data is exported from a different module
 use Test::Exception; # dies_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';

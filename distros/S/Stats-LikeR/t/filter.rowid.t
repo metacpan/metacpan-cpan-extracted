@@ -18,7 +18,7 @@
 
 require 5.010;
 use warnings FATAL => 'all';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::Exception; # dies_ok / throws_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';

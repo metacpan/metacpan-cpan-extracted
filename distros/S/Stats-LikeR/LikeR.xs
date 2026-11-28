@@ -468,28 +468,154 @@ static void usage_croak(pTHX_ const char *restrict fn, const char *restrict pat,
 	sv_2mortal(help); // only now: made mortal inside SAVETMPS, FREETMPS would have freed it too
 	croak("%" SVf "%s: error: %" SVf "\n", SVfARG(help), fn, SVfARG(msg));
 }
-/*Format a single NV with my_snprintf(). my_snprintf() carries a format
-attribute of its own, so an NVgf format written at the call site draws the same
-bogus warning pair described above; taking the format as an ordinary argument
-keeps the checker out of it. my_snprintf() is the portable spelling here --
-plain snprintf() cannot print an NV on a quadmath build.
-
-The price is -Wformat-nonliteral (in -Wformat=2) on the call below, which is
-silenced for this function alone: its one caller passes a literal. diagnostic
-push/pop is gcc 4.6 and clang; any other compiler compiles it unguarded.*/
-#if defined(__clang__) || (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)))
-#  define LIKER_NONLITERAL_FMT_OK 1
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wformat-nonliteral"
-#endif
-static int snprintf_nv(char *buf, Size_t buflen, const char *fmt, NV x)
-{
-	return my_snprintf(buf, buflen, fmt, x);
+/*An exponent printed with three digits where two would do ("1e-008", as the
+MSVCRT under Strawberry Perl 5.24 prints it) comes back to the two that C99,
+R, glibc and UCRT print.  The string is shortened in place.*/
+static void exp_two_digits(char *restrict s) {
+	char *restrict e = strchr(s, 'e');
+	if (!e || (e[1] != '+' && e[1] != '-')) return;
+	char *restrict d = e + 2;
+	size_t nd = strlen(d);
+	while (nd > 2 && d[0] == '0') { memmove(d, d + 1, nd); nd--; }
 }
-#ifdef LIKER_NONLITERAL_FMT_OK
-#  pragma GCC diagnostic pop
-#  undef LIKER_NONLITERAL_FMT_OK
-#endif
+/*Set out to perl's sprintf("%.*f", prec, x) (style 'f') or "%.*g" (style
+'g'), except that a value exactly halfway between two results rounds to the
+even one on every platform.  Call sv_set_nv_even() below, which also fixes the
+exponent's width.
+
+perl hands %f, %e and %g to the C library, and the libraries disagree on ties:
+glibc, UCRT and libquadmath round the exact binary value half to even, the
+MSVCRT under Strawberry Perl 5.24 rounds it half away from zero.  18 of 32 is
+exactly 56.25%, so 0.3431's table_one() printed "56.3%" there and "56.2%" on
+Linux (t/table_one.R.datasets.t 120).  Only ties differ: any other value has
+one correct rounding, which is left to the library.
+
+x is a tie at d decimals iff x * 2^(d+1) is an odd integer, because the
+halfway points (2k+1)/(2*10^d) that are binary fractions are exactly the
+m/2^(d+1) with m odd.  A tie has d+1 decimals, so the library prints it at
+d+1 exactly, and its digits are rounded half to even here.  For %g, d is
+prec - 1 - (the decimal exponent of x), and is negative for a large integer;
+x is then a tie iff x / (10^-d / 2) is an odd integer.  perl's own %.0f
+(F0convert() in sv.c) already rounds half to even without the library.
+
+The formatting goes through perl's formatter with SV arguments, so it reads
+every NV width and needs no NVgf length modifier for -Wformat to misread.
+out is not restrict: it and prec are perl-managed SVs.*/
+#define NV_EVEN_SIG_MAX 17 // MSVCRT prints a double exactly to 17 significant digits and no further, so a longer tie keeps the library's rounding
+#define NV_EVEN_G_MAX 13 // a %g tie is re-read through perl's Atof(), not correctly rounded on old perls; 13 digits keeps 2 orders of a double's 15 spare (chosen, not measured)
+static void sv_set_nv_even_tie(pTHX_ SV *out, const char style, SV *prec, const NV x)
+{
+	SV *args[2];
+	args[0] = prec;
+	args[1] = sv_2mortal(newSVnv(x));
+	const char pat[5] = { '%', '.', '*', style, '\0' };
+	sv_vsetpvfn(out, pat, 4, NULL, args, 2, NULL);
+	if (!nv_isfinite(x) || x == 0) return;
+	const IV p = SvIV(prec);
+	const IV want = p < 0 ? 6 : p; // perl drops a negative precision, and both styles default to 6
+	if (style == 'g' && want > NV_EVEN_G_MAX) return;
+	SV *tmp = sv_2mortal(newSV(0));
+	IV d; // the decimal place x is rounded at; negative for tens, hundreds, ...
+	if (style == 'f') d = want;
+	else {
+		/*want significant digits, so a tie has want + 1 of them, which %.<want>e
+		prints exactly, exponent included.*/
+		const IV sig = want ? want : 1; // %.0g shows one digit
+		args[0] = sv_2mortal(newSViv(sig));
+		sv_vsetpvfn(tmp, "%.*e", 4, NULL, args, 2, NULL);
+		const char *e = strchr(SvPV_nolen(tmp), 'e');
+		if (!e) return;
+		d = sig - 1 - (IV)strtol(e + 1, NULL, 10);
+	}
+	/*Below 2^(NV_MANT_DIG-1) every integer and every half-integer is exact,
+	and a tie at d >= 0 is not an integer, so nothing larger is one.  At 32
+	decimals or more a tie (at least 2^-(d+1)) has over NV_EVEN_SIG_MAX
+	significant digits.*/
+	const NV ax = nv_fabs(x);
+	const NV lim = nv_ldexp((NV)1, NV_MANT_DIG - 1);
+	if (ax >= lim || d >= 32) return;
+	bool tie;
+	if (d >= 0) {
+		const NV t = nv_ldexp(ax, (int)d + 1); // exact: a power-of-two scaling
+		tie = t < 2 * lim && t == nv_floor(t) && nv_floor(t / 2) * 2 != t;
+	} else {
+		NV h = 5; // 10^-d / 2, exact: ax < 2^(NV_MANT_DIG-1) bounds -d by its digits
+		for (size_t i = 1; i < (size_t)-d; i++) h *= 10;
+		const NV q = nv_floor(ax / h);
+		tie = q >= 1 && q * h == ax && nv_floor(q / 2) * 2 != q;
+	}
+	if (!tie) return;
+	args[0] = sv_2mortal(newSViv(d >= 0 ? d + 1 : 0));
+	sv_vsetpvfn(tmp, "%.*f", 4, NULL, args, 2, NULL);
+	STRLEN len;
+	const char *s = SvPV(tmp, len);
+	char dig[80]; // the digits alone: at most 34 before the point (ax < 2^112 on quadmath) and 32 after, plus a carry
+	size_t nd = 0, int_len = 0; // digits seen, and how many came before the point
+	bool neg = FALSE, point = FALSE;
+	for (STRLEN i = 0; i < len; i++) {
+		const char c = s[i];
+		if (c == '-') neg = TRUE;
+		else if (c == '.') point = TRUE;
+		else if (c >= '0' && c <= '9' && nd < sizeof(dig) - 1) {
+			dig[nd++] = c;
+			if (!point) int_len++;
+		} else return; // not the plain fixed-point number expected
+	}
+	size_t lead = 0; // the first nonzero digit, read after the loop
+	while (lead < nd && dig[lead] == '0') lead++;
+	if (nd - lead > NV_EVEN_SIG_MAX) return;
+	const IV keep_iv = (IV)int_len + d; // the digits that stay
+	if (keep_iv < 1 || (size_t)keep_iv >= nd) return;
+	size_t keep = (size_t)keep_iv;
+	if (dig[keep] != '5') return;
+	for (size_t i = keep + 1; i < nd; i++) if (dig[i] != '0') return;
+	if ((dig[keep - 1] - '0') % 2) { // odd: the even neighbor is away from zero
+		size_t i = keep; // where the carry stopped, read after the loop
+		while (i > 0 && dig[i - 1] == '9') dig[--i] = '0';
+		if (i > 0) dig[i - 1]++;
+		else {
+			memmove(dig + 1, dig, keep);
+			dig[0] = '1';
+			keep++;
+			int_len++;
+		}
+	}
+	sv_setpvn(tmp, neg ? "-" : "", neg ? 1 : 0);
+	if (d >= 0) {
+		sv_catpvn(tmp, dig, int_len);
+		if (d > 0) {
+			sv_catpvs(tmp, ".");
+			sv_catpvn(tmp, dig + int_len, (STRLEN)d);
+		}
+	} else {
+		sv_catpvn(tmp, dig, keep);
+		for (size_t i = 0; i < (size_t)-d; i++) sv_catpvs(tmp, "0");
+	}
+	if (style == 'f') {
+		sv_setsv(out, tmp);
+		return;
+	}
+	/*The rounded digits are no longer a tie, so the library lays them out as
+	%g would (exponent form and its digit count included) without choosing.*/
+	args[0] = prec;
+	args[1] = sv_2mortal(newSVnv(Atof(SvPV_nolen(tmp))));
+	sv_vsetpvfn(out, pat, 4, NULL, args, 2, NULL);
+}
+/*sv_set_nv_even_tie(), with a %g exponent cut to two digits where it fits.
+
+The MSVCRT under Strawberry Perl 5.24 prints an exponent with at least three,
+so 0.35's summary() and write_table(tex_format => 1) showed 12345 as
+"1.234e+004" there and "1.234e+04" everywhere else (t/format.ties.R.t 78,
+81-105, 109-111, 117, 122, 162-163).  Style 'f' prints no exponent.  out is
+not restrict: it and prec are perl-managed SVs.*/
+static void sv_set_nv_even(pTHX_ SV *out, const char style, SV *prec, const NV x)
+{
+	sv_set_nv_even_tie(aTHX_ out, style, prec, x);
+	if (style != 'g') return;
+	char *s = SvPV_force_nolen(out); // not restrict: perl-managed memory; forcing also unshares a COW buffer
+	exp_two_digits(s);
+	SvCUR_set(out, strlen(s));
+}
 /*Compare a NUL-terminated string against a lowercase ASCII literal, ignoring
 case. strcasecmp() would do this, but it is declared in <strings.h>, which is
 POSIX-only -- MSVC ships neither the header nor the function, so a build there
@@ -7097,16 +7223,6 @@ static double qn_pct(NV p) {
 	return x;
 }
 
-/*An exponent printed with three digits where two would do ("1e-008", as older
-Microsoft C libraries print it) comes back to R's two.*/
-static void qn_fix_exponent(char *restrict s) {
-	char *restrict e = strchr(s, 'e');
-	if (!e || (e[1] != '+' && e[1] != '-')) return;
-	char *restrict d = e + 2;
-	size_t nd = strlen(d);
-	while (nd > 2 && d[0] == '0') { memmove(d, d + 1, nd); nd--; }
-}
-
 /*formatC(x, format = "fg", width = 1, digits = 7) for one finite x >= 0: R's
 str_signif() (src/main/util.c), "fg" branch.  R first rounds x / 10^iex to six
 decimals to see whether it carries into the next power of ten, but that only
@@ -7183,7 +7299,7 @@ static void qn_format_vec(const double *restrict x, const bool *restrict ok,
 		if (!sci)        snprintf(out[i], len, "%.*f", d, x[i]);
 		else if (d > 0)  snprintf(out[i], len, "%#.*e", d, x[i]);
 		else             snprintf(out[i], len, "%.*e", d, x[i]);
-		qn_fix_exponent(out[i]);
+		exp_two_digits(out[i]);
 	}
 }
 /*R's pretty() over a range: the breakpoints hist() bins into.
@@ -8572,24 +8688,18 @@ says.  When the source SV is UTF-8, Greek letters are turned into their
 textgreek macros (e.g. U+0394 Greek Delta -> \textDelta{}; the trailing {}
 keeps a following letter from being swallowed into the control word). With
 do_format set, a numeric cell is first rendered with %.4g (mirrors the
-original 'format' option).  The cell is len bytes and may hold a NUL, which
-passes through like any other byte; what is kept is copied a run at a time.*/
+original 'format' option), a tie rounded to even and the exponent given two
+digits everywhere by sv_set_nv_even().  The cell is len bytes and may hold a NUL, which passes
+through like any other byte; what is kept is copied a run at a time.*/
 static void tex_escape_sv(pTHX_ SV *out, const char *s, STRLEN len, bool is_utf8, bool do_format){
 	sv_setpvs(out, "");
 	if (!s) return;
-	char numbuf[64];
 	if (do_format && len) {
 		SV *tmp = sv_2mortal(newSVpvn(s, len));
 		if (looks_like_number(tmp)) {
-/* snprintf_nv (my_snprintf), not snprintf: NVgf is "g", "Lg" or "Qg"
- depending on the build, and the C library only knows the first two. A
- quadmath build gets "%.4Qg" right here only because libquadmath's
- constructor teaches glibc the Q modifier -- a glibc extension no other
- platform offers. my_snprintf routes through quadmath_snprintf() itself,
- so it is correct on every build.*/
-			snprintf_nv(numbuf, sizeof(numbuf), "%.4" NVgf, SvNV(tmp));
-			s = numbuf;
-			len = strlen(numbuf);
+			SV *num = sv_2mortal(newSV(0));
+			sv_set_nv_even(aTHX_ num, 'g', sv_2mortal(newSViv(4)), SvNV(tmp));
+			s = SvPV(num, len);
 			is_utf8 = 0; // the formatted number is plain ASCII
 		}
 	}
@@ -33214,6 +33324,23 @@ _melt_xs(df, shape, id, val, otype, var_name, value_name)
 	FREETMPS;
 	LEAVE;
 }
+  OUTPUT:
+	RETVAL
+
+ # sprintf("%.*f", $prec, $x) for style 'f', "%.*g" for 'g', with an exact
+ # tie rounded to even and a %g exponent of two digits ("1e+04", not MSVCRT's
+ # "1e+004") on every platform; see sv_set_nv_even().  For table_one() and
+ # summary(), whose cells are strings people compare.
+SV *
+_format_nv(style, prec, x)
+	const char *style
+	SV *prec
+	NV x
+  CODE:
+	if ((style[0] != 'f' && style[0] != 'g') || style[1])
+		croak("_format_nv: style must be 'f' or 'g', not '%s'", style);
+	RETVAL = newSV(0);
+	sv_set_nv_even(aTHX_ RETVAL, style[0], prec, x);
   OUTPUT:
 	RETVAL
 

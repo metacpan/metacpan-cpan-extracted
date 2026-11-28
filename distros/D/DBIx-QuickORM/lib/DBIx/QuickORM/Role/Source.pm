@@ -2,7 +2,7 @@ package DBIx::QuickORM::Role::Source;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000031';
 
 use Role::Tiny;
 
@@ -12,95 +12,105 @@ use Role::Tiny;
 
 =head1 NAME
 
-DBIx::QuickORM::Role::Source - Role for things that can be queried.
+DBIx::QuickORM::Role::Source - What a handle reads from.
 
 =head1 DESCRIPTION
 
-A "source" is anything a query can run against: a table, a view, a join, or
-a literal SQL fragment. This role defines the interface the query and SQL
-layers rely on. Consumers include L<DBIx::QuickORM::Schema::Table>,
-L<DBIx::QuickORM::Join>, and L<DBIx::QuickORM::LiteralSource>.
+A source is what a L<DBIx::QuickORM::Handle> selects from: a table
+(L<DBIx::QuickORM::Source::Table>), a query (L<DBIx::QuickORM::Source::Query>),
+or tables joined together (L<DBIx::QuickORM::Source::Join>). Most code gets
+one from C<< $orm->handle >> and never touches it.
+
+The handle asks a source what to select and has it turn the fetched rows into
+results. The SQL builder asks it for the C<FROM> part of a statement. The
+Connection asks it which table, if any, its rows belong to and what fields the
+names in the SQL stand for.
+
+Rows from a source without a table or without a primary key bypass the lookup
+table: they are never canon and cannot be updated, refreshed, or deleted
+through the ORM.
+
+=head1 SYNOPSIS
+
+    package My::Source;
+    use Object::HashBase qw{<view};
+    use Role::Tiny::With qw/with/;
+    with 'DBIx::QuickORM::Role::Source';
+
+    sub table          { undef }
+    sub pk             { undef }
+    sub select_fields  { $_[1] }
+    sub field_records  { {} }
+    sub query_sql      { () }
+    sub from_sql       { my ($self, $dialect) = @_; ($dialect->quote_identifier($self->view), []) }
+
+    sub results {
+        my ($self, $orm, $raw, $ingest, @class) = @_;
+        ($raw, $orm->_row_builder(undef, @class));
+    }
 
 =head1 REQUIRED METHODS
 
 =over 4
 
-=item $sql = $source->source_db_moniker
+=item $name = $source->table
 
-The SQL naming the source: a table name, C<"table AS alias">, or literal SQL.
+The table the rows belong to, or undef when they belong to none.
 
-=item $name = $source->source_orm_name
+=item \@fields = $source->pk
 
-The abstract source kind: C<TABLE>, C<VIEW>, C<JOIN>, or C<LITERAL>.
+The primary key fields, or undef when there is none.
 
-=item $class = $source->row_class
+=item $fields = $source->select_fields($given)
 
-=item $cols = $source->primary_key
+What a select names, for the builder's C<fields> request (see
+L<DBIx::QuickORM::Role::SQLBuilder>), given the handle's C<fields>.
 
-=item $type = $source->field_type($field)
+C<$given> is undef when the handle has none (the result may be undef too, for
+every column), an arrayref of field names (to which a primary key is added),
+or a hashref of computed fields, which is used as it is. A table or join
+croaks for names it does not have. A query passes them on.
 
-=item $aff = $source->field_affinity($field, $dialect)
+=item \%fields = $source->field_records
 
-=item $bool = $source->has_field($field)
+The map's field records (see L<DBIx::QuickORM::Map>) by the names the SQL and
+the fetched columns use them under, or empty when there are none. They are
+used for binding and fetching values by their fields.
 
-=item $db_name = $source->field_db_name($field)
+The hash may be shared and returned on every call: callers read it and never
+change it.
 
-The database name for a field, given either its ORM or database name. Idempotent
-and used by the SQL builder to emit database names; an unknown field is returned
-unchanged.
+=item ($sql, \@binds) = $source->from_sql($dialect)
 
-=item $orm_name = $source->field_orm_name($field)
+What goes after C<FROM>, with its binds as C<[$field, $value]> pairs (the
+field undef when there is none).
 
-The ORM name for a field, given either its ORM or database name. Idempotent and
-used to remap fetched result keys back to ORM names; an unknown field is
-returned unchanged.
+=item ($sql, \@binds) = $source->query_sql
 
-=item $bool = $source->field_is_generated($field)
+A complete query to run as it is when the handle adds nothing to it, or an
+empty list when the source is not a query.
 
-True if the named field is a database-generated column (stored or virtual
-C<GENERATED>). Used by the row and SQL layers to keep generated columns out of
-C<INSERT> / C<UPDATE> column lists. Unknown fields return false.
+=item (\@rows, \&build) = $source->results($orm, \@raw, $ingest, @class)
 
-=item $bool = $source->source_has_aliases
+Turns the rows a query fetched (C<\@raw>, hashrefs keyed by column name) into
+results: C<\@rows> for the iterator (L<DBIx::QuickORM::Iterator>) and
+C<build>, which turns each into what the iterator hands out, or undef to
+hand the rows out as they are. C<< $orm->_row_builder >> gives the C<build>
+for rows of a table.
 
-True when the source has any column whose ORM name differs from its database
-name. Lets the SQL and row layers skip name translation entirely when there is
-nothing to translate.
+Ingesting happens here, at once, through the ORM's Connection
+(C<< $orm->connection >>), unless C<$ingest> is false: then rows are kept as
+fetched and never enter the lookup table (a C<no_cache> handle's rows).
+Building happens as each row is handed out.
 
-=item $fields = $source->fields_to_fetch
-
-=item $fields = $source->fields_to_omit
-
-=item $fields = $source->fields_list_all
-
-=back
-
-=head1 PROVIDED METHODS
-
-=over 4
-
-=item $bool = $source->cachable
-
-True when the source has a primary key (so its rows can be identity-mapped and
-cached), false otherwise.
-
-=item $bool = $source->is_writable
-
-True for a real source that C<INSERT> / C<UPDATE> / C<DELETE> can target. A
-derived-table (subquery) source overrides this to false so writes croak with a
-clear message instead of failing deep in statement construction.
+C<@class> is the handle's C<row_class> as a one-item list (even undef), or
+empty when the handle sets none.
 
 =back
 
 =cut
 
-sub cachable {
-    my $pk = $_[0]->primary_key or return 0;
-    return 1 if @$pk;
-    return 0;
-}
-
-sub is_writable { 1 }
+requires qw/table pk select_fields field_records from_sql query_sql results/;
 
 1;
 
@@ -108,7 +118,7 @@ __END__
 
 =head1 SOURCE
 
-The source code repository for DBIx::QuickORM can be found at
+The source code repository for DBIx-QuickORM can be found at
 L<https://github.com/exodist/DBIx-QuickORM>.
 
 =head1 MAINTAINERS

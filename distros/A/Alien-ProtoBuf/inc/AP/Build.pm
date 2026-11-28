@@ -35,14 +35,22 @@ sub alien_provides_cflags {
 sub ACTION_alien_code {
     my $self = shift;
     $self->SUPER::ACTION_alien_code();
-    my $system_provides = scalar $self->config_data('system_provides');
 
+    return if ExtUtils::CppGuess->new->is_msvc;
+
+    my $system_provides = scalar $self->config_data('system_provides');
     my $version = $self->alien_check_installed_version;
     my ($major, $minor) = split /\./, $version;
-    if ($major > 3 || ($major == 3 && $minor >= 6)) {
-        if (!ExtUtils::CppGuess->new->is_msvc) {
-            $system_provides->{'C++flags'} = "-std=c++11";
-        }
+
+    # C++11 is required by Prootbuf, while the higher C++ standards are required by Abseil.
+    # there is no 1:1 mapping between Protobuf and Abseil versions, so this is not going to be
+    # 100% accurate, but it should work for most cases.
+    if ($major >= 30) {
+        $system_provides->{'C++flags'} = "-std=c++17";
+    } elsif ($major >= 21) {
+        $system_provides->{'C++flags'} = "-std=c++14";
+    } elsif ($major > 3 || ($major == 3 && $minor >= 6)) {
+        $system_provides->{'C++flags'} = "-std=c++11";
     }
 }
 

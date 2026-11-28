@@ -1,0 +1,39 @@
+Revision history for Perl extension Web::Session (formerly Apache::Session::Browseable).
+
+1.0.0 (Web::Session, fork of Apache::Session::Browseable 1.4.0)
+    - Fork of Apache::Session::Browseable, renamed Web::Session
+      (https://github.com/linagora/perl-Web-Session)
+    - Apache::Session::Serialize::JSON and Apache::Session::Generate::SHA256
+      renamed Web::Session::Serialize::JSON and Web::Session::Generate::SHA256
+    - Postgres is now an alias of PgJSON, MySQL of MySQLJSON; new MariaDB
+      alias of MariaDBJSON
+    - Drop the Oracle, Informix, Sybase and PgHstore backends
+    - New MariaDBJSON backend
+    - PgJSON and Postgres: connection pool used by default (MaxIdle,
+      IdleTimeout, MaxLifetime; KeepConnections => 0 to disable), one
+      connection per tied session, a new session written once
+    - PgJSON and Postgres: Commit is on by default when no Handle is given
+      (Commit => 0 to roll back at untie)
+    - Patroni: uses the same pool, keyed by the primary node, with one
+      transaction per tied session (the row read stays locked until untie)
+    - PgJSON and Postgres: class methods (searchOn(), deleteIfLowerThan()...)
+      borrow a connection of the pool for each call
+    - DBI backends reuse their connection by default (noreuse to disable),
+      fork safe
+    - searchLt() and searchGt() for SQL, Redis and LDAP backends; if the SQL
+      comparison fails, sessions are compared in Perl (see "ERRORS" in
+      Web::Session)
+    - PgJSON: optional GIN index (GinIndex)
+    - SQL backends don't rewrite a session stored back unchanged
+      (RewriteUnchanged to always write it); the JSON serializer sorts keys
+    - Quote table and column names; fix SQL injections through
+      deleteIfLowerThan() values and JSON field names
+    - deleteIfLowerThan(): fix "and" and "not" rules, invalid rules
+    - PostgreSQL: deleteIfLowerThan() deletes by batches
+      ($Web::Session::_common::BatchSize)
+    - Faster full scans (batches, no eval per row), index documentation
+    - JSON serializer: decode UTF-8 bytes, Redis supports characters above
+      U+00FF
+    - Many Redis fixes (index cleanup, foreign keys, glob characters,
+      batched reads)
+    - LDAP: deleteIfLowerThan()

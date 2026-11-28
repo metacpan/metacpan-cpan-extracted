@@ -8,9 +8,10 @@ require_ok( 'WebService::Browshot' );
 
 my $browshot = WebService::Browshot->new(
 	key	=> $ENV{BROWSHOT_KEY} || '',
+	base	=> 'https://api.browshot.com/api/v1/',
 );
 
-is($browshot->api_version(), '1.32', "API version");
+is($browshot->api_version(), '2.0', "API version");
 
 SKIP: {
 	skip "env BROWSHOT_REMOTE_TESTS not set", 130 if (! $ENV{BROWSHOT_REMOTE_TESTS});

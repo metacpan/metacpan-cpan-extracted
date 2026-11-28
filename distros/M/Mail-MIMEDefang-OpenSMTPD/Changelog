@@ -1,0 +1,34 @@
+2026-11-27 Giovanni Bechis <giovanni@paclan.it>
+
+	* Release 1.1
+	* fix filter when using a non default socket path on OpenBSD
+
+2026-11-27 Giovanni Bechis <giovanni@paclan.it>
+
+	* Release 1.0
+	* Helper code moved into the new Perl module
+	  Mail::MIMEDefang::OpenSMTPD
+	* Build switched to ExtUtils::MakeMaker, the distribution is
+	  available from CPAN as Mail-MIMEDefang-OpenSMTPD
+	* New -s option to run filter_sender checks
+	* Pass all TLS macros to the filter
+	* Improved RESULTS file handling
+	* Regression test suite under t/, GitHub Actions CI
+
+2023-04-25 Giovanni Bechis <giovanni@paclan.it>
+
+	* Release 0.2
+	* Implement the relayok command
+	* Code refactoring, no functional change
+
+2023-01-16 Giovanni Bechis <giovanni@paclan.it>
+
+	* Release 0.1, first public release
+	* OpenSMTPD filter talking to mimedefang-multiplexor(8)
+	* Support for the C, D, M and T protocol commands
+	* Support for header insertion (at the correct position) and
+	  action_delete_header
+	* mx_id saved and used when needed
+	* Temporary directory cleaned up on disconnect, unveil(2) support
+	* Warnings for unsupported MIMEDefang features logged via syslog(3)
+	* Works with current MIMEDefang releases

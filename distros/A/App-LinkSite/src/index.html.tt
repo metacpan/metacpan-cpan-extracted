@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta property="og:title" content="[% site.name %] / @[% site.handle %]">
+    <meta property="og:title" content="[% site.name | html %] / @[% site.handle | html %]">
     <meta property="og:type" content="website">
 [% IF site.desc -%]
-    <meta property="og:description" content='[% site.desc.replace("\n", ' ') %]'>
+    <meta property="og:description" content="[% site.desc.replace("\n", ' ') | html %]">
 [% END -%]
 [% IF site.og_image -%]
-    <meta property="og:image" content="[% site.site_url %]img/[% site.og_image %]">
+    <meta property="og:image" content="[% site.site_url | html %]img/[% site.og_image | html %]">
 [% END -%]
-    <meta property="og:url" content="[% site.site_url %]">
+    <meta property="og:url" content="[% site.site_url | html %]">
 [% IF ga4 -%]
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KHXQ2SWP9P"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=[% ga4 %]"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -23,7 +23,7 @@
 [% END -%]
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="A page of links for [% site.name %] (@[% site.handle %])">
+    <meta name="description" content="A page of links for [% site.name | html %] (@[% site.handle | html %])">
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css"
           integrity="sha512-QeR2VH+lsBE5LSAe1Q5EnTBbe7XTBubt8dG93Y7gidSgdMCr8nVqKcfKAMyN96SV8KDbZVTDXChatu5G2KQGzg=="

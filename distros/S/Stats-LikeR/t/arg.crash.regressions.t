@@ -130,7 +130,7 @@ my $res_file  = File::Spec->catfile($work, 'snippet.res');
 my $out_file  = File::Spec->catfile($work, 'snippet.out');
 sub child_result {
 	my ($code) = @_;
-	my $prog = 'use Stats::LikeR; $SIG{__WARN__} = sub { };'
+	my $prog = 'use Stats::LikeR qw(:all); $SIG{__WARN__} = sub { };'
 	         . ' my $ok = eval { ' . $code . '; 1 };'
 	         . ' open my $R, ">", $ARGV[0] or exit 3;'
 	         . ' print {$R} $ok ? "ok" : "croak";'

@@ -25,6 +25,7 @@ mdee - em·dee, Markdown Easy on the Eyes
      -L  --[no-]lateral     all pages in one row, scrolled sideways
          --[no-]rule        use Unicode rules for tables (default: on)
     --ts --table-style=#    table style: lattice, 3line or simple (default: lattice)
+         --keep TYPE=WHAT   kept in one pane: table=none|row|head|all (default: table=head)
          --cat-v            visualize whitespace via cat-v
          --[no-]image[=#]   image types to show (default: png,jpeg,gif)
      -w  --width=#          output width (default: terminal width)
@@ -56,7 +57,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 # VERSION
 
-Version 1.30
+Version 1.32
 
 # DESCRIPTION
 
@@ -446,6 +447,39 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     space on both sides; the spaces at the right end of the table are then
     left out when the table does not fit the width with them.
 
+- **--keep** _TYPE_=_WHAT_\[,...\]
+
+    Tell what of a block of the _TYPE_ is kept in one pane of nup, so
+    that a pane does not end inside it.  The block goes to the next pane
+    when that part does not fit in the rest of the pane.  The option can
+    be repeated, and the settings can be joined by commas:
+    `--keep table=all`.  `table` is the only _TYPE_ for now, with
+    these values of _WHAT_ (default: `head`):
+
+    - `none`
+
+        Nothing: a pane may end between any two lines of a table.
+
+    - `row`
+
+        The lines of a row, which has more than one line when a cell is
+        wrapped.
+
+    - `head`
+
+        Also the header, the rule below it and the first row, and with
+        `3line` and `simple`, the last row and the rule below it.
+
+    - `all`
+
+        The whole table.  A table longer than a pane is laid out as lines,
+        and may be divided anywhere.
+
+    This has an effect only when tables are kept intact: with nup, when
+    folding and table formatting are on, and without `--cat-v`.
+    `default[keep]` in the configuration file gives the settings of the
+    types not given on the command line: `default[keep]=table=all`.
+
 - **--cat-v**
 
     Pass the output through [cat-v(1)](https://metacpan.org/pod/App%3A%3Acat%3A%3Av) to visualize
@@ -457,7 +491,9 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
 
     Show images in the terminal (default: on).  _TYPES_ is a list of
     the types of images to show, separated by commas: `png`, `jpeg` and
-    `gif` (default: all of them).  **--image=png** shows PNG only, and
+    `gif` (default: all of them), and `mermaid`, which is not in the
+    default: **--image=png,jpeg,gif,mermaid** also draws the Mermaid
+    diagrams (see ["Mermaid Diagrams"](#mermaid-diagrams)).  **--image=png** shows PNG only, and
     **--no-image** none.  They are shown only in the terminals that
     support them; see ["IMAGES"](#images).
 
@@ -852,6 +888,38 @@ is written in `=begin html` in POD and copied into README.
 
 Images inside a paragraph or a code block are not shown.
 
+## Mermaid Diagrams
+
+With `mermaid` in **--image**, a fenced code block whose info string
+is `mermaid` is followed by the image of its diagram.  The code is
+shown as it is, as the line of an image is, so the output with
+**--no-image** is the same text without the images.
+
+The diagrams are drawn by **mmdr** of
+[mermaid-rs-renderer](https://github.com/1jehuang/mermaid-rs-renderer),
+which needs no browser, is quick, and draws the diagrams in its own
+way.  They are drawn on the background GitHub shows them on: the
+`default` theme on white, or the `dark` theme on `#0d1117` in the
+dark mode.  The images are kept in
+`mdee-mermaid-_UID_` of the temporary directory (`TMPDIR`, or
+`/tmp`), which only the user can read, and drawn again only when the
+code changes or the system has cleaned them up.  A diagram that
+cannot be drawn is not shown, and is tried again the next time.
+**mmdr** does not fetch anything from the network.
+
+The look is set by `--config`: `mermaid_theme=NAME` (`default`,
+`dark`, `forest` or `neutral`), `mermaid_background=COLOR` (a color
+of CSS, or `transparent`, with which the background of the terminal
+shows through) and `mermaid_scale=N` (1.5 by default).  A diagram is
+shown at its size, in the cells of the terminal, and reduced to the
+fold width when it is wider; a larger scale makes a small diagram take
+more cells, and fewer panes (`-C1`, or `-p`) leave more width for a
+wide one.
+
+The command is given by `--config mermaid_command=COMMAND`, split
+into words as a shell does: a path, or **mmdr** with options.  With
+its own `-c`, it is not given the background.
+
 ## Image Files
 
 The file is read from the local disk, by a path relative to the
@@ -880,6 +948,9 @@ width and within the terminal height minus four lines.  With nup, an
 image is not split across panes: if it does not fit in the rest of a
 pane, it starts in the next one (requires
 [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn) 1.71 or later).
+
+An image is put in the middle of the fold width.  With
+`--config image_align=left` it is put at the left end.
 
 ## Conditions
 
@@ -1037,6 +1108,7 @@ This is a shell script that can set defaults and override colors:
     default[fold_width]=80           # set default fold width
     default[refill]=1                # join paragraph lines
     default[lateral]=1               # all pages in one row
+    default[keep]=table=all          # a table in one pane
     default[base_color]=DarkCyan     # set default base color
 
 A value which has spaces or characters special to the shell, as `<`,
@@ -1051,6 +1123,7 @@ The `default` associative array supports the following keys:
 - `default[fold_width]` - Corresponds to `--fold-width` (e.g., `80`)
 - `default[refill]` - Corresponds to `--refill` (`1` to enable)
 - `default[lateral]` - Corresponds to `--lateral` (`1` to enable)
+- `default[keep]` - Corresponds to `--keep` (e.g., `table=all`)
 - `default[pane_width]` - Corresponds to `--pane-width` (e.g., `100`)
 - `default[pane]` - Corresponds to `--pane` (e.g., `2` or `2,2`)
 - `default[base_color]` - Corresponds to `--base-color` (e.g., `DarkCyan`)

@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 # PODNAME: cpangit-server
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # ABSTRACT: serve a CPAN tree from a git branch, or all CPAN trees in the git repo
 
 use FindBin;
@@ -115,7 +115,7 @@ Disabled by default.  This has no effect when serving a single tree with C<--tre
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

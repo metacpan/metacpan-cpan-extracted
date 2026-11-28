@@ -294,7 +294,7 @@ throws_ok { write_table([ { a => 1 } ], path(), xlsx_sheet => q('Sheet)) }
 	my $f = path();
 	my $script = "$dir/announce.pl";
 	open my $sfh, '>', $script or die "cannot write $script: $!";
-	print {$sfh} "use Stats::LikeR; write_table({ A => [ { a => 1 } ], B => [ { a => 2 } ] }, \$ARGV[0]);\n";
+	print {$sfh} "use Stats::LikeR qw(:all); write_table({ A => [ { a => 1 } ], B => [ { a => 2 } ] }, \$ARGV[0]);\n";
 	close $sfh or die "cannot write $script: $!";
 	my @inc = map { "-I$_" } grep { !ref $_ } @INC;
 	open my $ph, '-|', $^X, @inc, $script, $f or die "cannot run a child perl: $!";
@@ -309,7 +309,7 @@ SKIP: {
 	skip 'needs /dev/stdout and a list-form pipe open', 1 if $^O eq 'MSWin32' || !-e '/dev/stdout';
 	my $script = "$dir/pipe.pl";
 	open my $sfh, '>', $script or die "cannot write $script: $!";
-	print {$sfh} 'use Stats::LikeR; my %b = (A => [ map { +{ id => $_, v => $_ / 7 } } 1 .. 3000 ], B => { x => [1 .. 9] }, C => []);',
+	print {$sfh} 'use Stats::LikeR qw(:all); my %b = (A => [ map { +{ id => $_, v => $_ / 7 } } 1 .. 3000 ], B => { x => [1 .. 9] }, C => []);',
 		" write_table(\\\%b, \$ARGV[0], xlsx => 1, quiet => 1, xlsx_freeze_rows => 1);",
 		" write_table(\\\%b, '/dev/stdout', xlsx => 1, quiet => 1, xlsx_freeze_rows => 1);\n";
 	close $sfh or die "cannot write $script: $!";

@@ -13,7 +13,7 @@
 # the same way by the module on older ones (see t/srand.stream.t).
 # There is no R/SciPy equivalent: sample()'s stream is this module's own.
 require 5.010; use strict; use warnings FATAL => 'all';
-use Test::More; use Stats::LikeR;
+use Test::More; use Stats::LikeR qw(:all);
 my @a = (0 .. 999);
 my @rows = (
 	[7,1,'266'],

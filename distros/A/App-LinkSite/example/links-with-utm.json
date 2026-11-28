@@ -1,0 +1,34 @@
+{
+  "name": "Example Profile",
+  "handle": "example",
+  "desc": "Links to my projects and writing.",
+  "image": "",
+  "og_image": "",
+  "site_url": "https://example.com/",
+  "utm": { "utm_source": "my-profile", "utm_campaign": "profile" },
+  "social": [
+    { "service": "substack", "handle": "example" }
+  ],
+  "links": [
+    { "title": "My project", "link": "https://example.com/project?view=latest#details" },
+    {
+      "title": "My newsletter",
+      "link": "https://example.com/newsletter",
+      "utm": { "utm_content": "newsletter" }
+    },
+    { "title": "Untracked destination", "link": "https://example.com/untracked", "utm": false },
+    { "title": "Email me", "link": "mailto:me@example.com" }
+  ],
+  "sections": [
+    {
+      "title": "Writing",
+      "links": [
+        {
+          "title": "A featured article",
+          "link": "https://example.com/article",
+          "utm": { "utm_content": "featured-article" }
+        }
+      ]
+    }
+  ]
+}

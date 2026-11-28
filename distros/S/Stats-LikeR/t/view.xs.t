@@ -22,7 +22,7 @@ use Test::More;
 use Test::Exception;
 use Test::LeakTrace 'no_leaks_ok';
 use B ();
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 
 $ENV{COLUMNS} = 1000;	# one block of columns, whatever the terminal
 

@@ -33,14 +33,19 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "5.57",
+            "Hash::Ordered" : "0.009",
+            "Math::Int64" : "0",
+            "Ref::Util" : "0.200",
+            "Sub::Util" : "1.40",
             "XSLoader" : "0",
             "perl" : "5.020"
          }
       },
       "test" : {
          "requires" : {
+            "B" : "0",
             "Digest::MD5" : "0",
-            "JSON::PP" : "2.27103",
+            "JSON" : "0",
             "MIME::Base64" : "0",
             "Test2::V0" : "0"
          }
@@ -53,7 +58,7 @@
          "web" : "https://github.com/robrwo/perl-HTTP-StructuredField"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.5",
    "x_contributors" : [
       "Paul Johnson <paul@pjcj.net>"
    ],

@@ -9,7 +9,7 @@ Their sources are at <https://codeberg.org/gandalf/boardstreams-perl> and <https
 
 ## Which versions work together
 
-The two halves work together when they speak the same **protocol version**. That is a whole number of its own, currently 1: `BoardStreams::PROTOCOL_VERSION` in Perl, and the `PROTOCOL_VERSION` export of the npm package. It only goes up when a release changes the protocol in a way that earlier releases cannot work with, and the change log of that release says so. The version numbers of the libraries themselves do not have to match, so you can upgrade either half alone as long as the protocol version stays the same.
+The two halves work together when they speak the same **protocol version**. That is a whole number of its own, currently 2: `BoardStreams::PROTOCOL_VERSION` in Perl, and the `PROTOCOL_VERSION` export of the npm package. It only goes up when a release changes the protocol in a way that earlier releases cannot work with, and the change log of that release says so. The version numbers of the libraries themselves do not have to match, so you can upgrade either half alone as long as the protocol version stays the same.
 
 This is enforced. The server announces its protocol version when a connection opens; a client that speaks another logs an error to the browser console naming both, refuses every join and request with the reason `protocol_mismatch`, and does not reconnect.
 
@@ -20,7 +20,7 @@ cpanm BoardStreams@v0.0.56
 npm install boardstreams@0.0.56
 ```
 
-Releases up to 0.0.55 compared the library versions instead, and do not work with later ones.
+Releases up to 0.0.55 compared the library versions instead, and do not work with later ones. Releases 0.0.56 to 0.0.58 speak protocol version 1, and releases from 0.0.59 on speak version 2.
 
 ## The model in one minute
 
@@ -161,6 +161,33 @@ join => sub ($ctx) {
 },
 ```
 
+You can also guard the WebSocket route itself, before any channel is involved, by mounting it behind an `under` with the plugin's `routes` option. Whoever fails the check never gets a connection:
+
+```perl
+my $members = app->routes->under(sub ($c) {
+    return 1 if $c->session('user');
+    $c->render(text => 'log in first', status => 401);
+    return undef;
+});
+
+my $hub = plugin BoardStreams => { pg => $pg, routes => $members };
+```
+
+The check may take its time. An `under` that has to look something up returns `undef` and calls `$c->continue` when it knows the answer:
+
+```perl
+my $partners = app->routes->under(sub ($c) {
+    $c->partners->verify_p($c->req->headers)->then(sub ($partner) {
+        return $c->render(text => 'unknown signature', status => 403) unless $partner;
+        $c->res->headers->header('X-Signature' => $partner->sign($c->req->headers->header('X-Nonce')));
+        $c->continue;
+    });
+    return undef;
+});
+```
+
+Headers that the `under` puts on the response, like the signature above, are sent with the answer to the WebSocket handshake, so a client that can read them can check who it is talking to. A browser cannot, but `BoardStreams::Client` and the JavaScript client under Node.js can; see [A client in Perl](#a-client-in-perl).
+
 ### Updating a channel from elsewhere
 
 Any part of the application can change a channel or emit on it, for example an ordinary HTTP action:
@@ -247,7 +274,7 @@ Two details are worth knowing:
 |---|---|---|
 | `pg` | required | A connection string or a `Mojo::Pg` object |
 | `route` | `/boardstreams` | Path of the WebSocket route |
-| `routes` | `app->routes` | Route object to attach it to, e.g. one behind an `under` |
+| `routes` | `app->routes` | Route object to attach it to, e.g. one behind an `under`, which may answer at once or later (see [Authorisation](#authorisation)) |
 | `retention` | `3600` | Seconds that event history and request IDs are kept |
 | `heartbeat_interval` | `25` | Seconds between heartbeats to each browser |
 | `retry_delay` | `1` | Seconds between retries while PostgreSQL is unreachable |
@@ -497,8 +524,53 @@ What differs from the JavaScript client is only what the language makes differ:
 | Promises | `Mojo::Promise` objects |
 | `BoardStreamsError` with `reason` and `data` | `BoardStreams::Client::Error` with `reason` and `data` methods |
 | A protocol mismatch is logged with `console.error` | It is reported with `warn` |
+| `headers` and `onHandshake` options, under Node.js only, with `NodeWebSocket` | `headers` and `on_handshake` options |
 
 It runs on the Mojolicious event loop, so inside a Mojolicious application it needs nothing more; a standalone script starts the loop itself, as above. Its own documentation is in `perldoc BoardStreams::Client`.
+
+### Taking part in the handshake
+
+A program, unlike a browser, can put headers on the request that opens the WebSocket and read the headers of the answer. Two options of the client make use of that, for instance so that two servers can prove to each other who they are before either says anything:
+
+```perl
+my $bs = BoardStreams::Client->new(
+    url => 'wss://other.example.com/boardstreams',
+
+    # Called for every connection attempt, reconnections included.
+    headers => sub { sign_request() },    # { 'X-Date' => ..., 'X-Nonce' => ..., 'X-Signature' => ... }
+
+    # Called with the answer, before anything of the connection is used.
+    on_handshake => sub ($handshake) {
+        if ($handshake->accepted) {
+            return 1 if answer_is_genuine($handshake->sent->{'X-Nonce'}, $handshake->headers);
+            return BoardStreams::Client::Error->new(reason => 'bad_signature');
+        }
+        return BoardStreams::Client::Error->new(reason => 'unauthorized', data => $handshake->body)
+            if $handshake->code == 401 or $handshake->code == 403;
+        return 1;    # anything else: keep trying
+    },
+);
+```
+
+- **`headers`** is a hash of headers to add to the handshake request, or a sub that returns one. A sub is called anew for each attempt, so the headers can carry a fresh date, nonce or signature.
+- **`on_handshake`** is shown the answer to each handshake: `code` (101 when the server accepted), `accepted`, `headers` and `header($name)`, `body` (what a refusal said) and `sent` (the headers this attempt added). It is called before any message of the connection is processed, and also when the server refuses the handshake with an HTTP status.
+- **What it returns decides what happens next.** A `BoardStreams::Client::Error` stops the client for good, as a protocol mismatch does: its status becomes `closed`, it does not reconnect, and every channel is refused with that error. Any other false value drops the connection and tries again after the usual delay. A true value uses the connection; for a handshake that the server refused there is nothing to use, so the client tries again, as it does without this option.
+
+On the server side, the check and the signature of the answer belong in an `under` in front of the route; see [Authorisation](#authorisation).
+
+**In JavaScript** the same two options exist, as `headers` and `onHandshake`, but only outside the browser: a browser's WebSocket can neither send headers of your choosing nor show the answer's. Under Node.js, pass the WebSocket that comes with the package for this purpose:
+
+```js
+import { BoardStreams, BoardStreamsError } from 'boardstreams';
+import { NodeWebSocket } from 'boardstreams/node';
+
+const bs = new BoardStreams('wss://other.example.com/boardstreams', {
+  WebSocket: NodeWebSocket,
+  headers: () => signRequest(),
+  onHandshake: (handshake) =>
+    handshake.accepted ? answerIsGenuine(handshake) || new BoardStreamsError('bad_signature') : true,
+});
+```
 
 ## 3. What happens when things break
 
@@ -550,4 +622,4 @@ or `STOPSIGNAL SIGQUIT` in the Dockerfile. The server must be the container's ma
 ## Known limitations
 
 - If a worker dies after committing a request's update but before recording its response, a resent copy of that request succeeds with a `null` payload.
-- A change to an array that is not an append sends the whole array to members, so keep large arrays append-only where you can.
+- A change to an array is sent compactly when it is at the ends: items added or removed at the start or the end (push, pop, shift, unshift, alone or together, such as a log that drops its oldest entry when it gains a new one). Any other change to an array, such as editing, inserting or removing an item in the middle or sorting, sends more of the array to members, up to all of it. So for large lists that change in the middle, prefer an object keyed by id.

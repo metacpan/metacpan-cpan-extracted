@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.81 {
+package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.82 {
 
-  use 5.022;
+  use 5.024;
   use Moose;
   use namespace::autoclean;
   use Perl::Tidy ();
@@ -281,7 +281,7 @@ Dist::Zilla::Plugin::Author::Plicease::MakeMaker - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.81
+version 2.82
 
 =head1 SYNOPSIS
 

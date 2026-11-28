@@ -51,7 +51,7 @@
 <div id="tablesbuts" class="ui-widget-content ui-corner-all">
     % for my $table1 (@$tablist) {
         % my $tinfo1 = $bytable->{$table1};
-        % my $url    = url_for('/tables')->query(start_with=>$table1);
+        % my $url    = url_for('tables')->query(start_with=>$table1);
         %= link_to $tinfo1->{label} => $url => (class=>"button")
     % }
 </div>
@@ -81,7 +81,7 @@
                         %= label_for $column => "* $label", title => "$column -> $ptable.$fkey"
                         %= t span => (id=>$column, class=>"data") => begin
                             % if (defined $id) {
-                                % my $url = url_for("/tables/$ptable/$id/view");
+                                % my $url = url_for('tables') . "/$ptable/$id/view";
                                 %= link_to $row->present($column, $cinfo) => $url
                             % } else {
                                 &nbsp;
@@ -96,7 +96,7 @@
                         %= t span => (id=>$column, class=>"data") => ($val||'')
                         %= t span => (id=>$parent, class=>"data") => begin
                             % if (defined $val) {
-                                % my $url = url_for("/tables/$ptable/$val/view");
+                                % my $url = url_for('tables') . "/$ptable/$val/view";
                                 %= link_to $row->present($parent, $pinfo) => $url
                             % } else {
                                 &nbsp;
@@ -118,7 +118,9 @@
             % my $cfkey  = $ginfo->{cfkey};
             %= t fieldset => begin
                 %= t legend => "Add to $ginfo->{label} of $row"
-                % my $save_url = url_for("/tables/$ctable/save")->query(redirect_to=>"/tables/$table/$id/view");
+                % my $redirect_str = url_for('tables') . "/$table/$id/view";
+                % my $save_url_str = url_for('tables') . "/$ctable/save";
+                % my $save_url     = Mojo::URL->new($save_url_str)->query(redirect_to=>$redirect_str);
                 %= form_for $save_url => (method=>'post') => begin
                     %= $save_buts->();
                     %= include 'tables/dml', ptable=>$table, table=>$ctable, dml_mode=>'add', parent_id=>$id, cfkey=>$cfkey, child=>$child
@@ -150,7 +152,7 @@
                                     % my $ckey = $child->compound_ids;
                                     %= t tr => begin
                                         %= t td => begin
-                                            %= link_to $child => url_for("/tables/$ctable/$ckey/view")
+                                            %= link_to $child => ( url_for('tables') . "/$ctable/$ckey/view" )
                                         % end
                                     % end
                                 % }

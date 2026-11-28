@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use File::Spec;
 use File::Temp 'tempdir';
 use Scalar::Util 'refaddr';
-use Stats::LikeR;
+use Stats::LikeR qw(:all);
 use Test::More;
 
 # Imported at compile time for no_leaks_ok's (&;$) prototype, as t/tied.frames.t

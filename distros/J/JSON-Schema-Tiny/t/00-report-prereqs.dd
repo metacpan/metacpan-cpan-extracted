@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.172',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.174',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -33,7 +33,6 @@ do { my $x = {
                       'requires' => {
                                       'Feature::Compat::Try' => '0',
                                       'Mojolicious' => '7.23',
-                                      'autovivification' => '0',
                                       'builtin::compat' => '0.003003',
                                       'experimental' => '0.026',
                                       'if' => '0',
@@ -104,6 +103,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::PodWeaver' => '4.008',
                                            'Dist::Zilla::Plugin::Prereqs' => '0',
                                            'Dist::Zilla::Plugin::Prereqs::AuthorDeps' => '0.006',
+                                           'Dist::Zilla::Plugin::Prereqs::Soften' => '0',
                                            'Dist::Zilla::Plugin::PromptIfStale' => '0',
                                            'Dist::Zilla::Plugin::Readme' => '0',
                                            'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.142180',

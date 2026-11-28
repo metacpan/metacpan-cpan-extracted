@@ -1,28 +1,150 @@
 ---
-abstract: "All about Japanese battle heroine \"Pretty Cure\""
+abstract: 'All about Japanese battle heroine "Pretty Cure"'
 author:
   - 'Kan Fushihara <kan.fushihara at gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  Test2::V0: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.00'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.3.2, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Acme-PrettyCure
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::PrettyCure:
+    file: lib/Acme/PrettyCure.pm
+    version: v1.0.0
+  Acme::PrettyCure::Girl::CureAce:
+    file: lib/Acme/PrettyCure/Girl/CureAce.pm
+  Acme::PrettyCure::Girl::CureAqua:
+    file: lib/Acme/PrettyCure/Girl/CureAqua.pm
+  Acme::PrettyCure::Girl::CureBeat:
+    file: lib/Acme/PrettyCure/Girl/CureBeat.pm
+  Acme::PrettyCure::Girl::CureBeauty:
+    file: lib/Acme/PrettyCure/Girl/CureBeauty.pm
+  Acme::PrettyCure::Girl::CureBerry:
+    file: lib/Acme/PrettyCure/Girl/CureBerry.pm
+  Acme::PrettyCure::Girl::CureBlack:
+    file: lib/Acme/PrettyCure/Girl/CureBlack.pm
+  Acme::PrettyCure::Girl::CureBlackMH:
+    file: lib/Acme/PrettyCure/Girl/CureBlackMH.pm
+  Acme::PrettyCure::Girl::CureBloom:
+    file: lib/Acme/PrettyCure/Girl/CureBloom.pm
+  Acme::PrettyCure::Girl::CureBlossom:
+    file: lib/Acme/PrettyCure/Girl/CureBlossom.pm
+  Acme::PrettyCure::Girl::CureBright:
+    file: lib/Acme/PrettyCure/Girl/CureBright.pm
+  Acme::PrettyCure::Girl::CureDiamond:
+    file: lib/Acme/PrettyCure/Girl/CureDiamond.pm
+  Acme::PrettyCure::Girl::CureDream:
+    file: lib/Acme/PrettyCure/Girl/CureDream.pm
+  Acme::PrettyCure::Girl::CureEcho:
+    file: lib/Acme/PrettyCure/Girl/CureEcho.pm
+  Acme::PrettyCure::Girl::CureEgret:
+    file: lib/Acme/PrettyCure/Girl/CureEgret.pm
+  Acme::PrettyCure::Girl::CureFlower:
+    file: lib/Acme/PrettyCure/Girl/CureFlower.pm
+  Acme::PrettyCure::Girl::CureHappy:
+    file: lib/Acme/PrettyCure/Girl/CureHappy.pm
+  Acme::PrettyCure::Girl::CureHeart:
+    file: lib/Acme/PrettyCure/Girl/CureHeart.pm
+  Acme::PrettyCure::Girl::CureLemonade:
+    file: lib/Acme/PrettyCure/Girl/CureLemonade.pm
+  Acme::PrettyCure::Girl::CureMarch:
+    file: lib/Acme/PrettyCure/Girl/CureMarch.pm
+  Acme::PrettyCure::Girl::CureMarine:
+    file: lib/Acme/PrettyCure/Girl/CureMarine.pm
+  Acme::PrettyCure::Girl::CureMelody:
+    file: lib/Acme/PrettyCure/Girl/CureMelody.pm
+  Acme::PrettyCure::Girl::CureMint:
+    file: lib/Acme/PrettyCure/Girl/CureMint.pm
+  Acme::PrettyCure::Girl::CureMoonlight:
+    file: lib/Acme/PrettyCure/Girl/CureMoonlight.pm
+  Acme::PrettyCure::Girl::CureMuse:
+    file: lib/Acme/PrettyCure/Girl/CureMuse.pm
+  Acme::PrettyCure::Girl::CurePassion:
+    file: lib/Acme/PrettyCure/Girl/CurePassion.pm
+  Acme::PrettyCure::Girl::CurePeace:
+    file: lib/Acme/PrettyCure/Girl/CurePeace.pm
+  Acme::PrettyCure::Girl::CurePeach:
+    file: lib/Acme/PrettyCure/Girl/CurePeach.pm
+  Acme::PrettyCure::Girl::CurePine:
+    file: lib/Acme/PrettyCure/Girl/CurePine.pm
+  Acme::PrettyCure::Girl::CureRhythm:
+    file: lib/Acme/PrettyCure/Girl/CureRhythm.pm
+  Acme::PrettyCure::Girl::CureRosetta:
+    file: lib/Acme/PrettyCure/Girl/CureRosetta.pm
+  Acme::PrettyCure::Girl::CureRouge:
+    file: lib/Acme/PrettyCure/Girl/CureRouge.pm
+  Acme::PrettyCure::Girl::CureSunny:
+    file: lib/Acme/PrettyCure/Girl/CureSunny.pm
+  Acme::PrettyCure::Girl::CureSunshine:
+    file: lib/Acme/PrettyCure/Girl/CureSunshine.pm
+  Acme::PrettyCure::Girl::CureSword:
+    file: lib/Acme/PrettyCure/Girl/CureSword.pm
+  Acme::PrettyCure::Girl::CureWhite:
+    file: lib/Acme/PrettyCure/Girl/CureWhite.pm
+  Acme::PrettyCure::Girl::CureWhiteMH:
+    file: lib/Acme/PrettyCure/Girl/CureWhiteMH.pm
+  Acme::PrettyCure::Girl::CureWindy:
+    file: lib/Acme/PrettyCure/Girl/CureWindy.pm
+  Acme::PrettyCure::Girl::MilkyRose:
+    file: lib/Acme/PrettyCure/Girl/MilkyRose.pm
+  Acme::PrettyCure::Girl::Role:
+    file: lib/Acme/PrettyCure/Girl/Role.pm
+  Acme::PrettyCure::Girl::Role::DokiDoki:
+    file: lib/Acme/PrettyCure/Girl/Role/DokiDoki.pm
+  Acme::PrettyCure::Girl::Role::Five:
+    file: lib/Acme/PrettyCure/Girl/Role/Five.pm
+  Acme::PrettyCure::Girl::Role::Fresh:
+    file: lib/Acme/PrettyCure/Girl/Role/Fresh.pm
+  Acme::PrettyCure::Girl::Role::Futari:
+    file: lib/Acme/PrettyCure/Girl/Role/Futari.pm
+  Acme::PrettyCure::Girl::Role::HeartCatch:
+    file: lib/Acme/PrettyCure/Girl/Role/HeartCatch.pm
+  Acme::PrettyCure::Girl::Role::Smile:
+    file: lib/Acme/PrettyCure/Girl/Role/Smile.pm
+  Acme::PrettyCure::Girl::Role::Suite:
+    file: lib/Acme/PrettyCure/Girl/Role/Suite.pm
+  Acme::PrettyCure::Girl::ShinyLuminous:
+    file: lib/Acme/PrettyCure/Girl/ShinyLuminous.pm
 requires:
-  Any::Moose: 0
-  Time::Piece: 0
-  perl: 5.10.0
+  Cache::LRU: '0'
+  Furl: '0'
+  Imager: '0'
+  List::MoreUtils: '0'
+  Math::Random::MT: '0'
+  Moo: '0'
+  Net::DNS::Lite: '0'
+  Time::Piece: '0'
+  UNIVERSAL::require: '0'
+  perl: '5.010001'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/kan/p5-acme-prettycure.git
-version: 0.02
+  bugtracker: https://github.com/kan/p5-acme-prettycure/issues
+  homepage: https://github.com/kan/p5-acme-prettycure
+  repository: https://github.com/kan/p5-acme-prettycure.git
+version: 1.0.0
+x_contributors:
+  - 'Claude <noreply@anthropic.com>'
+  - 'Kan Fushihara <kan.fushihara@gmail.com>'
+  - 'Kan Fushihara <kan@mfac.jp>'
+  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

@@ -7,7 +7,7 @@ use experimental 'class';
 # leaves the channel when the last of them has left. For internal use; a
 # port of the Membership class of the JavaScript client.
 class BoardStreams::Client::Membership {
-    our $VERSION = "v0.0.58";
+    our $VERSION = "v0.0.60";
 
     use Mojo::Util qw(generate_secret);
     use RxPerl::Mojo qw(rx_behavior_subject rx_replay_subject rx_subject);
